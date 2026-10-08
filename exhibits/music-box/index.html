@@ -1,0 +1,1066 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Thirty-Note Music Box</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Archivo:wght@400;500;600&display=swap">
+<style>
+:root {
+  /* Layout: a lid label and an introduction above, the open box with its strip of card full width, the crank and controls below it, and a note on the comb at the end. */
+  --ground: #e5e9e3;
+  --ground-2: #d7ddd4;
+  --text: #1b2622;
+  --muted: #54615b;
+  --line: rgba(27, 38, 34, 0.15);
+  --line-strong: rgba(27, 38, 34, 0.34);
+  --accent: #8a2c38;
+  --accent-ink: #fff6f0;
+  /* Objects keep their own colors in every theme. */
+  --velvet: #1c382f;
+  --paper: #f2ead6;
+  --paper-ink: #2a2118;
+  --paper-muted: #6b5d4d;
+  --label-red: #8a2c38;
+  --f-display: "Bodoni Moda", "Didot", "Bodoni 72", "Times New Roman", serif;
+  --f-body: "Archivo", "Helvetica Neue", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0f1714;
+    --ground-2: #19241f;
+    --text: #e9e5d9;
+    --muted: #9ba79f;
+    --line: rgba(233, 229, 217, 0.13);
+    --line-strong: rgba(233, 229, 217, 0.3);
+    --accent: #e08893;
+    --accent-ink: #1b0e11;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #0f1714;
+  --ground-2: #19241f;
+  --text: #e9e5d9;
+  --muted: #9ba79f;
+  --line: rgba(233, 229, 217, 0.13);
+  --line-strong: rgba(233, 229, 217, 0.3);
+  --accent: #e08893;
+  --accent-ink: #1b0e11;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--f-body);
+  font-size: 15.5px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.page {
+  box-sizing: border-box;
+  max-width: 1320px;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 3vw, 40px);
+  padding-block: 34px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+/* ---------- Top: introduction and lid label ---------- */
+.top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 350px); gap: 26px 52px; align-items: end; }
+.eyebrow { margin: 0; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+h1 {
+  margin: 8px 0 14px;
+  font-family: var(--f-display);
+  font-weight: 500;
+  font-size: clamp(2.2rem, 4vw, 3.3rem);
+  line-height: 1.02;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+}
+h1 em { font-weight: 400; }
+.lede { margin: 0; max-width: 60ch; color: var(--muted); font-size: 1.04rem; }
+
+.card {
+  position: relative;
+  padding: 16px 22px 10px;
+  background: var(--paper);
+  color: var(--paper-ink);
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16), 0 16px 32px -20px rgba(0, 0, 0, 0.5);
+}
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border: 1.5px solid rgba(42, 33, 24, 0.6);
+  outline: 1px solid rgba(42, 33, 24, 0.4);
+  outline-offset: -5px;
+  pointer-events: none;
+}
+.card h2 {
+  margin: 0 0 6px;
+  text-align: center;
+  font-family: var(--f-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.55rem;
+  line-height: 1.1;
+}
+.card .sub { margin: 0 0 8px; text-align: center; font-size: 0.74rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--paper-muted); }
+.airs { list-style: none; margin: 0; padding: 0; position: relative; }
+.air-btn {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 3.1em minmax(0, 1fr);
+  column-gap: 8px;
+  padding: 7px 6px 8px;
+  border: 0;
+  border-top: 1px dotted rgba(42, 33, 24, 0.4);
+  background: none;
+  color: var(--paper-ink);
+  text-align: left;
+}
+.air-btn:hover { background: rgba(138, 44, 56, 0.06); }
+.air-btn:focus-visible { outline-color: var(--label-red); outline-offset: -2px; }
+.air-btn .no { grid-row: span 2; align-self: center; font-family: var(--f-display); font-style: italic; font-size: 0.98rem; color: var(--paper-muted); }
+.air-btn .air { font-family: var(--f-display); font-size: 1.16rem; line-height: 1.2; }
+.air-btn .by { font-size: 0.8rem; color: var(--paper-muted); }
+.air-btn[aria-current="true"] { background: rgba(138, 44, 56, 0.08); }
+.air-btn[aria-current="true"] .no { color: var(--label-red); }
+
+/* ---------- The machine ---------- */
+.machine {
+  position: relative;
+  height: var(--mh, 480px);
+  border-radius: 10px;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 30% 20%, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0) 60%),
+    var(--velvet);
+  box-shadow: inset 0 2px 16px rgba(0, 0, 0, 0.55), 0 20px 44px -26px rgba(0, 0, 0, 0.7);
+}
+.scroller {
+  position: absolute;
+  inset: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(242, 234, 214, 0.4) transparent;
+  touch-action: pan-x;
+}
+.track { display: flex; height: 100%; }
+#strip { flex: none; display: block; cursor: crosshair; }
+#strip:focus-visible { outline: 2px solid var(--paper); outline-offset: -4px; }
+#strip.panning { cursor: grabbing; }
+.spacer { flex: none; }
+.box { position: absolute; left: 0; top: 0; z-index: 2; display: block; }
+.box .crank-hit { cursor: grab; }
+
+/* ---------- Deck: crank and controls ---------- */
+.deck { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 24px; }
+.crank-wrap { display: flex; align-items: center; gap: 12px; }
+#crank { width: 78px; height: 78px; display: block; cursor: grab; touch-action: none; }
+#crank.turning, .box.turning .crank-hit { cursor: grabbing; }
+.crank-label { display: flex; flex-direction: column; line-height: 1.25; }
+.crank-label b { font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: 1.2rem; }
+.crank-label span { font-size: 0.84rem; color: var(--muted); }
+.buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn {
+  padding: 8px 16px 9px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: none;
+  font-weight: 500;
+  transition: background-color 0.15s, border-color 0.15s, opacity 0.15s;
+}
+.btn:hover { background: var(--ground-2); }
+.btn.primary { min-width: 6.4em; background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { background: var(--accent); opacity: 0.88; }
+.btn.armed { border-color: var(--accent); color: var(--accent); }
+.tempo { display: flex; align-items: center; gap: 10px; }
+.tempo label, .loop { font-weight: 500; }
+.tempo input { width: 150px; accent-color: var(--accent); }
+.tempo output { min-width: 6.6em; color: var(--muted); font-variant-numeric: tabular-nums; }
+.loop { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.loop input { width: 18px; height: 18px; margin: 0; accent-color: var(--accent); }
+.status { margin: -8px 0 0; color: var(--muted); min-height: 1.55em; }
+.status em { font-family: var(--f-display); font-size: 1.08em; color: var(--text); }
+
+/* ---------- The comb ---------- */
+.comb { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 18px 52px; padding-top: 22px; border-top: 1px solid var(--line); }
+.comb h2 { margin: 0 0 8px; font-family: var(--f-display); font-weight: 500; font-size: 1.7rem; line-height: 1.1; }
+.comb p { margin: 0; max-width: 58ch; color: var(--muted); }
+.scale { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; align-content: start; }
+.scale button {
+  min-width: 3em;
+  padding: 4px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  background: none;
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
+}
+.scale button:hover { background: var(--ground-2); border-color: var(--text); }
+.scale button.sharp { color: var(--muted); }
+
+@media (max-width: 820px) {
+  .top { grid-template-columns: minmax(0, 1fr); }
+  .comb { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn { transition: none; }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="music-box" defer></script>
+</head>
+<body>
+<div class="page">
+  <div class="top">
+    <header>
+      <p class="eyebrow">Paper-strip music box</p>
+      <h1>Thirty notes, <em>one strip of card</em></h1>
+      <p class="lede">A steel comb of thirty tuned teeth, and a strip of card that feeds past it. Each hole lifts one tooth and lets it ring. Click the strip to punch a hole or patch one, then turn the crank.</p>
+    </header>
+    <aside class="card" aria-labelledby="card-title">
+      <h2 id="card-title">Airs</h2>
+      <p class="sub">Strips for this movement</p>
+      <ol class="airs" id="airs"></ol>
+    </aside>
+  </div>
+
+  <section class="machine" id="machine" aria-label="The music box and its paper strip">
+    <div class="scroller" id="scroller">
+      <div class="track">
+        <svg id="strip" tabindex="0" role="group" aria-label="Paper strip. Arrow keys move along it, Enter punches or patches a hole."></svg>
+        <div class="spacer" id="spacer"></div>
+      </div>
+    </div>
+    <svg class="box" id="box" aria-hidden="true"></svg>
+  </section>
+
+  <div class="deck">
+    <div class="crank-wrap">
+      <svg id="crank" viewBox="-40 -40 80 80" role="slider" tabindex="0" aria-label="Crank. Turn clockwise to feed the strip. Right arrow turns it one step."></svg>
+      <div class="crank-label"><b>Turn the crank</b><span>clockwise, at your own pace</span></div>
+    </div>
+    <div class="buttons">
+      <button type="button" class="btn primary" id="play">Play</button>
+      <button type="button" class="btn" id="rewind">Rewind</button>
+    </div>
+    <div class="tempo">
+      <label for="tempo">Tempo</label>
+      <input type="range" id="tempo" min="40" max="160" step="1" value="84">
+      <output id="tempo-out" for="tempo">84 a minute</output>
+    </div>
+    <label class="loop"><input type="checkbox" id="loop" checked> Glue the ends into a loop</label>
+    <button type="button" class="btn" id="clear">Clear strip</button>
+  </div>
+  <p class="status" id="status" aria-live="polite"></p>
+
+  <section class="comb" aria-labelledby="comb-title">
+    <div>
+      <h2 id="comb-title">The comb</h2>
+      <p>Thirty teeth, from C3 at the long bass end to E6. The comb leaves out notes tunes rarely ask for, like E3 and F3, and adds sharps in the middle octaves where melodies live. Lead weights under the lowest teeth slow them down to pitch. Click a note to hear its tooth.</p>
+    </div>
+    <ul class="scale" id="scale"></ul>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const $ = (id) => document.getElementById(id);
+  const mod = (a, n) => ((a % n) + n) % n;
+  const wrap180 = (a) => mod(a + 180, 360) - 180;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ================================================================
+     The comb: a standard thirty-note movement.
+     ================================================================ */
+  const NAMES = ['C3', 'D3', 'G3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F4', 'F#4', 'G4', 'A4', 'A#4', 'B4',
+    'C5', 'C#5', 'D5', 'D#5', 'E5', 'F5', 'F#5', 'G5', 'G#5', 'A5', 'A#5', 'B5', 'C6', 'C#6', 'D6', 'E6'];
+  const PC = { C: 0, 'C#': 1, D: 2, 'D#': 3, E: 4, F: 5, 'F#': 6, G: 7, 'G#': 8, A: 9, 'A#': 10, B: 11 };
+  const NOTES = NAMES.map((n) => {
+    const m = n.match(/^([A-G]#?)(\d)$/);
+    return { name: n, midi: 12 * (Number(m[2]) + 1) + PC[m[1]] };
+  });
+  const IDX = Object.fromEntries(NAMES.map((n, i) => [n, i]));
+  const N = NAMES.length, COLS = 192, STEPS_PER_TURN = 4;
+  const grid = new Uint8Array(COLS * N);
+
+  /* ================================================================
+     Airs. Steps are eighth notes; a quarter note is two steps.
+     ================================================================ */
+  function seq(list, start, map) {
+    const ev = [];
+    let c = start;
+    for (const [n, d] of list) { ev.push([c, map ? map(n) : n]); c += d; }
+    return ev;
+  }
+  const CHORDS = {
+    C: ['C3', ['E4', 'G4']], F: ['A3', ['C4', 'F4']], G: ['G3', ['B3', 'D4']], G7: ['G3', ['D4', 'F4']],
+  };
+  const BRAHMS = [
+    ['E5', 1], ['E5', 1],
+    ['G5', 3], ['E5', 1], ['E5', 2], ['G5', 4], ['E5', 1], ['G5', 1],
+    ['C6', 2], ['B5', 3], ['A5', 1], ['A5', 2], ['G5', 2], ['D5', 1], ['E5', 1],
+    ['F5', 2], ['D5', 2], ['D5', 1], ['E5', 1], ['F5', 4], ['D5', 1], ['F5', 1],
+    ['B5', 1], ['A5', 1], ['G5', 2], ['B5', 2], ['C6', 4], ['C5', 1], ['C5', 1],
+    ['C6', 4], ['A5', 1], ['F5', 1], ['G5', 4], ['E5', 1], ['C5', 1],
+    ['F5', 2], ['G5', 2], ['A5', 2], ['G5', 4], ['C5', 1], ['C5', 1],
+    ['C6', 4], ['A5', 1], ['F5', 1], ['G5', 4], ['E5', 1], ['C5', 1],
+    ['F5', 2], ['E5', 2], ['D5', 2], ['C5', 6],
+  ];
+  const ODE = [
+    ['E5', 2], ['E5', 2], ['F5', 2], ['G5', 2], ['G5', 2], ['F5', 2], ['E5', 2], ['D5', 2],
+    ['C5', 2], ['C5', 2], ['D5', 2], ['E5', 2], ['E5', 3], ['D5', 1], ['D5', 4],
+    ['E5', 2], ['E5', 2], ['F5', 2], ['G5', 2], ['G5', 2], ['F5', 2], ['E5', 2], ['D5', 2],
+    ['C5', 2], ['C5', 2], ['D5', 2], ['E5', 2], ['D5', 3], ['C5', 1], ['C5', 4],
+    ['D5', 2], ['D5', 2], ['E5', 2], ['C5', 2], ['D5', 2], ['E5', 1], ['F5', 1], ['E5', 2], ['C5', 2],
+    ['D5', 2], ['E5', 1], ['F5', 1], ['E5', 2], ['D5', 2], ['C5', 2], ['D5', 2], ['G4', 4],
+    ['E5', 2], ['E5', 2], ['F5', 2], ['G5', 2], ['G5', 2], ['F5', 2], ['E5', 2], ['D5', 2],
+    ['C5', 2], ['C5', 2], ['D5', 2], ['E5', 2], ['D5', 3], ['C5', 1], ['C5', 4],
+  ];
+  const FRERE = [
+    ['C', 2], ['D', 2], ['E', 2], ['C', 2], ['C', 2], ['D', 2], ['E', 2], ['C', 2],
+    ['E', 2], ['F', 2], ['G', 4], ['E', 2], ['F', 2], ['G', 4],
+    ['G', 1], ['A', 1], ['G', 1], ['F', 1], ['E', 2], ['C', 2], ['G', 1], ['A', 1], ['G', 1], ['F', 1], ['E', 2], ['C', 2],
+    ['C', 2], ['g', 2], ['C', 4], ['C', 2], ['g', 2], ['C', 4],
+  ];
+  function accompany(ev, harmony, first, bar, final) {
+    harmony.forEach((h, k) => {
+      const b = first + bar * k;
+      const parts = h.split('|');
+      if (k === harmony.length - 1 && final) {
+        for (const n of ['C3', 'C4', 'E4', 'G4']) ev.push([b, n]);
+        return;
+      }
+      parts.forEach((p, j) => {
+        const [bass, ch] = CHORDS[p];
+        const span = bar / parts.length, o = b + j * span;
+        ev.push([o, bass]);
+        for (let s = 2; s < span; s += 2) for (const n of ch) ev.push([o + s, n]);
+      });
+    });
+    return ev;
+  }
+  const AIRS = [
+    {
+      key: 'brahms', no: 'No. 1', title: 'Wiegenlied', by: 'Johannes Brahms, 1868', bpm: 84, bar: 6, barStart: 4, L: 100,
+      build: () => accompany(seq(BRAHMS, 2), ['C', 'C', 'F', 'C', 'G7', 'G7', 'G7', 'C', 'F', 'C', 'F', 'C', 'F', 'C', 'G7', 'C'], 4, 6, true),
+    },
+    {
+      key: 'ode', no: 'No. 2', title: 'An die Freude', by: 'Ludwig van Beethoven, 1824', bpm: 104, bar: 8, barStart: 2, L: 130,
+      build: () => accompany(seq(ODE, 2), ['C', 'G', 'C', 'G', 'C', 'G', 'C', 'G|C', 'G', 'G', 'G', 'C|G', 'C', 'G', 'C', 'G|C'], 2, 8, false),
+    },
+    {
+      key: 'frere', no: 'No. 3', title: 'Frère Jacques', by: 'Traditional, a round in three voices', bpm: 108, bar: 8, barStart: 2, L: 98,
+      build: () => {
+        const hi = (n) => (n === 'g' ? 'G4' : `${n}5`);
+        const lo = (n) => (n === 'g' ? 'G3' : `${n}4`);
+        return [...seq(FRERE, 2, hi), ...seq(FRERE, 18, lo), ...seq(FRERE, 34, hi)];
+      },
+    },
+    { key: 'blank', no: 'No. 4', title: 'A blank strip', by: 'Punch your own', bpm: 96, bar: 8, barStart: 2, L: 64, build: () => [] },
+  ];
+
+  /* ================================================================
+     Sound: a plucked steel tooth, synthesized.
+     ================================================================ */
+  let ac = null, master = null, noiseBuf = null;
+  function audio() {
+    if (ac) {
+      if (ac.state === 'suspended') ac.resume();
+      return ac;
+    }
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    ac = new AC();
+    const comp = ac.createDynamicsCompressor();
+    comp.threshold.value = -16; comp.knee.value = 12; comp.ratio.value = 3.5; comp.attack.value = 0.004; comp.release.value = 0.25;
+    master = ac.createGain();
+    master.gain.value = 0.55;
+    master.connect(comp);
+    comp.connect(ac.destination);
+    // The box itself: a short, woody reverb.
+    const len = Math.floor(ac.sampleRate * 1.7);
+    const ir = ac.createBuffer(2, len, ac.sampleRate);
+    for (let ch = 0; ch < 2; ch++) {
+      const d = ir.getChannelData(ch);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3.2);
+    }
+    const verb = ac.createConvolver();
+    verb.buffer = ir;
+    const tone = ac.createBiquadFilter();
+    tone.type = 'lowpass'; tone.frequency.value = 4200;
+    const wet = ac.createGain();
+    wet.gain.value = 0.24;
+    master.connect(verb); verb.connect(tone); tone.connect(wet); wet.connect(comp);
+    noiseBuf = ac.createBuffer(1, Math.floor(ac.sampleRate * 0.03), ac.sampleRate);
+    const nd = noiseBuf.getChannelData(0);
+    for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+    return ac;
+  }
+  function pluck(midi, when, vel) {
+    if (!ac) return;
+    const f = 440 * Math.pow(2, (midi - 69) / 12);
+    const T = Math.min(4.4, Math.max(1.1, 3 * Math.sqrt(523 / f)));
+    const out = ac.createGain();
+    out.gain.value = 0.2 * (vel || 1) * Math.pow(f / 523, -0.18);
+    out.connect(master);
+    // Steel cantilever: the fundamental, a slow beat, and two thin, quickly dying overtones.
+    const partials = [[1, 1, T], [1.0021, 0.32, T * 0.85], [6.27, 0.1, T * 0.1], [17.55, 0.025, 0.07]];
+    for (const [ratio, g, dec] of partials) {
+      const fr = f * ratio;
+      if (fr > 15000) continue;
+      const o = ac.createOscillator();
+      o.frequency.value = fr;
+      const env = ac.createGain();
+      env.gain.setValueAtTime(0, when);
+      env.gain.linearRampToValueAtTime(g, when + 0.003);
+      env.gain.exponentialRampToValueAtTime(0.0001, when + dec);
+      o.connect(env); env.connect(out);
+      o.start(when); o.stop(when + dec + 0.05);
+    }
+    const click = ac.createBufferSource();
+    click.buffer = noiseBuf;
+    const bp = ac.createBiquadFilter();
+    bp.type = 'bandpass'; bp.frequency.value = Math.min(9000, f * 4); bp.Q.value = 2.5;
+    const cg = ac.createGain();
+    cg.gain.setValueAtTime(0.05, when);
+    cg.gain.exponentialRampToValueAtTime(0.0001, when + 0.025);
+    click.connect(bp); bp.connect(cg); cg.connect(out);
+    click.start(when);
+  }
+
+  /* ================================================================
+     Geometry
+     ================================================================ */
+  let cw, rh, BW, PAD, M, MH, padLeft, small;
+  function sizes() {
+    small = window.innerWidth < 640;
+    cw = small ? 18 : 24;
+    rh = small ? 11 : 13;
+    BW = small ? 104 : 200;
+    PAD = small ? 12 : 18;
+    M = small ? 9 : 12;
+    MH = 2 * PAD + 2 * M + N * rh;
+    padLeft = BW - 3;
+  }
+  const rowY = (i) => PAD + M + (N - 1 - i + 0.5) * rh;
+  const colX = (c) => padLeft + c * cw;
+
+  const state = { air: AIRS[0], L: 100, bar: 6, barStart: 4, bpm: 84, pos: 0, playing: false, loop: true };
+  const sps = () => (state.bpm * 2) / 60;
+
+  /* ---------- Strip ---------- */
+  const machine = $('machine'), scroller = $('scroller'), strip = $('strip'), spacer = $('spacer'), box = $('box');
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  let holesG, ghost, chadsG, loopMark, holeEls = new Map();
+  const holeR = () => Math.min(cw, rh) * 0.36;
+
+  function buildStrip() {
+    const width = colX(COLS - 1) + cw * 2;
+    strip.setAttribute('width', width);
+    strip.setAttribute('height', MH);
+    strip.setAttribute('viewBox', `0 0 ${width} ${MH}`);
+    const x0 = padLeft - cw * 2, x1 = colX(COLS - 1) + cw * 1.5, y0 = PAD, y1 = MH - PAD;
+    let s = '';
+    s += `<rect x="${x0 + 2}" y="${y0 + 3}" width="${x1 - x0}" height="${y1 - y0}" fill="rgba(0,0,0,.28)"/>`;
+    s += `<rect x="${x0}" y="${y0}" width="${x1 - x0}" height="${y1 - y0}" fill="#f2ead6"/>`;
+    let thin = '', bars = '';
+    for (let c = 0; c < COLS; c++) {
+      const x = colX(c);
+      const isBar = c >= state.barStart && (c - state.barStart) % state.bar === 0;
+      if (isBar) bars += `M${x} ${y0 + M - 4}V${y1 - M + 4}`;
+      else thin += `M${x} ${y0 + M}V${y1 - M}`;
+    }
+    s += `<path d="${thin}" stroke="#d7c8a6" stroke-width="0.6" fill="none"/>`;
+    s += `<path d="${bars}" stroke="#a8916a" stroke-width="1" fill="none"/>`;
+    let lines = '', cLines = '';
+    for (let i = 0; i < N; i++) {
+      const y = rowY(i);
+      if (NAMES[i][0] === 'C' && NAMES[i][1] !== '#') cLines += `M${x0 + 6} ${y}H${x1 - 4}`;
+      else lines += `M${x0 + 6} ${y}H${x1 - 4}`;
+    }
+    s += `<path d="${lines}" stroke="#b9a582" stroke-width="0.7" fill="none"/>`;
+    s += `<path d="${cLines}" stroke="#7d6a4c" stroke-width="1.1" fill="none"/>`;
+    // Bar numbers along the top margin, note names printed every so often.
+    let t = '';
+    const fs = small ? 7 : 8.5;
+    for (let c = state.barStart, b = 1; c < COLS; c += state.bar, b++) {
+      t += `<text x="${colX(c) + 3}" y="${y0 + M - 3}" font-size="${fs}" fill="#8f7b5a">${b}</text>`;
+    }
+    for (let c = 8; c < COLS; c += 32) {
+      for (let i = 0; i < N; i++) {
+        t += `<text x="${colX(c) + cw / 2}" y="${rowY(i) + fs * 0.36}" font-size="${fs - 1}" text-anchor="middle" fill="#9c8762">${NAMES[i]}</text>`;
+      }
+    }
+    s += `<g font-family="Archivo, system-ui, sans-serif">${t}</g>`;
+    s += `<g id="loopmark"><path stroke="#8a2c38" stroke-width="1.2" stroke-dasharray="4 3" fill="none"/><text font-size="${fs + 1}" fill="#8a2c38" font-family="Archivo, system-ui, sans-serif" font-weight="600"></text></g>`;
+    s += '<g id="holes"></g><g id="chads"></g>';
+    s += `<circle id="ghost" r="${holeR() + 1.5}" fill="none" stroke="#8a2c38" stroke-width="1.4" stroke-dasharray="2.5 2" opacity="0"/>`;
+    strip.innerHTML = s;
+    holesG = $('holes');
+    chadsG = $('chads');
+    ghost = $('ghost');
+    loopMark = $('loopmark');
+    renderHoles();
+    placeLoopMark();
+  }
+  function makeHole(c, i) {
+    const el = document.createElementNS(SVGNS, 'circle');
+    el.setAttribute('cx', colX(c));
+    el.setAttribute('cy', rowY(i));
+    el.setAttribute('r', holeR());
+    el.setAttribute('fill', '#183229');
+    el.setAttribute('stroke', 'rgba(60,40,20,.45)');
+    el.setAttribute('stroke-width', '0.8');
+    return el;
+  }
+  function renderHoles() {
+    holesG.textContent = '';
+    holeEls = new Map();
+    for (let c = 0; c < COLS; c++) {
+      for (let i = 0; i < N; i++) {
+        if (!grid[c * N + i]) continue;
+        const el = makeHole(c, i);
+        holesG.append(el);
+        holeEls.set(c * N + i, el);
+      }
+    }
+  }
+  function placeLoopMark() {
+    const x = colX(state.L) - cw / 2;
+    const path = loopMark.querySelector('path'), text = loopMark.querySelector('text');
+    path.setAttribute('d', `M${x} ${PAD - 4}V${MH - PAD + 4}`);
+    text.setAttribute('x', x + 4);
+    text.setAttribute('y', MH - PAD - 4);
+    text.textContent = state.loop ? 'glued here' : 'end';
+  }
+
+  /* ---------- The box: wood, comb and crank ---------- */
+  let teeth = [], boxCrank = null;
+  function buildBox() {
+    box.setAttribute('width', BW);
+    box.setAttribute('height', MH);
+    box.setAttribute('viewBox', `0 0 ${BW} ${MH}`);
+    const baseX = small ? 6 : BW - 116, toothX = baseX + 24, tipX = BW - 2;
+    let s = `<defs>
+      <linearGradient id="wood" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#734a2e"/><stop offset=".55" stop-color="#55351f"/><stop offset="1" stop-color="#3b2414"/>
+      </linearGradient>
+      <linearGradient id="steel" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#eeede8"/><stop offset=".5" stop-color="#bebdb6"/><stop offset="1" stop-color="#8f8e88"/>
+      </linearGradient>
+      <linearGradient id="steel-base" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#9c9b94"/><stop offset=".4" stop-color="#dcdbd5"/><stop offset="1" stop-color="#a4a39c"/>
+      </linearGradient>
+      <radialGradient id="brass" cx="35%" cy="30%" r="75%">
+        <stop offset="0" stop-color="#f3d892"/><stop offset=".6" stop-color="#c9973f"/><stop offset="1" stop-color="#8d6223"/>
+      </radialGradient>
+    </defs>`;
+    s += `<rect x="0" y="0" width="${BW}" height="${MH}" fill="url(#wood)"/>`;
+    s += `<rect x="${BW - 1.5}" y="0" width="1.5" height="${MH}" fill="#24150b"/>`;
+    s += `<rect x="6" y="6" width="${BW - 13}" height="${MH - 12}" rx="3" fill="none" stroke="#c9a058" stroke-opacity=".55" stroke-width="1"/>`;
+    s += `<rect x="${baseX - 4}" y="${PAD - 6}" width="${tipX - baseX + 4}" height="${MH - 2 * PAD + 12}" rx="3" fill="#1a110a"/>`;
+    s += `<rect x="${baseX}" y="${PAD - 2}" width="26" height="${MH - 2 * PAD + 4}" rx="2" fill="url(#steel-base)" stroke="#5d5c57" stroke-width=".8"/>`;
+    for (const yy of [PAD + 14, MH / 2, MH - PAD - 14]) {
+      s += `<circle cx="${baseX + 13}" cy="${yy}" r="4.2" fill="#d9d8d1" stroke="#5d5c57" stroke-width=".8"/><path d="M${baseX + 10.4} ${yy}H${baseX + 15.6}" stroke="#5d5c57" stroke-width="1"/>`;
+    }
+    const th = rh * 0.56;
+    for (let i = 0; i < N; i++) {
+      const y = rowY(i);
+      s += `<rect class="tooth" data-i="${i}" x="${toothX}" y="${y - th / 2}" width="${tipX - toothX}" height="${th}" rx="${th / 2}" fill="url(#steel)" stroke="#6d6c66" stroke-width=".5"/>`;
+    }
+    // Lead weights under the bass teeth
+    for (let i = 0; i < 6; i++) {
+      const y = rowY(i);
+      s += `<ellipse cx="${toothX + (tipX - toothX) * 0.42}" cy="${y + th * 0.42}" rx="${Math.min(12, (tipX - toothX) * 0.18)}" ry="${th * 0.32}" fill="#575b62" stroke="#34373c" stroke-width=".6"/>`;
+    }
+    if (!small) {
+      const cx = 46, cy = MH / 2;
+      s += `<circle cx="${cx}" cy="${cy}" r="33" fill="#2b1a0e" opacity=".55"/>`;
+      s += `<g class="crank-hit"><circle cx="${cx}" cy="${cy}" r="40" fill="transparent"/>
+        <g id="box-crank">
+          <circle cx="${cx}" cy="${cy}" r="27" fill="url(#brass)" stroke="#5a3d14" stroke-width="1.2"/>
+          <circle cx="${cx}" cy="${cy}" r="19" fill="none" stroke="#5a3d14" stroke-opacity=".6" stroke-width=".8"/>
+          <path d="M${cx} ${cy}L${cx} ${cy - 24}" stroke="#5a3d14" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="${cx}" cy="${cy - 24}" r="6.5" fill="#3b2414" stroke="#1c1008" stroke-width="1"/>
+          <circle cx="${cx}" cy="${cy}" r="4" fill="#5a3d14"/>
+        </g></g>`;
+      s += `<text x="${cx}" y="${MH - PAD - 2}" text-anchor="middle" font-family="Bodoni Moda, Didot, serif" font-style="italic" font-size="13" fill="#d9b56d" fill-opacity=".8">No. 30</text>`;
+    }
+    box.innerHTML = s;
+    teeth = [...box.querySelectorAll('.tooth')].sort((a, b) => a.dataset.i - b.dataset.i);
+    boxCrank = $('box-crank');
+    const hit = box.querySelector('.crank-hit');
+    if (hit) attachCrank(hit, () => {
+      const r = hit.querySelector('circle').getBoundingClientRect();
+      return [r.left + r.width / 2, r.top + r.height / 2];
+    }, box);
+  }
+
+  /* ---------- Crank dial in the deck ---------- */
+  const crankDial = $('crank');
+  crankDial.innerHTML = `
+    <defs><radialGradient id="dial-brass" cx="35%" cy="30%" r="75%">
+      <stop offset="0" stop-color="#f3d892"/><stop offset=".6" stop-color="#c9973f"/><stop offset="1" stop-color="#8d6223"/>
+    </radialGradient></defs>
+    <circle r="37" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="2"/>
+    <path d="M27 -26A37 37 0 0 1 35 12" fill="none" stroke="currentColor" stroke-opacity=".5" stroke-width="1.6"/>
+    <path d="M35 12l-4.8-3.4M35 12l1.6-5.6" stroke="currentColor" stroke-opacity=".5" stroke-width="1.6" stroke-linecap="round"/>
+    <g id="dial-arm">
+      <circle r="26" fill="url(#dial-brass)" stroke="#5a3d14" stroke-width="1.2"/>
+      <circle r="18" fill="none" stroke="#5a3d14" stroke-opacity=".55" stroke-width=".8"/>
+      <path d="M0 0V-22" stroke="#5a3d14" stroke-width="5" stroke-linecap="round"/>
+      <circle cy="-22" r="7" fill="#3b2414" stroke="#1c1008" stroke-width="1"/>
+      <circle r="3.6" fill="#5a3d14"/>
+    </g>`;
+  const dialArm = $('dial-arm');
+
+  /* ================================================================
+     Position, playing and cranking
+     ================================================================ */
+  let lastSet = 0, raf = 0, t0 = 0, pos0 = 0, nextCol = 0, ringCol = 0, manualNext = 0;
+  const colIndex = (c) => (state.loop ? mod(c, state.L) : c);
+
+  function setPos(p) {
+    state.pos = p;
+    const shown = state.loop ? mod(p, state.L) : p;
+    const sl = Math.round(shown * cw);
+    lastSet = sl;
+    scroller.scrollLeft = sl;
+    const ang = ((p / STEPS_PER_TURN) * 360) % 360;
+    dialArm.setAttribute('transform', `rotate(${ang.toFixed(2)})`);
+    if (boxCrank) boxCrank.setAttribute('transform', `rotate(${ang.toFixed(2)} 46 ${MH / 2})`);
+  }
+  function playColumn(c, when, vel) {
+    const cc = colIndex(c);
+    if (cc < 0 || cc >= COLS) return;
+    const k = cc * N;
+    let n = 0;
+    for (let i = 0; i < N; i++) if (grid[k + i]) n++;
+    for (let i = 0; i < N; i++) if (grid[k + i]) pluck(NOTES[i].midi, when, (vel || 1) * (n > 3 ? 0.8 : 1));
+  }
+  const RING = [
+    { transform: 'translateY(0)' }, { transform: 'translateY(-1.6px)' }, { transform: 'translateY(1.3px)' },
+    { transform: 'translateY(-0.8px)' }, { transform: 'translateY(0.4px)' }, { transform: 'translateY(0)' },
+  ];
+  function ringColumn(c) {
+    if (reduceMotion) return;
+    const cc = colIndex(c);
+    if (cc < 0 || cc >= COLS) return;
+    for (let i = 0; i < N; i++) {
+      if (grid[cc * N + i] && teeth[i] && teeth[i].animate) teeth[i].animate(RING, { duration: 560, easing: 'ease-out' });
+    }
+  }
+  function frame() {
+    raf = 0;
+    if (!state.playing) return;
+    const now = ac.currentTime;
+    const p = pos0 + (now - t0) * sps();
+    const ahead = pos0 + (now + 0.12 - t0) * sps();
+    while (nextCol <= ahead) {
+      if (!state.loop && nextCol >= state.L) break;
+      playColumn(nextCol, Math.max(now, t0 + (nextCol - pos0) / sps()));
+      nextCol++;
+    }
+    while (ringCol <= p) { ringColumn(ringCol); ringCol++; }
+    if (!state.loop && p >= state.L) {
+      setPos(state.L);
+      pause();
+      say('The strip has run out. Press Play to start it again from the top.');
+      return;
+    }
+    setPos(p);
+    const b = barOf(p);
+    if (b !== lastBar) { lastBar = b; sayPlaying(); }
+    raf = requestAnimationFrame(frame);
+  }
+  let lastBar = -1;
+  const barOf = (p) => Math.max(1, Math.floor((colIndex(Math.floor(p)) - state.barStart) / state.bar) + 1);
+
+  function anchor() {
+    t0 = ac.currentTime + 0.04;
+    pos0 = state.pos;
+    nextCol = Math.ceil(pos0 - 1e-6);
+    ringCol = nextCol;
+  }
+  function play() {
+    if (!audio()) { say('This browser cannot make sound, so the box cannot play here.'); return; }
+    if (!state.loop && state.pos >= state.L - 0.01) setPos(0);
+    state.playing = true;
+    anchor();
+    $('play').textContent = 'Pause';
+    lastBar = -1;
+    if (!raf) raf = requestAnimationFrame(frame);
+  }
+  function pause() {
+    state.playing = false;
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    $('play').textContent = 'Play';
+    sayPaused();
+  }
+
+  function beginManual() {
+    if (state.playing) pause();
+    audio();
+    manualNext = Math.ceil(state.pos - 1e-6);
+  }
+  function crankBy(steps) {
+    if (steps <= 0) return;
+    const now = ac ? ac.currentTime : 0;
+    let p1 = state.pos + steps;
+    while (manualNext <= p1 + 1e-9) {
+      if (!state.loop && manualNext >= state.L) { p1 = Math.min(p1, state.L); break; }
+      playColumn(manualNext, now);
+      ringColumn(manualNext);
+      manualNext++;
+    }
+    setPos(p1);
+  }
+  let crankDrag = null;
+  function attachCrank(el, centerOf, classTarget) {
+    const target = classTarget || el;
+    el.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      e.preventDefault();
+      try { el.setPointerCapture(e.pointerId); } catch (err) { /* optional */ }
+      const [cx, cy] = centerOf();
+      crankDrag = { id: e.pointerId, cx, cy, a: Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI, el: target };
+      target.classList.add('turning');
+      beginManual();
+    });
+    el.addEventListener('pointermove', (e) => {
+      if (!crankDrag || e.pointerId !== crankDrag.id) return;
+      const a = Math.atan2(e.clientY - crankDrag.cy, e.clientX - crankDrag.cx) * 180 / Math.PI;
+      const d = wrap180(a - crankDrag.a);
+      crankDrag.a = a;
+      if (d > 0) crankBy((d / 360) * STEPS_PER_TURN);
+    });
+    const end = (e) => {
+      if (!crankDrag || e.pointerId !== crankDrag.id) return;
+      crankDrag.el.classList.remove('turning');
+      crankDrag = null;
+      sayPaused();
+    };
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+  }
+  attachCrank(crankDial, () => {
+    const r = crankDial.getBoundingClientRect();
+    return [r.left + r.width / 2, r.top + r.height / 2];
+  });
+  crankDial.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      beginManual();
+      crankBy(1);
+    }
+  });
+
+  scroller.addEventListener('scroll', () => {
+    if (Math.abs(scroller.scrollLeft - lastSet) <= 2) return;
+    lastSet = scroller.scrollLeft;
+    state.pos = scroller.scrollLeft / cw;
+    if (state.playing) anchor();
+  }, { passive: true });
+
+  /* ---------- Punching ---------- */
+  function hitAt(clientX, clientY) {
+    const r = strip.getBoundingClientRect();
+    const x = clientX - r.left, y = clientY - r.top;
+    const c = Math.round((x - padLeft) / cw);
+    const i = N - 1 - Math.floor((y - PAD - M) / rh);
+    if (c < 0 || c >= COLS || i < 0 || i >= N) return null;
+    return { c, i };
+  }
+  function showGhost(h) {
+    if (!h) { ghost.setAttribute('opacity', '0'); return; }
+    ghost.setAttribute('cx', colX(h.c));
+    ghost.setAttribute('cy', rowY(h.i));
+    ghost.setAttribute('opacity', '1');
+  }
+  function toggle(c, i) {
+    const k = c * N + i;
+    if (grid[k]) {
+      grid[k] = 0;
+      const el = holeEls.get(k);
+      if (el) el.remove();
+      holeEls.delete(k);
+    } else {
+      grid[k] = 1;
+      const el = makeHole(c, i);
+      holesG.append(el);
+      holeEls.set(k, el);
+      if (audio()) pluck(NOTES[i].midi, ac.currentTime + 0.005, 0.8);
+      if (!reduceMotion) {
+        const chad = document.createElementNS(SVGNS, 'circle');
+        chad.setAttribute('cx', colX(c));
+        chad.setAttribute('cy', rowY(i));
+        chad.setAttribute('r', holeR());
+        chad.setAttribute('fill', '#f2ead6');
+        chad.setAttribute('stroke', '#b9a582');
+        chad.setAttribute('stroke-width', '0.6');
+        chadsG.append(chad);
+        const a = chad.animate([
+          { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
+          { transform: `translate(${(Math.random() - 0.5) * 18}px, ${34 + Math.random() * 16}px)`, opacity: 0 },
+        ], { duration: 520, easing: 'cubic-bezier(.4,0,.8,.6)' });
+        a.onfinish = () => chad.remove();
+      }
+    }
+    let last = -1;
+    for (let cc = COLS - 1; cc >= 0 && last < 0; cc--) {
+      for (let ii = 0; ii < N; ii++) if (grid[cc * N + ii]) { last = cc; break; }
+    }
+    const need = Math.ceil((last + 2 - state.barStart) / state.bar) * state.bar + state.barStart;
+    const L = Math.min(COLS, Math.max(state.air.L, need));
+    if (L !== state.L) { state.L = L; placeLoopMark(); }
+    save();
+  }
+
+  let pan = null, suppressClick = false;
+  strip.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    pan = { x: e.clientX, sl: scroller.scrollLeft, moved: false, id: e.pointerId };
+  });
+  strip.addEventListener('pointermove', (e) => {
+    if (pan && e.pointerId === pan.id) {
+      const dx = e.clientX - pan.x;
+      if (!pan.moved && Math.abs(dx) > 6) {
+        pan.moved = true;
+        strip.classList.add('panning');
+        try { strip.setPointerCapture(e.pointerId); } catch (err) { /* optional */ }
+      }
+      if (pan.moved) {
+        scroller.scrollLeft = pan.sl - dx;
+        showGhost(null);
+        return;
+      }
+    }
+    showGhost(hitAt(e.clientX, e.clientY));
+  });
+  const endPan = (e) => {
+    if (!pan || e.pointerId !== pan.id) return;
+    if (pan.moved) suppressClick = true;
+    strip.classList.remove('panning');
+    pan = null;
+  };
+  strip.addEventListener('pointerup', endPan);
+  strip.addEventListener('pointercancel', endPan);
+  strip.addEventListener('pointerleave', () => { if (!pan) showGhost(null); });
+  strip.addEventListener('click', (e) => {
+    if (suppressClick) { suppressClick = false; return; }
+    const h = hitAt(e.clientX, e.clientY);
+    if (h) toggle(h.c, h.i);
+  });
+
+  // Keyboard punching
+  const cursor = { c: 0, i: IDX.C5 };
+  function showCursor() {
+    showGhost(cursor);
+    const x = colX(cursor.c), view = scroller.clientWidth;
+    if (x < scroller.scrollLeft + padLeft + cw) scroller.scrollLeft = Math.max(0, x - padLeft - cw);
+    else if (x > scroller.scrollLeft + view - cw * 2) scroller.scrollLeft = x - view + cw * 3;
+  }
+  strip.addEventListener('focus', () => {
+    cursor.c = Math.max(0, Math.min(COLS - 1, Math.round(state.loop ? mod(state.pos, state.L) : state.pos)));
+    showCursor();
+  });
+  strip.addEventListener('blur', () => showGhost(null));
+  strip.addEventListener('keydown', (e) => {
+    const moves = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, 1], ArrowDown: [0, -1] };
+    if (moves[e.key]) {
+      e.preventDefault();
+      cursor.c = Math.max(0, Math.min(COLS - 1, cursor.c + moves[e.key][0]));
+      cursor.i = Math.max(0, Math.min(N - 1, cursor.i + moves[e.key][1]));
+      showCursor();
+      if (moves[e.key][1] && audio()) pluck(NOTES[cursor.i].midi, ac.currentTime + 0.005, 0.5);
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggle(cursor.c, cursor.i);
+    }
+  });
+
+  /* ================================================================
+     Airs, controls and saving
+     ================================================================ */
+  const STORE = 'thirty-note-strip-v1';
+  let saveTimer = 0;
+  function save() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+      const holes = [];
+      for (let k = 0; k < grid.length; k++) if (grid[k]) holes.push(k);
+      try { localStorage.setItem(STORE, JSON.stringify({ key: state.air.key, holes, bpm: state.bpm, loop: state.loop })); } catch (err) { /* optional */ }
+    }, 400);
+  }
+
+  const airsEl = $('airs');
+  for (const a of AIRS) {
+    const li = document.createElement('li');
+    li.innerHTML = `<button type="button" class="air-btn" data-key="${a.key}"><span class="no">${a.no}</span><span class="air">${a.title}</span><span class="by">${a.by}</span></button>`;
+    airsEl.append(li);
+  }
+  airsEl.addEventListener('click', (e) => {
+    const b = e.target.closest('.air-btn');
+    if (!b) return;
+    const wasPlaying = state.playing;
+    if (wasPlaying) pause();
+    loadAir(AIRS.find((a) => a.key === b.dataset.key));
+    save();
+    if (wasPlaying) play();
+  });
+
+  function loadAir(air, holes) {
+    state.air = air;
+    state.bar = air.bar;
+    state.barStart = air.barStart;
+    state.L = air.L;
+    grid.fill(0);
+    if (holes) {
+      for (const k of holes) if (k >= 0 && k < grid.length) grid[k] = 1;
+    } else {
+      for (const [c, n] of air.build()) grid[c * N + IDX[n]] = 1;
+      setTempo(air.bpm);
+    }
+    let last = -1;
+    for (let k = 0; k < grid.length; k++) if (grid[k]) last = Math.floor(k / N);
+    const need = Math.ceil((last + 2 - state.barStart) / state.bar) * state.bar + state.barStart;
+    state.L = Math.min(COLS, Math.max(air.L, need));
+    for (const b of airsEl.querySelectorAll('.air-btn')) {
+      if (b.dataset.key === air.key) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+    }
+    buildStrip();
+    setPos(0);
+    sayPaused();
+  }
+
+  function setTempo(bpm) {
+    state.bpm = bpm;
+    $('tempo').value = String(bpm);
+    $('tempo-out').textContent = `${bpm} a minute`;
+    if (state.playing) anchor();
+  }
+  $('tempo').addEventListener('input', (e) => { setTempo(Number(e.target.value)); save(); });
+  $('loop').addEventListener('change', (e) => {
+    state.loop = e.target.checked;
+    const p = state.loop ? state.pos : Math.min(mod(state.pos, state.L), state.L);
+    state.pos = p;
+    placeLoopMark();
+    setPos(p);
+    if (state.playing) anchor();
+    save();
+  });
+  $('play').addEventListener('click', () => (state.playing ? pause() : play()));
+  $('rewind').addEventListener('click', () => {
+    setPos(0);
+    if (state.playing) anchor(); else sayPaused();
+  });
+
+  const clearBtn = $('clear');
+  let clearArmed = 0;
+  function disarmClear() {
+    clearTimeout(clearArmed);
+    clearArmed = 0;
+    clearBtn.textContent = 'Clear strip';
+    clearBtn.classList.remove('armed');
+  }
+  clearBtn.addEventListener('click', () => {
+    if (!clearArmed) {
+      clearBtn.textContent = 'Click again to clear';
+      clearBtn.classList.add('armed');
+      clearArmed = setTimeout(disarmClear, 2800);
+      return;
+    }
+    disarmClear();
+    if (state.playing) pause();
+    loadAir(AIRS[AIRS.length - 1]);
+    save();
+    say('The strip is blank. Click it to punch your first hole.');
+  });
+
+  const statusEl = $('status');
+  const say = (text) => { statusEl.textContent = text; };
+  function sayPlaying() {
+    statusEl.innerHTML = `Playing <em>${state.air.title}</em>, bar ${barOf(state.pos)}.`;
+  }
+  function sayPaused() {
+    if (state.playing) return;
+    const holes = grid.reduce((n, v) => n + v, 0);
+    if (!holes) { say('The strip is blank. Click it to punch your first hole.'); return; }
+    statusEl.innerHTML = state.pos < 0.5
+      ? `<em>${state.air.title}</em> is in the box, ${holes} holes long. Turn the crank or press Play.`
+      : `Stopped in bar ${barOf(state.pos)} of <em>${state.air.title}</em>.`;
+  }
+
+  const scaleEl = $('scale');
+  NOTES.forEach((n, i) => {
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = n.name.replace('#', '♯');
+    if (n.name.includes('#')) b.className = 'sharp';
+    b.addEventListener('click', () => {
+      if (!audio()) return;
+      pluck(n.midi, ac.currentTime + 0.005, 0.9);
+      if (teeth[i] && teeth[i].animate && !reduceMotion) teeth[i].animate(RING, { duration: 560, easing: 'ease-out' });
+    });
+    li.append(b);
+    scaleEl.append(li);
+  });
+
+  /* ---------- Layout ---------- */
+  function layout(rebuild) {
+    const wasSmall = small;
+    sizes();
+    machine.style.setProperty('--mh', `${MH}px`);
+    spacer.style.width = `${Math.max(0, scroller.clientWidth - padLeft - cw)}px`;
+    if (rebuild || wasSmall !== small) {
+      buildBox();
+      buildStrip();
+      setPos(state.pos);
+    }
+  }
+  window.addEventListener('resize', () => layout(false));
+
+  /* ---------- Start ---------- */
+  sizes();
+  machine.style.setProperty('--mh', `${MH}px`);
+  buildBox();
+  let restored = false;
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORE) || 'null');
+    const air = saved && AIRS.find((a) => a.key === saved.key);
+    if (air && Array.isArray(saved.holes)) {
+      state.loop = saved.loop !== false;
+      $('loop').checked = state.loop;
+      setTempo(Number(saved.bpm) || air.bpm);
+      loadAir(air, saved.holes);
+      restored = true;
+    }
+  } catch (err) { restored = false; }
+  if (!restored) loadAir(AIRS[0]);
+  layout(false);
+})();
+</script>
+</body>
+</html>

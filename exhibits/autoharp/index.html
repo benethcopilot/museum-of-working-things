@@ -1,0 +1,1145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Autoharp Chords</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:ital,wght@0,500;0,700;1,500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+:root {
+  /* Layout: a music lesson around one instrument. The autoharp and its button bank lead, the chord you are holding is explained beside it, then four short lessons, songs to play along with, and the instrument's history. */
+  --ground: #e8ecee;
+  --ground-2: #dbe1e4;
+  --card: #f4f6f7;
+  --text: #1b2426;
+  --muted: #536165;
+  --line: rgba(27, 36, 38, 0.14);
+  --line-strong: rgba(27, 36, 38, 0.32);
+  --accent: #1d6a5b;
+  --accent-ink: #f2fbf8;
+  /* Chord roles */
+  --root: #b3422b;
+  --third: #2a67a0;
+  --fifth: #3d7d4c;
+  --seventh: #8b569d;
+  --good: #2f7a45;
+  --bad: #b3422b;
+  --f-display: "Zilla Slab", "Rockwell", "Roboto Slab", Georgia, serif;
+  --f-body: "Atkinson Hyperlegible", "Verdana", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #121819;
+    --ground-2: #1c2527;
+    --card: #182022;
+    --text: #e6ece9;
+    --muted: #9aa9a6;
+    --line: rgba(230, 236, 233, 0.12);
+    --line-strong: rgba(230, 236, 233, 0.3);
+    --accent: #5fc3a8;
+    --accent-ink: #0b1714;
+    --root: #f08a70;
+    --third: #74aee6;
+    --fifth: #84c592;
+    --seventh: #c79be0;
+    --good: #7fd19a;
+    --bad: #f08a70;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #121819;
+  --ground-2: #1c2527;
+  --card: #182022;
+  --text: #e6ece9;
+  --muted: #9aa9a6;
+  --line: rgba(230, 236, 233, 0.12);
+  --line-strong: rgba(230, 236, 233, 0.3);
+  --accent: #5fc3a8;
+  --accent-ink: #0b1714;
+  --root: #f08a70;
+  --third: #74aee6;
+  --fifth: #84c592;
+  --seventh: #c79be0;
+  --good: #7fd19a;
+  --bad: #f08a70;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--f-body);
+  font-size: 16.5px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.page {
+  box-sizing: border-box;
+  max-width: 1240px;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 3vw, 40px);
+  padding-block: 30px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+h1, h2, h3 { font-family: var(--f-display); font-weight: 700; line-height: 1.1; text-wrap: balance; }
+.eyebrow { margin: 0; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+.masthead h1 { margin: 4px 0 10px; font-size: clamp(2.6rem, 6vw, 4.2rem); letter-spacing: -0.01em; }
+.lede { margin: 0; max-width: 64ch; font-size: 1.08rem; color: var(--muted); }
+.sec-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 20px; margin-bottom: 14px; }
+.sec-head h2 { margin: 0; font-size: 1.9rem; }
+.sec-head p { margin: 0; color: var(--muted); max-width: 60ch; }
+
+/* ---------- The instrument ---------- */
+.studio { display: grid; grid-template-columns: minmax(0, 1fr) minmax(290px, 360px); gap: 22px 32px; align-items: start; }
+.harp-col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+#harp { display: block; width: 100%; height: auto; touch-action: none; cursor: ns-resize; -webkit-user-select: none; user-select: none; }
+#harp .glow { opacity: 0; pointer-events: none; }
+#harp .str { transition: opacity 0.12s; }
+#harp .str.muted { opacity: 0.38; }
+#harp .slabel { opacity: 0; transition: opacity 0.15s; }
+#harp .slabel.on { opacity: 1; }
+#harp .bar rect.wood { transition: fill 0.1s; }
+#harp .bar.down rect.wood { fill: #2e1d11; }
+#harp .bar.down { transform: translate(1.5px, 1.5px); }
+#harp .bar.down .felt { opacity: 1; }
+.strum-hint { margin: -4px 0 0; font-size: 0.92rem; color: var(--muted); }
+
+.bank {
+  display: grid;
+  grid-template-columns: repeat(16, minmax(0, 1fr));
+  gap: 7px 4px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #3a2717;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+.cb {
+  grid-column: span 2;
+  position: relative;
+  min-width: 0;
+  padding: 8px 2px 7px;
+  border: 0;
+  border-radius: 6px;
+  background: linear-gradient(#fbf6ea, #e4d9c1);
+  color: #1d1610;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.1;
+  box-shadow: 0 3px 0 #9b8a69, 0 4px 6px rgba(0, 0, 0, 0.35);
+  transition: transform 0.06s, box-shadow 0.06s;
+}
+.cb .k { position: absolute; top: 2px; right: 4px; font-size: 0.62rem; font-weight: 400; color: #7c6f58; }
+.cb[aria-pressed="true"] { transform: translateY(3px); box-shadow: 0 0 0 #9b8a69, 0 1px 2px rgba(0, 0, 0, 0.4); background: linear-gradient(#f3e3b5, #d9c48e); }
+.cb.hint { animation: hint 0.9s ease-in-out infinite; }
+@keyframes hint { 50% { box-shadow: 0 3px 0 #9b8a69, 0 0 0 4px #5fc3a8, 0 0 14px 4px rgba(95, 195, 168, 0.6); } }
+.cb.top1 { grid-row: 1; }
+.cb.top2 { grid-row: 2; }
+.bank-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; font-size: 0.9rem; color: var(--muted); }
+.textbtn { padding: 0; border: 0; background: none; font-weight: 700; color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------- Chord panel ---------- */
+.panel {
+  position: sticky;
+  top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 18px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+}
+.panel .label { margin: 0; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.ch-name { margin: 0; font-family: var(--f-display); font-size: 3.1rem; line-height: 1; }
+.ch-full { margin: 2px 0 0; color: var(--muted); }
+.notes { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.note-chip { display: flex; flex-direction: column; align-items: center; min-width: 3.4em; padding: 5px 8px 4px; border-radius: 8px; border: 2px solid currentColor; }
+.note-chip b { font-size: 1.25rem; line-height: 1.1; color: var(--text); }
+.note-chip span { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.r-root { color: var(--root); }
+.r-third { color: var(--third); }
+.r-fifth { color: var(--fifth); }
+.r-seventh { color: var(--seventh); }
+.recipe { margin: 0; font-size: 0.95rem; }
+.recipe .iv { display: inline-block; padding: 0 6px; margin: 0 2px; border-radius: 999px; background: var(--ground-2); font-size: 0.85rem; white-space: nowrap; }
+#keys { display: block; width: 100%; height: auto; }
+.ch-text { margin: 0; font-size: 0.95rem; }
+.panel-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn {
+  padding: 8px 14px 9px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 6px;
+  background: none;
+  font-weight: 700;
+  transition: background-color 0.15s, border-color 0.15s, opacity 0.15s;
+}
+.btn:hover { background: var(--ground-2); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { background: var(--accent); opacity: 0.88; }
+.btn:disabled { opacity: 0.45; cursor: default; }
+
+/* ---------- Lessons ---------- */
+.lessons { display: grid; grid-template-columns: repeat(auto-fit, minmax(176px, 1fr)); gap: 12px; }
+.lesson { display: flex; flex-direction: column; gap: 8px; padding: 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
+.lesson h3 { margin: 0; font-size: 1.25rem; }
+.lesson p { margin: 0; font-size: 0.95rem; color: var(--muted); flex: 1; }
+.lesson .btn { align-self: flex-start; }
+
+/* ---------- Songs ---------- */
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 8px 14px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 8px;
+  background: none;
+  text-align: left;
+}
+.tab b { font-family: var(--f-display); font-size: 1.15rem; }
+.tab span { font-size: 0.85rem; color: var(--muted); }
+.tab[aria-selected="true"] { border-color: var(--accent); background: var(--card); box-shadow: inset 0 0 0 1px var(--accent); }
+.song-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-bottom: 12px; }
+.song-bar label { display: flex; align-items: center; gap: 8px; color: var(--muted); }
+.song-bar input[type="range"] { width: 130px; accent-color: var(--accent); }
+.song-bar input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--accent); margin: 0; }
+.song-status { margin: 0 0 12px; min-height: 1.6em; font-weight: 700; }
+.chart { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 6px; }
+.cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-height: 74px;
+  padding: 7px 9px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+}
+.cell .cn { font-family: var(--f-display); font-weight: 700; font-size: 1.35rem; line-height: 1.1; }
+.cell .cn.same { color: var(--muted); opacity: 0.55; }
+.cell .rn { font-size: 0.78rem; font-weight: 700; color: var(--muted); }
+.cell .ly { font-size: 0.9rem; color: var(--muted); }
+.cell.pickup { background: none; border-style: dashed; }
+.cell.now { border-color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
+.cell.now .ly { color: var(--text); }
+.cell .mark { position: absolute; top: 5px; right: 8px; font-weight: 700; }
+.cell.ok .mark { color: var(--good); }
+.cell.miss .mark { color: var(--bad); }
+.key-note { margin: 12px 0 0; font-size: 0.92rem; color: var(--muted); }
+
+/* ---------- History ---------- */
+.history { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 44px; padding-top: 24px; border-top: 1px solid var(--line-strong); }
+.history h2 { margin: 0 0 8px; font-size: 1.5rem; }
+.history p { margin: 0 0 10px; max-width: 64ch; }
+.history .sources { grid-column: 1 / -1; font-size: 0.88rem; color: var(--muted); }
+.history a { color: inherit; text-underline-offset: 3px; }
+
+@media (max-width: 920px) {
+  .studio { grid-template-columns: minmax(0, 1fr); }
+  .panel { position: static; }
+  .history { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .cb { font-size: 0.86rem; padding-inline: 0; }
+  .cb .k { display: none; }
+  .bank { padding: 8px; gap: 6px 3px; }
+}
+@media (hover: none) { .cb .k { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .cb, .btn, #harp .str, #harp .slabel { transition: none; }
+  .cb.hint { animation: none; box-shadow: 0 3px 0 #9b8a69, 0 0 0 4px #5fc3a8; }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="autoharp" defer></script>
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Learn chords on an</p>
+    <h1>Autoharp</h1>
+    <p class="lede">An autoharp has a string for nearly every note and a row of wooden bars lined with felt. Press a bar and its felt silences every string that doesn’t belong to the chord. Strum, and only the chord rings. That is what a chord is: the notes that are left.</p>
+  </header>
+
+  <section class="studio" aria-label="The autoharp">
+    <div class="harp-col">
+      <svg id="harp" viewBox="0 0 1200 500" role="img" aria-label="An autoharp with 36 strings and 15 chord bars. Drag across the strings to strum."></svg>
+      <p class="strum-hint">Drag up or down across the strings to strum, or press <kbd>Space</kbd>. Press a button below to hold its bar down.</p>
+      <div class="bank" id="bank" role="group" aria-label="Chord bar buttons"></div>
+      <div class="bank-foot">
+        <span>The fifteen bars of the standard factory layout, in its two rows.</span>
+        <button type="button" class="textbtn" id="lift">Lift the bar</button>
+      </div>
+    </div>
+
+    <aside class="panel" aria-label="The chord you are holding">
+      <p class="label">The bar you are holding</p>
+      <div>
+        <p class="ch-name" id="ch-name">None</p>
+        <p class="ch-full" id="ch-full"></p>
+      </div>
+      <ul class="notes" id="ch-notes"></ul>
+      <p class="recipe" id="ch-recipe"></p>
+      <svg id="keys" viewBox="0 0 330 100" aria-hidden="true"></svg>
+      <p class="ch-text" id="ch-text"></p>
+      <div class="panel-actions">
+        <button type="button" class="btn primary" id="hear">Hear it built</button>
+        <button type="button" class="btn" id="compare" hidden></button>
+      </div>
+    </aside>
+  </section>
+
+  <section aria-labelledby="lessons-h">
+    <div class="sec-head">
+      <h2 id="lessons-h">How chords work</h2>
+      <p>Five short lessons. Each button plays its example on the harp above.</p>
+    </div>
+    <div class="lessons">
+      <div class="lesson">
+        <h3>Every note at once</h3>
+        <p>With no bar pressed, all 36 strings ring together. Every note sounds and nothing fits. That cloud is why the bars exist.</p>
+        <button type="button" class="btn" data-demo="open">Strum with no bar</button>
+      </div>
+      <div class="lesson">
+        <h3>Major: a big third, then a small one</h3>
+        <p>Start on a note, the root. Go up four semitones to the major third, then three more to the fifth. C, E and G make C major: bright and settled.</p>
+        <button type="button" class="btn" data-demo="major">Build C major</button>
+      </div>
+      <div class="lesson">
+        <h3>Minor: the small third first</h3>
+        <p>Swap the order. Three semitones, then four. D, F and A make D minor. Only one note moves, from F♯ down to F, and the mood turns darker.</p>
+        <button type="button" class="btn" data-demo="minor">Hear D, then D minor</button>
+      </div>
+      <div class="lesson">
+        <h3>Sevenths want to go home</h3>
+        <p>Add one more third on top. G7 is G, B, D and F. The B leans up toward C and the F leans down toward E, so G7 pulls toward a C chord.</p>
+        <button type="button" class="btn" data-demo="seventh">Hear G7 go to C</button>
+      </div>
+      <div class="lesson">
+        <h3>Three chords carry a song</h3>
+        <p>In the key of C, C is chord I, F is IV and G is V. Most folk songs need only those three. On this harp they sit side by side.</p>
+        <button type="button" class="btn" data-demo="cadence">Hear I, IV, V, I</button>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="songs-h">
+    <div class="sec-head">
+      <h2 id="songs-h">Play along</h2>
+      <p>Listen first, then take a turn. On your turn you press the bars and the harp keeps strumming.</p>
+    </div>
+    <div class="tabs" id="tabs" role="tablist" aria-label="Songs"></div>
+    <div class="song-bar">
+      <button type="button" class="btn primary" id="listen">Play it for me</button>
+      <button type="button" class="btn" id="turn">Your turn</button>
+      <button type="button" class="btn" id="stop" disabled>Stop</button>
+      <label for="speed">Speed <input type="range" id="speed" min="50" max="130" value="100"></label>
+      <label for="hints"><input type="checkbox" id="hints" checked> Light up the next bar</label>
+    </div>
+    <p class="song-status" id="song-status" aria-live="polite"></p>
+    <div class="chart" id="chart"></div>
+    <p class="key-note" id="key-note"></p>
+  </section>
+
+  <section class="history">
+    <div>
+      <h2>Who made the autoharp</h2>
+      <p>In December 1881 Charles F. Zimmermann, a German-born instrument maker in Philadelphia, applied for a patent on a zither with dampers that silenced chosen strings, and named it the autoharp. The patent was issued in May 1882. The design behind today’s instrument came from Karl August Gütter of Markneukirchen, Germany, whose Volkszither he patented in Britain around 1883–84. From 1885 Zimmermann built autoharps on Gütter’s pattern.</p>
+    </div>
+    <div>
+      <h2>This harp</h2>
+      <p>The common modern autoharp has 36 strings, from F2 up to C6. It is not fully chromatic: covering that range note for note would take 44 strings, so a few low notes, and the G♯ below middle C, are left out. This one has the fifteen bars of the standard factory layout. Each key’s main chords sit close together on it: B♭, C7 and F; F, G7 and C; C, D7 and G.</p>
+    </div>
+    <p class="sources">Sources: <a href="https://en.wikipedia.org/wiki/Autoharp" target="_blank" rel="noopener">Autoharp</a> on Wikipedia, for the tuning and bar layout, and <a href="https://creekdontrise.com/acoustic/autoharp/fretlesszithers.com/www.pickaway.press/fz/ahhistory.html" target="_blank" rel="noopener">a history of 19th-century autoharp makers</a>. Melodies from ABC transcriptions by Robert Walker (Clementine) and <a href="https://trillian.mit.edu/~jc/music/abc/" target="_blank" rel="noopener">John Chambers</a> (Red River Valley); Amazing Grace is written out from the traditional tune. The strings are synthesized with the Karplus–Strong method: a burst of noise circling through a delay one vibration long.</p>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mod = (a, n) => ((a % n) + n) % n;
+  const $ = (id) => document.getElementById(id);
+
+  /* ================================================================
+     The instrument: 36 strings and 15 bars
+     ================================================================ */
+  const STRING_MIDI = [41, 43, 48, 50, 52, 53, 54, 55, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84];
+  const NS = STRING_MIDI.length;
+  const PC_NAMES = ['C', 'C♯', 'D', 'E♭', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'B♭', 'B'];
+  const LETTERS = 'CDEFGAB';
+  const LETTER_PC = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+  // Physical order of the bars; odd ones carry their button in the top row.
+  const BARS = ['Eb', 'D', 'F7', 'Gm', 'Bb', 'A7', 'C7', 'Dm', 'F', 'E7', 'G7', 'Am', 'C', 'D7', 'G'];
+  const KEYS_TOP = ['1', '2', '3', '4', '5', '6', '7'];
+  const KEYS_BOTTOM = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i'];
+
+  const pretty = (name) => name.replace('b', '♭').replace('#', '♯');
+  function chord(name) {
+    const m = name.match(/^([A-G])([#b]?)(m|7)?$/);
+    const rootL = m[1];
+    const rootPc = mod(LETTER_PC[rootL] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0), 12);
+    const q = m[3] || '';
+    const ints = q === 'm' ? [0, 3, 7] : q === '7' ? [0, 4, 7, 10] : [0, 4, 7];
+    const roles = ['root', 'third', 'fifth', 'seventh'];
+    const notes = ints.map((iv, k) => {
+      const L = LETTERS[(LETTERS.indexOf(rootL) + 2 * k) % 7];
+      const pc = (rootPc + iv) % 12;
+      const acc = mod(pc - LETTER_PC[L] + 6, 12) - 6;
+      return { name: L + (acc > 0 ? '♯'.repeat(acc) : acc < 0 ? '♭'.repeat(-acc) : ''), pc, role: roles[k], iv };
+    });
+    const rootName = notes[0].name;
+    const full = q === 'm' ? `${rootName} minor` : q === '7' ? `${rootName} seventh` : `${rootName} major`;
+    return { name, label: pretty(name), q, rootPc, notes, pcs: new Set(notes.map((n) => n.pc)), full };
+  }
+  const CHORDS = Object.fromEntries(BARS.map((b) => [b, chord(b)]));
+
+  /* ---------- Drawing ---------- */
+  const harp = $('harp');
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  const yS = (i) => 452 - i * 11;
+  const xEnd = (i) => 1130 - i * 7.2;
+  const HOLD = [172, 560];
+  const barX = (k) => 196 + k * 24;
+  let strEls = [], glowEls = [], labelEls = [], barEls = [];
+
+  function buildHarp() {
+    let s = `<defs>
+      <linearGradient id="spruce" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ecd29c"/><stop offset=".5" stop-color="#ddb36d"/><stop offset="1" stop-color="#e7c487"/>
+      </linearGradient>
+      <linearGradient id="rail" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#6b4528"/><stop offset="1" stop-color="#3b2516"/>
+      </linearGradient>
+      <linearGradient id="barwood" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#7b5233"/><stop offset=".5" stop-color="#9a6b43"/><stop offset="1" stop-color="#6a4429"/>
+      </linearGradient>
+      <radialGradient id="pin" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#f4f4f2"/><stop offset="1" stop-color="#7d8188"/></radialGradient>
+    </defs>`;
+    const body = 'M58 34H896Q904 34 908 41L1170 470Q1175 484 1160 486H52Q36 486 36 470V50Q36 34 52 34Z';
+    s += `<path d="${body}" fill="#3d2414" transform="translate(4 6)" opacity=".35"/>`;
+    s += `<path d="${body}" fill="url(#spruce)" stroke="#4a2b17" stroke-width="9" stroke-linejoin="round"/>`;
+    let grain = '';
+    for (let k = 0; k < 26; k++) {
+      const y = 50 + k * 17 + Math.sin(k * 2.3) * 4;
+      grain += `M50 ${y.toFixed(1)}C400 ${(y + 3).toFixed(1)} 800 ${(y - 3).toFixed(1)} ${(1160 - (486 - y) * 0.64).toFixed(1)} ${y.toFixed(1)}`;
+    }
+    s += `<path d="${grain}" fill="none" stroke="#b9874a" stroke-opacity=".22" stroke-width="1.2"/>`;
+    // Sound hole and rosette
+    s += `<circle cx="790" cy="262" r="58" fill="none" stroke="#4a2b17" stroke-width="3"/>`;
+    s += `<circle cx="790" cy="262" r="52" fill="none" stroke="#a46b35" stroke-width="5" stroke-dasharray="3 3"/>`;
+    s += `<circle cx="790" cy="262" r="44" fill="#24150b"/>`;
+    // Strings
+    for (let i = 0; i < NS; i++) {
+      const y = yS(i), x2 = xEnd(i), wound = i < 12;
+      const w = wound ? 2.3 - i * 0.07 : 1.25 - (i - 12) * 0.012;
+      s += `<line x1="70" y1="${y + 1.4}" x2="${x2}" y2="${y + 1.4}" stroke="#000" stroke-opacity=".22" stroke-width="${w.toFixed(2)}"/>`;
+      s += `<line class="str" data-i="${i}" x1="70" y1="${y}" x2="${x2}" y2="${y}" stroke="${wound ? '#b88a4c' : '#d9dce0'}" stroke-width="${w.toFixed(2)}"/>`;
+      s += `<line class="glow" data-i="${i}" x1="70" y1="${y}" x2="${x2}" y2="${y}" stroke="#fff6d0" stroke-width="${(w + 2.4).toFixed(2)}" stroke-linecap="round"/>`;
+      s += `<circle cx="70" cy="${y}" r="3" fill="url(#pin)"/>`;
+      s += `<circle cx="${x2}" cy="${y}" r="3.8" fill="url(#pin)" stroke="#55585e" stroke-width=".6"/>`;
+      const nm = PC_NAMES[STRING_MIDI[i] % 12];
+      s += `<text class="slabel" data-i="${i}" x="${(x2 + 10).toFixed(1)}" y="${y + 3.5}" font-size="10" font-weight="700" font-family="Atkinson Hyperlegible, Verdana, sans-serif" fill="#3b2516">${nm}</text>`;
+    }
+    // The bar holder: two rails and the bars between them
+    s += `<rect x="${HOLD[0]}" y="40" width="${HOLD[1] - HOLD[0]}" height="18" rx="5" fill="url(#rail)"/>`;
+    s += `<rect x="${HOLD[0]}" y="462" width="${HOLD[1] - HOLD[0]}" height="18" rx="5" fill="url(#rail)"/>`;
+    s += `<rect x="${HOLD[0]}" y="40" width="14" height="440" rx="5" fill="url(#rail)"/>`;
+    s += `<rect x="${HOLD[1] - 14}" y="40" width="14" height="440" rx="5" fill="url(#rail)"/>`;
+    BARS.forEach((name, k) => {
+      const x = barX(k), c = CHORDS[name];
+      let felts = '';
+      for (let i = 0; i < NS; i++) {
+        if (!c.pcs.has(STRING_MIDI[i] % 12)) felts += `<rect class="felt" x="${x - 1}" y="${yS(i) - 3.2}" width="16" height="6.4" rx="1.5" fill="#6d2525" opacity=".62"/>`;
+      }
+      s += `<g class="bar" data-k="${k}"><rect x="${x + 2}" y="60" width="14" height="402" rx="3" fill="#000" opacity=".25"/>`;
+      s += `<rect class="wood" x="${x}" y="58" width="14" height="404" rx="3" fill="url(#barwood)" stroke="#3b2516" stroke-width=".8"/>${felts}`;
+      s += `<text x="${x + 7}" y="${k % 2 ? 76 : 452}" text-anchor="middle" font-size="10" font-weight="700" font-family="Atkinson Hyperlegible, Verdana, sans-serif" fill="#f3e6c8">${c.label}</text></g>`;
+    });
+    harp.innerHTML = s;
+    strEls = [...harp.querySelectorAll('.str')];
+    glowEls = [...harp.querySelectorAll('.glow')];
+    labelEls = [...harp.querySelectorAll('.slabel')];
+    barEls = [...harp.querySelectorAll('.bar')];
+  }
+
+  /* ================================================================
+     Sound: Karplus–Strong strings, computed once per string
+     ================================================================ */
+  let ac = null, body = null, master = null;
+  const bufCache = [];
+  const ringing = new Array(NS).fill(null);
+  const hz = (m) => 440 * Math.pow(2, (m - 69) / 12);
+  function audio() {
+    if (ac) {
+      if (ac.state === 'suspended') ac.resume();
+      return ac;
+    }
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    ac = new AC();
+    master = ac.createGain();
+    master.gain.value = 0.8;
+    const comp = ac.createDynamicsCompressor();
+    comp.threshold.value = -16; comp.ratio.value = 3; comp.attack.value = 0.004; comp.release.value = 0.2;
+    body = ac.createGain();
+    const warm = ac.createBiquadFilter();
+    warm.type = 'peaking'; warm.frequency.value = 230; warm.Q.value = 1; warm.gain.value = 4;
+    const soft = ac.createBiquadFilter();
+    soft.type = 'highshelf'; soft.frequency.value = 3500; soft.gain.value = -4;
+    body.connect(warm); warm.connect(soft); soft.connect(comp); comp.connect(master); master.connect(ac.destination);
+    const len = Math.floor(ac.sampleRate * 1.3);
+    const ir = ac.createBuffer(2, len, ac.sampleRate);
+    for (let ch = 0; ch < 2; ch++) {
+      const d = ir.getChannelData(ch);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+    }
+    const verb = ac.createConvolver();
+    verb.buffer = ir;
+    const wet = ac.createGain();
+    wet.gain.value = 0.2;
+    soft.connect(verb); verb.connect(wet); wet.connect(comp);
+    return ac;
+  }
+  function stringBuffer(i) {
+    if (bufCache[i]) return bufCache[i];
+    const sr = 32000, f = hz(STRING_MIDI[i]);
+    const T60 = 4.2 - (i / (NS - 1)) * 2.6;
+    const a = Math.pow(10, -3 / (T60 * f));
+    const w = (2 * Math.PI * f) / sr;
+    const need = (1 - a * a) / (2 * (1 - Math.cos(w)));
+    const sw = need >= 0.25 ? 0.5 : (1 - Math.sqrt(1 - 4 * need)) / 2;
+    const Af = Math.sqrt(1 - 2 * sw * (1 - sw) * (1 - Math.cos(w)));
+    const g = Math.min(0.99995, a / Af);
+    const N = Math.max(2, Math.floor(sr / f - sw));
+    const len = Math.floor(sr * Math.min(4.5, T60 * 0.85));
+    const buf = ac.createBuffer(1, len, sr);
+    const d = buf.getChannelData(0);
+    const bright = i < 12 ? 0.5 : 0.85;
+    let lp = 0, mean = 0;
+    for (let k = 0; k < N; k++) { lp += bright * (Math.random() * 2 - 1 - lp); d[k] = lp; mean += lp; }
+    mean /= N;
+    for (let k = 0; k < N; k++) d[k] -= mean;
+    for (let k = N; k < len; k++) d[k] = g * ((1 - sw) * d[k - N] + sw * (k - N - 1 >= 0 ? d[k - N - 1] : 0));
+    bufCache[i] = { buf, rate: f / (sr / (N + sw)) };
+    return bufCache[i];
+  }
+  function stopNode(r, t) {
+    r.g.gain.setTargetAtTime(0, t, 0.015);
+    try { r.src.stop(t + 0.12); } catch (err) { /* already stopped */ }
+  }
+  function pluck(i, t, vel, muted) {
+    const { buf, rate } = stringBuffer(i);
+    const src = ac.createBufferSource();
+    src.buffer = buf;
+    src.playbackRate.value = rate;
+    const g = ac.createGain();
+    const peak = (i < 12 ? 0.3 : 0.22) * vel;
+    g.gain.setValueAtTime(muted ? peak * 0.3 : peak, t);
+    if (muted) g.gain.setTargetAtTime(0, t + 0.004, 0.011);
+    src.connect(g); g.connect(body);
+    src.start(t);
+    const dur = muted ? 0.1 : buf.duration / rate;
+    src.stop(t + dur);
+    if (!muted) {
+      if (ringing[i] && ringing[i].until > t) stopNode(ringing[i], t);
+      ringing[i] = { src, g, until: t + dur };
+    }
+    if (!reduceMotion) {
+      const delay = Math.max(0, (t - ac.currentTime) * 1000);
+      glowEls[i].animate([{ opacity: muted ? 0.25 : 0.95 }, { opacity: 0 }], { duration: muted ? 120 : 700, delay, easing: 'ease-out' });
+    }
+  }
+
+  let pressed = null;
+  const inChord = (i, name = pressed) => !name || CHORDS[name].pcs.has(STRING_MIDI[i] % 12);
+  function strum(from, to, t, vel, name = pressed) {
+    const dir = to >= from ? 1 : -1;
+    for (let i = from, k = 0; dir > 0 ? i <= to : i >= to; i += dir, k++) {
+      pluck(i, t + k * 0.0045, vel * (0.85 + 0.3 * Math.random()), !inChord(i, name));
+    }
+  }
+
+  /* ================================================================
+     Pressing bars and explaining the chord
+     ================================================================ */
+  const bank = $('bank');
+  const btns = {};
+  BARS.forEach((name, k) => {
+    const top = k % 2 === 1;
+    const idx = top ? (k - 1) / 2 : k / 2;
+    const key = top ? KEYS_TOP[idx] : KEYS_BOTTOM[idx];
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = `cb ${top ? 'top1' : 'top2'}`;
+    b.style.gridColumn = `${(top ? 2 : 1) + idx * 2} / span 2`;
+    b.dataset.name = name;
+    b.setAttribute('aria-pressed', 'false');
+    b.setAttribute('aria-label', `${CHORDS[name].full} (key ${key.toUpperCase()})`);
+    b.innerHTML = `${CHORDS[name].label}<span class="k" aria-hidden="true">${key.toUpperCase()}</span>`;
+    b.addEventListener('click', () => {
+      audio();
+      press(pressed === name ? null : name, true);
+    });
+    bank.append(b);
+    btns[name] = b;
+  });
+
+  function press(name, byHand) {
+    if (byHand) userTouched = true;
+    pressed = name;
+    for (const [n, b] of Object.entries(btns)) b.setAttribute('aria-pressed', String(n === name));
+    barEls.forEach((g, k) => g.classList.toggle('down', BARS[k] === name));
+    for (let i = 0; i < NS; i++) {
+      const on = !name || inChord(i, name);
+      strEls[i].classList.toggle('muted', !on);
+      labelEls[i].classList.toggle('on', !!name && on);
+      if (!on && ac && ringing[i]) {
+        stopNode(ringing[i], ac.currentTime);
+        ringing[i] = null;
+      }
+    }
+    explain(name);
+  }
+
+  function explain(name) {
+    const nameEl = $('ch-name'), full = $('ch-full'), notes = $('ch-notes'), recipe = $('ch-recipe'), text = $('ch-text');
+    const cmp = $('compare');
+    if (!name) {
+      nameEl.textContent = 'None';
+      full.textContent = 'No bar pressed';
+      notes.innerHTML = '';
+      recipe.textContent = '';
+      text.textContent = 'All 36 strings are free, so a strum sounds every note on the harp at once. Press a button to bring a bar down onto the strings.';
+      drawKeys(null);
+      $('hear').disabled = true;
+      cmp.hidden = true;
+      return;
+    }
+    const c = CHORDS[name];
+    nameEl.textContent = c.label;
+    full.textContent = c.full;
+    notes.innerHTML = c.notes.map((n) => `<li class="note-chip r-${n.role}"><b>${n.name}</b><span>${n.role}</span></li>`).join('');
+    const ivName = (d) => (d === 4 ? 'major third' : 'minor third');
+    let r = `<b>${c.notes[0].name}</b>`;
+    for (let k = 1; k < c.notes.length; k++) {
+      const d = c.notes[k].iv - c.notes[k - 1].iv;
+      r += ` <span class="iv">+${d} ${ivName(d)}</span> <b>${c.notes[k].name}</b>`;
+    }
+    recipe.innerHTML = r;
+    const [R, T, F, S] = c.notes.map((n) => n.name);
+    text.textContent = c.q === 'm'
+      ? `A minor chord starts with the small third: ${R} up three semitones to ${T}, then four more to ${F}. It sounds darker than ${R} major.`
+      : c.q === '7'
+        ? `A seventh chord is a major chord with one more third on top. ${S} sits ten semitones above ${R}, and it makes the chord lean toward the next one: ${c.label} usually moves to the chord a fifth below.`
+        : `A major chord starts with the big third: ${R} up four semitones to ${T}, then three more to ${F}. Every major chord on the harp has the same shape.`;
+    drawKeys(c);
+    $('hear').disabled = false;
+    // Something to compare it with, if the harp has it
+    const root = name.replace(/m|7/g, '');
+    const options = c.q === 'm' ? [root, `${root}7`] : c.q === '7' ? [root, `${root}m`] : [`${root}m`, `${root}7`];
+    const other = options.find((o) => CHORDS[o]);
+    cmp.hidden = !other;
+    if (other) {
+      cmp.textContent = `Compare with ${CHORDS[other].label}`;
+      cmp.dataset.other = other;
+    }
+  }
+
+  function drawKeys(c) {
+    const keys = $('keys');
+    const whites = [0, 2, 4, 5, 7, 9, 11];
+    const W = 330 / 14;
+    let s = '';
+    const role = (pc) => (c ? c.notes.find((n) => n.pc === pc) : null);
+    for (let o = 0; o < 2; o++) {
+      whites.forEach((pc, k) => {
+        const x = (o * 7 + k) * W;
+        const r = role(pc);
+        s += `<rect x="${x + 0.5}" y="1" width="${W - 1}" height="96" rx="3" fill="#fbfbf8" stroke="#8f989b"/>`;
+        if (r) s += `<circle cx="${x + W / 2}" cy="78" r="8" style="fill:var(--${r.role})"/><text x="${x + W / 2}" y="82" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Atkinson Hyperlegible, sans-serif">${r.role === 'root' ? 'R' : r.role[0] === 't' ? '3' : r.role[0] === 'f' ? '5' : '7'}</text>`;
+      });
+    }
+    const blacks = [[1, 1], [3, 2], [6, 4], [8, 5], [10, 6]];
+    for (let o = 0; o < 2; o++) {
+      for (const [pc, k] of blacks) {
+        const x = (o * 7 + k) * W - W * 0.3;
+        const r = role(pc);
+        s += `<rect x="${x}" y="1" width="${W * 0.6}" height="58" rx="2" fill="#23292b" stroke="#111"/>`;
+        if (r) s += `<circle cx="${x + W * 0.3}" cy="44" r="7" style="fill:var(--${r.role})"/><text x="${x + W * 0.3}" y="48" text-anchor="middle" font-size="9" font-weight="700" fill="#fff" font-family="Atkinson Hyperlegible, sans-serif">${r.role === 'root' ? 'R' : r.role[0] === 't' ? '3' : r.role[0] === 'f' ? '5' : '7'}</text>`;
+      }
+    }
+    keys.innerHTML = s;
+  }
+
+  // Pick a string for a pitch class near a target
+  function stringFor(pc, near) {
+    let best = -1, bd = 1e9;
+    STRING_MIDI.forEach((m, i) => {
+      if (m % 12 === pc && Math.abs(m - near) < bd) { bd = Math.abs(m - near); best = i; }
+    });
+    return best;
+  }
+
+  /* ================================================================
+     Strumming by hand
+     ================================================================ */
+  let drag = null, userTouched = false;
+  function svgPoint(e) {
+    const pt = harp.createSVGPoint();
+    pt.x = e.clientX; pt.y = e.clientY;
+    return pt.matrixTransform(harp.getScreenCTM().inverse());
+  }
+  const stringAt = (y) => Math.max(0, Math.min(NS - 1, Math.round((452 - y) / 11)));
+  const playable = (p) => (p.x < HOLD[0] - 4 || p.x > HOLD[1] + 4) && p.x > 60 && p.x < 1150 && p.y > 40 && p.y < 470;
+  harp.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    const p = svgPoint(e);
+    if (!playable(p) || !audio()) return;
+    e.preventDefault();
+    try { harp.setPointerCapture(e.pointerId); } catch (err) { /* optional */ }
+    const i = stringAt(p.y);
+    drag = { id: e.pointerId, last: i, t: performance.now() };
+    if (Math.abs(yS(i) - p.y) < 6 && p.x < xEnd(i)) pluck(i, ac.currentTime + 0.005, 0.9, !inChord(i));
+  });
+  harp.addEventListener('pointermove', (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const p = svgPoint(e);
+    const i = stringAt(p.y);
+    if (i === drag.last) return;
+    const now = performance.now();
+    const speed = Math.abs(i - drag.last) / Math.max(8, now - drag.t);
+    const vel = Math.max(0.55, Math.min(1.1, 0.6 + speed * 1.2));
+    const dir = i > drag.last ? 1 : -1;
+    let k = 0;
+    for (let j = drag.last + dir; dir > 0 ? j <= i : j >= i; j += dir, k++) {
+      pluck(j, ac.currentTime + 0.003 + k * 0.003, vel, !inChord(j));
+    }
+    drag.last = i;
+    drag.t = now;
+  });
+  const endDrag = (e) => { if (drag && e.pointerId === drag.id) drag = null; };
+  harp.addEventListener('pointerup', endDrag);
+  harp.addEventListener('pointercancel', endDrag);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'select' || tag === 'textarea') return;
+    const k = e.key.toLowerCase();
+    if (k === ' ') {
+      // Space strums, even right after clicking a chord button; other buttons keep their own Space.
+      if (tag === 'button' && !e.target.classList.contains('cb')) return;
+      e.preventDefault();
+      if (!audio()) return;
+      strum(0, NS - 1, ac.currentTime + 0.01, 0.9);
+      return;
+    }
+    let name = null;
+    const ti = KEYS_TOP.indexOf(k), bi = KEYS_BOTTOM.indexOf(k);
+    if (ti >= 0) name = BARS[ti * 2 + 1];
+    if (bi >= 0) name = BARS[bi * 2];
+    if (name) {
+      audio();
+      press(name, true);
+    }
+  });
+  $('lift').addEventListener('click', () => press(null, true));
+
+  /* ================================================================
+     Demonstrations
+     ================================================================ */
+  let demoTimers = [];
+  function clearDemo() { demoTimers.forEach(clearTimeout); demoTimers = []; }
+  function at(sec, fn) { demoTimers.push(setTimeout(fn, sec * 1000)); }
+  function arpeggio(name, start) {
+    const c = CHORDS[name];
+    let near = 62;
+    c.notes.forEach((n, k) => {
+      const i = stringFor(n.pc, near);
+      near = STRING_MIDI[i] + 3;
+      at(start + k * 0.5, () => pluck(i, ac.currentTime + 0.01, 1, false));
+    });
+    return start + c.notes.length * 0.5;
+  }
+  function strumAt(sec, name, vel = 0.95) {
+    at(sec, () => {
+      if (name !== undefined && name !== pressed) press(name, false);
+      strum(0, NS - 1, ac.currentTime + 0.02, vel);
+    });
+  }
+  const DEMOS = {
+    open() { at(0, () => press(null, false)); strumAt(0.05, null); },
+    major() { at(0, () => press('C', false)); const t = arpeggio('C', 0.15); strumAt(t + 0.2, 'C'); },
+    minor() { strumAt(0, 'D'); strumAt(1.6, 'Dm'); strumAt(3.2, 'D'); strumAt(4.8, 'Dm'); },
+    seventh() { strumAt(0, 'G'); strumAt(1.4, 'G7'); strumAt(2.8, 'C'); },
+    cadence() { strumAt(0, 'C'); strumAt(1.3, 'F'); strumAt(2.6, 'G7'); strumAt(3.9, 'C'); },
+  };
+  document.querySelectorAll('[data-demo]').forEach((b) => {
+    b.addEventListener('click', () => {
+      if (!audio()) return;
+      stopSong();
+      clearDemo();
+      DEMOS[b.dataset.demo]();
+    });
+  });
+  $('hear').addEventListener('click', () => {
+    if (!pressed || !audio()) return;
+    clearDemo();
+    const name = pressed;
+    const t = arpeggio(name, 0);
+    strumAt(t + 0.2, name);
+  });
+  $('compare').addEventListener('click', () => {
+    if (!pressed || !audio()) return;
+    clearDemo();
+    const a = pressed, b = $('compare').dataset.other;
+    strumAt(0, a); strumAt(1.5, b); strumAt(3, a); strumAt(4.5, b);
+  });
+
+  /* ================================================================
+     Songs: melody from ABC, chords from its chord symbols
+     ================================================================ */
+  const FIFTHS = { C: 0, G: 1, D: 2, A: 3, E: 4, B: 5, F: -1, Bb: -2, Eb: -3 };
+  function keySig(k) {
+    const m = String(k).trim().match(/^([A-G]b?)/);
+    const n = m && FIFTHS[m[1]] !== undefined ? FIFTHS[m[1]] : 0;
+    const acc = {};
+    for (const l of 'FCGDAEB'.slice(0, Math.max(0, n))) acc[l] = 1;
+    for (const l of 'BEADGCF'.slice(0, Math.max(0, -n))) acc[l] = -1;
+    return acc;
+  }
+  function parseABC(src) {
+    let M = '4/4', Lh = '1/8', K = 'C';
+    const body = [];
+    for (const raw of src.split('\n')) {
+      const h = raw.match(/^([A-Za-z]):\s*(.*)$/);
+      if (h) {
+        if (h[1] === 'M') M = h[2].trim(); else if (h[1] === 'L') Lh = h[2].trim(); else if (h[1] === 'K') K = h[2].trim();
+        continue;
+      }
+      body.push(raw);
+    }
+    const lm = Lh.match(/(\d+)\/(\d+)/);
+    const unit = lm ? Number(lm[1]) / Number(lm[2]) : 1 / 8;
+    const s = body.join(' ');
+    const ks = keySig(K);
+    let barAcc = {}, i = 0;
+    const toks = [];
+    const digit = (c) => c >= '0' && c <= '9';
+    const readLen = () => {
+      let num = '';
+      while (i < s.length && digit(s[i])) num += s[i++];
+      let v = num ? Number(num) : 1;
+      while (s[i] === '/') {
+        i++;
+        let den = '';
+        while (i < s.length && digit(s[i])) den += s[i++];
+        v /= den ? Number(den) : 2;
+      }
+      return v * unit;
+    };
+    while (i < s.length) {
+      const c = s[i];
+      if (c === '"') {
+        const j = s.indexOf('"', i + 1);
+        toks.push({ type: 'chord', name: s.slice(i + 1, j).trim() });
+        i = j + 1;
+        continue;
+      }
+      if (c === '|' || c === ':') {
+        let j = i;
+        while (j < s.length && '|:]['.includes(s[j])) j++;
+        const bar = s.slice(i, j);
+        toks.push({ type: 'bar', open: bar.endsWith(':'), close: bar.startsWith(':') });
+        barAcc = {};
+        i = j;
+        continue;
+      }
+      if (c === 'z') { i++; toks.push({ type: 'rest', dur: readLen() }); continue; }
+      if (c === '-') { for (let k = toks.length - 1; k >= 0; k--) if (toks[k].type === 'note') { toks[k].tie = true; break; } i++; continue; }
+      if (c === '^' || c === '_' || c === '=' || /[A-Ga-g]/.test(c)) {
+        let acc = null;
+        while (s[i] === '^' || s[i] === '_' || s[i] === '=') { const a = s[i++]; acc = a === '=' ? 0 : (acc || 0) + (a === '^' ? 1 : -1); }
+        const L = s[i++], up = L.toUpperCase();
+        let oct = L === up ? 0 : 1;
+        while (s[i] === "'" || s[i] === ',') { oct += s[i] === "'" ? 1 : -1; i++; }
+        const id = up + oct;
+        if (acc !== null) barAcc[id] = acc;
+        const midi = 60 + LETTER_PC[up] + 12 * oct + (id in barAcc ? barAcc[id] : ks[up] || 0);
+        toks.push({ type: 'note', midi, dur: readLen() });
+        continue;
+      }
+      i++;
+    }
+    // unroll repeats
+    const out = [];
+    let start = 0;
+    toks.forEach((t, k) => {
+      if (t.type === 'bar' && t.close) { out.push(t); for (let r = start; r < k; r++) out.push(toks[r]); start = k + 1; return; }
+      if (t.type === 'bar' && t.open) start = k + 1;
+      out.push(t);
+    });
+    let t = 0, last = null;
+    const notes = [], chords = [], bars = [];
+    for (const u of out) {
+      if (u.type === 'chord') chords.push({ t: t * 4, name: u.name });
+      else if (u.type === 'bar') bars.push(t * 4);
+      else if (u.type === 'note') {
+        if (last && last.tie && last.midi === u.midi) { last.dur += u.dur * 4; last.tie = !!u.tie; }
+        else { last = { t: t * 4, dur: u.dur * 4, midi: u.midi, tie: !!u.tie }; notes.push(last); }
+        t += u.dur;
+      } else if (u.type === 'rest') { last = null; t += u.dur; }
+    }
+    const mm = M.match(/(\d+)\/(\d+)/);
+    const barBeats = mm ? (Number(mm[1]) * 4) / Number(mm[2]) : 4;
+    return { notes, chords, bars, total: t * 4, barBeats, key: K };
+  }
+
+  const SONGS = [
+    {
+      id: 'clementine', title: 'Clementine', sub: 'Two chords: I and V7', origin: 'American, 1880s', bpm: 104,
+      abc: `M:3/4
+L:1/4
+K:D
+D3/4D/4|"D"D A, F3/4F/4|F D D/2F/2|A3/2 A/2 G/2F/2|"A7"E2 E/2F/2|G G F/2E/2|"D"F D D/2F/2|"A7"E A, C/2E/2|"D"D2 D3/4D/4|
+"D"D A, F3/4F/4|F D D/2F/2|A3/2 A/2 G/2F/2|"A7"E2 E/2F/2|G G F3/4E/4|"D"F D D/2F/2|"A7"E A, C/2E/2|"D"D2|]`,
+      lyrics: ['In a', 'cavern, in a', 'canyon, exca-', 'vating for a', 'mine, dwelt a', 'miner, forty-', 'niner, and his', 'daughter, Clemen-', 'tine. Oh, my',
+        'darling, oh, my', 'darling, oh, my', 'darling, Clemen-', 'tine, you are', 'lost and gone for-', 'ever, dreadful', 'sorry, Clemen-', 'tine.'],
+    },
+    {
+      id: 'redriver', title: 'Red River Valley', sub: 'Three chords: I, IV, V7', origin: 'North American, late 1800s', bpm: 100,
+      abc: `M:4/4
+L:1/8
+K:G
+|:D2G2|"G"B4 B2B2|B4 A2B2|A2 G6-|G4 D2G2|B4 G2B2|d4 c2B2|"D7"A8-|A4 d2c2|"G"B4 B2A2|"G7"G4 A2B2|"C"d2 c6-|c4 F2E2|"D7"D4 F2G2|A4 B2A2|"G"G8-|G4:|`,
+      lyrics: ['From this', 'valley they', 'say you are', 'going,', 'we will', 'miss your bright', 'eyes and sweet', 'smile,', 'for they', 'say you are', 'taking the', 'sunshine', 'that has', 'brightened our', 'pathway a', 'while.', 'Come and',
+        'sit by my', 'side if you', 'love me,', 'do not', 'hasten to', 'bid me a-', 'dieu,', 'but re-', 'member the', 'Red River', 'Valley', 'and the', 'cowboy who', 'loved you so', 'true.', ''],
+    },
+    {
+      id: 'grace', title: 'Amazing Grace', sub: 'Four chords: I, I7, IV, V7', origin: 'words John Newton, 1779; tune New Britain', bpm: 84,
+      abc: `M:3/4
+L:1/4
+K:G
+|:D|"G"G2 B/G/|B2 A|"C"G2 E|"G"D2 D|G2 B/G/|B2 A/B/|"D7"d3-|d2 B|"G"d2 B/G/|"G7"B2 A|"C"G2 E|"G"D2 D|G2 B/G/|"D7"B2 A|"G"G3-|G2:|`,
+      lyrics: ['A-', 'mazing', 'grace, how', 'sweet the', 'sound that', 'saved a', 'wretch like', 'me.', 'I', 'once was', 'lost, but', 'now am', 'found, was', 'blind, but', 'now I', 'see.', '’Twas',
+        'grace that', 'taught my', 'heart to', 'fear, and', 'grace my', 'fears re-', 'lieved;', 'how', 'precious', 'did that', 'grace ap-', 'pear the', 'hour I', 'first be-', 'lieved.', ''],
+    },
+  ].map((song) => {
+    const P = parseABC(song.abc);
+    const B = P.barBeats;
+    const firstBar = P.bars.find((b) => b > 1e-6);
+    const offset = firstBar === undefined ? 0 : mod(firstBar, B);
+    const cells = [];
+    if (offset > 1e-6) cells.push({ t: 0, chord: null, pickup: true });
+    for (let t = offset; t < P.total - 1e-6; t += B) {
+      let ch = null;
+      for (const c of P.chords) if (c.t <= t + 1e-6) ch = c.name;
+      cells.push({ t, chord: ch, pickup: false });
+    }
+    const sorted = P.notes.map((n) => n.midi).sort((a, b) => a - b);
+    const median = sorted[Math.floor(sorted.length / 2)];
+    const shift = 12 * Math.round((74 - median) / 12);
+    const tonic = mod(LETTER_PC[P.key[0]] + (P.key[1] === 'b' ? -1 : 0), 12);
+    return { ...song, P, B, offset, cells, shift, tonic };
+  });
+
+  function roman(name, tonic) {
+    const c = CHORDS[name];
+    if (!c) return '';
+    const deg = { 0: 'I', 2: 'II', 4: 'III', 5: 'IV', 7: 'V', 9: 'VI', 11: 'VII', 10: '♭VII' }[mod(c.rootPc - tonic, 12)] || '?';
+    return (c.q === 'm' ? deg.toLowerCase() : deg) + (c.q === '7' ? '7' : '');
+  }
+
+  let songIdx = 0;
+  const tabs = $('tabs'), chart = $('chart');
+  SONGS.forEach((s, k) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tab';
+    b.setAttribute('role', 'tab');
+    b.innerHTML = `<b>${s.title}</b><span>${s.sub}</span>`;
+    b.addEventListener('click', () => { stopSong(); selectSong(k); });
+    tabs.append(b);
+  });
+  function selectSong(k) {
+    songIdx = k;
+    [...tabs.children].forEach((b, j) => b.setAttribute('aria-selected', String(j === k)));
+    const s = SONGS[k];
+    let prev = null;
+    chart.innerHTML = s.cells.map((c, j) => {
+      const ly = s.lyrics[j] || '';
+      if (c.pickup) return `<div class="cell pickup"><span class="rn">pickup</span><span class="ly">${ly}</span></div>`;
+      const same = c.chord === prev;
+      prev = c.chord;
+      return `<div class="cell"><span class="mark"></span><span class="cn${same ? ' same' : ''}">${c.chord ? pretty(c.chord) : ''}</span><span class="rn">${c.chord ? roman(c.chord, s.tonic) : ''}</span><span class="ly">${ly}</span></div>`;
+    }).join('');
+    const used = [...new Set(s.cells.map((c) => c.chord).filter(Boolean))];
+    const keyName = s.P.key[0] + (s.P.key[1] === 'b' ? '♭' : '');
+    $('key-note').textContent = `${s.title} is in ${keyName} major and uses ${used.map((u) => `${pretty(u)} (${roman(u, s.tonic)})`).join(', ')}. Its melody is ${s.origin}.`;
+    $('speed').value = '100';
+    setStatus(`${s.cells.filter((c) => !c.pickup).length} bars in ${s.B === 3 ? 'waltz time, three beats to a bar' : 'four beats to a bar'}. Press “Play it for me” to hear it first.`);
+  }
+  const setStatus = (t) => { $('song-status').textContent = t; };
+
+  /* ---------- Playing a song ---------- */
+  let song = null;
+  function whistle(midi, t, dur) {
+    const f = hz(midi);
+    const o = ac.createOscillator();
+    o.type = 'sine';
+    o.frequency.value = f;
+    const o2 = ac.createOscillator();
+    o2.type = 'triangle';
+    o2.frequency.value = f;
+    const vib = ac.createOscillator();
+    vib.frequency.value = 5.4;
+    const vg = ac.createGain();
+    vg.gain.setValueAtTime(0, t);
+    vg.gain.linearRampToValueAtTime(f * 0.004, t + Math.min(0.4, dur));
+    vib.connect(vg); vg.connect(o.frequency); vg.connect(o2.frequency);
+    const g = ac.createGain();
+    const end = t + Math.max(0.1, dur * 0.95);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.08, t + 0.04);
+    g.gain.setValueAtTime(0.08, end - 0.05);
+    g.gain.linearRampToValueAtTime(0, end);
+    const g2 = ac.createGain();
+    g2.gain.value = 0.25;
+    o.connect(g); o2.connect(g2); g2.connect(g); g.connect(master);
+    for (const x of [o, o2, vib]) { x.start(t); x.stop(end + 0.02); }
+  }
+  function click(t, strong) {
+    const o = ac.createOscillator();
+    o.frequency.value = strong ? 1500 : 1100;
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0.18, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
+    o.connect(g); g.connect(master);
+    o.start(t); o.stop(t + 0.06);
+  }
+
+  function startSong(mode) {
+    if (!audio()) { setStatus('This browser cannot make sound, so the harp cannot play here.'); return; }
+    stopSong();
+    clearDemo();
+    const s = SONGS[songIdx];
+    const spb = 60 / (s.bpm * Number($('speed').value) / 100);
+    const t0 = ac.currentTime + 0.3;
+    const begin = t0 + s.B * spb;      // beat 0 of the song, after a bar of count-in
+    const events = [];
+    for (let b = 0; b < s.B; b++) events.push({ t: t0 + b * spb, kind: 'click', strong: b === 0 });
+    for (const n of s.P.notes) events.push({ t: begin + n.t * spb, kind: 'note', midi: n.midi + s.shift, dur: n.dur * spb });
+    s.cells.forEach((c, j) => {
+      if (c.pickup || !c.chord) return;
+      const pattern = s.B === 3 ? [['bass', 0], ['treble', 1], ['treble', 2]] : [['bass', 0], ['treble', 1], ['bass', 2], ['treble', 3]];
+      if (mode === 'listen') events.push({ t: begin + c.t * spb - 0.06, kind: 'press', chord: c.chord });
+      for (const [kind, b] of pattern) {
+        const tt = c.t + b;
+        if (tt >= s.P.total - 1e-6) break;
+        events.push({ t: begin + tt * spb, kind: 'strum', style: kind, cell: j, beat: b, strong: b === 0 });
+      }
+      events.push({ t: begin + c.t * spb + 0.2, kind: 'check', cell: j, chord: c.chord });
+    });
+    events.sort((a, b) => a.t - b.t);
+    song = { mode, s, spb, begin, events, ptr: 0, vis: [], right: 0, judged: 0, end: begin + s.P.total * spb + 0.6 };
+    for (const el of chart.children) el.classList.remove('now', 'ok', 'miss');
+    chart.querySelectorAll('.mark').forEach((m) => { m.textContent = ''; });
+    if (mode === 'listen') press(null, false);
+    $('stop').disabled = false;
+    setStatus(mode === 'listen' ? `Listen: the harp presses the bars itself. Count-in: ${s.B} clicks.` : `Your turn: press each bar as its bar of music begins. Count-in: ${s.B} clicks.`);
+    song.timer = setInterval(scheduleSong, 25);
+    scheduleSong();
+    song.raf = requestAnimationFrame(songFrame);
+  }
+  function scheduleSong() {
+    if (!song) return;
+    const look = song.mode === 'turn' ? 0.06 : 0.15;
+    const horizon = ac.currentTime + look;
+    while (song.ptr < song.events.length && song.events[song.ptr].t < horizon) {
+      const e = song.events[song.ptr++];
+      const t = Math.max(ac.currentTime + 0.003, e.t);
+      if (e.kind === 'click') click(t, e.strong);
+      else if (e.kind === 'note') whistle(e.midi, t, e.dur);
+      else if (e.kind === 'strum') {
+        const vel = e.strong ? 0.9 : 0.6;
+        if (e.style === 'bass') strum(0, 19, t, vel);
+        else strum(15, NS - 1, t, vel * 0.85);
+      }
+      song.vis.push({ ...e, t });
+    }
+  }
+  function songFrame() {
+    if (!song) return;
+    const now = ac.currentTime;
+    song.vis.sort((a, b) => a.t - b.t);
+    let n = 0;
+    while (n < song.vis.length && song.vis[n].t <= now) {
+      const e = song.vis[n++];
+      if (e.kind === 'press') press(e.chord, false);
+      else if (e.kind === 'strum' && e.beat === 0) {
+        [...chart.children].forEach((el, j) => el.classList.toggle('now', j === e.cell));
+      } else if (e.kind === 'check' && song.mode === 'turn') {
+        const el = chart.children[e.cell];
+        const ok = pressed === e.chord;
+        song.judged++;
+        if (ok) song.right++;
+        el.classList.add(ok ? 'ok' : 'miss');
+        el.querySelector('.mark').textContent = ok ? '✓' : '✗';
+        el.querySelector('.mark').setAttribute('aria-label', ok ? 'right chord' : 'wrong chord');
+      }
+    }
+    if (n) song.vis = song.vis.slice(n);
+    // In your turn, light the bar that comes next
+    Object.values(btns).forEach((b) => b.classList.remove('hint'));
+    if (song.mode === 'turn' && $('hints').checked) {
+      const beat = (now - song.begin) / song.spb;
+      const next = song.s.cells.find((c) => !c.pickup && c.chord && c.t + 0.5 > beat);
+      if (next && next.t - beat < 1.2 && btns[next.chord]) btns[next.chord].classList.add('hint');
+    }
+    if (now > song.end) {
+      const { mode, right, judged } = song;
+      stopSong();
+      setStatus(mode === 'turn'
+        ? `Done. You had the right bar down in ${right} of ${judged} bars.${right === judged ? ' Every one.' : ' Try it again, or slow it down.'}`
+        : 'That’s the whole song. Now press “Your turn” and play the bars yourself.');
+      return;
+    }
+    song.raf = requestAnimationFrame(songFrame);
+  }
+  function stopSong() {
+    if (!song) return;
+    clearInterval(song.timer);
+    cancelAnimationFrame(song.raf);
+    song = null;
+    Object.values(btns).forEach((b) => b.classList.remove('hint'));
+    for (const el of chart.children) el.classList.remove('now');
+    $('stop').disabled = true;
+  }
+  $('listen').addEventListener('click', () => startSong('listen'));
+  $('turn').addEventListener('click', () => { press(null, false); startSong('turn'); });
+  $('stop').addEventListener('click', () => { stopSong(); setStatus('Stopped.'); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden && song) { stopSong(); setStatus('Stopped while this tab was hidden.'); } });
+
+  /* ---------- Start ---------- */
+  buildHarp();
+  selectSong(0);
+  press('C', false);
+})();
+</script>
+</body>
+</html>

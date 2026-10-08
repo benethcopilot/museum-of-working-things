@@ -1,0 +1,1618 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Ebru Tray</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;1,400;1,500&family=Alegreya+Sans+SC:wght@500;700&family=Alegreya+Sans:wght@400;500;700&display=swap">
+<style>
+:root {
+  /* Layout: a marbler's bench. Tools and the pattern book sit in a narrow left column, the tray is lit large on the right; on phones the tray comes first and the tools follow. */
+  --ground: #e1e2dd;
+  --ground-2: #d3d5ce;
+  --text: #1c2131;
+  --muted: #565b6a;
+  --line: rgba(28, 33, 49, 0.14);
+  --line-strong: rgba(28, 33, 49, 0.34);
+  --accent: #2b4183;
+  --rim: #33291f;
+  --rim-hi: #5a4a3b;
+  --veil: rgba(16, 18, 26, 0.72);
+  --on-veil: #f2eee4;
+  --on-veil-muted: rgba(242, 238, 228, 0.72);
+  --paper: #f4efe3;
+  --f-display: "Alegreya", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --f-body: "Alegreya Sans", "Gill Sans", "Gill Sans MT", "Segoe UI", system-ui, sans-serif;
+  --f-label: "Alegreya Sans SC", "Alegreya Sans", "Gill Sans", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #13151c;
+    --ground-2: #1e2129;
+    --text: #e7e3d8;
+    --muted: #9da0ad;
+    --line: rgba(231, 227, 216, 0.13);
+    --line-strong: rgba(231, 227, 216, 0.3);
+    --accent: #a8baf0;
+    --rim: #2b231c;
+    --rim-hi: #4a3d31;
+    --veil: rgba(6, 7, 10, 0.78);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #13151c;
+  --ground-2: #1e2129;
+  --text: #e7e3d8;
+  --muted: #9da0ad;
+  --line: rgba(231, 227, 216, 0.13);
+  --line-strong: rgba(231, 227, 216, 0.3);
+  --accent: #a8baf0;
+  --rim: #2b231c;
+  --rim-hi: #4a3d31;
+  --veil: rgba(6, 7, 10, 0.78);
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* ---------- Frame ---------- */
+.app {
+  height: 100%;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(270px, 320px) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-areas: "brand stage" "controls stage";
+  column-gap: clamp(24px, 3.2vw, 52px);
+  padding-inline: clamp(16px, 3vw, 44px);
+}
+.brand { grid-area: brand; padding-block: 30px 22px; }
+.controls {
+  grid-area: controls;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding-block: 2px 30px;
+  padding-inline: 2px;
+  margin-inline: -2px;
+}
+.stage {
+  grid-area: stage;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-block: 30px;
+}
+
+/* ---------- Brand ---------- */
+.eyebrow {
+  margin: 0;
+  font-family: var(--f-label);
+  font-weight: 500;
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+h1 {
+  margin: 0 0 12px;
+  font-family: var(--f-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(3.6rem, 5.4vw, 4.8rem);
+  line-height: 0.95;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+}
+.intro { margin: 0; max-width: 38ch; color: var(--muted); font-size: 0.98rem; line-height: 1.55; }
+
+/* ---------- Section labels ---------- */
+.label {
+  margin: 0 0 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--f-label);
+  font-weight: 500;
+  font-size: 0.92rem;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+}
+.label .aside { font-family: var(--f-label); letter-spacing: 0.04em; font-size: 0.82rem; }
+.label .now { font-family: var(--f-display); font-style: italic; letter-spacing: 0; font-size: 1.05rem; color: var(--text); }
+
+/* ---------- Tools ---------- */
+.tool-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.tool {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 10px 10px 9px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  text-align: left;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.tool svg { width: 22px; height: 22px; margin-bottom: 5px; color: var(--muted); fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+.tool .t-name { font-family: var(--f-display); font-style: italic; font-size: 1.22rem; line-height: 1.1; }
+.tool .t-gloss { font-family: var(--f-label); font-weight: 500; font-size: 0.8rem; letter-spacing: 0.06em; color: var(--muted); }
+.tool:hover { background: var(--ground-2); }
+.tool[aria-pressed="true"] { border-color: var(--text); background: var(--ground-2); }
+.tool[aria-pressed="true"] svg { color: var(--text); }
+.hint { margin: 10px 0 0; min-height: 3em; font-size: 0.93rem; color: var(--muted); }
+
+/* ---------- Inks ---------- */
+.pots { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 9px; }
+.pot {
+  width: 100%;
+  max-width: 34px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 30%, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0) 44%),
+    var(--c);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2), inset 0 -3px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.15s;
+}
+.pot:hover { transform: translateY(-1px); }
+.pot[aria-pressed="true"] {
+  box-shadow: 0 0 0 2px var(--ground), 0 0 0 3.5px var(--text), inset 0 0 0 1px rgba(0, 0, 0, 0.2), inset 0 -3px 6px rgba(0, 0, 0, 0.2);
+}
+.pot:focus-visible { outline-offset: 5px; }
+
+/* ---------- Pattern book ---------- */
+.book { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.book li { border-bottom: 1px solid var(--line); }
+.pattern {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 10px;
+  row-gap: 2px;
+  padding: 11px 8px 12px;
+  text-align: left;
+  transition: background-color 0.15s;
+}
+.pattern:hover { background: var(--ground-2); }
+.p-head { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 9px; min-width: 0; }
+.p-name { font-family: var(--f-display); font-style: italic; font-size: 1.32rem; line-height: 1.15; }
+.p-gloss { font-family: var(--f-label); font-weight: 500; font-size: 0.84rem; letter-spacing: 0.04em; color: var(--muted); }
+.p-state { align-self: center; font-family: var(--f-label); font-weight: 700; font-size: 0.74rem; letter-spacing: 0.08em; color: var(--accent); }
+.p-desc { grid-column: 1 / -1; font-size: 0.9rem; line-height: 1.45; color: var(--muted); }
+
+/* ---------- Drying rack ---------- */
+.thumbs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; }
+.thumb { display: block; border-radius: 1px; }
+.thumb img {
+  display: block;
+  width: 100%;
+  aspect-ratio: var(--tray-aspect, 1.4);
+  object-fit: cover;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+  transition: transform 0.15s;
+}
+.thumb:hover img { transform: translateY(-2px) rotate(-0.6deg); }
+
+.keys { margin: 0; font-size: 0.84rem; color: var(--muted); }
+kbd {
+  font-family: var(--f-body);
+  font-weight: 700;
+  font-size: 0.78rem;
+  padding: 0 5px;
+  border: 1px solid var(--line-strong);
+  border-radius: 3px;
+}
+
+/* ---------- Tray ---------- */
+.tray-wrap { flex: 1 1 auto; min-height: 0; display: grid; place-items: center; }
+.tray {
+  position: relative;
+  box-sizing: border-box;
+  border: 9px solid var(--rim);
+  border-top-color: var(--rim-hi);
+  border-radius: 5px;
+  background: var(--paper);
+  box-shadow: 0 34px 60px -34px rgba(8, 10, 18, 0.6), 0 5px 12px -3px rgba(8, 10, 18, 0.28);
+  max-width: 100%;
+}
+.tray canvas { position: absolute; left: 0; top: 0; display: block; }
+#ink { z-index: 0; }
+.grain, .sheen, .meniscus, .sheet { position: absolute; inset: 0; pointer-events: none; }
+.grain { z-index: 1; background-image: var(--grain); background-size: var(--grain-size, 180px); mix-blend-mode: multiply; }
+.sheen {
+  z-index: 2;
+  background:
+    linear-gradient(162deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 34%),
+    radial-gradient(120% 90% at 85% 110%, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 60%);
+  mix-blend-mode: screen;
+}
+.meniscus { z-index: 3; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4), inset 0 2px 16px rgba(40, 25, 10, 0.3); }
+#cursor { z-index: 4; touch-action: none; cursor: none; }
+.sheet {
+  z-index: 5;
+  background: var(--paper) var(--grain);
+  background-size: var(--grain-size, 180px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+}
+.sheet img { display: block; width: 100%; height: 100%; opacity: 0; transition: opacity 0.3s; }
+.sheet.inked img { opacity: 1; }
+.sheet.lay { animation: lay 1.5s cubic-bezier(0.45, 0, 0.25, 1) both; }
+@keyframes lay {
+  0% { opacity: 0; transform: translateY(-3%) scale(1.02); }
+  26% { opacity: 1; transform: none; }
+  62% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translateY(-7%) rotate(-1.2deg) scale(1.01); }
+}
+
+/* ---------- Bar under the tray ---------- */
+.bar {
+  width: 100%;
+  margin-inline: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+}
+.status { flex: 1 1 260px; min-width: 0; margin: 0; font-size: 1rem; color: var(--muted); }
+.status em { font-family: var(--f-display); font-style: italic; font-size: 1.1em; color: var(--text); }
+.linkish {
+  margin-left: 6px;
+  font-weight: 500;
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--line-strong);
+}
+.linkish:hover { text-decoration-color: currentColor; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn {
+  font-weight: 500;
+  font-size: 0.98rem;
+  padding: 8px 16px 9px;
+  border: 1px solid var(--line-strong);
+  border-radius: 3px;
+  transition: background-color 0.15s, border-color 0.15s, opacity 0.15s;
+}
+.btn:hover { background: var(--ground-2); }
+.btn.primary { background: var(--text); color: var(--ground); border-color: var(--text); }
+.btn.primary:hover { background: var(--text); opacity: 0.86; }
+.btn.armed { border-color: var(--text); background: var(--ground-2); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+
+/* ---------- Print view ---------- */
+.print-view {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  padding: 28px 16px;
+  background: var(--veil);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  animation: fade 0.35s ease both;
+}
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+.pv { display: flex; flex-direction: column; align-items: center; gap: 18px; max-width: min(1100px, 100%); color: var(--on-veil); text-align: center; }
+.pv figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 16px; max-width: 100%; }
+.pv img {
+  display: block;
+  max-width: 100%;
+  max-height: 68vh;
+  width: auto;
+  height: auto;
+  background: var(--paper);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 30px 60px -20px rgba(0, 0, 0, 0.6);
+}
+.pv h2 { margin: 0; font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: 2rem; line-height: 1.1; text-wrap: balance; }
+.pv .meta { margin: 4px 0 0; font-family: var(--f-label); font-weight: 500; letter-spacing: 0.06em; color: var(--on-veil-muted); }
+.pv .note { margin: 0; max-width: 46ch; font-size: 0.95rem; color: var(--on-veil-muted); }
+.pv .btn { color: var(--on-veil); border-color: rgba(242, 238, 228, 0.45); }
+.pv .btn:hover { background: rgba(242, 238, 228, 0.1); }
+
+/* ---------- Narrow screens: tray first ---------- */
+@media (max-width: 900px) {
+  .app {
+    height: auto;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-template-areas: "brand" "stage" "controls";
+  }
+  .brand { padding-block: 22px 16px; }
+  h1 { font-size: 3.4rem; }
+  .controls { overflow: visible; padding-block: 14px 36px; }
+  .stage { padding-block: 0 4px; }
+  .tray-wrap { flex: none; width: 100%; aspect-ratio: var(--tray-aspect, 1.4); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet.lay, .print-view { animation: none; }
+  .pot, .thumb img, .tool, .pattern, .btn { transition: none; }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="ebru" defer></script>
+</head>
+<body>
+<div class="app">
+  <header class="brand">
+    <p class="eyebrow">Turkish paper marbling</p>
+    <h1>Ebru</h1>
+    <p class="intro">Inks thinned with ox gall float on water thickened with gum tragacanth. The marbler sprinkles them with a horsehair brush, draws them into patterns with an awl and a comb, then lifts them off with one sheet of paper. Each tray gives one print.</p>
+  </header>
+
+  <main class="stage">
+    <div class="tray-wrap" id="wrap">
+      <div class="tray" id="tray">
+        <canvas id="ink" role="img" aria-label="Marbling tray"></canvas>
+        <div class="grain"></div>
+        <div class="sheen"></div>
+        <div class="meniscus"></div>
+        <canvas id="cursor" aria-hidden="true"></canvas>
+        <div class="sheet" id="sheet" hidden><img id="sheet-img" alt=""></div>
+      </div>
+    </div>
+    <div class="bar" id="bar">
+      <p class="status" id="status" aria-live="polite"></p>
+      <div class="actions">
+        <button type="button" class="btn" id="rinse">Rinse tray</button>
+        <button type="button" class="btn primary" id="pull">Pull a print</button>
+      </div>
+    </div>
+  </main>
+
+  <div class="controls">
+    <section aria-labelledby="tool-label">
+      <h2 class="label" id="tool-label">Tool</h2>
+      <div class="tool-row" id="tools"></div>
+      <p class="hint" id="hint"></p>
+    </section>
+
+    <section aria-labelledby="ink-label">
+      <h2 class="label"><span id="ink-label">Ink</span><span class="now" id="ink-name"></span></h2>
+      <div class="pots" id="pots"></div>
+    </section>
+
+    <section aria-labelledby="book-label">
+      <h2 class="label"><span id="book-label">Pattern book</span><span class="aside">each starts a fresh tray</span></h2>
+      <ul class="book" id="book"></ul>
+    </section>
+
+    <section aria-labelledby="rack-label" id="rack" hidden>
+      <h2 class="label" id="rack-label">Prints drying</h2>
+      <div class="thumbs" id="thumbs"></div>
+    </section>
+
+    <p class="keys"><kbd>F</kbd> brush · <kbd>B</kbd> awl · <kbd>T</kbd> comb · <kbd>1</kbd>–<kbd>8</kbd> inks</p>
+  </div>
+</div>
+
+<div class="print-view" id="print-view" hidden>
+  <div class="pv" role="dialog" aria-modal="true" aria-labelledby="pv-title">
+    <figure>
+      <img id="pv-img" alt="">
+      <figcaption>
+        <h2 id="pv-title"></h2>
+        <p class="meta" id="pv-meta"></p>
+      </figcaption>
+    </figure>
+    <p class="note">To keep it, right-click or long-press the print and save the image.</p>
+    <button type="button" class="btn" id="pv-close">Back to the tray</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ================================================================
+     Inks. Fixed pigment colors: they are the artwork, not the chrome.
+     ================================================================ */
+  const INKS = [
+    { id: 'indigo', name: 'Indigo', hex: '#25386b' },
+    { id: 'woad', name: 'Woad', hex: '#7a9dbd' },
+    { id: 'madder', name: 'Madder', hex: '#9c2e2a' },
+    { id: 'rose', name: 'Rose madder', hex: '#cf8579' },
+    { id: 'ochre', name: 'Ochre', hex: '#c8952f' },
+    { id: 'verdigris', name: 'Verdigris', hex: '#3c7366' },
+    { id: 'black', name: 'Lamp black', hex: '#201e22' },
+    { id: 'chalk', name: 'Chalk', hex: '#ebe3d0' },
+  ];
+  const INK = {};
+  for (const ink of INKS) {
+    const n = parseInt(ink.hex.slice(1), 16);
+    const k = 0.6;
+    ink.rim = `rgba(${Math.round(((n >> 16) & 255) * k)},${Math.round(((n >> 8) & 255) * k)},${Math.round((n & 255) * k)},0.42)`;
+    INK[ink.id] = ink;
+  }
+  const PAPER = '#f4efe3';
+
+  /* ================================================================
+     Tray geometry, in logical units (1000 on the short side).
+     ================================================================ */
+  const PORTRAIT = window.innerWidth < 760 && window.innerHeight > window.innerWidth;
+  const W = PORTRAIT ? 1000 : 1400;
+  const H = PORTRAIT ? 1400 : 1000;
+  const VIS = [-160, -160, W + 160, H + 160];   // refine curves inside this
+  const FAR = [-460, -460, W + 460, H + 460];   // forget ink beyond this
+  const BASE_EDGE = 3.4, BASE_TOL = 0.2, BASE_MIN = 0.22, VERT_BUDGET = 450000;
+  const MAX_DEPTH = 12, FAR_MERGE2 = 22 * 22;
+  let MAX_EDGE2 = BASE_EDGE * BASE_EDGE, TOL2 = BASE_TOL * BASE_TOL, MIN_D2 = BASE_MIN * BASE_MIN;
+
+  const R_TAP = 38, HOLD_RATE = 5200, R_MAX = 190, SPRINKLE_GAP = 72;
+  const AWL_LAM = 6, COMB_LAM = 4.4, COMB_S = 34;
+
+  /* ================================================================
+     Ink on water: every drop is a closed polygon. Each tool is an
+     invertible map of the plane applied to every vertex. Edges are
+     subdivided in the pre-image wherever the image would get coarse,
+     so the curves stay exact as they stretch.
+     ================================================================ */
+  let polys = [];
+  let OX = 0, OY = 0;
+  let OUT = new Float64Array(0), ON = 0;
+  let dirty = true;
+  const trackers = new Set();   // points carried by the ink (centers of growing drops)
+
+  function outcode(x, y) {
+    return (x < VIS[0] ? 1 : x > VIS[2] ? 2 : 0) | (y < VIS[1] ? 4 : y > VIS[3] ? 8 : 0);
+  }
+  function edgeVisible(ax, ay, bx, by) {
+    const ca = outcode(ax, ay), cb = outcode(bx, by);
+    if (ca & cb) return false;
+    if (!ca || !cb) return true;
+    const dx = bx - ax, dy = by - ay;
+    const s1 = dx * (VIS[1] - ay) - dy * (VIS[0] - ax);
+    const s2 = dx * (VIS[1] - ay) - dy * (VIS[2] - ax);
+    const s3 = dx * (VIS[3] - ay) - dy * (VIS[0] - ax);
+    const s4 = dx * (VIS[3] - ay) - dy * (VIS[2] - ax);
+    return !((s1 > 0 && s2 > 0 && s3 > 0 && s4 > 0) || (s1 < 0 && s2 < 0 && s3 < 0 && s4 < 0));
+  }
+  function farOut(x, y) {
+    return x < FAR[0] || x > FAR[2] || y < FAR[1] || y > FAR[3];
+  }
+  function push(x, y) {
+    if (ON >= 2) {
+      const lx = OUT[ON - 2], ly = OUT[ON - 1];
+      const dx = x - lx, dy = y - ly, dd = dx * dx + dy * dy;
+      if (dd < MIN_D2) return;
+      if (dd < FAR_MERGE2 && farOut(x, y) && farOut(lx, ly)) return;
+    }
+    if (ON + 2 > OUT.length) {
+      const nb = new Float64Array(Math.max(64, OUT.length * 2));
+      nb.set(OUT);
+      OUT = nb;
+    }
+    OUT[ON++] = x;
+    OUT[ON++] = y;
+  }
+  function sub(m, ax, ay, fax, fay, bx, by, fbx, fby, depth) {
+    if (depth >= MAX_DEPTH || !edgeVisible(fax, fay, fbx, fby)) return;
+    const mx = (ax + bx) * 0.5, my = (ay + by) * 0.5;
+    m.map(mx, my);
+    const fmx = OX, fmy = OY;
+    const cx = fbx - fax, cy = fby - fay;
+    const ex = fmx - (fax + fbx) * 0.5, ey = fmy - (fay + fby) * 0.5;
+    if (cx * cx + cy * cy > MAX_EDGE2 || ex * ex + ey * ey > TOL2) {
+      sub(m, ax, ay, fax, fay, mx, my, fmx, fmy, depth + 1);
+      push(fmx, fmy);
+      sub(m, mx, my, fmx, fmy, bx, by, fbx, fby, depth + 1);
+    }
+  }
+  function transformPoly(p, m) {
+    const src = p.pts, n = p.n;
+    OUT = p.spare.length >= n ? p.spare : new Float64Array(n + 64);
+    ON = 0;
+    m.map(src[0], src[1]);
+    const f0x = OX, f0y = OY;
+    let ax = src[0], ay = src[1], fax = f0x, fay = f0y;
+    for (let i = 0; i < n; i += 2) {
+      let bx, by, fbx, fby;
+      if (i + 2 < n) {
+        bx = src[i + 2]; by = src[i + 3];
+        m.map(bx, by);
+        fbx = OX; fby = OY;
+      } else {
+        bx = src[0]; by = src[1]; fbx = f0x; fby = f0y;
+      }
+      push(fax, fay);
+      sub(m, ax, ay, fax, fay, bx, by, fbx, fby, 0);
+      ax = bx; ay = by; fax = fbx; fay = fby;
+    }
+    p.spare = src;
+    p.pts = OUT;
+    p.n = ON;
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (let i = 0; i < ON; i += 2) {
+      const x = OUT[i], y = OUT[i + 1];
+      if (x < x0) x0 = x;
+      if (x > x1) x1 = x;
+      if (y < y0) y0 = y;
+      if (y > y1) y1 = y;
+    }
+    p.x0 = x0; p.y0 = y0; p.x1 = x1; p.y1 = y1;
+  }
+  function applyMap(m) {
+    const b = m.bounds;
+    for (let i = 0; i < polys.length; i++) {
+      const p = polys[i];
+      if (b && (p.x1 < b[0] || p.x0 > b[2] || p.y1 < b[1] || p.y0 > b[3])) continue;
+      transformPoly(p, m);
+    }
+    for (const c of trackers) {
+      m.map(c.x, c.y);
+      c.x = OX;
+      c.y = OY;
+    }
+    cull();
+    dirty = true;
+  }
+  function cull() {
+    let j = 0, total = 0;
+    for (let i = 0; i < polys.length; i++) {
+      const p = polys[i];
+      if (p.n < 6 || p.x1 < FAR[0] || p.x0 > FAR[2] || p.y1 < FAR[1] || p.y0 > FAR[3]) continue;
+      polys[j++] = p;
+      total += p.n;
+    }
+    polys.length = j;
+    // Under very heavy combing, trade a little resolution for speed.
+    const q = Math.min(4, Math.max(1, Math.sqrt(total / 2 / VERT_BUDGET)));
+    MAX_EDGE2 = (BASE_EDGE * q) ** 2;
+    TOL2 = (BASE_TOL * q) ** 2;
+    MIN_D2 = (BASE_MIN * q) ** 2;
+  }
+  function addCircle(cx, cy, r, ink) {
+    const n = Math.max(32, Math.ceil((2 * Math.PI * r) / BASE_EDGE));
+    const pts = new Float64Array(n * 2);
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2;
+      pts[2 * i] = cx + r * Math.cos(a);
+      pts[2 * i + 1] = cy + r * Math.sin(a);
+    }
+    const p = { pts, spare: new Float64Array(0), n: n * 2, ink, x0: cx - r, y0: cy - r, x1: cx + r, y1: cy + r };
+    polys.push(p);
+    return p;
+  }
+
+  /* ---------- The maps ---------- */
+  // A drop of area pi*r2 at c pushes everything outward; area is preserved.
+  const dropMap = {
+    cx: 0, cy: 0, r2: 0, bounds: null,
+    map(x, y) {
+      const dx = x - this.cx, dy = y - this.cy, d2 = dx * dx + dy * dy;
+      if (d2 < 1e-9) { OX = x; OY = y; return; }
+      const s = Math.sqrt(1 + this.r2 / d2);
+      OX = this.cx + dx * s;
+      OY = this.cy + dy * s;
+    },
+  };
+  // A tine drawn the full length of the tray (or a set of parallel tines).
+  const lineMap = {
+    ox: 0, oy: 0, mx: 1, my: 0, nx: 0, ny: 1, spacing: 0, z: 0, lam: 6, cut: 54, bounds: null,
+    map(x, y) {
+      let t = (x - this.ox) * this.nx + (y - this.oy) * this.ny;
+      if (this.spacing) t -= this.spacing * Math.round(t / this.spacing);
+      const d = t < 0 ? -t : t;
+      if (d > this.cut) { OX = x; OY = y; return; }
+      const w = this.z * Math.exp(-d / this.lam);
+      OX = x + w * this.mx;
+      OY = y + w * this.my;
+    },
+  };
+  // The awl turned in place: rotation that fades with distance.
+  const vortexMap = {
+    cx: 0, cy: 0, a: 0, lam: 30, cut: 330, bounds: [0, 0, 0, 0],
+    map(x, y) {
+      const dx = x - this.cx, dy = y - this.cy;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d > this.cut) { OX = x; OY = y; return; }
+      const th = this.a * Math.exp(-d / this.lam);
+      const c = Math.cos(th), s = Math.sin(th);
+      OX = this.cx + dx * c - dy * s;
+      OY = this.cy + dx * s + dy * c;
+    },
+  };
+  // One short step of a hand-held awl.
+  const stylusMap = {
+    ax: 0, ay: 0, ux: 1, uy: 0, len: 0, z: 0, lam: AWL_LAM, cut: 48, bounds: [0, 0, 0, 0],
+    set(ax, ay, bx, by, z, lam) {
+      const dx = bx - ax, dy = by - ay, len = Math.sqrt(dx * dx + dy * dy);
+      if (len < 1e-9) return false;
+      this.ax = ax; this.ay = ay; this.ux = dx / len; this.uy = dy / len; this.len = len;
+      this.z = z; this.lam = lam; this.cut = 8 * lam;
+      const b = this.bounds;
+      b[0] = Math.min(ax, bx) - this.cut; b[1] = Math.min(ay, by) - this.cut;
+      b[2] = Math.max(ax, bx) + this.cut; b[3] = Math.max(ay, by) + this.cut;
+      return true;
+    },
+    map(x, y) {
+      const px = x - this.ax, py = y - this.ay;
+      let s = px * this.ux + py * this.uy;
+      if (s < 0) s = 0; else if (s > this.len) s = this.len;
+      const qx = px - s * this.ux, qy = py - s * this.uy;
+      const d = Math.sqrt(qx * qx + qy * qy);
+      if (d > this.cut) { OX = x; OY = y; return; }
+      const w = this.z * Math.exp(-d / this.lam);
+      OX = x + w * this.ux;
+      OY = y + w * this.uy;
+    },
+  };
+  // One short step of a comb: a row of tines spaced along a fixed axis.
+  function tineRange(ax, ay, nx, ny) {
+    let lo = -Infinity, hi = Infinity;
+    const sx = COMB_S * nx, sy = COMB_S * ny;
+    if (Math.abs(sx) > 1e-9) {
+      const a = -ax / sx, b = (W - ax) / sx;
+      lo = Math.max(lo, Math.min(a, b)); hi = Math.min(hi, Math.max(a, b));
+    } else if (ax < 0 || ax > W) { lo = 1; hi = 0; }
+    if (Math.abs(sy) > 1e-9) {
+      const a = -ay / sy, b = (H - ay) / sy;
+      lo = Math.max(lo, Math.min(a, b)); hi = Math.min(hi, Math.max(a, b));
+    } else if (ay < 0 || ay > H) { lo = 1; hi = 0; }
+    return [Math.ceil(lo), Math.floor(hi)];
+  }
+  const combMap = {
+    ax: 0, ay: 0, ux: 1, uy: 0, len: 0, z: 0, lam: COMB_LAM, cut: 8 * COMB_LAM, nx: 0, ny: 1, kmin: 0, kmax: -1,
+    bounds: [0, 0, 0, 0],
+    set(ax, ay, bx, by, nx, ny, z) {
+      const dx = bx - ax, dy = by - ay, len = Math.sqrt(dx * dx + dy * dy);
+      if (len < 1e-9) return false;
+      this.ax = ax; this.ay = ay; this.ux = dx / len; this.uy = dy / len; this.len = len;
+      this.nx = nx; this.ny = ny; this.z = z;
+      const r = tineRange(ax, ay, nx, ny);
+      this.kmin = r[0]; this.kmax = r[1];
+      const pad = this.cut + len, b = this.bounds;
+      b[0] = -pad; b[1] = -pad; b[2] = W + pad; b[3] = H + pad;
+      return this.kmin <= this.kmax;
+    },
+    map(x, y) {
+      const px = x - this.ax, py = y - this.ay;
+      let k = Math.round((px * this.nx + py * this.ny) / COMB_S);
+      if (k < this.kmin) k = this.kmin; else if (k > this.kmax) k = this.kmax;
+      const tx = px - k * COMB_S * this.nx, ty = py - k * COMB_S * this.ny;
+      let s = tx * this.ux + ty * this.uy;
+      if (s < 0) s = 0; else if (s > this.len) s = this.len;
+      const qx = tx - s * this.ux, qy = ty - s * this.uy;
+      const d = Math.sqrt(qx * qx + qy * qy);
+      if (d > this.cut) { OX = x; OY = y; return; }
+      const w = this.z * Math.exp(-d / this.lam);
+      OX = x + w * this.ux;
+      OY = y + w * this.uy;
+    },
+  };
+
+  /* ================================================================
+     Timed operations. Each map composes exactly with itself, so an
+     operation can be played out over many frames in small increments.
+     ================================================================ */
+  const easeOut = (t) => 1 - (1 - t) * (1 - t);
+  const easeInOut = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+  class Op {
+    constructor(start, dur, ease) {
+      this.start = start; this.dur = dur; this.ease = ease; this.e = 0; this.done = false;
+    }
+    advanceTo(f) {
+      if (this.done) return;
+      const e = f >= 1 ? 1 : this.ease(Math.max(0, f));
+      if (e > this.e) { this.apply(this.e, e); this.e = e; }
+      if (f >= 1) { this.done = true; this.finish(); }
+    }
+    finish() {}
+  }
+  class DropOp extends Op {
+    constructor(x, y, r, ink, start, dur) {
+      super(start, dur, easeOut);
+      this.c = { x, y }; this.r2 = r * r; this.ink = INK[ink]; this.got = 0; this.poly = null;
+    }
+    apply(e0, e1) {
+      const target = this.r2 * e1;
+      dropMap.cx = this.c.x; dropMap.cy = this.c.y;
+      if (!this.poly) {
+        const r2 = Math.max(target, 4);
+        dropMap.r2 = r2;
+        applyMap(dropMap);
+        this.poly = addCircle(this.c.x, this.c.y, Math.sqrt(r2), this.ink);
+        this.got = r2;
+        trackers.add(this.c);
+      } else if (target > this.got) {
+        dropMap.r2 = target - this.got;
+        applyMap(dropMap);
+        this.got = target;
+      }
+    }
+    finish() { trackers.delete(this.c); }
+  }
+  class LineOp extends Op {
+    constructor(ox, oy, mx, my, spacing, z, lam, start, dur) {
+      super(start, dur, easeInOut);
+      this.ox = ox; this.oy = oy; this.mx = mx; this.my = my; this.spacing = spacing; this.z = z; this.lam = lam;
+    }
+    apply(e0, e1) {
+      const L = lineMap;
+      L.ox = this.ox; L.oy = this.oy; L.mx = this.mx; L.my = this.my; L.nx = -this.my; L.ny = this.mx;
+      L.spacing = this.spacing; L.z = this.z * (e1 - e0); L.lam = this.lam; L.cut = 9 * this.lam;
+      applyMap(L);
+    }
+  }
+  class VortexOp extends Op {
+    constructor(x, y, a, lam, start, dur) {
+      super(start, dur, easeInOut);
+      this.x = x; this.y = y; this.a = a; this.lam = lam;
+    }
+    apply(e0, e1) {
+      const V = vortexMap;
+      V.cx = this.x; V.cy = this.y; V.a = this.a * (e1 - e0); V.lam = this.lam; V.cut = 11 * this.lam;
+      V.bounds[0] = V.cx - V.cut; V.bounds[1] = V.cy - V.cut; V.bounds[2] = V.cx + V.cut; V.bounds[3] = V.cy + V.cut;
+      applyMap(V);
+    }
+  }
+  class StrokeOp extends Op {
+    constructor(points, lam, start, dur) {
+      super(start, dur, easeInOut);
+      this.p = points; this.lam = lam; this.cum = [0];
+      for (let i = 1; i < points.length; i++) {
+        this.cum.push(this.cum[i - 1] + Math.hypot(points[i][0] - points[i - 1][0], points[i][1] - points[i - 1][1]));
+      }
+      this.L = this.cum[this.cum.length - 1];
+    }
+    at(s) {
+      let i = 1;
+      while (i < this.cum.length - 1 && this.cum[i] < s) i++;
+      const a = this.p[i - 1], b = this.p[i], seg = this.cum[i] - this.cum[i - 1] || 1;
+      const t = Math.min(1, Math.max(0, (s - this.cum[i - 1]) / seg));
+      return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+    }
+    apply(e0, e1) {
+      let s0 = this.L * e0;
+      const s1 = this.L * e1, step = 0.7 * this.lam;
+      let a = this.at(s0);
+      while (s0 < s1 - 1e-9) {
+        const s = Math.min(s1, s0 + step);
+        const b = this.at(s);
+        if (stylusMap.set(a[0], a[1], b[0], b[1], 0.92 * (s - s0), this.lam)) applyMap(stylusMap);
+        a = b;
+        s0 = s;
+      }
+    }
+  }
+
+  /* ================================================================
+     The pattern book: traditional sequences, played as operations.
+     ================================================================ */
+  // The first color is thinned until it floods the whole bath; later colors crowd it into veins.
+  const GROUNDS = {
+    indigo: { flood: 'indigo', layers: [['ochre', 40, 100], ['madder', 34, 74], ['chalk', 30, 56]] },
+    madder: { flood: 'madder', layers: [['rose', 40, 100], ['chalk', 34, 72], ['indigo', 28, 50]] },
+    verdigris: { flood: 'verdigris', layers: [['chalk', 40, 100], ['ochre', 34, 72], ['black', 26, 46]] },
+    pale: { flood: 'chalk', layers: [['woad', 36, 96], ['chalk', 30, 60], ['ochre', 14, 34]] },
+  };
+  const pick = (rng, list) => list[Math.floor(rng() * list.length)];
+
+  class FloodOp extends Op {
+    constructor(ink, start) { super(start, 1, (t) => t); this.ink = INK[ink]; }
+    apply() {
+      if (this.placed) return;
+      this.placed = true;
+      const x0 = -400, y0 = -400, x1 = W + 400, y1 = H + 400;
+      polys.unshift({
+        pts: new Float64Array([x0, y0, x1, y0, x1, y1, x0, y1]), spare: new Float64Array(0), n: 8,
+        ink: this.ink, x0, y0, x1, y1,
+      });
+      dirty = true;
+    }
+  }
+  function sprinkle(ops, rng, t, ground) {
+    ops.push(new FloodOp(ground.flood, t));
+    t += 120;
+    for (const [ink, count, r] of ground.layers) {
+      // A brush scatters evenly: one drop per cell of a jittered grid, in random order.
+      const cols = Math.max(1, Math.round(Math.sqrt((count * W) / H))), rows = Math.ceil(count / cols);
+      const cells = [];
+      for (let i = 0; i < cols * rows; i++) cells.push(i);
+      for (let i = cells.length - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        const tmp = cells[i]; cells[i] = cells[j]; cells[j] = tmp;
+      }
+      for (let k = 0; k < count; k++) {
+        const gx = cells[k] % cols, gy = Math.floor(cells[k] / cols);
+        const x = (-0.03 + (1.06 * (gx + rng())) / cols) * W;
+        const y = (-0.03 + (1.06 * (gy + rng())) / rows) * H;
+        ops.push(new DropOp(x, y, r * (0.7 + 0.6 * rng()), ink, t, 360));
+        t += 26;
+      }
+      t += 160;
+    }
+    return t;
+  }
+  // The awl back and forth across the tray: alternate lines move in opposite directions.
+  function gelgit(ops, t, axis, s, z, lam, dur) {
+    const mx = axis === 'x' ? 1 : 0, my = axis === 'x' ? 0 : 1;
+    const nx = -my, ny = mx;
+    ops.push(new LineOp(nx * s * 0.5, ny * s * 0.5, mx, my, 2 * s, z, lam, t, dur));
+    ops.push(new LineOp(nx * s * 1.5, ny * s * 1.5, -mx, -my, 2 * s, z, lam, t + dur * 0.35, dur));
+    return t + dur * 1.35;
+  }
+  function nests(ops, t, spacing, a, lam) {
+    const cols = Math.max(1, Math.round(W / spacing)), rows = Math.max(1, Math.round(H / spacing));
+    const sx = W / cols, sy = H / rows;
+    for (let r = 0; r < rows; r++) {
+      const odd = r % 2 === 1;
+      for (let c = 0; c <= cols; c++) {
+        if (!odd && c === cols) continue;
+        const x = odd ? c * sx : (c + 0.5) * sx;
+        ops.push(new VortexOp(x, (r + 0.5) * sy, a, lam, t, 900));
+        t += 38;
+      }
+    }
+    return t;
+  }
+  const HATIP_RINGS = [
+    [['madder', 46], ['ochre', 34], ['indigo', 28], ['chalk', 20], ['madder', 14], ['verdigris', 9]],
+    [['indigo', 46], ['chalk', 34], ['madder', 28], ['ochre', 20], ['black', 13], ['chalk', 8]],
+  ];
+  function hatipFlowers(ops, rng, t) {
+    const rows = W > H ? [3, 2] : [2, 3, 2];
+    let m = 0;
+    rows.forEach((count, r) => {
+      const y = (H * (r + 0.5)) / rows.length;
+      for (let c = 0; c < count; c++) {
+        const cx = (W * (c + 0.5)) / count + (rng() - 0.5) * 40;
+        const cy = y + (rng() - 0.5) * 40;
+        for (const [ink, rad] of HATIP_RINGS[m % 2]) {
+          ops.push(new DropOp(cx, cy, rad, ink, t, 300));
+          t += 120;
+        }
+        const petals = rng() < 0.5 ? 5 : 6;
+        const rot = rng() * Math.PI * 2;
+        for (let k = 0; k < petals; k++) {
+          const a = rot + (k * Math.PI * 2) / petals;
+          ops.push(new StrokeOp([[cx + Math.cos(a) * 108, cy + Math.sin(a) * 108], [cx + Math.cos(a) * 4, cy + Math.sin(a) * 4]], 5, t, 320));
+          t += 190;
+        }
+        for (let k = 0; k < petals; k++) {
+          const a = rot + ((k + 0.5) * Math.PI * 2) / petals;
+          ops.push(new StrokeOp([[cx + Math.cos(a) * 50, cy + Math.sin(a) * 50], [cx + Math.cos(a) * 104, cy + Math.sin(a) * 104]], 5, t, 220));
+          t += 130;
+        }
+        m++;
+      }
+    });
+    return t;
+  }
+
+  const PATTERNS = {
+    battal: {
+      name: 'Battal', gloss: 'stone ground',
+      desc: 'Colors sprinkled one after another until the drops crowd into stones. Most patterns begin on this ground.',
+      build(rng) {
+        const ops = [];
+        sprinkle(ops, rng, 0, GROUNDS[pick(rng, ['indigo', 'madder', 'verdigris'])]);
+        return ops;
+      },
+    },
+    gelgit: {
+      name: 'Gel-git', gloss: 'come and go',
+      desc: 'A stone ground drawn through with the awl, back and forth, in close parallel lines.',
+      build(rng) {
+        const ops = [];
+        const t = sprinkle(ops, rng, 0, GROUNDS[pick(rng, ['indigo', 'madder'])]);
+        gelgit(ops, t + 200, 'x', 46, 120, 6.5, 1800);
+        return ops;
+      },
+    },
+    tarakli: {
+      name: 'Taraklı', gloss: 'combed',
+      desc: 'A ground drawn back and forth, then pulled through with a fine comb into rows of small points.',
+      build(rng) {
+        const ops = [];
+        let t = sprinkle(ops, rng, 0, GROUNDS[pick(rng, ['indigo', 'verdigris'])]);
+        t = gelgit(ops, t + 200, 'y', 56, 140, 7, 1700);
+        ops.push(new LineOp(0, 11, 1, 0, 22, 52, 3.8, t + 100, 2000));
+        return ops;
+      },
+    },
+    bulbul: {
+      name: 'Bülbül yuvası', gloss: 'nightingale’s nest',
+      desc: 'Spirals turned with the awl, row on row, into a ground already drawn both ways.',
+      build(rng) {
+        const ops = [];
+        let t = sprinkle(ops, rng, 0, GROUNDS[pick(rng, ['madder', 'indigo'])]);
+        t = gelgit(ops, t + 200, 'x', 40, 100, 6, 1500);
+        t = gelgit(ops, t, 'y', 40, 70, 5, 1500);
+        nests(ops, t + 100, 150, -2.4 * Math.PI, 30);
+        return ops;
+      },
+    },
+    hatip: {
+      name: 'Hatip', gloss: 'the preacher’s',
+      desc: 'Inks dropped one inside another, then pulled into flowers with the awl. Named for Hatip Mehmed Efendi, who died in 1773.',
+      build(rng) {
+        const ops = [];
+        const t = sprinkle(ops, rng, 0, GROUNDS.pale);
+        hatipFlowers(ops, rng, t + 300);
+        return ops;
+      },
+    },
+  };
+
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6d2b79f5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  /* ================================================================
+     Page state
+     ================================================================ */
+  const $ = (id) => document.getElementById(id);
+  const wrap = $('wrap'), tray = $('tray'), cv = $('ink'), cv2 = $('cursor');
+  const ctx = cv.getContext('2d', { alpha: false });
+  const octx = cv2.getContext('2d');
+  const statusEl = $('status'), bar = $('bar');
+  let dpr = 1, scale = 1, dispW = W;
+
+  let tool = 'awl', inkId = 'madder';
+  let comp = null;                 // running composition
+  let composedKey = null, composedName = null, touched = false;
+  let growing = [];                // drops spreading under the brush
+  let stroke = null;               // awl or comb in motion
+  let active = null;               // pointer currently on the tray
+  let lastDrop = null;
+  let hover = null, overlayDirty = true, pulling = false;
+
+  /* ---------- Paper grain, shared by screen and print ---------- */
+  function makeGrain() {
+    const S = 256, c = document.createElement('canvas');
+    c.width = c.height = S;
+    const g = c.getContext('2d');
+    const img = g.createImageData(S, S), d = img.data;
+    for (let i = 0; i < S * S; i++) {
+      const r = Math.random();
+      const v = 255 - r * r * r * 38 - Math.random() * 6;
+      d[i * 4] = v; d[i * 4 + 1] = v - 1; d[i * 4 + 2] = v - 4; d[i * 4 + 3] = 255;
+    }
+    g.putImageData(img, 0, 0);
+    g.lineWidth = 0.7;
+    g.strokeStyle = 'rgba(110, 92, 70, 0.11)';
+    for (let k = 0; k < 60; k++) {
+      const x = Math.random() * S, y = Math.random() * S, a = Math.random() * Math.PI * 2;
+      const L = 6 + Math.random() * 16, bend = (Math.random() - 0.5) * 8;
+      for (const ox of [-S, 0, S]) {
+        for (const oy of [-S, 0, S]) {
+          g.beginPath();
+          g.moveTo(x + ox, y + oy);
+          g.quadraticCurveTo(
+            x + ox + (Math.cos(a) * L) / 2 - Math.sin(a) * bend, y + oy + (Math.sin(a) * L) / 2 + Math.cos(a) * bend,
+            x + ox + Math.cos(a) * L, y + oy + Math.sin(a) * L
+          );
+          g.stroke();
+        }
+      }
+    }
+    return c;
+  }
+  const grainTile = makeGrain();
+  const grainURL = grainTile.toDataURL('image/png');
+  tray.style.setProperty('--grain', `url(${grainURL})`);
+  document.documentElement.style.setProperty('--tray-aspect', String(W / H));
+
+  /* ---------- Drawing ---------- */
+  function drawInk(g, s, lw) {
+    g.setTransform(s, 0, 0, s, 0, 0);
+    g.fillStyle = PAPER;
+    g.fillRect(0, 0, W, H);
+    g.lineJoin = 'round';
+    g.lineWidth = lw;
+    for (let i = 0; i < polys.length; i++) {
+      const p = polys[i];
+      if (p.x1 < 0 || p.x0 > W || p.y1 < 0 || p.y0 > H) continue;
+      const a = p.pts, n = p.n;
+      g.beginPath();
+      g.moveTo(a[0], a[1]);
+      for (let k = 2; k < n; k += 2) g.lineTo(a[k], a[k + 1]);
+      g.closePath();
+      g.fillStyle = p.ink.hex;
+      g.fill();
+      g.strokeStyle = p.ink.rim;
+      g.stroke();
+    }
+  }
+  function render() {
+    drawInk(ctx, scale, 0.85 * (W / dispW));
+    dirty = false;
+  }
+  function drawOverlay() {
+    const g = octx;
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.clearRect(0, 0, cv2.width, cv2.height);
+    g.setTransform(scale, 0, 0, scale, 0, 0);
+    const px = W / dispW;   // logical units per CSS pixel
+    if (!polys.length && !comp && !pulling) {
+      g.textAlign = 'center';
+      g.textBaseline = 'middle';
+      g.fillStyle = 'rgba(70, 60, 50, 0.55)';
+      g.font = `italic 500 ${30 * px}px Alegreya, "Iowan Old Style", Georgia, serif`;
+      g.fillText('Touch the water', W / 2, H / 2 - 12 * px);
+      g.fillStyle = 'rgba(70, 60, 50, 0.5)';
+      g.font = `500 ${15 * px}px "Alegreya Sans SC", "Alegreya Sans", system-ui, sans-serif`;
+      g.fillText('choose an ink, then tap or hold', W / 2, H / 2 + 20 * px);
+    }
+    const at = stroke ? stroke.cur : hover;
+    if (!at || pulling) return;
+    g.lineWidth = 1.25 * px;
+    const dark = 'rgba(28, 24, 30, 0.6)';
+    if (tool === 'brush') {
+      const gd = growing.length ? growing[growing.length - 1] : null;
+      const live = gd && gd.holding;
+      const cx = live ? gd.c.x : at.x, cy = live ? gd.c.y : at.y;
+      const r = live ? Math.sqrt(Math.max(gd.target, 1)) : R_TAP;
+      g.beginPath();
+      g.arc(cx, cy, r, 0, Math.PI * 2);
+      g.setLineDash([4 * px, 4 * px]);
+      g.strokeStyle = dark;
+      g.stroke();
+      g.setLineDash([]);
+      g.beginPath();
+      g.arc(at.x, at.y, 3.5 * px, 0, Math.PI * 2);
+      g.fillStyle = INK[inkId].hex;
+      g.fill();
+      g.stroke();
+    } else if (tool === 'awl') {
+      g.beginPath();
+      g.arc(at.x, at.y, Math.max(AWL_LAM * 1.6, 7 * px), 0, Math.PI * 2);
+      g.strokeStyle = 'rgba(28, 24, 30, 0.42)';
+      g.stroke();
+      g.beginPath();
+      g.arc(at.x, at.y, 1.8 * px, 0, Math.PI * 2);
+      g.fillStyle = 'rgba(28, 24, 30, 0.9)';
+      g.fill();
+    } else {
+      let nx = 0, ny = 1;
+      if (stroke && stroke.axis) { nx = stroke.nx; ny = stroke.ny; }
+      const [k0, k1] = tineRange(at.x, at.y, nx, ny);
+      if (k0 <= k1) {
+        g.beginPath();
+        g.moveTo(at.x + k0 * COMB_S * nx, at.y + k0 * COMB_S * ny);
+        g.lineTo(at.x + k1 * COMB_S * nx, at.y + k1 * COMB_S * ny);
+        g.strokeStyle = 'rgba(28, 24, 30, 0.22)';
+        g.stroke();
+        g.fillStyle = 'rgba(28, 24, 30, 0.75)';
+        for (let k = k0; k <= k1; k++) {
+          g.beginPath();
+          g.arc(at.x + k * COMB_S * nx, at.y + k * COMB_S * ny, 2.2 * px, 0, Math.PI * 2);
+          g.fill();
+        }
+      }
+    }
+  }
+
+  function layout() {
+    const r = wrap.getBoundingClientRect();
+    const rim = 18;
+    let w = r.width - rim, h = r.height - rim;
+    if (w <= 10 || h <= 10) return;
+    if (w / h > W / H) w = (h * W) / H; else h = (w * H) / W;
+    w = Math.floor(w); h = Math.floor(h);
+    tray.style.width = `${w + rim}px`;
+    tray.style.height = `${h + rim}px`;
+    bar.style.maxWidth = `${w + rim}px`;
+    tray.style.setProperty('--grain-size', `${((256 * w) / W).toFixed(1)}px`);
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    for (const c of [cv, cv2]) {
+      c.width = Math.round(w * dpr);
+      c.height = Math.round(h * dpr);
+      c.style.width = `${w}px`;
+      c.style.height = `${h}px`;
+    }
+    dispW = w;
+    scale = cv.width / W;
+    dirty = true;
+    overlayDirty = true;
+    wake();
+  }
+
+  /* ================================================================
+     Frame loop
+     ================================================================ */
+  let raf = 0, lastT = 0;
+  function wake() {
+    if (!raf) raf = requestAnimationFrame(frame);
+  }
+  function frame(now) {
+    raf = 0;
+    const dt = lastT ? Math.min(50, now - lastT) : 16;
+    lastT = now;
+    const deadline = performance.now() + 14;
+    if (comp) stepComp(dt);
+    if (growing.length) growing = growing.filter((gd) => gd.step(dt / 1000));
+    if (stroke) processStroke(deadline);
+    if (dirty) render();
+    if (overlayDirty || stroke || growing.length) { drawOverlay(); overlayDirty = false; }
+    if (comp || growing.length || stroke) raf = requestAnimationFrame(frame);
+    else lastT = 0;
+  }
+
+  /* ---------- Compositions ---------- */
+  function rinse() {
+    polys = [];
+    trackers.clear();
+    composedKey = null;
+    composedName = null;
+    touched = false;
+    dirty = true;
+    overlayDirty = true;
+    refreshBook();
+  }
+  function cancelInteraction() {
+    if (stroke) { processStroke(Infinity); stroke = null; }
+    for (const gd of growing) trackers.delete(gd.c);
+    growing = [];
+    active = null;
+  }
+  function compose(key, animate, seed) {
+    cancelInteraction();
+    comp = null;
+    rinse();
+    const pat = PATTERNS[key];
+    const ops = pat.build(mulberry32(seed)).sort((a, b) => a.start - b.start);
+    composedKey = key;
+    composedName = pat.name;
+    if (!animate) {
+      for (const op of ops) op.advanceTo(1);
+      trackers.clear();
+      onComposed();
+    } else {
+      comp = { ops, t: 0, first: 0, left: ops.length };
+      setStatus(`Composing <em>${pat.name}</em>…`, true);
+      refreshBook();
+    }
+    wake();
+  }
+  function stepComp(dt) {
+    comp.t += dt;
+    const ops = comp.ops;
+    while (comp.first < ops.length && ops[comp.first].done) comp.first++;
+    for (let i = comp.first; i < ops.length; i++) {
+      const op = ops[i];
+      if (op.done) continue;
+      if (op.start > comp.t) break;
+      op.advanceTo(Math.min(1, (comp.t - op.start) / op.dur));
+      if (op.done) comp.left--;
+    }
+    if (comp.left <= 0) { comp = null; onComposed(); }
+  }
+  function finishComposition() {
+    if (!comp) return;
+    for (const op of comp.ops) op.advanceTo(1);
+    comp = null;
+    trackers.clear();
+    onComposed();
+  }
+  function onComposed() {
+    trackers.clear();
+    dirty = true;
+    overlayDirty = true;
+    setStatus(`<em>${composedName}</em> is on the tray. Work into it, or pull a print.`);
+    refreshBook();
+    wake();
+  }
+
+  /* ---------- Hand tools ---------- */
+  class GrowingDrop {
+    constructor(x, y, ink) {
+      this.c = { x, y }; this.ink = ink; this.got = 0; this.target = R_TAP * R_TAP; this.holding = true; this.poly = null;
+      trackers.add(this.c);
+    }
+    step(dt) {
+      if (this.holding) this.target = Math.min(this.target + HOLD_RATE * dt, R_MAX * R_MAX);
+      const next = this.got + (this.target - this.got) * (1 - Math.exp(-dt / 0.16));
+      dropMap.cx = this.c.x;
+      dropMap.cy = this.c.y;
+      if (!this.poly) {
+        const r2 = Math.max(next, 9);
+        dropMap.r2 = r2;
+        applyMap(dropMap);
+        this.poly = addCircle(this.c.x, this.c.y, Math.sqrt(r2), this.ink);
+        this.got = r2;
+      } else if (next - this.got > 0.05) {
+        dropMap.r2 = next - this.got;
+        applyMap(dropMap);
+        this.got = next;
+      }
+      if (!this.holding && this.target - this.got < 1) {
+        trackers.delete(this.c);
+        return false;
+      }
+      return true;
+    }
+  }
+  function startDrop(p) {
+    for (const gd of growing) gd.holding = false;
+    const gd = new GrowingDrop(p.x, p.y, INK[inkId]);
+    gd.step(1 / 60);
+    growing.push(gd);
+    lastDrop = p;
+  }
+  function processStroke(deadline) {
+    const st = stroke;
+    const lam = st.tool === 'comb' ? COMB_LAM : AWL_LAM;
+    const STEP = 0.7 * lam;
+    while (st.queue.length) {
+      if (performance.now() > deadline) return;
+      const tgt = st.queue[0];
+      const dx = tgt.x - st.cur.x, dy = tgt.y - st.cur.y, d = Math.hypot(dx, dy);
+      if (d < 0.01) { st.queue.shift(); continue; }
+      const step = Math.min(d, STEP);
+      const bx = st.cur.x + (dx / d) * step, by = st.cur.y + (dy / d) * step;
+      if (st.tool === 'comb') {
+        if (combMap.set(st.cur.x, st.cur.y, bx, by, st.nx, st.ny, 0.9 * step)) applyMap(combMap);
+      } else if (stylusMap.set(st.cur.x, st.cur.y, bx, by, 0.92 * step, AWL_LAM)) {
+        applyMap(stylusMap);
+      }
+      st.cur.x = bx;
+      st.cur.y = by;
+      if (step >= d) st.queue.shift();
+    }
+    if (st.ended) stroke = null;
+  }
+  function toTray(e) {
+    const r = cv2.getBoundingClientRect();
+    return { x: ((e.clientX - r.left) / r.width) * W, y: ((e.clientY - r.top) / r.height) * H };
+  }
+
+  cv2.addEventListener('pointerdown', (e) => {
+    if (pulling || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    e.preventDefault();
+    try { cv2.setPointerCapture(e.pointerId); } catch (err) { /* capture is optional */ }
+    if (comp) finishComposition();
+    if (stroke) { processStroke(Infinity); stroke = null; }
+    const p = toTray(e);
+    hover = p;
+    active = { id: e.pointerId, start: p };
+    if (polys.length || tool === 'brush') touched = true;
+    if (tool === 'brush') startDrop(p);
+    else stroke = { tool, cur: { x: p.x, y: p.y }, queue: [], axis: tool === 'awl', nx: 0, ny: 1, ended: false };
+    overlayDirty = true;
+    wake();
+  });
+  cv2.addEventListener('pointermove', (e) => {
+    hover = toTray(e);
+    overlayDirty = true;
+    if (active && e.pointerId === active.id) {
+      const list = (e.getCoalescedEvents && e.getCoalescedEvents()) || [];
+      const evs = list.length ? list : [e];
+      for (const ev of evs) {
+        const p = toTray(ev);
+        if (tool === 'brush') {
+          if (Math.hypot(p.x - lastDrop.x, p.y - lastDrop.y) > SPRINKLE_GAP) startDrop(p);
+        } else if (stroke) {
+          if (!stroke.axis) {
+            const dx = p.x - active.start.x, dy = p.y - active.start.y, d = Math.hypot(dx, dy);
+            if (d < 6) continue;
+            stroke.nx = -dy / d;   // the comb is held across the first direction of pull
+            stroke.ny = dx / d;
+            stroke.axis = true;
+          }
+          stroke.queue.push(p);
+        }
+      }
+    }
+    wake();
+  });
+  function endPointer(e) {
+    if (!active || e.pointerId !== active.id) return;
+    for (const gd of growing) gd.holding = false;
+    if (stroke) stroke.ended = true;
+    active = null;
+    if (e.pointerType !== 'mouse') hover = null;
+    overlayDirty = true;
+    wake();
+  }
+  cv2.addEventListener('pointerup', endPointer);
+  cv2.addEventListener('pointercancel', endPointer);
+  cv2.addEventListener('pointerleave', () => {
+    if (!active) { hover = null; overlayDirty = true; wake(); }
+  });
+
+  /* ================================================================
+     Controls
+     ================================================================ */
+  const TOOLS = [
+    {
+      id: 'brush', name: 'Fırça', gloss: 'brush', key: 'f',
+      hint: 'Tap to drop ink. Hold to let it spread. Drag to sprinkle a trail of drops.',
+      icon: '<path d="M4 20l9-9" stroke-width="1.6"/><path d="M13 11l7-7M13 11l6.6-4.2M13 11l4.2-6.6" stroke-width="1.2"/><circle cx="13" cy="11" r="1.3" stroke-width="1.4"/>',
+    },
+    {
+      id: 'awl', name: 'Biz', gloss: 'awl', key: 'b',
+      hint: 'Drag through the ink to draw it into fine lines. Small circles turn spirals.',
+      icon: '<path d="M3.5 20.5l10.5-10.5" stroke-width="1.2"/><path d="M14.5 9.5l5-5" stroke-width="3.4"/>',
+    },
+    {
+      id: 'comb', name: 'Tarak', gloss: 'comb', key: 't',
+      hint: 'Drag across the tray. A row of tines pulls through everything at once.',
+      icon: '<path d="M3 6.5h18" stroke-width="2"/><path d="M5 7v11M8.5 7v11M12 7v11M15.5 7v11M19 7v11" stroke-width="1.3"/>',
+    },
+  ];
+  const toolsEl = $('tools'), hintEl = $('hint');
+  for (const t of TOOLS) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tool';
+    b.dataset.tool = t.id;
+    b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${t.icon}</svg><span class="t-name">${t.name}</span><span class="t-gloss">${t.gloss}</span>`;
+    b.addEventListener('click', () => setTool(t.id));
+    toolsEl.append(b);
+  }
+  function setTool(id) {
+    tool = id;
+    for (const b of toolsEl.children) b.setAttribute('aria-pressed', String(b.dataset.tool === id));
+    hintEl.textContent = TOOLS.find((t) => t.id === id).hint;
+    overlayDirty = true;
+    wake();
+  }
+
+  const potsEl = $('pots'), inkNameEl = $('ink-name');
+  INKS.forEach((ink, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'pot';
+    b.dataset.ink = ink.id;
+    b.style.setProperty('--c', ink.hex);
+    b.setAttribute('aria-label', `${ink.name} (key ${i + 1})`);
+    b.title = ink.name;
+    b.addEventListener('click', () => setInk(ink.id));
+    potsEl.append(b);
+  });
+  function setInk(id) {
+    inkId = id;
+    for (const b of potsEl.children) b.setAttribute('aria-pressed', String(b.dataset.ink === id));
+    inkNameEl.textContent = INK[id].name;
+    overlayDirty = true;
+    wake();
+  }
+
+  const bookEl = $('book');
+  for (const [key, p] of Object.entries(PATTERNS)) {
+    const li = document.createElement('li');
+    li.innerHTML = `<button type="button" class="pattern" data-key="${key}"><span class="p-head"><span class="p-name">${p.name}</span><span class="p-gloss">${p.gloss}</span></span><span class="p-state" aria-hidden="true"></span><span class="p-desc">${p.desc}</span></button>`;
+    bookEl.append(li);
+  }
+  bookEl.addEventListener('click', (e) => {
+    const b = e.target.closest('.pattern');
+    if (!b || pulling) return;
+    compose(b.dataset.key, !reduceMotion, (Math.random() * 4294967296) >>> 0);
+  });
+  function refreshBook() {
+    for (const b of bookEl.querySelectorAll('.pattern')) {
+      const on = b.dataset.key === composedKey;
+      const state = b.querySelector('.p-state');
+      state.textContent = on ? (comp ? 'composing' : 'on the tray') : '';
+      if (on) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+    }
+  }
+
+  function setStatus(html, withFinish) {
+    statusEl.innerHTML = html;
+    if (withFinish) {
+      const f = document.createElement('button');
+      f.type = 'button';
+      f.className = 'linkish';
+      f.textContent = 'Finish now';
+      f.addEventListener('click', () => finishComposition());
+      statusEl.append(f);
+    }
+  }
+
+  /* ---------- Rinse ---------- */
+  const rinseBtn = $('rinse');
+  let rinseArmed = null;
+  function disarmRinse() {
+    clearTimeout(rinseArmed);
+    rinseArmed = null;
+    rinseBtn.textContent = 'Rinse tray';
+    rinseBtn.classList.remove('armed');
+  }
+  rinseBtn.addEventListener('click', () => {
+    if (pulling) return;
+    if (!polys.length && !comp) { setStatus('The tray is already clean.'); return; }
+    if (!rinseArmed) {
+      rinseBtn.textContent = 'Click again to rinse';
+      rinseBtn.classList.add('armed');
+      rinseArmed = setTimeout(disarmRinse, 2800);
+      return;
+    }
+    disarmRinse();
+    cancelInteraction();
+    comp = null;
+    rinse();
+    if (tool !== 'brush') setTool('brush');
+    setStatus('The tray is clean. Choose an ink and touch the water.');
+    wake();
+  });
+
+  /* ---------- Prints ---------- */
+  const STORE = 'ebru-prints-v1';
+  let prints = [];
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORE) || '[]');
+    if (Array.isArray(saved)) prints = saved.filter((p) => p && typeof p.thumb === 'string' && p.thumb.startsWith('data:image/'));
+  } catch (err) { prints = []; }
+  function savePrints() {
+    let list = prints.slice(0, 8).map(({ no, name, date, thumb }) => ({ no, name, date, thumb }));
+    for (let tries = 0; tries < 5 && list.length; tries++) {
+      try { localStorage.setItem(STORE, JSON.stringify(list)); return; } catch (err) { list = list.slice(0, list.length - 2); }
+    }
+  }
+  const rack = $('rack'), thumbsEl = $('thumbs');
+  function refreshRack() {
+    thumbsEl.textContent = '';
+    rack.hidden = !prints.length;
+    for (const p of prints.slice(0, 8)) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'thumb';
+      b.setAttribute('aria-label', `Open print no. ${p.no}, ${p.name}`);
+      const img = document.createElement('img');
+      img.src = p.thumb;
+      img.alt = '';
+      b.append(img);
+      b.addEventListener('click', () => openPrint(p));
+      thumbsEl.append(b);
+    }
+  }
+  function printCanvas() {
+    const c = document.createElement('canvas');
+    c.width = W;
+    c.height = H;
+    const g = c.getContext('2d');
+    drawInk(g, 1, 0.8);
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.globalCompositeOperation = 'multiply';
+    g.fillStyle = g.createPattern(grainTile, 'repeat');
+    g.fillRect(0, 0, W, H);
+    g.globalCompositeOperation = 'source-over';
+    return c;
+  }
+  function thumbOf(c, w) {
+    const t = document.createElement('canvas');
+    t.width = w;
+    t.height = Math.round((w * H) / W);
+    t.getContext('2d').drawImage(c, 0, 0, t.width, t.height);
+    return t.toDataURL('image/jpeg', 0.82);
+  }
+  const wait = (ms) => new Promise((res) => setTimeout(res, ms));
+  const fmtDate = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  const pullBtn = $('pull'), sheet = $('sheet'), sheetImg = $('sheet-img');
+  pullBtn.addEventListener('click', async () => {
+    if (pulling) return;
+    if (comp) finishComposition();
+    cancelInteraction();
+    if (!polys.length) { setStatus('There is no ink on the tray to print. Drop some first.'); return; }
+    pulling = true;
+    pullBtn.disabled = true;
+    hover = null;
+    overlayDirty = true;
+    const name = composedName ? (touched ? `${composedName}, worked by hand` : composedName) : 'Freehand';
+    const c = printCanvas();
+    const print = {
+      no: (prints.length ? Math.max(...prints.map((p) => p.no || 0)) : 0) + 1,
+      name,
+      date: fmtDate.format(new Date()),
+      full: c.toDataURL('image/jpeg', 0.92),
+      thumb: thumbOf(c, 900),
+    };
+    if (!reduceMotion) {
+      sheetImg.src = print.full;
+      sheet.hidden = false;
+      sheet.classList.remove('lay', 'inked');
+      void sheet.offsetWidth;
+      sheet.classList.add('lay');
+      await wait(560);
+      sheet.classList.add('inked');
+      rinse();
+      render();
+      drawOverlay();
+      await wait(940);
+      sheet.hidden = true;
+      sheet.classList.remove('lay', 'inked');
+    } else {
+      rinse();
+    }
+    prints.unshift(print);
+    savePrints();
+    refreshRack();
+    if (tool !== 'brush') setTool('brush');
+    setStatus('The ink lifted with the paper. The tray is clean again.');
+    pulling = false;
+    pullBtn.disabled = false;
+    overlayDirty = true;
+    wake();
+    openPrint(print);
+  });
+
+  const pv = $('print-view'), pvImg = $('pv-img'), pvClose = $('pv-close');
+  let returnFocus = null;
+  function openPrint(p) {
+    returnFocus = document.activeElement;
+    pvImg.src = p.full || p.thumb;
+    pvImg.alt = `Marbled print: ${p.name}`;
+    $('pv-title').textContent = p.name;
+    $('pv-meta').textContent = `Print no. ${p.no} · pulled ${p.date}`;
+    pv.hidden = false;
+    pvClose.focus();
+  }
+  function closePrint() {
+    pv.hidden = true;
+    if (returnFocus && returnFocus.focus) returnFocus.focus();
+  }
+  pvClose.addEventListener('click', closePrint);
+  pv.addEventListener('click', (e) => { if (e.target === pv) closePrint(); });
+
+  document.addEventListener('keydown', (e) => {
+    if (!pv.hidden) {
+      if (e.key === 'Escape') closePrint();
+      return;
+    }
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key.toLowerCase();
+    const t = TOOLS.find((x) => x.key === k);
+    if (t) { setTool(t.id); return; }
+    const n = parseInt(e.key, 10);
+    if (n >= 1 && n <= INKS.length) setInk(INKS[n - 1].id);
+  });
+
+  /* ================================================================
+     Start: a hatip pattern already on the tray.
+     ================================================================ */
+  setTool('awl');
+  setInk('madder');
+  refreshRack();
+  compose('hatip', false, 1773);
+  layout();
+  render();
+  drawOverlay();
+  new ResizeObserver(() => layout()).observe(wrap);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { overlayDirty = true; wake(); });
+})();
+</script>
+</body>
+</html>

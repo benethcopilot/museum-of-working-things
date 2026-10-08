@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Museum of Working Things</title>
+<meta name="description" content="Instruments, machines and mysteries you can operate, each with the true story behind it.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Lexend:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="shared/museum.css">
+<style>
+:root {
+  /* Layout: a museum lobby. The museum's name and your passport at the entrance, then one band per hall, each with a row of exhibit cards. */
+  --ground: #eef1f5;
+  --card: #ffffff;
+  --text: #1c2230;
+  --muted: #586174;
+  --line: rgba(28, 34, 48, 0.12);
+  --line-strong: rgba(28, 34, 48, 0.28);
+  --accent: #2f56a6;
+  --stamp: #2b7a4b;
+  --f-display: "Fredoka", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Lexend", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #10141c;
+    --card: #181e29;
+    --text: #e8ebf1;
+    --muted: #9ba4b6;
+    --line: rgba(232, 235, 241, 0.12);
+    --line-strong: rgba(232, 235, 241, 0.28);
+    --accent: #8fb0f2;
+    --stamp: #72d199;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #10141c;
+  --card: #181e29;
+  --text: #e8ebf1;
+  --muted: #9ba4b6;
+  --line: rgba(232, 235, 241, 0.12);
+  --line-strong: rgba(232, 235, 241, 0.28);
+  --accent: #8fb0f2;
+  --stamp: #72d199;
+  color-scheme: dark;
+}
+body { margin: 0; background: var(--ground); color: var(--text); font-family: var(--f-body); font-size: 16px; line-height: 1.55; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 600; line-height: 1.1; margin: 0; text-wrap: balance; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.lobby { box-sizing: border-box; max-width: 1180px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 36px 60px; display: flex; flex-direction: column; gap: 40px; }
+.entrance { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px 32px; align-items: end; }
+.eyebrow { margin: 0 0 4px; font-family: var(--f-display); font-weight: 600; font-size: 0.95rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); font-weight: 700; }
+.tagline { margin: 12px 0 0; max-width: 56ch; font-size: 1.1rem; color: var(--muted); }
+.passport { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 14px 18px; border: 2px dashed var(--line-strong); border-radius: 16px; text-align: center; min-width: 9em; }
+.passport b { font-family: var(--f-display); font-size: 2rem; line-height: 1; }
+.passport span { font-size: 0.85rem; color: var(--muted); }
+#halls { display: flex; flex-direction: column; gap: 40px; }
+.hall { display: flex; flex-direction: column; gap: 14px; }
+.hall-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; padding-left: 14px; border-left: 6px solid var(--hall); }
+.hall-head h2 { font-size: 1.7rem; }
+.hall-head p { margin: 0; color: var(--muted); }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 18px 16px;
+  border-radius: 16px;
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-top: 6px solid var(--hall);
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.15s, border-color 0.15s;
+}
+a.card:hover { transform: translateY(-3px); border-color: var(--hall); }
+.card h3 { font-size: 1.35rem; }
+.card.stamped h3 { padding-right: 4.8em; }
+.card p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+.card .meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: 6px; }
+.card .meta span { font-size: 0.8rem; padding: 2px 9px; border-radius: 999px; background: var(--ground); color: var(--text); }
+.card .stamp { position: absolute; top: 14px; right: 14px; font-family: var(--f-display); font-weight: 700; font-size: 0.8rem; color: var(--stamp); border: 2px solid var(--stamp); border-radius: 999px; padding: 1px 9px; transform: rotate(-6deg); }
+.card.soon { border-style: dashed; border-top-style: solid; opacity: 0.72; }
+.card.soon .meta span { font-style: italic; }
+.note { margin: 0; color: var(--muted); }
+footer { padding-top: 22px; border-top: 1px solid var(--line); font-size: 0.9rem; color: var(--muted); }
+footer a { color: inherit; text-underline-offset: 3px; }
+@media (max-width: 640px) {
+  .entrance { grid-template-columns: minmax(0, 1fr); }
+  .passport { flex-direction: row; justify-content: center; gap: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .card { transition: none; } a.card:hover { transform: none; } }
+</style>
+</head>
+<body>
+<div class="lobby">
+  <header class="entrance">
+    <div>
+      <p class="eyebrow">Welcome to</p>
+      <h1 id="name">The Museum of Working Things</h1>
+      <p class="tagline" id="tagline"></p>
+    </div>
+    <div class="passport" aria-live="polite"><b id="pass-count">0</b><span id="pass-text">exhibits stamped</span></div>
+  </header>
+  <main id="halls"><p class="note">Opening the doors…</p></main>
+  <footer id="footer">Every exhibit runs in your browser. Nothing you do here is sent anywhere; your passport stamps are kept in this browser only.</footer>
+</div>
+<script>
+(() => {
+  'use strict';
+  const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  let seen = new Set();
+  try { seen = new Set(JSON.parse(localStorage.getItem('museum-passport-v1') || '[]')); } catch (err) { /* stamps are optional */ }
+
+  fetch('exhibits.json')
+    .then((r) => r.json())
+    .then((data) => {
+      document.title = data.museum.name;
+      document.getElementById('name').textContent = data.museum.name;
+      document.getElementById('tagline').textContent = data.museum.tagline;
+      const open = data.exhibits.filter((e) => e.status !== 'planned');
+      const stamped = open.filter((e) => seen.has(e.slug)).length;
+      document.getElementById('pass-count').textContent = `${stamped} of ${open.length}`;
+      document.getElementById('pass-text').textContent = stamped === open.length && open.length ? 'every exhibit stamped' : 'exhibits stamped';
+      document.getElementById('halls').innerHTML = data.halls.map((h) => {
+        const list = data.exhibits.filter((e) => e.hall === h.id);
+        if (!list.length) return '';
+        const cards = list.map((e) => {
+          if (e.status === 'planned') {
+            return `<div class="card soon" style="--hall:${esc(h.color)}"><h3>${esc(e.title)}</h3><p>${esc(e.blurb)}</p><p class="meta"><span>Opening soon</span></p></div>`;
+          }
+          return `<a class="card${seen.has(e.slug) ? ' stamped' : ''}" href="exhibits/${esc(e.slug)}/" style="--hall:${esc(h.color)}">
+            ${seen.has(e.slug) ? '<span class="stamp">Stamped</span>' : ''}
+            <h3>${esc(e.title)}</h3><p>${esc(e.blurb)}</p>
+            <p class="meta">${e.ages ? `<span>${esc(e.ages)}</span>` : ''}${e.try ? `<span>Try: ${esc(e.try)}</span>` : ''}</p></a>`;
+        }).join('');
+        return `<section class="hall" style="--hall:${esc(h.color)}" aria-labelledby="hall-${esc(h.id)}">
+          <div class="hall-head"><h2 id="hall-${esc(h.id)}">${esc(h.name)}</h2><p>${esc(h.blurb)}</p></div>
+          <div class="cards">${cards}</div></section>`;
+      }).join('');
+      if (data.museum.repo) {
+        document.getElementById('footer').insertAdjacentHTML('beforeend', ` The museum is open source: <a href="${esc(data.museum.repo)}">see how it is built</a>.`);
+      }
+    })
+    .catch(() => {
+      document.getElementById('halls').innerHTML = '<p class="note">The exhibit list could not be loaded. If you opened this file straight from your computer, run a small web server instead: see the README.</p>';
+    });
+})();
+</script>
+</body>
+</html>

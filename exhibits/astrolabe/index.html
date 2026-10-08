@@ -1,0 +1,976 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Brass Astrolabe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Libre+Franklin:wght@400;500;600&display=swap">
+<style>
+:root {
+  /* Layout: a museum object and its label. The instrument fills the left in a pool of light; the label card with its readings and controls sits to the right, and stacks below on phones. */
+  --ground: #dde2e8;
+  --ground-2: #cfd6de;
+  --text: #172033;
+  --muted: #4f5c71;
+  --line: rgba(23, 32, 51, 0.14);
+  --line-strong: rgba(23, 32, 51, 0.32);
+  --accent: #85560f;
+  --halo: rgba(255, 255, 255, 0.62);
+  /* The instrument itself is brass in every theme. */
+  --engrave: #3a2811;
+  --brass-halo: #d2a656;
+  --f-display: "IM Fell English", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --f-engrave: "IM Fell English SC", "IM Fell English", "Palatino Linotype", Georgia, serif;
+  --f-body: "Libre Franklin", "Franklin Gothic Book", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0c111d;
+    --ground-2: #161e2f;
+    --text: #e9e2cf;
+    --muted: #97a1b6;
+    --line: rgba(233, 226, 207, 0.12);
+    --line-strong: rgba(233, 226, 207, 0.3);
+    --accent: #ddb062;
+    --halo: rgba(130, 150, 205, 0.17);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #0c111d;
+  --ground-2: #161e2f;
+  --text: #e9e2cf;
+  --muted: #97a1b6;
+  --line: rgba(233, 226, 207, 0.12);
+  --line-strong: rgba(233, 226, 207, 0.3);
+  --accent: #ddb062;
+  --halo: rgba(130, 150, 205, 0.17);
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--f-body);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+button, select, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.app {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 410px);
+  grid-template-rows: auto 1fr;
+  grid-template-areas: "art head" "art panel";
+  column-gap: clamp(24px, 4vw, 64px);
+  padding-inline: clamp(16px, 3vw, 48px);
+}
+
+/* ---------- The instrument ---------- */
+.art {
+  grid-area: art;
+  align-self: start;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  box-sizing: border-box;
+  margin: 0;
+  padding-block: 18px;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(closest-side, var(--halo), rgba(0, 0, 0, 0));
+}
+#astro {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+#astro.turning { cursor: grabbing; }
+#astro:focus-visible { outline: none; }
+#astro:focus-visible .focus-ring { stroke: var(--accent); }
+#astro .focus-ring { fill: none; stroke: transparent; stroke-width: 3; }
+#astro .eng { fill: none; stroke: var(--engrave); stroke-width: 0.85; vector-effect: non-scaling-stroke; }
+#astro .eng.thin { stroke-width: 0.5; stroke-opacity: 0.8; }
+#astro .eng.bold { stroke-width: 1.5; }
+#astro .eng.dash { stroke-dasharray: 5 4; stroke-width: 0.9; }
+#astro text { font-family: var(--f-engrave); fill: var(--engrave); }
+#astro .halo { paint-order: stroke; stroke: var(--brass-halo); stroke-width: 3.5px; stroke-linejoin: round; }
+
+/* ---------- The label ---------- */
+.head { grid-area: head; padding-block: 44px 6px; }
+.eyebrow {
+  margin: 0;
+  font-family: var(--f-engrave);
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+h1 {
+  margin: 4px 0 10px;
+  font-family: var(--f-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(2.3rem, 3.6vw, 3.1rem);
+  line-height: 1.02;
+  text-wrap: balance;
+}
+.medium { margin: 0; font-family: var(--f-display); font-size: 1.12rem; color: var(--muted); }
+#t-lat { white-space: nowrap; }
+
+.panel {
+  grid-area: panel;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  padding-block: 14px 56px;
+}
+.desc { margin: 0; max-width: 62ch; }
+
+.read { margin: 0; border-top: 1px solid var(--line); }
+.read > div {
+  display: grid;
+  grid-template-columns: 7.2rem minmax(0, 1fr);
+  gap: 4px 14px;
+  align-items: baseline;
+  padding-block: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.read dt { font-family: var(--f-engrave); font-size: 1.02rem; letter-spacing: 0.03em; color: var(--muted); }
+.read dd { margin: 0; min-width: 0; }
+.showing { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.big { font-family: var(--f-display); font-size: 2.5rem; line-height: 1; }
+.when { color: var(--muted); }
+.chip {
+  font-family: var(--f-engrave);
+  font-size: 0.92rem;
+  letter-spacing: 0.05em;
+  padding: 0 8px 1px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  color: var(--accent);
+}
+.textbtn {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: var(--line-strong);
+  text-underline-offset: 3px;
+}
+.textbtn:hover { text-decoration-color: currentColor; }
+.stars { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 3px 14px; }
+.stars .sn { font-family: var(--f-display); font-style: italic; font-size: 1.08rem; }
+.stars .alt { color: var(--muted); font-variant-numeric: tabular-nums; }
+.note { color: var(--muted); }
+
+.label { margin: 0 0 9px; font-family: var(--f-engrave); font-size: 1.02rem; letter-spacing: 0.03em; color: var(--muted); }
+.events { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.ev {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 9px 12px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 3px;
+  background: none;
+  text-align: left;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.ev:hover { background: var(--ground-2); border-color: var(--text); }
+.ev:disabled { opacity: 0.45; cursor: default; }
+.ev:disabled:hover { background: none; border-color: var(--line-strong); }
+.ev .k { font-size: 0.86rem; font-weight: 500; color: var(--muted); }
+.ev .v { font-family: var(--f-display); font-size: 1.45rem; line-height: 1.1; }
+
+.fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.field label { font-family: var(--f-engrave); font-size: 1.02rem; letter-spacing: 0.03em; color: var(--muted); }
+.field select, .field input {
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 3px;
+  background: var(--ground);
+}
+.hint { margin: 0; font-size: 0.92rem; color: var(--muted); }
+
+.key { margin: 0; border-top: 1px solid var(--line); }
+.key > div { display: grid; grid-template-columns: 7.2rem minmax(0, 1fr); gap: 4px 14px; padding-block: 10px; border-bottom: 1px solid var(--line); }
+.key dt { font-family: var(--f-display); font-style: italic; font-size: 1.12rem; }
+.key dd { margin: 0; min-width: 0; font-size: 0.94rem; }
+
+@media (max-width: 900px) {
+  .app {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-template-areas: "head" "art" "panel";
+  }
+  .head { padding-block: 26px 0; }
+  .art { position: static; height: auto; padding-block: 6px; }
+  #astro { height: auto; }
+}
+@media (max-width: 460px) {
+  .read > div, .key > div { grid-template-columns: minmax(0, 1fr); }
+  .fields { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ev { transition: none; }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="astrolabe" defer></script>
+</head>
+<body>
+<div class="app">
+  <header class="head">
+    <p class="eyebrow">Planispheric astrolabe</p>
+    <h1>The sky over <span id="t-city">Greenwich</span></h1>
+    <p class="medium">Brass, engraved in your browser. Plate for latitude <span id="t-lat">51° 29′ N</span>.</p>
+  </header>
+
+  <figure class="art">
+    <svg id="astro" viewBox="-500 -655 1000 1170" role="slider" tabindex="0"
+      aria-label="Astrolabe. Turn the rete to change the time shown." aria-valuemin="0" aria-valuemax="1439" aria-valuenow="0"></svg>
+  </figure>
+
+  <section class="panel">
+    <p class="desc">An astrolabe is a model of the sky you can hold. The plate underneath is engraved for one latitude: the horizon, circles of altitude rising to the point overhead, and lines of direction. The pierced rete on top is the sky. Its flames point to bright stars, and its offset ring is the ecliptic, the sun’s yearly road through the zodiac. Turn the rete as the sky turns and the instrument tells the hour, the sunrise and which stars are up.</p>
+
+    <dl class="read">
+      <div>
+        <dt>Showing</dt>
+        <dd class="showing">
+          <span class="big" id="r-time">--:--</span>
+          <span class="when" id="r-date"></span>
+          <span class="chip" id="now-chip">now</span>
+          <button type="button" class="textbtn" id="now-btn" hidden>Back to now</button>
+        </dd>
+      </div>
+      <div>
+        <dt>Sun</dt>
+        <dd id="r-sun"></dd>
+      </div>
+      <div>
+        <dt>Above the horizon</dt>
+        <dd><ul class="stars" id="r-stars"></ul><span class="note" id="r-stars-note"></span></dd>
+      </div>
+    </dl>
+
+    <div>
+      <p class="label">Turn the rete to</p>
+      <div class="events">
+        <button type="button" class="ev" data-ev="rise"><span class="k">Sunrise</span><span class="v" id="ev-rise">--:--</span></button>
+        <button type="button" class="ev" data-ev="noon"><span class="k">Noon</span><span class="v" id="ev-noon">--:--</span></button>
+        <button type="button" class="ev" data-ev="set"><span class="k">Sunset</span><span class="v" id="ev-set">--:--</span></button>
+      </div>
+    </div>
+
+    <div class="fields">
+      <div class="field">
+        <label for="plate">Plate</label>
+        <select id="plate"></select>
+      </div>
+      <div class="field">
+        <label for="date">Date</label>
+        <input type="date" id="date">
+      </div>
+    </div>
+    <p class="hint">Drag the instrument round to turn the rete through the day. On a phone, swipe sideways. With the instrument focused, the arrow keys turn it a quarter hour and Home returns to now.</p>
+
+    <dl class="key" aria-label="Reading the instrument">
+      <div><dt>Horizon</dt><dd>The long arc across the plate. Everything inside it is above the ground. The small circles nesting toward the top mark altitude, up to the zenith.</dd></div>
+      <div><dt>Rete</dt><dd>Each flame’s tip is a star. The sun sits on the ecliptic ring at today’s place in the zodiac and moves round it once a year.</dd></div>
+      <div><dt>Rule</dt><dd>The straight bar lies across the sun. Where it meets the rim, the Roman numerals give sundial time, with noon at the top.</dd></div>
+      <div><dt>Night hours</dt><dd>The curves below the horizon split the night into twelve unequal hours, the way time was kept before clocks.</dd></div>
+    </dl>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const D2R = Math.PI / 180, R2D = 180 / Math.PI;
+  const mod = (a, n) => ((a % n) + n) % n;
+  const wrap180 = (a) => mod(a + 180, 360) - 180;
+  const f = (n) => String(Math.round(n * 100) / 100);
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ================================================================
+     Sky
+     ================================================================ */
+  const EPS = 23.436;                       // obliquity of the ecliptic, 2026
+  const sinE = Math.sin(EPS * D2R), cosE = Math.cos(EPS * D2R);
+  const jd = (ms) => ms / 86400000 + 2440587.5;
+  const gmst = (ms) => mod(280.46061837 + 360.98564736629 * (jd(ms) - 2451545), 360);
+  function sunLon(ms) {
+    const n = jd(ms) - 2451545;
+    const L = 280.46 + 0.9856474 * n;
+    const g = (357.528 + 0.9856003 * n) * D2R;
+    return mod(L + 1.915 * Math.sin(g) + 0.02 * Math.sin(2 * g), 360);
+  }
+  function eclToEq(lam) {
+    const l = lam * D2R;
+    return [mod(Math.atan2(cosE * Math.sin(l), Math.cos(l)) * R2D, 360), Math.asin(sinE * Math.sin(l)) * R2D];
+  }
+  function altAz(Hdeg, dec, lat) {
+    const H = Hdeg * D2R, d = dec * D2R, p = lat * D2R;
+    const s = Math.sin(p) * Math.sin(d) + Math.cos(p) * Math.cos(d) * Math.cos(H);
+    const alt = Math.asin(Math.max(-1, Math.min(1, s))) * R2D;
+    const az = mod(Math.atan2(-Math.cos(d) * Math.sin(H), Math.sin(d) * Math.cos(p) - Math.cos(d) * Math.sin(p) * Math.cos(H)) * R2D, 360);
+    return [alt, az];
+  }
+
+  // Bright stars engraved on the rete (J2000 right ascension in hours, declination in degrees).
+  const STARS = [
+    ['Alpheratz', 0.1398, 29.091], ['Schedar', 0.6751, 56.537], ['Algol', 3.1361, 40.956],
+    ['Aldebaran', 4.5987, 16.509], ['Rigel', 5.2423, -8.202], ['Capella', 5.2782, 45.998],
+    ['Betelgeuse', 5.9195, 7.407], ['Sirius', 6.7525, -16.716], ['Procyon', 7.655, 5.225],
+    ['Pollux', 7.7553, 28.026], ['Alphard', 9.4598, -8.659], ['Regulus', 10.1395, 11.967],
+    ['Dubhe', 11.0621, 61.751], ['Denebola', 11.8177, 14.572], ['Spica', 13.4199, -11.161],
+    ['Alkaid', 13.7923, 49.313], ['Arcturus', 14.261, 19.182], ['Kochab', 14.8451, 74.156],
+    ['Alphecca', 15.5781, 26.715], ['Rasalhague', 17.5822, 12.56], ['Vega', 18.6156, 38.784],
+    ['Altair', 19.8464, 8.868], ['Deneb', 20.6905, 45.28], ['Markab', 23.0794, 15.205],
+  ].map(([name, ra, dec]) => ({ name, ra: ra * 15, dec }));
+
+  /* ================================================================
+     Stereographic projection from the south celestial pole.
+     The north pole sits at the center; the plate ends at the
+     Tropic of Capricorn.
+     ================================================================ */
+  const R_CAP = 400;
+  const R_EQ = R_CAP / Math.tan(((90 + EPS) / 2) * D2R);
+  const rDec = (dec) => R_EQ * Math.tan(((90 - dec) / 2) * D2R);
+  const R_CAN = rDec(EPS);
+  const EX = (R_CAP - R_CAN) / 2, ER = (R_CAP + R_CAN) / 2, BAND = 30;
+  function reteXY(ra, dec) {
+    const r = rDec(dec), a = ra * D2R;
+    return [-r * Math.sin(a), -r * Math.cos(a)];
+  }
+  function plateXY(H, dec) {
+    const r = rDec(dec), a = H * D2R;
+    return [r * Math.sin(a), -r * Math.cos(a)];
+  }
+  function almucantar(h, lat) {
+    const yS = -R_EQ * Math.tan(((180 - lat - h) / 2) * D2R);
+    const yN = -R_EQ * Math.tan(((h - lat) / 2) * D2R);
+    return { cy: (yS + yN) / 2, r: Math.abs(yS - yN) / 2, yS, yN };
+  }
+
+  /* ================================================================
+     Places. A real astrolabe carried a stack of plates, one per city.
+     ================================================================ */
+  const ZONES = {
+    'America/New_York': ['New York', 40.71, -74.01], 'America/Detroit': ['Detroit', 42.33, -83.05],
+    'America/Toronto': ['Toronto', 43.65, -79.38], 'America/Chicago': ['Chicago', 41.88, -87.63],
+    'America/Winnipeg': ['Winnipeg', 49.9, -97.14], 'America/Mexico_City': ['Mexico City', 19.43, -99.13],
+    'America/Denver': ['Denver', 39.74, -104.99], 'America/Edmonton': ['Edmonton', 53.55, -113.49],
+    'America/Phoenix': ['Phoenix', 33.45, -112.07], 'America/Los_Angeles': ['Los Angeles', 34.05, -118.24],
+    'America/Vancouver': ['Vancouver', 49.28, -123.12], 'America/Anchorage': ['Anchorage', 61.22, -149.9],
+    'Pacific/Honolulu': ['Honolulu', 21.31, -157.86], 'Europe/London': ['London', 51.51, -0.13],
+    'Europe/Dublin': ['Dublin', 53.35, -6.26], 'Europe/Lisbon': ['Lisbon', 38.72, -9.14],
+    'Europe/Madrid': ['Madrid', 40.42, -3.7], 'Europe/Paris': ['Paris', 48.86, 2.35],
+    'Europe/Brussels': ['Brussels', 50.85, 4.35], 'Europe/Amsterdam': ['Amsterdam', 52.37, 4.9],
+    'Europe/Berlin': ['Berlin', 52.52, 13.4], 'Europe/Zurich': ['Zurich', 47.38, 8.54],
+    'Europe/Rome': ['Rome', 41.9, 12.5], 'Europe/Vienna': ['Vienna', 48.21, 16.37],
+    'Europe/Prague': ['Prague', 50.08, 14.44], 'Europe/Warsaw': ['Warsaw', 52.23, 21.01],
+    'Europe/Stockholm': ['Stockholm', 59.33, 18.07], 'Europe/Oslo': ['Oslo', 59.91, 10.75],
+    'Europe/Copenhagen': ['Copenhagen', 55.68, 12.57], 'Europe/Helsinki': ['Helsinki', 60.17, 24.94],
+    'Europe/Athens': ['Athens', 37.98, 23.73], 'Europe/Istanbul': ['Istanbul', 41.01, 28.98],
+    'Europe/Moscow': ['Moscow', 55.76, 37.62], 'Africa/Cairo': ['Cairo', 30.04, 31.24],
+    'Asia/Jerusalem': ['Jerusalem', 31.77, 35.21], 'Asia/Dubai': ['Dubai', 25.2, 55.27],
+    'Asia/Tehran': ['Tehran', 35.69, 51.39], 'Asia/Karachi': ['Karachi', 24.86, 67.0],
+    'Asia/Kolkata': ['Kolkata', 22.57, 88.36], 'Asia/Calcutta': ['Kolkata', 22.57, 88.36],
+    'Asia/Bangkok': ['Bangkok', 13.76, 100.5], 'Asia/Singapore': ['Singapore', 1.35, 103.82],
+    'Asia/Hong_Kong': ['Hong Kong', 22.32, 114.17], 'Asia/Shanghai': ['Shanghai', 31.23, 121.47],
+    'Asia/Taipei': ['Taipei', 25.03, 121.57], 'Asia/Seoul': ['Seoul', 37.57, 126.98],
+    'Asia/Tokyo': ['Tokyo', 35.68, 139.69],
+  };
+  const HISTORIC = [
+    { name: 'Baghdad', lat: 33.31, lon: 44.36, tz: 'Asia/Baghdad' },
+    { name: 'Cairo', lat: 30.04, lon: 31.24, tz: 'Africa/Cairo' },
+    { name: 'Isfahan', lat: 32.65, lon: 51.67, tz: 'Asia/Tehran' },
+    { name: 'Maragheh', lat: 37.39, lon: 46.24, tz: 'Asia/Tehran' },
+    { name: 'Samarkand', lat: 39.65, lon: 66.96, tz: 'Asia/Samarkand' },
+    { name: 'Toledo', lat: 39.86, lon: -4.02, tz: 'Europe/Madrid' },
+    { name: 'Nuremberg', lat: 49.45, lon: 11.08, tz: 'Europe/Berlin' },
+    { name: 'Oxford', lat: 51.75, lon: -1.26, tz: 'Europe/London' },
+  ];
+  let userTz = 'UTC';
+  try { userTz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; } catch (err) { /* keep UTC */ }
+  const z = ZONES[userTz];
+  const home = z
+    ? { name: z[0], lat: z[1], lon: z[2], tz: userTz, home: true }
+    : { name: 'Greenwich', lat: 51.48, lon: 0, tz: 'Europe/London', home: true };
+  const PLATES = [home, ...HISTORIC.filter((p) => p.name !== home.name)];
+
+  /* ================================================================
+     Drawing
+     ================================================================ */
+  const svg = document.getElementById('astro');
+  svg.innerHTML = `
+    <defs>
+      <radialGradient id="g-brass" cx="38%" cy="32%" r="80%">
+        <stop offset="0" stop-color="#ecc979"/><stop offset=".45" stop-color="#c9973f"/>
+        <stop offset=".85" stop-color="#9b6c25"/><stop offset="1" stop-color="#7a521b"/>
+      </radialGradient>
+      <radialGradient id="g-plate" cx="40%" cy="35%" r="75%">
+        <stop offset="0" stop-color="#e4c06f"/><stop offset=".7" stop-color="#c69749"/><stop offset="1" stop-color="#aa7d34"/>
+      </radialGradient>
+      <linearGradient id="g-throne" x1="0" y1="-640" x2="0" y2="-430" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#eccb7e"/><stop offset="1" stop-color="#9a6b24"/>
+      </linearGradient>
+      <linearGradient id="g-rete" x1="-400" y1="-400" x2="400" y2="400" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#f1d78d"/><stop offset=".5" stop-color="#d0a14a"/><stop offset="1" stop-color="#a97929"/>
+      </linearGradient>
+      <linearGradient id="g-rule" x1="0" y1="0" x2="14" y2="0" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#f6e09e"/><stop offset="1" stop-color="#b0802c"/>
+      </linearGradient>
+      <radialGradient id="g-pin" cx="35%" cy="30%" r="70%">
+        <stop offset="0" stop-color="#f7e5ab"/><stop offset="1" stop-color="#8a5f1e"/>
+      </radialGradient>
+      <radialGradient id="g-shadow">
+        <stop offset=".62" stop-color="#000" stop-opacity=".3"/><stop offset="1" stop-color="#000" stop-opacity="0"/>
+      </radialGradient>
+      <filter id="lift" x="-15%" y="-15%" width="130%" height="130%">
+        <feDropShadow dx="3" dy="5" stdDeviation="3.5" flood-color="#1a1005" flood-opacity=".45"/>
+      </filter>
+      <g id="rete-shapes"></g>
+    </defs>
+    <ellipse cx="16" cy="40" rx="508" ry="508" fill="url(#g-shadow)"/>
+    <g id="mater"></g>
+    <g id="plate"></g>
+    <g filter="url(#lift)"><g id="rete"></g></g>
+    <g filter="url(#lift)"><g id="rule"></g></g>
+    <circle r="12" fill="url(#g-pin)" stroke="#3a2811" stroke-width="1.5"/>
+    <circle class="focus-ring" r="486"/>`;
+  const $ = (id) => document.getElementById(id);
+
+  function circlePath(cx, cy, r) {
+    return `M${f(cx + r)} ${f(cy)}A${f(r)} ${f(r)} 0 1 0 ${f(cx - r)} ${f(cy)}A${f(r)} ${f(r)} 0 1 0 ${f(cx + r)} ${f(cy)}Z`;
+  }
+
+  /* ---------- Mater: throne, body and limb ---------- */
+  function buildMater() {
+    const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+    const throne = 'M-150 -430C-140 -470 -105 -492 -86 -510C-70 -526 -74 -552 -56 -566C-40 -580 -18 -584 0 -600'
+      + 'C18 -584 40 -580 56 -566C74 -552 70 -526 86 -510C105 -492 140 -470 150 -430Z';
+    let s = '';
+    s += `<path d="${throne}${circlePath(0, -540, 21)}" fill="url(#g-throne)" fill-rule="evenodd" stroke="#4a3210" stroke-width="2"/>`;
+    s += `<circle class="eng" cx="0" cy="-540" r="29"/>`;
+    s += `<path class="eng thin" d="M-118 -452C-108 -478 -86 -494 -72 -508M118 -452C108 -478 86 -494 72 -508"/>`;
+    s += `<circle cx="0" cy="-627" r="20" fill="none" stroke="#4a3210" stroke-width="11"/>`;
+    s += `<circle cx="0" cy="-627" r="20" fill="none" stroke="url(#g-throne)" stroke-width="7.5"/>`;
+    s += `<rect x="-8" y="-611" width="16" height="16" rx="3" fill="url(#g-throne)" stroke="#4a3210" stroke-width="1.5"/>`;
+    s += `<circle r="478" fill="url(#g-brass)" stroke="#4a3210" stroke-width="2.5"/>`;
+    s += `<circle r="474" fill="none" stroke="#f6e0a0" stroke-opacity=".35" stroke-width="1.5"/>`;
+    s += `<circle class="eng" r="470"/><circle class="eng" r="432"/><circle class="eng" r="404"/>`;
+    let ticks = '';
+    for (let d = 0; d < 360; d++) {
+      const len = d % 15 === 0 ? 28 : d % 5 === 0 ? 11 : 6;
+      const a = d * D2R, sx = Math.sin(a), cy = -Math.cos(a);
+      ticks += `M${f(404 * sx)} ${f(404 * cy)}L${f((404 + len) * sx)} ${f((404 + len) * cy)}`;
+    }
+    for (let q = 0; q < 96; q++) {
+      if (q % 4 === 0) continue;
+      const a = q * 3.75 * D2R, sx = Math.sin(a), cy = -Math.cos(a);
+      const len = q % 2 === 0 ? 8 : 5;
+      ticks += `M${f(432 * sx)} ${f(432 * cy)}L${f((432 + len) * sx)} ${f((432 + len) * cy)}`;
+    }
+    s += `<path class="eng thin" d="${ticks}"/>`;
+    for (let hh = 0; hh < 24; hh++) {
+      const th = (hh - 12) * 15;
+      s += `<text transform="rotate(${th}) translate(0 -452)" text-anchor="middle" dominant-baseline="central" font-size="21">${ROMAN[(hh + 11) % 12]}</text>`;
+    }
+    $('mater').innerHTML = s;
+  }
+
+  /* ---------- Plate: engraved for one latitude ---------- */
+  function arcThrough(p1, p2, p3) {
+    const [x1, y1] = p1, [x2, y2] = p2, [x3, y3] = p3;
+    const d = 2 * (x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2));
+    if (Math.abs(d) < 1e-6) return `M${f(x1)} ${f(y1)}L${f(x3)} ${f(y3)}`;
+    const s1 = x1 * x1 + y1 * y1, s2 = x2 * x2 + y2 * y2, s3 = x3 * x3 + y3 * y3;
+    const ux = (s1 * (y2 - y3) + s2 * (y3 - y1) + s3 * (y1 - y2)) / d;
+    const uy = (s1 * (x3 - x2) + s2 * (x1 - x3) + s3 * (x2 - x1)) / d;
+    const r = Math.hypot(x1 - ux, y1 - uy);
+    if (r > 1e5) return `M${f(x1)} ${f(y1)}L${f(x3)} ${f(y3)}`;
+    const sweep = (x2 - x1) * (y3 - y2) - (y2 - y1) * (x3 - x2) > 0 ? 1 : 0;
+    const side = (px, py) => (x3 - x1) * (py - y1) - (y3 - y1) * (px - x1);
+    const large = side(ux, uy) * side(x2, y2) > 0 ? 1 : 0;
+    return `M${f(x1)} ${f(y1)}A${f(r)} ${f(r)} 0 ${large} ${sweep} ${f(x3)} ${f(y3)}`;
+  }
+  const nightH0 = (lat, dec) => Math.acos(Math.max(-1, Math.min(1, -Math.tan(lat * D2R) * Math.tan(dec * D2R)))) * R2D;
+  function fmtLat(lat) {
+    const d = Math.floor(lat), m = Math.round((lat - d) * 60);
+    return m === 60 ? `${d + 1}° 00′ N` : `${d}° ${String(m).padStart(2, '0')}′ N`;
+  }
+  function longestDay(lat) {
+    const mins = Math.round((2 * nightH0(lat, EPS) / 15) * 60);
+    return `${Math.floor(mins / 60)}h ${String(mins % 60).padStart(2, '0')}m`;
+  }
+
+  function buildPlate(city) {
+    const lat = city.lat;
+    const hz = almucantar(0, lat);
+    let s = `<defs><clipPath id="c-plate"><circle r="${R_CAP}"/></clipPath>`
+      + `<clipPath id="c-sky"><circle cx="0" cy="${f(hz.cy)}" r="${f(hz.r)}"/></clipPath></defs>`;
+    s += `<circle r="${R_CAP}" fill="url(#g-plate)"/>`;
+    s += '<g clip-path="url(#c-plate)">';
+    s += `<circle class="eng" r="${f(R_CAN)}"/><circle class="eng" r="${f(R_EQ)}"/>`;
+    s += `<path class="eng thin" d="M0 -400V400M-400 0H400"/>`;
+    // Almucantars: circles of equal altitude every 2°, heavier every 10°.
+    for (let h = 2; h < 90; h += 2) {
+      const c = almucantar(h, lat);
+      s += `<circle class="eng${h % 10 ? ' thin' : ''}" cy="${f(c.cy)}" r="${f(c.r)}"/>`;
+    }
+    // Azimuths: great circles through the zenith, every 10°, above the horizon only.
+    const yZ = -R_EQ * Math.tan(((90 - lat) / 2) * D2R), yNad = R_EQ * Math.tan(((90 + lat) / 2) * D2R);
+    const dd = (yNad - yZ) / 2, ym = (yZ + yNad) / 2;
+    s += '<g clip-path="url(#c-sky)">';
+    for (let A = 10; A < 180; A += 10) {
+      const t = Math.tan(A * D2R);
+      const xc = Math.abs(t) > 1e9 ? 0 : dd / t;
+      s += `<circle class="eng thin" cx="${f(xc)}" cy="${f(ym)}" r="${f(dd / Math.sin(A * D2R))}"/>`;
+    }
+    s += '</g>';
+    s += `<circle class="eng bold" cy="${f(hz.cy)}" r="${f(hz.r)}"/>`;
+    const tw = almucantar(-18, lat);
+    s += `<circle class="eng dash" cy="${f(tw.cy)}" r="${f(tw.r)}"/>`;
+    // Unequal hours: each night arc divided in twelve, joined through the tropics and equator.
+    let uh = '';
+    for (let k = 1; k <= 11; k++) {
+      const pts = [-EPS, 0, EPS].map((dec) => {
+        const H0 = nightH0(lat, dec);
+        return plateXY(H0 + (k * (360 - 2 * H0)) / 12, dec);
+      });
+      uh += arcThrough(pts[0], pts[1], pts[2]);
+    }
+    s += `<path class="eng" d="${uh}"/>`;
+    // Labels
+    let t = '';
+    for (let h = 10; h <= 80; h += 10) {
+      const yS = almucantar(h, lat).yS;
+      if (yS > -392) t += `<text x="5" y="${f(yS - 3)}" font-size="11">${h}</text>`;
+    }
+    const H0c = nightH0(lat, -EPS);
+    for (let k = 1; k <= 12; k++) {
+      const [x, y] = plateXY(H0c + ((k - 0.5) * (360 - 2 * H0c)) / 12, -EPS);
+      const sc = 382 / R_CAP;
+      t += `<text x="${f(x * sc)}" y="${f(y * sc)}" font-size="12" text-anchor="middle" dominant-baseline="central">${k}</text>`;
+    }
+    // Oriens and occidens along the horizon, just inside the sky.
+    const yi = (R_CAP * R_CAP - hz.r * hz.r + hz.cy * hz.cy) / (2 * hz.cy);
+    const ti = Math.PI - Math.asin(Math.max(-1, Math.min(1, (yi - hz.cy) / hz.r)));
+    const at = (u) => {
+      const tt = Math.PI / 2 + u * (ti - Math.PI / 2);
+      return [hz.r * Math.cos(tt), hz.cy + hz.r * Math.sin(tt)];
+    };
+    for (const [word, side] of [['Oriens', 1], ['Occidens', -1]]) {
+      let [ax, ay] = at(0.8), [bx, by] = at(0.6);
+      if (side < 0) { ax = -ax; bx = -bx; [ax, ay, bx, by] = [bx, by, ax, ay]; }
+      const ang = Math.atan2(by - ay, bx - ax) * R2D;
+      const mx = (ax + bx) / 2, my = (ay + by) / 2;
+      const nl = Math.hypot(mx, my - hz.cy) || 1;
+      const ox = mx - ((mx - 0) / nl) * 12, oy = my - ((my - hz.cy) / nl) * 12;
+      t += `<text transform="translate(${f(ox)} ${f(oy)}) rotate(${f(ang)})" text-anchor="middle" dominant-baseline="central" font-size="13" letter-spacing="1.5">${word}</text>`;
+    }
+    t += `<text x="0" y="${f(tw.yN + 13)}" text-anchor="middle" font-size="10.5" letter-spacing="1">crepusculum</text>`;
+    s += t;
+    s += '</g>';
+    s += `<circle class="eng bold" r="${R_CAP}"/>`;
+    // Cartouche with the plate's latitude
+    s += `<rect x="-128" y="290" width="256" height="58" rx="4" fill="#c99b4c" stroke="#3a2811" stroke-width="1.2"/>`;
+    s += `<rect x="-123" y="295" width="246" height="48" rx="2" class="eng thin"/>`;
+    s += `<text x="0" y="314" text-anchor="middle" font-size="20" letter-spacing="2">${city.name}</text>`;
+    s += `<text x="0" y="334" text-anchor="middle" font-size="11.5" letter-spacing=".6">Lat. ${fmtLat(lat)} · longest day ${longestDay(lat)}</text>`;
+    $('plate').innerHTML = s;
+  }
+
+  /* ---------- Rete: the sky, cut from one sheet ---------- */
+  let sunEl = null;
+  function buildRete() {
+    const shapes = [];
+    const fills = [];
+    shapes.push(`<path fill-rule="evenodd" d="${circlePath(0, 0, R_CAP)}${circlePath(0, 0, R_CAP - 14)}"/>`);
+    shapes.push(`<path fill-rule="evenodd" d="${circlePath(EX, 0, ER)}${circlePath(EX, 0, ER - BAND)}"/>`);
+    shapes.push(`<rect x="-392" y="-5" width="784" height="10"/>`);
+    shapes.push(`<rect x="-5" y="-392" width="10" height="${f(392 - R_EQ + 8)}"/>`);
+    shapes.push(`<rect x="-5" y="${f(R_EQ - 8)}" width="10" height="${f(392 - R_EQ + 8)}"/>`);
+
+    let dots = '', labels = '';
+    STARS.forEach((st, i) => {
+      if (st.dec < -EPS + 1) return;
+      const [sx, sy] = reteXY(st.ra, st.dec);
+      const cands = [];
+      const r = Math.hypot(sx, sy);
+      if (r < R_CAP - 14) cands.push([(sx / r) * (R_CAP - 12), (sy / r) * (R_CAP - 12)]);
+      const ex = sx - EX, de = Math.hypot(ex, sy);
+      let onBand = false;
+      if (de > ER) cands.push([EX + (ex / de) * (ER - 2), (sy / de) * (ER - 2)]);
+      else if (de < ER - BAND) cands.push([EX + (ex / de) * (ER - BAND + 2), (sy / de) * (ER - BAND + 2)]);
+      else onBand = true;
+      if (Math.abs(sx) < 388) cands.push([sx, sy >= 0 ? 3 : -3]);
+      if ((sy < -R_EQ && sy > -392) || (sy > R_EQ && sy < 392)) cands.push([sx >= 0 ? 3 : -3, sy]);
+      let best = null, bd = Infinity;
+      for (const c of cands) {
+        const d = Math.hypot(c[0] - sx, c[1] - sy);
+        if (d < bd) { bd = d; best = c; }
+      }
+      let ux = 0, uy = -1;
+      if (!onBand && best && bd > 7) {
+        const [ax, ay] = best;
+        ux = (sx - ax) / bd; uy = (sy - ay) / bd;
+        const nx = -uy, ny = ux;
+        const bx = ax - ux * 5, by = ay - uy * 5;
+        const w = Math.min(9, 3 + bd * 0.1);
+        const bend = bd * 0.2 * (i % 2 ? 1 : -1);
+        const mx = (bx + sx) / 2 + nx * bend, my = (by + sy) / 2 + ny * bend;
+        shapes.push(`<path d="M${f(bx + nx * w)} ${f(by + ny * w)}Q${f(mx + nx * w * 0.6)} ${f(my + ny * w * 0.6)} ${f(sx)} ${f(sy)}`
+          + `Q${f(mx - nx * w * 0.6)} ${f(my - ny * w * 0.6)} ${f(bx - nx * w)} ${f(by - ny * w)}Z"/>`);
+        shapes.push(`<circle cx="${f(ax)}" cy="${f(ay)}" r="${f(w * 0.95)}"/>`);
+        fills.push(`<path class="eng thin" d="M${f(bx)} ${f(by)}Q${f(mx)} ${f(my)} ${f(sx)} ${f(sy)}"/>`);
+      }
+      dots += `<circle cx="${f(sx)}" cy="${f(sy)}" r="2.6" fill="#3a2811"/>`;
+      const lx = sx + ux * 9, ly = sy + uy * 9;
+      const anchor = ux > 0.25 ? 'start' : ux < -0.25 ? 'end' : 'middle';
+      const dy = anchor === 'middle' ? (uy > 0 ? 8 : -8) : 0;
+      labels += `<text class="halo" x="${f(lx)}" y="${f(ly + dy)}" text-anchor="${anchor}" dominant-baseline="central" font-size="14">${st.name}</text>`;
+    });
+    $('rete-shapes').innerHTML = shapes.join('');
+
+    // Degree scale and zodiac on the ecliptic ring.
+    let ticks = '';
+    for (let lam = 0; lam < 360; lam++) {
+      const [ra, dec] = eclToEq(lam);
+      const [px, py] = reteXY(ra, dec);
+      const vx = (EX - px) / ER, vy = -py / ER;
+      const len = lam % 30 === 0 ? BAND : lam % 10 === 0 ? 10 : lam % 5 === 0 ? 7 : 4;
+      ticks += `M${f(px)} ${f(py)}L${f(px + vx * len)} ${f(py + vy * len)}`;
+    }
+    const SIGNS = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricornus', 'Aquarius', 'Pisces'];
+    let signs = '';
+    SIGNS.forEach((name, i) => {
+      const [ra, dec] = eclToEq(i * 30 + 15);
+      const [px, py] = reteXY(ra, dec);
+      const th = Math.atan2(py, px - EX);
+      const rr = ER - 20;
+      signs += `<text transform="translate(${f(EX + rr * Math.cos(th))} ${f(rr * Math.sin(th))}) rotate(${f(th * R2D + 90)})" text-anchor="middle" dominant-baseline="central" font-size="13" letter-spacing=".8">${name}</text>`;
+    });
+
+    let rays = '';
+    for (let k = 0; k < 8; k++) {
+      const a = (k * 45) * D2R;
+      rays += `M${f(13 * Math.cos(a))} ${f(13 * Math.sin(a))}L${f(19 * Math.cos(a))} ${f(19 * Math.sin(a))}`;
+    }
+    $('rete').innerHTML = `
+      <use href="#rete-shapes" fill="#3a2811" stroke="#3a2811" stroke-width="3.2" stroke-linejoin="round"/>
+      <use href="#rete-shapes" fill="url(#g-rete)"/>
+      <circle class="eng thin" cx="${f(EX)}" cy="0" r="${f(ER - BAND)}"/>
+      <path class="eng thin" d="${ticks}"/>
+      ${fills.join('')}
+      ${signs}
+      ${dots}
+      ${labels}
+      <g id="sun"><path d="${rays}" stroke="#3a2811" stroke-width="2" stroke-linecap="round"/>
+        <circle r="10.5" fill="#f8d468" stroke="#3a2811" stroke-width="1.5"/></g>`;
+    sunEl = $('sun');
+  }
+
+  function buildRule() {
+    $('rule').innerHTML = `
+      <path d="M0 -474L14 -440V-30A30 30 0 0 1 14 30V440L0 474Z" fill="url(#g-rule)" stroke="#3a2811" stroke-width="1.4" stroke-linejoin="round"/>
+      <path class="eng" d="M0 -474V474"/>
+      <path class="eng thin" d="M7 -430V-40M7 40V430"/>`;
+  }
+
+  /* ================================================================
+     State and readouts
+     ================================================================ */
+  let city = home;
+  let displayTime = Date.now();
+  let nowMode = true;
+  let anim = 0, pending = 0;
+  let fmt = null;
+  let eventsKey = '';
+  let events = { rise: null, noon: null, set: null };
+
+  function makeFormats() {
+    const tz = city.tz;
+    const safe = (opts) => {
+      try { return new Intl.DateTimeFormat('en-GB', { ...opts, timeZone: tz }); } catch (err) { return new Intl.DateTimeFormat('en-GB', opts); }
+    };
+    fmt = {
+      time: safe({ hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }),
+      date: safe({ weekday: 'long', day: 'numeric', month: 'long' }),
+      iso: (() => { try { return new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: tz }); } catch (err) { return new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' }); } })(),
+    };
+  }
+  const hhmm = (mins) => {
+    const m = Math.round(mod(mins, 1440));
+    return `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+  };
+  const clockMinutes = (t) => {
+    const [h, m] = fmt.time.format(t).split(':').map(Number);
+    return h * 60 + m;
+  };
+  const DIRS = ['north', 'north-east', 'east', 'south-east', 'south', 'south-west', 'west', 'north-west'];
+
+  function sunAt(ms) {
+    const [ra, dec] = eclToEq(sunLon(ms));
+    return { H: wrap180(gmst(ms) + city.lon - ra), dec };
+  }
+  function solarNoon(ms) {
+    let t = ms;
+    for (let i = 0; i < 5; i++) t -= (sunAt(t).H / 15) * 3600000;
+    return t;
+  }
+  function sunEvent(noon, sign) {
+    let t = noon;
+    for (let i = 0; i < 6; i++) {
+      const s = sunAt(t);
+      const c = -Math.tan(city.lat * D2R) * Math.tan(s.dec * D2R);
+      if (c < -1 || c > 1) return null;
+      t += (wrap180(sign * Math.acos(c) * R2D - s.H) / 15) * 3600000;
+    }
+    return t;
+  }
+
+  const els = {
+    time: $('r-time'), date: $('r-date'), sun: $('r-sun'), stars: $('r-stars'), starsNote: $('r-stars-note'),
+    chip: $('now-chip'), nowBtn: $('now-btn'), dateIn: $('date'), plate: $('plate'),
+    rise: $('ev-rise'), noon: $('ev-noon'), set: $('ev-set'),
+  };
+
+  function update() {
+    pending = 0;
+    const t = displayTime;
+    const lst = mod(gmst(t) + city.lon, 360);
+    $('rete').setAttribute('transform', `rotate(${lst.toFixed(3)})`);
+    const [sra, sdec] = eclToEq(sunLon(t));
+    const [sx, sy] = reteXY(sra, sdec);
+    sunEl.setAttribute('transform', `translate(${f(sx)} ${f(sy)})`);
+    const H = wrap180(lst - sra);
+    $('rule').setAttribute('transform', `rotate(${H.toFixed(3)})`);
+
+    // Showing
+    const clock = fmt.time.format(t);
+    els.time.textContent = clock;
+    els.date.textContent = fmt.date.format(t);
+    els.chip.hidden = !nowMode;
+    els.nowBtn.hidden = nowMode;
+    const iso = fmt.iso.format(t);
+    if (document.activeElement !== els.dateIn) els.dateIn.value = iso;
+    svg.setAttribute('aria-valuenow', String(clockMinutes(t)));
+    svg.setAttribute('aria-valuetext', `${clock}, ${fmt.date.format(t)}`);
+
+    // Sun
+    const [alt, az] = altAz(H, sdec, city.lat);
+    const a = Math.round(Math.abs(alt));
+    let sunText;
+    if (alt > 0) sunText = `Up, ${a}° above the ${DIRS[Math.round(az / 45) % 8]} horizon.`;
+    else if (alt > -6) sunText = `${a}° below the horizon. Civil twilight.`;
+    else if (alt > -12) sunText = `${a}° below the horizon. Nautical twilight.`;
+    else if (alt > -18) sunText = `${a}° below the horizon. Astronomical twilight.`;
+    else sunText = `${a}° below the horizon. Full night.`;
+    const sundial = (12 + H / 15) * 60;
+    let diff = Math.round(mod(sundial - clockMinutes(t) + 720, 1440) - 720);
+    const rel = Math.abs(diff) < 1 ? 'level with the clock' : `${Math.abs(diff)} min ${diff < 0 ? 'behind' : 'ahead of'} the clock`;
+    els.sun.textContent = `${sunText} Sundial time ${hhmm(sundial)}, ${rel}.`;
+
+    // Stars above the horizon
+    const up = [];
+    for (const st of STARS) {
+      const [sAlt] = altAz(lst - st.ra, st.dec, city.lat);
+      if (sAlt > 0) up.push([st.name, sAlt]);
+    }
+    up.sort((p, q) => q[1] - p[1]);
+    els.stars.innerHTML = up.map(([n, al]) => `<li><span class="sn">${n}</span> <span class="alt">${Math.round(al)}°</span></li>`).join('');
+    els.starsNote.textContent = !up.length ? 'None of the rete’s stars.' : alt > -6 ? 'Hidden by daylight, but there.' : '';
+
+    // Sunrise, noon and sunset for the day shown
+    const key = `${city.name}|${iso}`;
+    if (key !== eventsKey) {
+      eventsKey = key;
+      const noon = solarNoon(t);
+      events = { rise: sunEvent(noon, -1), noon, set: sunEvent(noon, 1) };
+      for (const k of ['rise', 'noon', 'set']) {
+        const btn = document.querySelector(`.ev[data-ev="${k}"]`);
+        btn.disabled = events[k] == null;
+        els[k].textContent = events[k] == null ? 'none' : fmt.time.format(events[k]);
+      }
+    }
+  }
+  function schedule() {
+    if (!pending) pending = requestAnimationFrame(update);
+  }
+
+  function stopAnim() {
+    if (anim) cancelAnimationFrame(anim);
+    anim = 0;
+  }
+  function turnTo(target, thenNow) {
+    stopAnim();
+    nowMode = false;
+    if (reduceMotion) {
+      displayTime = target;
+      nowMode = !!thenNow;
+      update();
+      return;
+    }
+    const from = displayTime, d = target - from, t0 = performance.now();
+    const dur = Math.min(1900, 650 + (Math.abs(d) / 3600000) * 95);
+    const step = (now) => {
+      const k = Math.min(1, (now - t0) / dur);
+      const e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+      displayTime = from + d * e;
+      if (k < 1) {
+        update();
+        anim = requestAnimationFrame(step);
+      } else {
+        anim = 0;
+        if (thenNow) { nowMode = true; displayTime = Date.now(); }
+        update();
+      }
+    };
+    anim = requestAnimationFrame(step);
+  }
+
+  /* ---------- Turning by hand ---------- */
+  let drag = null;
+  function svgPoint(e) {
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    return pt.matrixTransform(svg.getScreenCTM().inverse());
+  }
+  function turnBy(deg) {
+    if (!deg) return;
+    nowMode = false;
+    displayTime += (deg / 360.98564736629) * 86400000;
+    schedule();
+  }
+  svg.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    const p = svgPoint(e);
+    if (Math.hypot(p.x, p.y) > 482) return;
+    stopAnim();
+    drag = { id: e.pointerId, a: Math.atan2(p.y, p.x) * R2D, x: e.clientX, touch: e.pointerType !== 'mouse' && e.pointerType !== 'pen' };
+    try { svg.setPointerCapture(e.pointerId); } catch (err) { /* optional */ }
+    svg.classList.add('turning');
+  });
+  svg.addEventListener('pointermove', (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    if (drag.touch) {
+      const w = svg.getBoundingClientRect().width || 1;
+      turnBy(((e.clientX - drag.x) / (Math.PI * w * 0.82)) * 360);
+      drag.x = e.clientX;
+    } else {
+      const p = svgPoint(e);
+      const a = Math.atan2(p.y, p.x) * R2D;
+      turnBy(wrap180(a - drag.a));
+      drag.a = a;
+    }
+  });
+  const endDrag = (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    drag = null;
+    svg.classList.remove('turning');
+  };
+  svg.addEventListener('pointerup', endDrag);
+  svg.addEventListener('pointercancel', endDrag);
+  svg.addEventListener('keydown', (e) => {
+    const q = 15 * 60000;
+    let d = 0;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') d = e.shiftKey ? 4 * q : q;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') d = -(e.shiftKey ? 4 * q : q);
+    else if (e.key === 'PageUp') d = 4 * q;
+    else if (e.key === 'PageDown') d = -4 * q;
+    else if (e.key === 'Home') { e.preventDefault(); turnTo(Date.now(), true); return; }
+    if (!d) return;
+    e.preventDefault();
+    stopAnim();
+    nowMode = false;
+    displayTime += d;
+    update();
+  });
+
+  /* ---------- Controls ---------- */
+  document.querySelectorAll('.ev').forEach((b) => {
+    b.addEventListener('click', () => {
+      const t = events[b.dataset.ev];
+      if (t != null) turnTo(t, false);
+    });
+  });
+  els.nowBtn.addEventListener('click', () => turnTo(Date.now(), true));
+  els.dateIn.addEventListener('change', () => {
+    const v = els.dateIn.value;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return;
+    const days = Math.round((Date.parse(v) - Date.parse(fmt.iso.format(displayTime))) / 86400000);
+    if (!days) return;
+    stopAnim();
+    nowMode = false;
+    displayTime += days * 86400000;
+    update();
+  });
+
+  PLATES.forEach((p, i) => {
+    const o = document.createElement('option');
+    o.value = String(i);
+    o.textContent = p.home ? `${p.name} (your time zone)` : p.name;
+    els.plate.append(o);
+  });
+  if (!z) els.plate.options[0].textContent = 'Greenwich';
+  els.plate.addEventListener('change', () => setCity(PLATES[Number(els.plate.value)]));
+
+  function setCity(c) {
+    city = c;
+    makeFormats();
+    eventsKey = '';
+    buildPlate(city);
+    $('t-city').textContent = city.name;
+    $('t-lat').textContent = fmtLat(city.lat);
+    update();
+  }
+
+  // The sky turns about a quarter of a degree a minute: a look every 15 seconds is plenty.
+  setInterval(() => {
+    if (nowMode && !anim && !drag && !document.hidden) {
+      displayTime = Date.now();
+      update();
+    }
+  }, 15000);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && nowMode) {
+      displayTime = Date.now();
+      update();
+    }
+  });
+
+  buildMater();
+  buildRete();
+  buildRule();
+  setCity(city);
+})();
+</script>
+</body>
+</html>

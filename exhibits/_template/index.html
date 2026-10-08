@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<!-- A starting point for a new exhibit. Copy this folder to exhibits/<slug>/, change
+     data-exhibit below to the slug, add the exhibit to exhibits.json, and run
+     node tools/check.mjs. See the README for the house rules. -->
+<title>Exhibit Name</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Lexend:wght@400;500;600&display=swap">
+<style>
+:root {
+  /* Layout: say in one line how this exhibit is laid out. */
+  --ground: #eef1f5;
+  --card: #ffffff;
+  --text: #1c2230;
+  --muted: #586174;
+  --line: rgba(28, 34, 48, 0.12);
+  --accent: #2f56a6;
+  --f-display: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
+  --f-body: "Lexend", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --ground: #10141c; --card: #181e29; --text: #e8ebf1; --muted: #9ba4b6; --line: rgba(232, 235, 241, 0.12); --accent: #8fb0f2; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --ground: #10141c; --card: #181e29; --text: #e8ebf1; --muted: #9ba4b6; --line: rgba(232, 235, 241, 0.12); --accent: #8fb0f2; color-scheme: dark; }
+body { margin: 0; background: var(--ground); color: var(--text); font-family: var(--f-body); line-height: 1.6; }
+.page { box-sizing: border-box; max-width: 1100px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 60px; display: flex; flex-direction: column; gap: 32px; }
+h1, h2 { font-family: var(--f-display); font-weight: 600; line-height: 1.1; margin: 0; }
+.object { min-height: 320px; display: grid; place-items: center; border-radius: 16px; background: var(--card); border: 2px solid var(--line); }
+.label { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px 32px; }
+.label p { margin: 0; max-width: 64ch; }
+.sources { font-size: 0.85rem; color: var(--muted); }
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="_template" defer></script>
+</head>
+<body>
+<div class="page">
+  <header>
+    <h1>Exhibit Name</h1>
+    <p>One or two sentences: what the object is, and what the visitor gets to do with it.</p>
+  </header>
+  <section class="object" aria-label="The object">
+    <p>The working object goes here. It should open in a working state, not an empty one.</p>
+  </section>
+  <section class="label">
+    <div><h2>How it works</h2><p>The idea behind it, in short plain sentences.</p></div>
+    <div><h2>The history</h2><p>Who made it, when and why. Only facts you can source.</p></div>
+  </section>
+  <p class="sources">Sources: link every fact above.</p>
+</div>
+</body>
+</html>

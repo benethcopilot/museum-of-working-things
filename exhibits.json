@@ -1,0 +1,58 @@
+{
+  "museum": {
+    "name": "The Museum of Working Things",
+    "tagline": "Instruments, machines and mysteries you can operate. Every exhibit works, and every one has a true story behind it.",
+    "repo": "https://github.com/benethcopilot/museum-of-working-things"
+  },
+  "halls": [
+    { "id": "sky", "name": "Sky & Time", "color": "#2f56a6", "blurb": "How people read the heavens and kept the hours." },
+    { "id": "sound", "name": "Music & Sound", "color": "#b23f2a", "blurb": "Machines that make music, and the ideas inside a chord." },
+    { "id": "life", "name": "Life Science", "color": "#2b7a4b", "blurb": "How living things pass traits from parents to their young." },
+    { "id": "making", "name": "Making & Mending", "color": "#a5741a", "blurb": "Crafts where the process is the lesson." },
+    { "id": "machines", "name": "Machines & Messages", "color": "#4b5b6b", "blurb": "Codes, wires and water: how messages and boats got through." },
+    { "id": "numbers", "name": "Numbers & Elements", "color": "#7a4aa0", "blurb": "Tools for calculating, and the table that put matter in order." }
+  ],
+  "exhibits": [
+    {
+      "slug": "astrolabe", "hall": "sky", "title": "Brass Astrolabe", "ages": "10 and up",
+      "blurb": "Turn a working astrolabe to tell the time, find the sunrise and see which stars are up over your city.",
+      "try": "Turn the rete to sunrise"
+    },
+    {
+      "slug": "band-organ", "hall": "sound", "title": "Carousel Band Organ", "ages": "All ages",
+      "blurb": "A paper roll plays carousel tunes from before 1914, after the Wurlitzer organ at Como Park.",
+      "try": "Watch the roll switch on the bells"
+    },
+    {
+      "slug": "music-box", "hall": "sound", "title": "Thirty-Note Music Box", "ages": "6 and up",
+      "blurb": "Punch holes in a paper strip and crank it through a tuned steel comb.",
+      "try": "Punch a tune of your own"
+    },
+    {
+      "slug": "autoharp", "hall": "sound", "title": "Autoharp Chords", "ages": "8 and up",
+      "blurb": "Press a felt-lined bar and strum to see what a chord really is.",
+      "try": "Play along with Clementine"
+    },
+    {
+      "slug": "litter-lab", "hall": "life", "title": "Litter Lab", "ages": "9 and up",
+      "blurb": "Predict Labrador puppy colors with Punnett squares and solve the 1899 mystery of Ben of Hyde.",
+      "try": "Crack Mystery Molly’s genes"
+    },
+    {
+      "slug": "kintsugi", "hall": "making", "title": "Kintsugi Bowl", "ages": "All ages",
+      "blurb": "Break a tea bowl, then mend it with lacquer and gold, one real step at a time.",
+      "try": "Break a mended bowl again"
+    },
+    {
+      "slug": "ebru", "hall": "making", "title": "Ebru Tray", "ages": "All ages",
+      "blurb": "Marble paper on water with a brush, an awl and a comb, then pull your one print.",
+      "try": "Pull a print"
+    },
+    { "slug": "letterpress", "hall": "making", "title": "Letterpress Type Case", "status": "planned", "blurb": "Set a line of metal type by hand and pull a proof you can keep." },
+    { "slug": "mendeleev", "hall": "numbers", "title": "Mendeleev’s Table", "status": "planned", "blurb": "Sort the elements known in 1869 and predict the ones nobody had found yet." },
+    { "slug": "slide-rule", "hall": "numbers", "title": "Slide Rule", "status": "planned", "blurb": "Multiply by sliding two scales, the way engineers did until the 1970s." },
+    { "slug": "lock-and-dam", "hall": "machines", "title": "Lock and Dam No. 1", "status": "planned", "blurb": "Raise a barge on the Mississippi between Minneapolis and St. Paul." },
+    { "slug": "enigma", "hall": "machines", "title": "Enigma Machine", "status": "planned", "blurb": "Encrypt a message with real rotor wirings and find the flaw codebreakers used." },
+    { "slug": "telegraph", "hall": "machines", "title": "Telegraph Office", "status": "planned", "blurb": "Tap out Morse code and pay for your telegram by the word." }
+  ]
+}

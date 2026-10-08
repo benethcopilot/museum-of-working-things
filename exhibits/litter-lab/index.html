@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Litter Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Lexend:wght@400;500;600&display=swap">
+<style>
+:root {
+  /* Layout: a science-museum exhibit in three steps. A mystery from 1899 opens it; each step pairs two parent dogs with their Punnett square and a litter you can breed; a detective challenge and the history close it. */
+  --ground: #f2f6ee;
+  --ground-2: #e4eadd;
+  --card: #ffffff;
+  --text: #1b2920;
+  --muted: #53635a;
+  --line: rgba(27, 41, 32, 0.13);
+  --line-strong: rgba(27, 41, 32, 0.3);
+  --accent: #2b7a4b;
+  --accent-ink: #f2fff6;
+  --gene-b: #7a4932;
+  --gene-e: #9c6c0b;
+  --good: #2b7a4b;
+  --bad: #b2402e;
+  --f-display: "Fredoka", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Lexend", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #111913;
+    --ground-2: #1b251e;
+    --card: #18221b;
+    --text: #e4eee6;
+    --muted: #9db0a3;
+    --line: rgba(228, 238, 230, 0.12);
+    --line-strong: rgba(228, 238, 230, 0.3);
+    --accent: #72d199;
+    --accent-ink: #0c1a11;
+    --gene-b: #dba184;
+    --gene-e: #e7bb52;
+    --good: #72d199;
+    --bad: #f08d78;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #111913;
+  --ground-2: #1b251e;
+  --card: #18221b;
+  --text: #e4eee6;
+  --muted: #9db0a3;
+  --line: rgba(228, 238, 230, 0.12);
+  --line-strong: rgba(228, 238, 230, 0.3);
+  --accent: #72d199;
+  --accent-ink: #0c1a11;
+  --gene-b: #dba184;
+  --gene-e: #e7bb52;
+  --good: #72d199;
+  --bad: #f08d78;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 600; line-height: 1.1; text-wrap: balance; margin: 0; }
+
+.page {
+  box-sizing: border-box;
+  max-width: 1160px;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 3vw, 40px);
+  padding-block: 28px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 44px;
+}
+
+/* ---------- Opening ---------- */
+.hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 22px 40px; align-items: center; }
+.eyebrow { margin: 0 0 4px; font-family: var(--f-display); font-weight: 600; font-size: 0.95rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+.hero h1 { font-size: clamp(2.8rem, 7vw, 4.6rem); font-weight: 700; }
+.lede { margin: 12px 0 0; max-width: 58ch; font-size: 1.08rem; color: var(--muted); }
+.hook {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 6px 16px;
+  align-items: center;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: var(--card);
+  border: 2px solid var(--line);
+}
+.hook .trio { grid-row: span 2; display: flex; align-items: flex-end; }
+.hook .trio .dog { width: 64px; height: 64px; }
+.hook .trio .dog.small { width: 46px; height: 46px; margin-inline: -6px; }
+.hook h2 { font-size: 1.35rem; }
+.hook p { margin: 0; font-size: 0.97rem; color: var(--muted); }
+
+/* ---------- Steps ---------- */
+.step-head { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+.num {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1.4rem;
+}
+.step-head h2 { font-size: clamp(1.6rem, 3.2vw, 2.1rem); }
+.intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, 300px); gap: 14px 28px; margin-bottom: 18px; align-items: start; }
+.intro p { margin: 0; max-width: 64ch; }
+.gene-card { padding: 12px 14px; border-radius: 12px; border: 2px dashed var(--line-strong); font-size: 0.92rem; }
+.gene-card b { font-family: var(--f-display); font-size: 1.05rem; }
+.gene-card p { margin: 4px 0 0; color: var(--muted); }
+
+.cross { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 20px 28px; align-items: start; }
+.parents { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 10px; align-items: center; }
+.times { font-family: var(--f-display); font-size: 1.8rem; color: var(--muted); }
+.parent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 10px 12px;
+  border-radius: 16px;
+  background: var(--card);
+  border: 2px solid var(--line);
+  text-align: center;
+  min-width: 0;
+}
+.parent.warn { border-color: var(--bad); }
+.parent .dog { width: 110px; height: 110px; }
+.parent .who { font-family: var(--f-display); font-weight: 600; font-size: 1.15rem; line-height: 1.1; }
+.parent .role { font-size: 0.8rem; color: var(--muted); }
+.alleles { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.pair { display: flex; gap: 3px; padding: 3px; border-radius: 10px; background: var(--ground-2); }
+.allele {
+  width: 36px;
+  height: 40px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--card);
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1.35rem;
+  line-height: 1;
+  box-shadow: 0 2px 0 var(--line-strong);
+  transition: transform 0.08s;
+}
+.allele:active { transform: translateY(2px); box-shadow: none; }
+.allele.g-B, .chip.g-B { color: var(--gene-b); }
+.allele.g-E, .chip.g-E { color: var(--gene-e); }
+.allele.hidden-copy { color: var(--muted); }
+.pheno { font-size: 0.92rem; line-height: 1.35; }
+.pheno .carry { display: block; font-size: 0.8rem; color: var(--muted); }
+.parent .note { margin: 0; font-size: 0.82rem; font-weight: 600; color: var(--bad); }
+
+.square-box { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.square-scroll { overflow-x: auto; }
+.punnett { border-collapse: separate; border-spacing: 4px; margin-inline: auto; }
+.punnett th { font-family: var(--f-display); font-weight: 700; font-size: 1.05rem; padding: 2px 4px; white-space: nowrap; }
+.punnett th small { display: block; font-family: var(--f-body); font-weight: 400; font-size: 0.7rem; color: var(--muted); }
+.punnett td {
+  width: 76px;
+  padding: 4px 4px 5px;
+  border-radius: 10px;
+  background: var(--card);
+  border: 2px solid var(--line);
+  text-align: center;
+  vertical-align: top;
+}
+.punnett.big td { width: 62px; }
+.punnett td .dog { width: 46px; height: 46px; display: block; margin: 0 auto; }
+.punnett.big td .dog { width: 38px; height: 38px; }
+.punnett td .gt { font-family: var(--f-display); font-weight: 600; font-size: 0.92rem; white-space: nowrap; }
+.punnett.big td .gt { font-size: 0.8rem; }
+.punnett td.flash { animation: flash 0.9s ease-out; }
+@keyframes flash { 0% { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent); } 100% { box-shadow: 0 0 0 0 transparent; } }
+.chip { font-family: var(--f-display); font-weight: 700; }
+.corner { font-size: 0.72rem; font-weight: 400; color: var(--muted); text-align: right; }
+
+.odds { display: flex; flex-direction: column; gap: 6px; }
+.odds .label { font-size: 0.85rem; color: var(--muted); }
+.bar { display: flex; gap: 2px; height: 22px; }
+.bar span { height: 100%; }
+.bar span:first-child { border-radius: 4px 0 0 4px; }
+.bar span:last-child { border-radius: 0 4px 4px 0; }
+.bar span:only-child { border-radius: 4px; }
+.yellow-seg { box-shadow: inset 0 0 0 1px rgba(120, 90, 30, 0.45); }
+.odds-text { margin: 0; font-weight: 600; }
+
+.litter-box { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 16px; background: var(--ground-2); }
+.controls { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; }
+.btn {
+  padding: 9px 16px 10px;
+  border-radius: 999px;
+  border: 2px solid var(--line-strong);
+  background: var(--card);
+  font-weight: 600;
+  transition: opacity 0.15s, background-color 0.15s;
+}
+.btn:hover { border-color: var(--text); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { opacity: 0.9; }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.pups { display: flex; flex-wrap: wrap; gap: 6px; min-height: 72px; align-items: flex-end; }
+.pup { display: flex; flex-direction: column; align-items: center; width: 70px; font-size: 0.72rem; color: var(--muted); text-align: center; line-height: 1.2; }
+.pup .dog { width: 60px; height: 60px; }
+.pup.born { animation: born 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) both; }
+@keyframes born { from { transform: translateY(10px) scale(0.6); opacity: 0; } to { transform: none; opacity: 1; } }
+.empty { margin: 0; color: var(--muted); font-size: 0.92rem; }
+.tally { margin: 0; font-weight: 600; }
+.chart { display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, 280px); gap: 12px 20px; align-items: start; }
+.chart .rows { display: flex; flex-direction: column; gap: 8px; }
+.chart .row-label { font-size: 0.85rem; color: var(--muted); margin-bottom: 3px; }
+.chart table { border-collapse: collapse; font-size: 0.88rem; font-variant-numeric: tabular-nums; width: 100%; }
+.chart th, .chart td { padding: 3px 6px; text-align: right; border-bottom: 1px solid var(--line); }
+.chart th:first-child, .chart td:first-child { text-align: left; }
+.chart th { font-weight: 600; color: var(--muted); }
+.swatch { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.chart-note { grid-column: 1 / -1; margin: 0; font-size: 0.9rem; color: var(--muted); }
+
+.success { margin: 0; padding: 12px 14px; border-radius: 12px; font-weight: 600; background: var(--card); border: 2px solid var(--line); }
+.success.solved { border-color: var(--good); }
+
+/* ---------- Mystery Molly ---------- */
+.molly { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px 28px; align-items: start; margin-top: 18px; }
+.molly h3 { font-size: 1.5rem; margin-bottom: 6px; }
+.molly p { margin: 0 0 10px; }
+.clues { margin: 0; padding-left: 20px; }
+.clues li { margin-bottom: 4px; }
+.guesses { display: flex; flex-wrap: wrap; gap: 8px; }
+.guess { font-family: var(--f-display); font-weight: 700; font-size: 1.1rem; }
+.verdict { margin: 10px 0 0; padding: 12px 14px; border-radius: 12px; background: var(--card); border: 2px solid var(--line); }
+.verdict.right { border-color: var(--good); }
+.verdict.wrong { border-color: var(--bad); }
+
+/* ---------- History ---------- */
+.history { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 28px; padding-top: 24px; border-top: 2px solid var(--line); }
+.history h2 { font-size: 1.3rem; margin-bottom: 6px; }
+.history p { margin: 0; font-size: 0.95rem; }
+.history .sources { grid-column: 1 / -1; font-size: 0.85rem; color: var(--muted); }
+.history a { color: inherit; text-underline-offset: 3px; }
+
+@media (max-width: 900px) {
+  .hero, .intro, .cross, .molly, .chart { grid-template-columns: minmax(0, 1fr); }
+  .history { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 480px) {
+  .parent .dog { width: 84px; height: 84px; }
+  .allele { width: 30px; height: 36px; font-size: 1.15rem; }
+  .punnett { border-spacing: 3px; }
+  .punnett td { width: 60px; }
+  .punnett.big td { width: 50px; padding: 3px 1px; }
+  .punnett.big td .dog { width: 32px; height: 32px; }
+  .punnett.big td .gt { font-size: 0.7rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pup.born, .punnett td.flash { animation: none; }
+  .allele, .btn { transition: none; }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="litter-lab" defer></script>
+</head>
+<body>
+<div class="page">
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Life science · Heredity</p>
+      <h1>Litter Lab</h1>
+      <p class="lede">Every puppy gets two copies of each gene, one from its mother and one from its father. A Punnett square lays out every way those copies can pair up, so you can predict a litter before it is born. Labrador Retrievers are perfect for practice: just two genes decide whether a Lab is black, chocolate or yellow.</p>
+    </div>
+    <aside class="hook" aria-labelledby="hook-h">
+      <div class="trio" id="hook-art"></div>
+      <h2 id="hook-h">The 1899 mystery</h2>
+      <p>Two black Labradors, Neptune and Duchess, had a yellow puppy. His name was Ben of Hyde, and he is the first yellow Lab on record. How can two black dogs have a yellow puppy? Work through the steps, then solve it in step 3.</p>
+    </aside>
+  </header>
+
+  <section aria-labelledby="s1-h">
+    <div class="step-head"><span class="num" aria-hidden="true">1</span><h2 id="s1-h">One gene: black or chocolate</h2></div>
+    <div class="intro">
+      <p>The B gene decides whether a Lab’s dark color is black or brown. It comes in two versions. Big <b class="chip g-B">B</b> makes black. Little <b class="chip g-B">b</b> makes brown, which breeders call chocolate. One big B is enough to make a dog black, so B is <i>dominant</i>. A chocolate Lab must have two little b’s. Tap the letters on each parent to change their genes, then watch the square.</p>
+      <div class="gene-card"><b>B gene</b> · its scientific name is TYRP1<p>Each puppy gets one letter from Mom (down the side of the square) and one from Dad (across the top). Each box is one equally likely puppy.</p></div>
+    </div>
+    <div class="cross" id="cross1"></div>
+  </section>
+
+  <section aria-labelledby="s2-h">
+    <div class="step-head"><span class="num" aria-hidden="true">2</span><h2 id="s2-h">Two genes: where yellow comes from</h2></div>
+    <div class="intro">
+      <p>A second gene, E, decides whether that black or brown reaches the fur at all. With at least one big <b class="chip g-E">E</b>, it does. With two little <b class="chip g-E">e</b>’s, the fur can’t hold it and the dog is yellow, whatever its B gene says. When one gene hides another like this, scientists call it <i>epistasis</i>. The B gene still shows in the nose: a yellow Lab with a big B has a black nose, and one with bb has a brown nose.</p>
+      <div class="gene-card"><b>E gene</b> · its scientific name is MC1R<p>Each sperm or egg carries one copy of each gene, so a parent with Bb Ee can pass on four combinations: BE, Be, bE or be. That makes the square four by four: sixteen equally likely puppies.</p></div>
+    </div>
+    <div class="cross" id="cross2"></div>
+  </section>
+
+  <section aria-labelledby="s3-h">
+    <div class="step-head"><span class="num" aria-hidden="true">3</span><h2 id="s3-h">Solve the 1899 mystery</h2></div>
+    <div class="intro">
+      <p>Here are Neptune and Duchess, both black. With the genes they start with, no puppy of theirs could be yellow. Change their letters so a yellow puppy becomes possible, but keep both dogs black. They really were.</p>
+      <div class="gene-card"><b>The rule you need</b><p>A yellow puppy needs two little e’s, and it can only get them if each parent gives one.</p></div>
+    </div>
+    <div class="cross" id="cross3"></div>
+
+    <div class="molly" aria-labelledby="molly-h">
+      <div>
+        <h3 id="molly-h">Detective challenge: Mystery Molly</h3>
+        <p>Molly is a black Lab, but nobody knows which hidden letters she carries. To find out, breed her with Dudley, a yellow Lab with a brown nose. Dudley’s genes are bb ee, so he can only give b and e. That means every puppy shows exactly which letters Molly gave it. Breed as many litters as you like, then make your guess.</p>
+        <div class="parents" id="molly-parents"></div>
+      </div>
+      <div>
+        <div class="controls">
+          <button type="button" class="btn primary" id="molly-breed">Breed Molly and Dudley</button>
+          <button type="button" class="btn" id="molly-new">A new mystery dog</button>
+        </div>
+        <div class="pups" id="molly-pups" aria-live="polite"><p class="empty">Puppies will appear here.</p></div>
+        <p class="tally" id="molly-tally"></p>
+        <ul class="clues" id="molly-clues"></ul>
+        <p style="margin:12px 0 6px;font-weight:600">What are Molly’s letters?</p>
+        <div class="guesses" id="molly-guesses"></div>
+        <p class="verdict" id="molly-verdict" hidden></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="history">
+    <div>
+      <h2>Mendel’s peas</h2>
+      <p>Gregor Mendel, a friar in Brno, crossed pea plants for about eight years and published his results in 1866. He showed that traits travel in pairs of units, one from each parent. Almost nobody noticed until 1900, when three scientists rediscovered his work.</p>
+    </div>
+    <div>
+      <h2>Punnett’s square</h2>
+      <p>Reginald Punnett, a geneticist at Cambridge, drew the square in his 1905 book <i>Mendelism</i> to make Mendel’s rules easy to see. Every cell is one equally likely pairing, so counting cells gives you the odds.</p>
+    </div>
+    <div>
+      <h2>Labs, in color</h2>
+      <p>Early Labradors were bred to be black. Liver puppies, now called chocolate, were recorded at the Duke of Buccleuch’s kennels around 1892, and Ben of Hyde, born in 1899, is the first yellow on record. The genes behind the colors were found about a century later: MC1R for yellow and TYRP1 for brown.</p>
+    </div>
+    <p class="sources">Sources: <a href="https://en.wikipedia.org/wiki/Labrador_Retriever_coat_colour_genetics" target="_blank" rel="noopener">Labrador Retriever coat colour genetics</a>, <a href="https://en.wikipedia.org/wiki/Labrador_Retriever" target="_blank" rel="noopener">Labrador Retriever</a> and <a href="https://en.wikipedia.org/wiki/Reginald_Punnett" target="_blank" rel="noopener">Reginald Punnett</a> on Wikipedia; Ben of Hyde’s pedigree at <a href="https://www.huntinglabpedigree.com/pedigree.asp?ID=24265" target="_blank" rel="noopener">HuntingLabPedigree</a>. Real coat color has more genes than these two, and this page keeps to the two that explain black, chocolate and yellow Labs.</p>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = (id) => document.getElementById(id);
+
+  /* ================================================================
+     Coats, noses and the dog drawing
+     ================================================================ */
+  const COAT = {
+    black: { fur: '#2b2827', dark: '#191716', light: '#4a4441', label: 'Black' },
+    chocolate: { fur: '#6e4128', dark: '#52301c', light: '#8b583b', label: 'Chocolate' },
+    yellow: { fur: '#dcae5f', dark: '#c0904a', light: '#efd29d', label: 'Yellow' },
+  };
+  const NOSE = { black: '#151110', brown: '#8a4f37' };
+  function dogSVG(coat, nose, opts = {}) {
+    const c = COAT[coat];
+    const tilt = opts.tilt || 0;
+    const tongue = opts.tongue ? `<path d="M47.6 49.4h4.8v3.2a2.4 2.4 0 0 1-4.8 0z" fill="#e2808a"/>` : '';
+    return `<svg class="dog${opts.cls ? ` ${opts.cls}` : ''}" viewBox="0 0 100 100" aria-hidden="true">
+      <ellipse cx="51" cy="95" rx="30" ry="3.5" fill="#000" opacity=".12"/>
+      <path d="M71 79C86 77 90 65 84 57" stroke="${c.dark}" stroke-width="6.5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="52" cy="71" rx="24" ry="21" fill="${c.fur}"/>
+      <ellipse cx="48" cy="67" rx="10" ry="13" fill="${c.light}" opacity=".5"/>
+      <rect x="37" y="74" width="10.5" height="20" rx="5" fill="${c.fur}"/>
+      <rect x="51.5" y="74" width="10.5" height="20" rx="5" fill="${c.fur}"/>
+      <ellipse cx="42.2" cy="93" rx="6.6" ry="3.4" fill="${c.light}"/>
+      <ellipse cx="56.8" cy="93" rx="6.6" ry="3.4" fill="${c.light}"/>
+      <g transform="rotate(${tilt} 50 40)">
+        <ellipse cx="31.5" cy="40" rx="8" ry="14" transform="rotate(18 31.5 40)" fill="${c.dark}"/>
+        <ellipse cx="68.5" cy="40" rx="8" ry="14" transform="rotate(-18 68.5 40)" fill="${c.dark}"/>
+        <ellipse cx="50" cy="36" rx="19" ry="18" fill="${c.fur}"/>
+        <ellipse cx="50" cy="45.5" rx="11" ry="8.5" fill="${c.light}"/>
+        <circle cx="42.5" cy="34" r="3.1" fill="#2a170c" stroke="${c.light}" stroke-width=".9"/>
+        <circle cx="57.5" cy="34" r="3.1" fill="#2a170c" stroke="${c.light}" stroke-width=".9"/>
+        <circle cx="43.5" cy="33" r="1" fill="#fff"/>
+        <circle cx="58.5" cy="33" r="1" fill="#fff"/>
+        ${tongue}
+        <path d="M45.4 41.4Q50 39.2 54.6 41.4Q54.2 45.2 50 46.2Q45.8 45.2 45.4 41.4Z" fill="${NOSE[nose]}"/>
+        <path d="M50 46.2Q50 49.2 46.4 49.6M50 46.2Q50 49.2 53.6 49.6" stroke="${c.dark}" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+      </g>
+    </svg>`;
+  }
+
+  /* ================================================================
+     Genetics
+     ================================================================ */
+  const pairText = (p) => [...p].sort((a, b) => (a === b ? 0 : a === a.toUpperCase() ? -1 : 1)).join('');
+  function look(g) {
+    const hasB = g.B.includes('B');
+    const hasE = g.E.includes('E');
+    const coat = !hasE ? 'yellow' : hasB ? 'black' : 'chocolate';
+    const nose = hasB ? 'black' : 'brown';
+    return { coat, nose, name: coat === 'yellow' && nose === 'brown' ? 'Yellow, brown nose' : COAT[coat].label };
+  }
+  function carries(g, genes) {
+    const out = [];
+    const l = look(g);
+    if (l.coat === 'black' && g.B.includes('b')) out.push('chocolate');
+    if (l.coat !== 'yellow' && g.E.includes('e') && genes.includes('E')) out.push('yellow');
+    return out;
+  }
+  function gametes(p, genes) {
+    if (genes.length === 1) return [{ B: p.B[0], E: 'E' }, { B: p.B[1], E: 'E' }];
+    const out = [];
+    for (const b of p.B) for (const e of p.E) out.push({ B: b, E: e });
+    return out;
+  }
+  const child = (m, d) => ({ B: [m.B, d.B], E: [m.E, d.E] });
+  const rand = (n) => Math.floor(Math.random() * n);
+  const litterSize = () => 5 + rand(5);
+
+  /* ================================================================
+     A cross: two parents, their square, odds and litters
+     ================================================================ */
+  function makeCross(root, cfg) {
+    const id = root.id;
+    const st = { mom: { ...cfg.mom, B: [...cfg.mom.B], E: [...cfg.mom.E] }, dad: { ...cfg.dad, B: [...cfg.dad.B], E: [...cfg.dad.E] } };
+    root.innerHTML = `
+      <div class="parents" id="${id}-parents"></div>
+      <div class="square-box">
+        <div class="square-scroll"><table class="punnett${cfg.genes.length > 1 ? ' big' : ''}" id="${id}-sq"></table></div>
+        <div class="odds" id="${id}-odds"></div>
+        ${cfg.goal ? `<p class="success" id="${id}-goal" aria-live="polite"></p>` : ''}
+      </div>
+      <div class="litter-box">
+        <div class="controls">
+          <button type="button" class="btn primary" data-act="litter">Have a litter</button>
+          <button type="button" class="btn" data-act="many">Have 100 litters</button>
+        </div>
+        <div class="pups" id="${id}-pups" aria-live="polite"><p class="empty">Each puppy is one random box from the square. Press “Have a litter”.</p></div>
+        <p class="tally" id="${id}-tally"></p>
+        <div class="chart" id="${id}-chart" hidden></div>
+      </div>`;
+
+    function parentCard(key) {
+      const p = st[key];
+      const g = { B: p.B, E: cfg.genes.includes('E') ? p.E : ['E', 'E'] };
+      const l = look(g);
+      const car = carries(g, cfg.genes);
+      const blackNeeded = cfg.keepBlack && l.coat !== 'black';
+      let chips = '';
+      for (const gene of cfg.genes) {
+        chips += `<span class="pair">${p[gene].map((a, k) => `<button type="button" class="allele g-${gene}" data-who="${key}" data-gene="${gene}" data-k="${k}" aria-label="${p.name}'s ${k ? 'second' : 'first'} ${gene} copy is ${a === a.toUpperCase() ? 'big' : 'little'} ${a}. Tap to change it.">${a}</button>`).join('')}</span>`;
+      }
+      return `<div class="parent${blackNeeded ? ' warn' : ''}">
+        ${dogSVG(l.coat, l.nose, { tilt: key === 'mom' ? -4 : 4 })}
+        <div class="who">${p.name}</div><div class="role">${key === 'mom' ? 'Mom' : 'Dad'}</div>
+        <div class="alleles">${chips}</div>
+        <div class="pheno">${l.name}${car.length ? `<span class="carry">carries ${car.join(' and ')}</span>` : ''}</div>
+        ${blackNeeded ? `<p class="note">${p.name} was black. Keep ${key === 'mom' ? 'her' : 'him'} black.</p>` : ''}
+      </div>`;
+    }
+
+    function render() {
+      $(`${id}-parents`).innerHTML = parentCard('mom') + '<span class="times" aria-hidden="true">×</span>' + parentCard('dad');
+      const mg = gametes(st.mom, cfg.genes), dg = gametes(st.dad, cfg.genes);
+      const gt = (x) => cfg.genes.map((g) => `<span class="chip g-${g}">${x[g]}</span>`).join('');
+      let h = `<tr><th class="corner" scope="col">Mom ↓ · Dad →</th>${dg.map((d) => `<th scope="col">${gt(d)}<small>from Dad</small></th>`).join('')}</tr>`;
+      const counts = { black: 0, chocolate: 0, yellow: 0 };
+      mg.forEach((m, r) => {
+        h += `<tr><th scope="row">${gt(m)}<small>from Mom</small></th>`;
+        dg.forEach((d, c) => {
+          const ch = child(m, d);
+          const l = look(ch);
+          counts[l.coat]++;
+          const label = cfg.genes.map((g) => `<span class="chip g-${g}">${pairText(ch[g])}</span>`).join(' ');
+          h += `<td data-r="${r}" data-c="${c}" aria-label="${cfg.genes.map((g) => pairText(ch[g])).join(' ')}: ${l.name}">${dogSVG(l.coat, l.nose)}<span class="gt">${label}</span></td>`;
+        });
+        h += '</tr>';
+      });
+      $(`${id}-sq`).innerHTML = h;
+      st.mg = mg; st.dg = dg;
+      const total = mg.length * dg.length;
+      st.expected = Object.fromEntries(Object.entries(counts).map(([k, v]) => [k, v / total]));
+      const keys = ['black', 'chocolate', 'yellow'].filter((k) => counts[k] > 0);
+      $(`${id}-odds`).innerHTML = `<span class="label">Odds for each puppy</span>
+        <div class="bar">${keys.map((k) => `<span class="${k === 'yellow' ? 'yellow-seg' : ''}" style="flex:${counts[k]};background:${COAT[k].fur}" title="${COAT[k].label}: ${counts[k]} of ${total}"></span>`).join('')}</div>
+        <p class="odds-text">${keys.map((k) => `${COAT[k].label}: ${counts[k]} in ${total}`).join(' · ')}</p>`;
+      if (cfg.goal) {
+        const mL = look(st.mom), dL = look(st.dad);
+        const bothBlack = mL.coat === 'black' && dL.coat === 'black';
+        const goal = $(`${id}-goal`);
+        const solved = bothBlack && counts.yellow > 0;
+        goal.classList.toggle('solved', solved);
+        goal.textContent = solved
+          ? `Solved. Both dogs are black, but each carries a hidden little e. Any puppy that gets e from both of them is yellow: ${counts.yellow} in ${total}. That is how Ben of Hyde happened.`
+          : !bothBlack
+            ? 'Both parents need to stay black. Hide the change in a copy that the other letter covers.'
+            : 'No yellow puppies possible yet. Which gene makes a dog yellow, and what would each parent have to carry?';
+      }
+    }
+
+    root.addEventListener('click', (e) => {
+      const a = e.target.closest('.allele');
+      if (a) {
+        const p = st[a.dataset.who], gene = a.dataset.gene, k = Number(a.dataset.k);
+        const v = p[gene][k];
+        p[gene][k] = v === v.toUpperCase() ? v.toLowerCase() : v.toUpperCase();
+        render();
+        $(`${id}-pups`).innerHTML = '<p class="empty">The parents changed. Have a new litter to see their puppies.</p>';
+        $(`${id}-tally`).textContent = '';
+        $(`${id}-chart`).hidden = true;
+        const again = root.querySelector(`.allele[data-who="${a.dataset.who}"][data-gene="${gene}"][data-k="${k}"]`);
+        if (again) again.focus();
+        return;
+      }
+      const btn = e.target.closest('[data-act]');
+      if (!btn) return;
+      if (btn.dataset.act === 'litter') litter();
+      else many();
+    });
+
+    function litter() {
+      const n = litterSize();
+      const pups = [], counts = { black: 0, chocolate: 0, yellow: 0 };
+      const cells = root.querySelectorAll('.punnett td');
+      let html = '';
+      for (let k = 0; k < n; k++) {
+        const r = rand(st.mg.length), c = rand(st.dg.length);
+        const l = look(child(st.mg[r], st.dg[c]));
+        counts[l.coat]++;
+        pups.push({ r, c });
+        html += `<div class="pup${reduceMotion ? '' : ' born'}" style="animation-delay:${k * 0.12}s">${dogSVG(l.coat, l.nose, { tilt: rand(17) - 8, tongue: Math.random() < 0.3 })}${l.name}</div>`;
+      }
+      $(`${id}-pups`).innerHTML = html;
+      if (!reduceMotion) {
+        pups.forEach((p, k) => setTimeout(() => {
+          const cell = [...cells].find((td) => Number(td.dataset.r) === p.r && Number(td.dataset.c) === p.c);
+          if (!cell) return;
+          cell.classList.remove('flash');
+          void cell.offsetWidth;
+          cell.classList.add('flash');
+        }, k * 120));
+      }
+      const parts = ['black', 'chocolate', 'yellow'].filter((k) => counts[k]).map((k) => `${counts[k]} ${COAT[k].label.toLowerCase()}`);
+      $(`${id}-tally`).textContent = `This litter of ${n}: ${parts.join(', ')}. A real litter rarely matches the odds exactly, the same way four coin flips don’t always give two heads.`;
+    }
+
+    function many() {
+      const counts = { black: 0, chocolate: 0, yellow: 0 };
+      let total = 0;
+      for (let l = 0; l < 100; l++) {
+        const n = litterSize();
+        for (let k = 0; k < n; k++) {
+          counts[look(child(st.mg[rand(st.mg.length)], st.dg[rand(st.dg.length)])).coat]++;
+          total++;
+        }
+      }
+      const keys = ['black', 'chocolate', 'yellow'].filter((k) => counts[k] || st.expected[k]);
+      const pct = (x) => `${Math.round(x * 100)}%`;
+      const bar = (vals, lbl) => `<div><div class="row-label">${lbl}</div><div class="bar">${keys.filter((k) => vals[k] > 0).map((k) => `<span class="${k === 'yellow' ? 'yellow-seg' : ''}" style="flex:${vals[k]};background:${COAT[k].fur}" title="${COAT[k].label}: ${pct(vals[k])}"></span>`).join('')}</div></div>`;
+      const observed = Object.fromEntries(keys.map((k) => [k, counts[k] / total]));
+      const chart = $(`${id}-chart`);
+      chart.hidden = false;
+      chart.innerHTML = `<div class="rows">${bar(st.expected, 'The square predicts')}${bar(observed, `100 litters, ${total} puppies`)}</div>
+        <table><thead><tr><th scope="col">Color</th><th scope="col">Predicted</th><th scope="col">Born</th></tr></thead>
+        <tbody>${keys.map((k) => `<tr><td><span class="swatch${k === 'yellow' ? ' yellow-seg' : ''}" style="background:${COAT[k].fur}"></span>${COAT[k].label}</td><td>${pct(st.expected[k])}</td><td>${counts[k]} · ${pct(observed[k])}</td></tr>`).join('')}</tbody></table>
+        <p class="chart-note">One litter can surprise you. Hundreds of puppies land close to what the square predicts.</p>`;
+      $(`${id}-tally`).textContent = '';
+    }
+
+    render();
+  }
+
+  makeCross($('cross1'), {
+    genes: ['B'],
+    mom: { name: 'Daisy', B: ['B', 'b'], E: ['E', 'E'] },
+    dad: { name: 'Shadow', B: ['B', 'b'], E: ['E', 'E'] },
+  });
+  makeCross($('cross2'), {
+    genes: ['B', 'E'],
+    mom: { name: 'Juniper', B: ['B', 'b'], E: ['E', 'e'] },
+    dad: { name: 'Bramble', B: ['B', 'b'], E: ['E', 'e'] },
+  });
+  makeCross($('cross3'), {
+    genes: ['B', 'E'], keepBlack: true, goal: true,
+    mom: { name: 'Duchess', B: ['B', 'b'], E: ['E', 'E'] },
+    dad: { name: 'Neptune', B: ['B', 'B'], E: ['E', 'E'] },
+  });
+
+  $('hook-art').innerHTML = dogSVG('black', 'black', { tilt: -5 }) + dogSVG('yellow', 'black', { cls: 'small', tilt: 6, tongue: true }) + dogSVG('black', 'black', { tilt: 5 });
+
+  /* ================================================================
+     Mystery Molly: a test cross
+     ================================================================ */
+  const OPTIONS = [['BB', 'EE'], ['Bb', 'EE'], ['BB', 'Ee'], ['Bb', 'Ee']];
+  let molly = null;
+  function newMolly() {
+    const [b, e] = OPTIONS[rand(OPTIONS.length)];
+    molly = { B: b.split(''), E: e.split(''), pups: 0, black: 0, chocolate: 0, yellowBlack: 0, yellowBrown: 0, guessed: false };
+    $('molly-parents').innerHTML = `
+      <div class="parent">${dogSVG('black', 'black', { tilt: -4 })}<div class="who">Molly</div><div class="role">Mom</div>
+        <div class="alleles"><span class="pair"><span class="allele g-B">B</span><span class="allele hidden-copy">?</span></span><span class="pair"><span class="allele g-E">E</span><span class="allele hidden-copy">?</span></span></div>
+        <div class="pheno">Black<span class="carry">She’s black, so she has at least one B and one E.</span></div></div>
+      <span class="times" aria-hidden="true">×</span>
+      <div class="parent">${dogSVG('yellow', 'brown', { tilt: 4 })}<div class="who">Dudley</div><div class="role">Dad</div>
+        <div class="alleles"><span class="pair"><span class="allele g-B">b</span><span class="allele g-B">b</span></span><span class="pair"><span class="allele g-E">e</span><span class="allele g-E">e</span></span></div>
+        <div class="pheno">Yellow, brown nose<span class="carry">He can only give b and e.</span></div></div>`;
+    $('molly-pups').innerHTML = '<p class="empty">Puppies will appear here.</p>';
+    $('molly-tally').textContent = '';
+    $('molly-clues').innerHTML = '';
+    $('molly-verdict').hidden = true;
+    renderGuesses();
+  }
+  function renderGuesses() {
+    $('molly-guesses').innerHTML = OPTIONS.map(([b, e]) => `<button type="button" class="btn guess" data-g="${b} ${e}"${molly.guessed ? ' disabled' : ''}><span class="chip g-B">${b}</span> <span class="chip g-E">${e}</span></button>`).join('');
+  }
+  $('molly-breed').addEventListener('click', () => {
+    if (molly.guessed) newMolly();
+    const n = litterSize();
+    let html = '';
+    for (let k = 0; k < n; k++) {
+      const g = { B: [molly.B[rand(2)], 'b'], E: [molly.E[rand(2)], 'e'] };
+      const l = look(g);
+      molly.pups++;
+      if (l.coat === 'black') molly.black++;
+      else if (l.coat === 'chocolate') molly.chocolate++;
+      else if (l.nose === 'black') molly.yellowBlack++;
+      else molly.yellowBrown++;
+      html += `<div class="pup${reduceMotion ? '' : ' born'}" style="animation-delay:${k * 0.12}s">${dogSVG(l.coat, l.nose, { tilt: rand(17) - 8, tongue: Math.random() < 0.3 })}${l.name}</div>`;
+    }
+    $('molly-pups').innerHTML = html;
+    const m = molly;
+    $('molly-tally').textContent = `${m.pups} puppies so far: ${m.black} black, ${m.chocolate} chocolate, ${m.yellowBlack} yellow with a black nose, ${m.yellowBrown} yellow with a brown nose.`;
+    const clues = [];
+    const sawB = m.chocolate + m.yellowBrown > 0, sawE = m.yellowBlack + m.yellowBrown > 0;
+    clues.push(sawB
+      ? 'A chocolate puppy or a brown-nosed puppy got b from Molly as well as from Dudley. So Molly carries b.'
+      : `No chocolate or brown-nosed puppies in ${m.pups}. If Molly carried b, each puppy would have a 1 in 2 chance of showing it, so the chance of seeing none is 1 in ${Math.pow(2, m.pups).toLocaleString()}.`);
+    clues.push(sawE
+      ? 'A yellow puppy got e from Molly as well as from Dudley. So Molly carries e.'
+      : `No yellow puppies in ${m.pups}. If Molly carried e, the chance of seeing none is 1 in ${Math.pow(2, m.pups).toLocaleString()}.`);
+    $('molly-clues').innerHTML = clues.map((c) => `<li>${c}</li>`).join('');
+  });
+  $('molly-guesses').addEventListener('click', (e) => {
+    const b = e.target.closest('.guess');
+    if (!b || molly.guessed) return;
+    const truth = `${pairText(molly.B)} ${pairText(molly.E)}`;
+    const right = b.dataset.g === truth;
+    molly.guessed = true;
+    renderGuesses();
+    const v = $('molly-verdict');
+    v.hidden = false;
+    v.className = `verdict ${right ? 'right' : 'wrong'}`;
+    v.textContent = right
+      ? `Right. Molly is ${truth}. ${molly.pups < 6 ? 'A bold guess with so few puppies. More litters make you surer.' : 'The puppies gave her away.'} Breeding with Dudley to reveal hidden letters is called a test cross.`
+      : `Not quite. Molly is ${truth}. ${molly.pups < 8 ? 'A few more litters would have made it clearer.' : 'Look back at which puppy colors showed up.'} Breeding with Dudley to reveal hidden letters is called a test cross.`;
+    $('molly-breed').textContent = 'Breed a new mystery dog';
+  });
+  $('molly-new').addEventListener('click', () => { newMolly(); $('molly-breed').textContent = 'Breed Molly and Dudley'; });
+  newMolly();
+})();
+</script>
+</body>
+</html>
