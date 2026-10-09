@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Eratosthenes’ Shadow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=GFS+Didot&family=Gentium+Book+Plus:ital,wght@0,400;0,700;1,400&family=Spline+Sans+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  /* Layout: a cut through the Earth with the Sun's parallel rays fills the top; beside it the one slider that moves Alexandria; then the arithmetic worked out on a wax tablet; then your own two-city version; then the history. */
+  --ground: #e2e8ea;
+  --ground-2: #d2dadd;
+  --tablet: #efe9dc;
+  --text: #16222a;
+  --muted: #53636b;
+  --line: rgba(22, 34, 42, 0.14);
+  --line-strong: rgba(22, 34, 42, 0.32);
+  --lapis: #2a4c9a;
+  --sun: #c98a0e;
+  --earth: #b9a27d;
+  --earth-2: #8d7650;
+  --sky-1: #f5e7c4;
+  --sky-2: #e3ecf0;
+  --f-display: "GFS Didot", "Didot", "Bodoni 72", Georgia, serif;
+  --f-body: "Gentium Book Plus", "Gentium Plus", Georgia, serif;
+  --f-data: "Spline Sans Mono", "Consolas", "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0f1519;
+    --ground-2: #19222a;
+    --tablet: #1c1a15;
+    --text: #e4ebee;
+    --muted: #9eadb5;
+    --line: rgba(228, 235, 238, 0.12);
+    --line-strong: rgba(228, 235, 238, 0.3);
+    --lapis: #8fb0ff;
+    --sun: #f2b84a;
+    --earth: #6f5f45;
+    --earth-2: #9b8762;
+    --sky-1: #2a2416;
+    --sky-2: #111a20;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #0f1519;
+  --ground-2: #19222a;
+  --tablet: #1c1a15;
+  --text: #e4ebee;
+  --muted: #9eadb5;
+  --line: rgba(228, 235, 238, 0.12);
+  --line-strong: rgba(228, 235, 238, 0.3);
+  --lapis: #8fb0ff;
+  --sun: #f2b84a;
+  --earth: #6f5f45;
+  --earth-2: #9b8762;
+  --sky-1: #2a2416;
+  --sky-2: #111a20;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--text); font-family: var(--f-body); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 400; line-height: 1.05; margin: 0; text-wrap: balance; }
+
+.page { box-sizing: border-box; max-width: 1200px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 36px; }
+.masthead { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.eyebrow { grid-column: 1 / -1; margin: 0; font-family: var(--f-data); font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--lapis); }
+.masthead h1 { font-size: clamp(2.6rem, 6.4vw, 4.8rem); }
+.masthead h1 span { display: block; font-size: 0.42em; color: var(--muted); margin-top: 6px; }
+.lede { margin: 0; max-width: 60ch; color: var(--muted); }
+
+/* ---------- The cut through the Earth ---------- */
+.stage { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr); gap: 24px; align-items: start; }
+.figure { border-radius: 6px; overflow: hidden; border: 1px solid var(--line); }
+#fig { display: block; width: 100%; height: auto; }
+.ray { stroke: var(--sun); stroke-width: 1.3; opacity: 0.55; }
+.ray.key { opacity: 1; stroke-width: 2; }
+.earth { fill: var(--earth); }
+.earth-edge { fill: none; stroke: var(--earth-2); stroke-width: 2; }
+.radius { stroke: var(--text); stroke-width: 1.2; stroke-dasharray: 5 5; opacity: 0.7; }
+.stick { stroke: var(--text); stroke-width: 4; stroke-linecap: round; }
+.shadow { stroke: #2b2b2b; stroke-width: 5; stroke-linecap: round; opacity: 0.7; }
+.ang { fill: none; stroke: var(--lapis); stroke-width: 2.2; }
+.angt { font-family: var(--f-data); font-size: 15px; font-weight: 600; fill: var(--lapis); }
+.lbl { font-family: var(--f-body); font-size: 17px; fill: var(--text); }
+.lbl.small { font-size: 14px; fill: var(--muted); }
+.lbl.sun { fill: var(--sun); font-style: italic; }
+.city { fill: var(--text); }
+.drag { cursor: grab; }
+.side { display: flex; flex-direction: column; gap: 14px; }
+.control { display: flex; flex-direction: column; gap: 6px; }
+.control label { font-weight: 700; }
+.control input[type="range"] { width: 100%; accent-color: var(--lapis); }
+.readout { font-family: var(--f-data); font-size: 0.95rem; }
+.readout b { color: var(--lapis); }
+.note { margin: 0; padding: 12px 14px; border-left: 3px solid var(--sun); background: var(--ground-2); font-size: 0.97rem; }
+.toggle { display: flex; align-items: center; gap: 8px; font-size: 0.95rem; }
+.btn { padding: 7px 14px; border: 1.5px solid var(--line-strong); border-radius: 4px; background: none; font-size: 0.92rem; }
+.btn:hover { background: var(--ground-2); }
+.btn[aria-pressed="true"] { background: var(--text); color: var(--ground); border-color: var(--text); }
+
+/* ---------- The arithmetic ---------- */
+.sec-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 24px; margin-bottom: 12px; }
+.sec-head h2 { font-size: clamp(1.8rem, 3.4vw, 2.4rem); }
+.sec-head p { margin: 0; max-width: 62ch; color: var(--muted); }
+.tablet { padding: 20px 22px; border-radius: 6px; background: var(--tablet); border: 1px solid var(--line); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+.stepbox { display: flex; flex-direction: column; gap: 8px; }
+.stepbox h3 { font-size: 1.25rem; }
+.stepbox p { margin: 0; font-size: 0.95rem; color: var(--muted); }
+.inrow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-family: var(--f-data); font-size: 0.92rem; }
+.inrow input { width: 6.5em; padding: 4px 6px; border: 1.5px solid var(--line-strong); border-radius: 4px; background: var(--ground); font-family: var(--f-data); font-variant-numeric: tabular-nums; }
+.inrow select { padding: 4px 6px; border: 1.5px solid var(--line-strong); border-radius: 4px; background: var(--ground); font-family: var(--f-data); }
+.big { font-family: var(--f-display); font-size: 2rem; line-height: 1.1; color: var(--lapis); font-variant-numeric: tabular-nums; }
+.big small { display: block; font-family: var(--f-data); font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+
+/* ---------- Your turn ---------- */
+.yours { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.1fr); gap: 16px; align-items: start; }
+.site { padding: 16px; border-radius: 6px; border: 1px solid var(--line-strong); display: flex; flex-direction: column; gap: 8px; }
+.site h3 { font-size: 1.2rem; }
+.site input[type="text"] { width: 100%; box-sizing: border-box; padding: 4px 6px; border: 1.5px solid var(--line-strong); border-radius: 4px; background: var(--ground); }
+.result { padding: 16px 18px; border-radius: 6px; background: var(--ground-2); display: flex; flex-direction: column; gap: 8px; }
+.result p { margin: 0; font-size: 0.95rem; }
+.example { margin: 0; font-size: 0.9rem; color: var(--muted); }
+
+/* ---------- History ---------- */
+.history { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 20px 40px; padding-top: 24px; border-top: 1px solid var(--line-strong); }
+.history h2 { font-size: 2rem; margin-bottom: 12px; }
+.timeline { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.timeline li { display: grid; grid-template-columns: 6.6em minmax(0, 1fr); gap: 12px; }
+.timeline .yr { font-family: var(--f-data); font-size: 0.85rem; line-height: 1.9; color: var(--lapis); }
+.timeline p { margin: 0; font-size: 0.97rem; }
+.aside p { margin: 0 0 10px; font-size: 0.97rem; }
+.greek { font-style: italic; }
+.sources { grid-column: 1 / -1; margin: 0; font-size: 0.85rem; color: var(--muted); }
+.sources a { color: inherit; text-underline-offset: 3px; }
+
+@media (max-width: 960px) {
+  .stage, .history, .yours { grid-template-columns: minmax(0, 1fr); }
+  .tablet { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .masthead { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 520px) {
+  .tablet { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="eratosthenes" defer></script>
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Sky &amp; Time · Alexandria, about 240 BC</p>
+    <h1>Eratosthenes’ Shadow<span>How a librarian measured the whole Earth with two sticks</span></h1>
+    <p class="lede">At noon on midsummer day, a stick at Syene in southern Egypt cast no shadow. At Alexandria, far to the north, a stick cast a short one. Eratosthenes worked out that the difference meant the ground curves, and by how much.</p>
+  </header>
+
+  <section class="stage" aria-label="A cut through the Earth">
+    <div class="figure">
+      <svg id="fig" viewBox="0 0 900 600" role="img" aria-label="A slice through the Earth. Parallel sunlight falls straight down on Syene, where a stick has no shadow, and at an angle on Alexandria, where a stick casts a shadow. The same angle appears at the centre of the Earth between the two cities."></svg>
+    </div>
+    <div class="side">
+      <div class="control">
+        <label for="theta">How far north is Alexandria?</label>
+        <input type="range" id="theta" min="0" max="30" step="0.1" value="7.2">
+        <span class="readout" id="th-read"></span>
+      </div>
+      <p class="note" id="note"></p>
+      <label class="toggle" for="flat"><input type="checkbox" id="flat"> What if the Earth were flat?</label>
+      <button type="button" class="btn" id="reset">Put Alexandria back at 7.2°</button>
+    </div>
+  </section>
+
+  <section aria-labelledby="calc-h">
+    <div class="sec-head">
+      <h2 id="calc-h">Work it out</h2>
+      <p>The sunlight’s angle at Alexandria is the same as the angle between the two cities at the Earth’s centre. So the distance between them is the same fraction of the whole way round.</p>
+    </div>
+    <div class="tablet">
+      <div class="stepbox">
+        <h3>The shadow</h3>
+        <p>A stick and its noon shadow at Alexandria on midsummer day.</p>
+        <div class="inrow"><label for="stick">Stick</label><input id="stick" type="number" min="1" step="1" value="100"></div>
+        <div class="inrow"><label for="shad">Shadow</label><input id="shad" type="number" min="0" step="0.1" value="12.6"></div>
+        <div class="big" id="angle-out">7.2°<small>about 1/50 of a circle</small></div>
+      </div>
+      <div class="stepbox">
+        <h3>The distance</h3>
+        <p>Syene to Alexandria, measured by the king’s surveyors, who paced out Egypt for taxes.</p>
+        <div class="inrow"><label for="dist">Distance</label><input id="dist" type="number" min="1" step="10" value="5000"> stadia</div>
+      </div>
+      <div class="stepbox">
+        <h3>The whole circle</h3>
+        <p>If 7.2° takes 5,000 stadia, then 360° takes fifty times as far.</p>
+        <div class="big" id="stadia-out">250,000<small>stadia around the Earth</small></div>
+      </div>
+      <div class="stepbox">
+        <h3>In kilometres</h3>
+        <p>Nobody knows exactly how long his stadion was. Pick one.</p>
+        <div class="inrow"><label for="stad">Stadion</label><select id="stad">
+          <option value="155">155 m</option>
+          <option value="157.5" selected>157.5 m</option>
+          <option value="160">160 m</option>
+          <option value="185">185 m (the Athenian length)</option>
+        </select></div>
+        <div class="big" id="km-out">39,375 km<small>the real figure, pole to pole, is 40,008 km</small></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="yours-h">
+    <div class="sec-head">
+      <h2 id="yours-h">Do it yourself with a friend</h2>
+      <p>You don’t need Syene. Two people, one north of the other, each measure a stick and its shadow at local noon on the same day. The difference in angle and the distance between you give the size of the Earth. Schools around the world do this on the equinoxes.</p>
+    </div>
+    <div class="yours">
+      <div class="site">
+        <h3>The northern stick</h3>
+        <input type="text" id="n-name" value="Minneapolis" aria-label="Northern place">
+        <div class="inrow"><label for="n-stick">Stick</label><input id="n-stick" type="number" step="0.1" value="100"> cm</div>
+        <div class="inrow"><label for="n-shad">Shadow</label><input id="n-shad" type="number" step="0.1" value="99.9"> cm</div>
+        <span class="readout" id="n-ang"></span>
+      </div>
+      <div class="site">
+        <h3>The southern stick</h3>
+        <input type="text" id="s-name" value="Austin, Texas" aria-label="Southern place">
+        <div class="inrow"><label for="s-stick">Stick</label><input id="s-stick" type="number" step="0.1" value="100"> cm</div>
+        <div class="inrow"><label for="s-shad">Shadow</label><input id="s-shad" type="number" step="0.1" value="58.4"> cm</div>
+        <span class="readout" id="s-ang"></span>
+      </div>
+      <div class="result">
+        <div class="inrow"><label for="ns">North–south distance</label><input id="ns" type="number" step="1" value="1636"> km</div>
+        <div class="big" id="mine">40,040 km</div>
+        <p id="mine-say"></p>
+        <p class="example">The example shows the shadows these two cities would get on an equinox. Measure the north–south distance on a map, ignoring how far east or west you are.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="history">
+    <div>
+      <h2>The man they called Beta</h2>
+      <ol class="timeline">
+        <li><span class="yr">c. 276 BC</span><p>Eratosthenes is born in Cyrene, a Greek city in what is now Libya. He studies in Athens.</p></li>
+        <li><span class="yr">Later</span><p>He becomes chief librarian of the Library of Alexandria and tutor to the young prince who became Ptolemy IV.</p></li>
+        <li><span class="yr">c. 240 BC</span><p>He measures the Earth. His own book, <i>On the Measurement of the Earth</i>, is lost. The simple version told here comes from the astronomer Cleomedes, who gives 250,000 stadia. Pliny and others quote 252,000.</p></li>
+        <li><span class="yr">1st c. BC</span><p>Posidonius tries another way, using how high the star Canopus rises at Rhodes and at Alexandria.</p></li>
+        <li><span class="yr">1492</span><p>Columbus chooses a figure for the Earth about a quarter smaller than Eratosthenes’. With the larger one he would have known the land he reached could not be Asia.</p></li>
+        <li><span class="yr">Today</span><p>The Earth measures 40,008 km around through the poles. Depending on the stadion, Eratosthenes was within a few percent.</p></li>
+      </ol>
+    </div>
+    <div class="aside">
+      <h2>What the story leaves out</h2>
+      <p>Cleomedes’ version assumes Syene sat exactly on the Tropic of Cancer and exactly south of Alexandria. Really it was a little north of the tropic and about 3 degrees of longitude east. Eratosthenes’ own method was more involved, and leaned on the surveys of professional pacers called bematists.</p>
+      <p>Critics nicknamed him <span class="greek">Beta</span>, “number two”, because he was second best at everything. Admirers called him <span class="greek">Pentathlos</span>, after the athletes who competed in five events. He also invented the sieve for finding prime numbers that carries his name.</p>
+    </div>
+    <p class="sources">Sources: <a href="https://en.wikipedia.org/wiki/Earth%27s_circumference" target="_blank" rel="noopener">Earth’s circumference</a> and <a href="https://en.wikipedia.org/wiki/Eratosthenes" target="_blank" rel="noopener">Eratosthenes</a> on Wikipedia, drawing on Cleomedes, <i>Caelestia</i> i.7; Pliny, <i>Natural History</i> 2.112; and Lucio Russo, <i>The Forgotten Revolution</i> (2004). The two-city example uses each city’s latitude to work out the equinox shadows.</p>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const rad = (d) => (d * Math.PI) / 180;
+  const deg = (r) => (r * 180) / Math.PI;
+  const fmt = (n) => Math.round(n).toLocaleString('en-US');
+
+  /* ================================================================
+     The cut through the Earth
+     ================================================================ */
+  const CX = 450, CY = 560, R = 380, G = 88;
+  const fig = $('fig');
+  let theta = 7.2, flat = false;
+
+  function pointAt(a) { return [CX + R * Math.sin(rad(a)), CY - R * Math.cos(rad(a))]; }
+  function arc(cx, cy, r, a0, a1) {
+    // angles measured clockwise from straight up
+    const p0 = [cx + r * Math.sin(rad(a0)), cy - r * Math.cos(rad(a0))];
+    const p1 = [cx + r * Math.sin(rad(a1)), cy - r * Math.cos(rad(a1))];
+    return `M${p0[0].toFixed(1)} ${p0[1].toFixed(1)}A${r} ${r} 0 0 ${a1 > a0 ? 1 : 0} ${p1[0].toFixed(1)} ${p1[1].toFixed(1)}`;
+  }
+
+  function draw() {
+    let s = `<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--sky-1)"/><stop offset="1" style="stop-color:var(--sky-2)"/></linearGradient></defs>`;
+    s += '<rect width="900" height="600" fill="url(#sky)"/>';
+    s += '<circle cx="450" cy="-60" r="95" style="fill:var(--sun)" opacity="0.9"/>';
+    s += '<text class="lbl sun" x="560" y="30">sunlight from very far away arrives in parallel rays</text>';
+    // rays
+    const surfaceY = (x) => (flat ? 180 : CY - Math.sqrt(Math.max(0, R * R - (x - CX) * (x - CX))));
+    for (let x = 30; x <= 870; x += 42) s += `<line class="ray" x1="${x}" y1="40" x2="${x}" y2="${surfaceY(x).toFixed(1)}"/>`;
+    if (flat) {
+      s += '<rect class="earth" x="0" y="180" width="900" height="420"/><line class="earth-edge" x1="0" x2="900" y1="180" y2="180"/>';
+      const ax = 450 + R * rad(theta);
+      for (const [x, name] of [[450, 'Syene'], [ax, 'Alexandria']]) {
+        s += `<line class="stick" x1="${x}" y1="180" x2="${x}" y2="${180 - G}"/><circle class="city" cx="${x}" cy="180" r="5"/>`;
+        s += `<text class="lbl" x="${x}" y="215" text-anchor="middle">${name}</text>`;
+      }
+      s += '<text class="lbl small" x="450" y="300" text-anchor="middle">On flat ground, every stick stands parallel to the sunlight.</text>';
+      s += '<text class="lbl small" x="450" y="324" text-anchor="middle">Neither stick casts a shadow, so the two cities would match.</text>';
+      fig.innerHTML = s;
+      return;
+    }
+    s += `<circle class="earth" cx="${CX}" cy="${CY}" r="${R}"/><circle class="earth-edge" cx="${CX}" cy="${CY}" r="${R}"/>`;
+    const [sx, sy] = pointAt(0), [ax, ay] = pointAt(theta);
+    // radii to the centre
+    s += `<line class="radius" x1="${CX}" y1="${CY}" x2="${sx}" y2="${sy}"/><line class="radius" x1="${CX}" y1="${CY}" x2="${ax.toFixed(1)}" y2="${ay.toFixed(1)}"/>`;
+    s += `<circle cx="${CX}" cy="${CY}" r="4" style="fill:var(--text)"/><text class="lbl small" x="${CX + 10}" y="${CY + 30}">centre of the Earth</text>`;
+    if (theta > 0.3) s += `<path class="ang" d="${arc(CX, CY, 70, 0, theta)}"/><text class="angt" x="${(CX + 84 * Math.sin(rad(theta / 2)) + 4).toFixed(1)}" y="${(CY - 84 * Math.cos(rad(theta / 2))).toFixed(1)}">${theta.toFixed(1)}°</text>`;
+    // sticks
+    const tip = (a) => { const [x, y] = pointAt(a); return [x + G * Math.sin(rad(a)), y - G * Math.cos(rad(a))]; };
+    const [stx, sty] = tip(0), [atx, aty] = tip(theta);
+    s += `<line class="ray key" x1="${sx}" y1="40" x2="${sx}" y2="${sy}"/>`;
+    s += `<line class="stick" x1="${sx}" y1="${sy}" x2="${stx}" y2="${sty}"/><circle class="city" cx="${sx}" cy="${sy}" r="5"/>`;
+    // shadow at Alexandria along the ground, away from Syene
+    const L = G * Math.tan(rad(theta));
+    const shx = ax + L * Math.cos(rad(theta)), shy = ay + L * Math.sin(rad(theta));
+    s += `<line class="ray key" x1="${atx.toFixed(1)}" y1="40" x2="${shx.toFixed(1)}" y2="${shy.toFixed(1)}"/>`;
+    if (theta > 0.05) s += `<line class="shadow" x1="${ax.toFixed(1)}" y1="${ay.toFixed(1)}" x2="${shx.toFixed(1)}" y2="${shy.toFixed(1)}"/>`;
+    s += `<line class="stick" x1="${ax.toFixed(1)}" y1="${ay.toFixed(1)}" x2="${atx.toFixed(1)}" y2="${aty.toFixed(1)}"/>`;
+    s += `<g class="drag" id="alex"><circle class="city" cx="${ax.toFixed(1)}" cy="${ay.toFixed(1)}" r="7"/><circle cx="${ax.toFixed(1)}" cy="${ay.toFixed(1)}" r="18" fill="transparent"/></g>`;
+    // the angle at the top of the Alexandria stick, between the stick and the sunlight
+    if (theta > 0.3) {
+      const r = 26;
+      const p0 = [atx + r * Math.sin(rad(180 + theta)), aty - r * Math.cos(rad(180 + theta))];
+      const p1 = [atx, aty + r];
+      s += `<path class="ang" d="M${p0[0].toFixed(1)} ${p0[1].toFixed(1)}A${r} ${r} 0 0 0 ${p1[0].toFixed(1)} ${p1[1].toFixed(1)}"/>`;
+      s += `<text class="angt" x="${(atx + 10).toFixed(1)}" y="${(aty - 10).toFixed(1)}">${theta.toFixed(1)}°</text>`;
+    }
+    s += `<text class="lbl" x="${sx - 12}" y="${sy - G - 16}" text-anchor="end">Syene</text><text class="lbl small" x="${sx - 12}" y="${sy - G + 2}" text-anchor="end">no shadow</text>`;
+    s += `<text class="lbl" x="${(atx + 14).toFixed(1)}" y="${(aty - 34).toFixed(1)}">Alexandria</text>`;
+    s += `<text class="lbl small" x="40" y="590">north is to the right · drag Alexandria along the ground</text>`;
+    fig.innerHTML = s;
+  }
+  function readout() {
+    const frac = 360 / theta;
+    $('th-read').innerHTML = theta < 0.05 ? 'Alexandria is at Syene.' : `Angle <b>${theta.toFixed(1)}°</b>, which is <b>1/${frac >= 99.5 ? Math.round(frac) : frac.toFixed(frac < 10 ? 1 : 0)}</b> of a full circle.`;
+    $('note').textContent = flat
+      ? 'If the Earth were flat, sunlight would hit both cities at the same angle and both sticks would lack a shadow. Alexandria’s stick did cast one, so the ground between them curves.'
+      : theta < 0.05
+        ? 'With both sticks in the same place, both shadows vanish.'
+        : `The angle between the stick and the sunlight at Alexandria is the same as the angle between the two cities at the centre of the Earth. Walk ${theta.toFixed(1)}° around the Earth and the shadow grows to match.`;
+  }
+  function setTheta(t) {
+    theta = Math.max(0, Math.min(30, t));
+    $('theta').value = theta;
+    draw();
+    readout();
+  }
+  $('theta').addEventListener('input', (e) => setTheta(Number(e.target.value)));
+  $('flat').addEventListener('change', (e) => { flat = e.target.checked; draw(); readout(); });
+  $('reset').addEventListener('click', () => { $('flat').checked = false; flat = false; setTheta(7.2); });
+  let dragging = false;
+  fig.addEventListener('pointerdown', (e) => { if (!flat && e.target.closest('#alex')) { dragging = true; fig.setPointerCapture(e.pointerId); e.preventDefault(); } });
+  fig.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    const pt = fig.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    const p = pt.matrixTransform(fig.getScreenCTM().inverse());
+    setTheta(Math.round(deg(Math.atan2(p.x - CX, CY - p.y)) * 10) / 10);
+  });
+  const stop = () => { dragging = false; };
+  fig.addEventListener('pointerup', stop);
+  fig.addEventListener('pointercancel', stop);
+
+  /* ================================================================
+     The arithmetic
+     ================================================================ */
+  function calc() {
+    const stick = Number($('stick').value), shad = Number($('shad').value), dist = Number($('dist').value), st = Number($('stad').value);
+    if (!(stick > 0) || !(shad > 0) || !(dist > 0)) {
+      $('angle-out').innerHTML = '–<small>enter a stick, a shadow and a distance</small>';
+      return;
+    }
+    const a = deg(Math.atan(shad / stick));
+    const frac = 360 / a;
+    // Eratosthenes worked with the round fraction; so do we when the shadow gives it.
+    const aUse = Math.abs(a - 7.2) < 0.05 ? 7.2 : a;
+    const around = (dist * 360) / aUse;
+    $('angle-out').innerHTML = `${a.toFixed(1)}°<small>about 1/${Math.round(frac)} of a circle</small>`;
+    $('stadia-out').innerHTML = `${fmt(around)}<small>stadia around the Earth</small>`;
+    const km = (around * st) / 1000;
+    const err = ((km - 40008) / 40008) * 100;
+    $('km-out').innerHTML = `${fmt(km)} km<small>${Math.abs(err) < 0.5 ? 'almost exactly' : `${Math.abs(err).toFixed(1)}% ${err > 0 ? 'over' : 'under'}`} the real 40,008 km, pole to pole</small>`;
+  }
+  ['stick', 'shad', 'dist', 'stad'].forEach((id) => $(id).addEventListener('input', calc));
+
+  /* ================================================================
+     Your own two cities
+     ================================================================ */
+  function mine() {
+    const an = deg(Math.atan(Number($('n-shad').value) / Number($('n-stick').value)));
+    const as = deg(Math.atan(Number($('s-shad').value) / Number($('s-stick').value)));
+    const ns = Number($('ns').value);
+    $('n-ang').textContent = Number.isFinite(an) ? `Sun is ${an.toFixed(2)}° from straight overhead` : '';
+    $('s-ang').textContent = Number.isFinite(as) ? `Sun is ${as.toFixed(2)}° from straight overhead` : '';
+    const d = an - as;
+    if (!Number.isFinite(d) || d <= 0.01 || !(ns > 0)) {
+      $('mine').textContent = '–';
+      $('mine-say').textContent = 'The northern stick needs the longer shadow, and the distance must be more than zero.';
+      return;
+    }
+    const c = (ns * 360) / d;
+    $('mine').textContent = `${fmt(c)} km`;
+    $('mine-say').textContent = `The angles differ by ${d.toFixed(2)}°, which is 1/${Math.round(360 / d)} of a circle. ${ns.toLocaleString('en-US')} km × ${Math.round(360 / d)} gives the whole Earth, against a real 40,008 km.`;
+  }
+  ['n-stick', 'n-shad', 's-stick', 's-shad', 'ns'].forEach((id) => $(id).addEventListener('input', mine));
+
+  setTheta(7.2);
+  calc();
+  mine();
+})();
+</script>
+</body>
+</html>
