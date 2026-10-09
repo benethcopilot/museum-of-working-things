@@ -196,6 +196,16 @@ h1, h2, h3 { font-family: var(--f-display); font-weight: 700; line-height: 1.1; 
 .lesson h3 { margin: 0; font-size: 1.25rem; }
 .lesson p { margin: 0; font-size: 0.95rem; color: var(--muted); flex: 1; }
 .lesson .btn { align-self: flex-start; }
+.ear { display: flex; flex-direction: column; gap: 12px; padding: 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
+.ear-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.ear-row .btn[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.ear-how { margin: 0; color: var(--muted); }
+.ear-score { margin-left: auto; font-weight: 700; font-variant-numeric: tabular-nums; }
+.ear-ans { min-width: 7.5em; }
+.ear-ans.right, .ear-ans.right:disabled { border-color: var(--good); color: var(--good); opacity: 1; box-shadow: inset 0 0 0 1px var(--good); }
+.ear-ans.wrong, .ear-ans.wrong:disabled { text-decoration: line-through; opacity: 0.75; }
+.ear-say { margin: 0; min-height: 1.6em; font-weight: 700; }
+.ear-say.good { color: var(--good); }
 
 /* ---------- Songs ---------- */
 .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
@@ -334,6 +344,27 @@ h1, h2, h3 { font-family: var(--f-display); font-weight: 700; line-height: 1.1; 
         <p>In the key of C, C is chord I, F is IV and G is V. Most folk songs need only those three. On this harp they sit side by side.</p>
         <button type="button" class="btn" data-demo="cadence">Hear I, IV, V, I</button>
       </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="ear-h">
+    <div class="sec-head">
+      <h2 id="ear-h">Train your ear</h2>
+      <p>The harp strums a chord without showing you which bar it pressed. Name it by its sound alone.</p>
+    </div>
+    <div class="ear">
+      <div class="ear-row" role="group" aria-label="Choose a game">
+        <button type="button" class="btn" data-game="quality" aria-pressed="true">Major, minor or seventh?</button>
+        <button type="button" class="btn" data-game="degree" aria-pressed="false">Home, four or five?</button>
+      </div>
+      <p class="ear-how" id="ear-how"></p>
+      <div class="ear-row">
+        <button type="button" class="btn primary" id="ear-play">Play a mystery chord</button>
+        <button type="button" class="btn" id="ear-again" disabled>Play it again</button>
+        <span class="ear-score" id="ear-score">0 right of 0</span>
+      </div>
+      <div class="ear-row" id="ear-answers" role="group" aria-label="Your answer"></div>
+      <p class="ear-say" id="ear-say" aria-live="polite"></p>
     </div>
   </section>
 
@@ -1134,6 +1165,83 @@ K:G
   $('turn').addEventListener('click', () => { press(null, false); startSong('turn'); });
   $('stop').addEventListener('click', () => { stopSong(); setStatus('Stopped.'); });
   document.addEventListener('visibilitychange', () => { if (document.hidden && song) { stopSong(); setStatus('Stopped while this tab was hidden.'); } });
+
+  /* ================================================================
+     Train your ear
+     ================================================================ */
+  const GAMES = {
+    quality: {
+      how: 'Listen to the colour of the chord. Major sounds bright and settled, minor sounds darker, and a seventh sounds as if it wants to move on.',
+      answers: [['', 'Major'], ['m', 'Minor'], ['7', 'Seventh']],
+      pick: () => BARS[Math.floor(Math.random() * BARS.length)],
+      truth: (name) => CHORDS[name].q,
+      play: (name, t) => strum(0, NS - 1, t, 0.9, name),
+    },
+    degree: {
+      how: 'You’ll hear C, the home chord, then a mystery chord from the key of C. Is it home again (I, C), the four chord (IV, F) or the five chord (V, G)? Five sounds as if it needs to come home.',
+      answers: [['C', 'I: home (C)'], ['F', 'IV: four (F)'], ['G', 'V: five (G)']],
+      pick: () => ['C', 'F', 'G'][Math.floor(Math.random() * 3)],
+      truth: (name) => name,
+      play: (name, t) => { strum(0, NS - 1, t, 0.85, 'C'); strum(0, NS - 1, t + 1.5, 0.9, name); },
+    },
+  };
+  let game = 'quality', mystery = null, answered = false;
+  const earScore = { quality: [0, 0], degree: [0, 0] };
+  function drawEar() {
+    const g = GAMES[game];
+    $('ear-how').textContent = g.how;
+    $('ear-answers').innerHTML = g.answers.map(([v, label]) => `<button type="button" class="btn ear-ans" data-ans="${v}"${mystery && !answered ? '' : ' disabled'}>${label}</button>`).join('');
+    const [r, n] = earScore[game];
+    $('ear-score').textContent = `${r} right of ${n}`;
+    document.querySelectorAll('[data-game]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.game === game)));
+  }
+  function playMystery(fresh) {
+    const ctx = audio();
+    if (!ctx) return;
+    stopSong();
+    if (fresh || !mystery) {
+      let next;
+      do { next = GAMES[game].pick(); } while (next === mystery && Math.random() < 0.7);
+      mystery = next;
+      answered = false;
+      press(null, false);
+      $('ear-say').textContent = 'Listen, then choose.';
+      $('ear-say').classList.remove('good');
+    }
+    GAMES[game].play(mystery, ctx.currentTime + 0.05);
+    $('ear-again').disabled = false;
+    drawEar();
+  }
+  $('ear-play').addEventListener('click', () => playMystery(true));
+  $('ear-again').addEventListener('click', () => playMystery(false));
+  $('ear-answers').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-ans]');
+    if (!b || !mystery || answered) return;
+    const g = GAMES[game];
+    const right = b.dataset.ans === g.truth(mystery);
+    answered = true;
+    earScore[game][1]++;
+    if (right) earScore[game][0]++;
+    drawEar();
+    document.querySelectorAll('.ear-ans').forEach((x) => {
+      if (x.dataset.ans === g.truth(mystery)) x.classList.add('right');
+      else if (x === b) x.classList.add('wrong');
+    });
+    const c = CHORDS[mystery];
+    const say = $('ear-say');
+    say.classList.toggle('good', right);
+    say.textContent = `${right ? 'Yes.' : 'Not quite.'} That was ${c.full}. It’s pressed on the harp now, so you can strum it and compare.`;
+    press(mystery, false);
+  });
+  document.querySelectorAll('[data-game]').forEach((b) => b.addEventListener('click', () => {
+    game = b.dataset.game;
+    mystery = null;
+    answered = false;
+    $('ear-again').disabled = true;
+    $('ear-say').textContent = '';
+    drawEar();
+  }));
+  drawEar();
 
   /* ---------- Start ---------- */
   buildHarp();
