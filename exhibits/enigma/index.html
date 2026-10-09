@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Enigma Machine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=Spectral:ital,wght@0,400;0,600;1,400&family=Special+Elite&display=swap">
+<style>
+:root {
+  /* Layout: the machine on the left with its paper tape on the right; below it the current traced through the rotors; then a Bletchley worksheet for breaking an intercept; then the history. */
+  --ground: #e2e4e0;
+  --ground-2: #d4d7d2;
+  --sheet: #f2efe4;
+  --text: #1b1c1e;
+  --muted: #565b5f;
+  --line: rgba(27, 28, 30, 0.14);
+  --line-strong: rgba(27, 28, 30, 0.32);
+  --fwd: #b3261e;
+  --back: #1d5fa8;
+  --ok: #2f7a45;
+  /* The machine keeps its own colors in both themes. */
+  --wood: #5a3a22;
+  --wood-2: #6e4a2d;
+  --panel: #18191a;
+  --panel-2: #222426;
+  --nickel: #b9bdc0;
+  --lamp-off: #2c2d28;
+  --lamp-ink: #77735f;
+  --lamp-on: #ffd86b;
+  --f-display: "Jost", "Futura", "Century Gothic", "Trebuchet MS", sans-serif;
+  --f-body: "Spectral", "Iowan Old Style", Georgia, serif;
+  --f-type: "Special Elite", "American Typewriter", "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #121314;
+    --ground-2: #1c1e20;
+    --sheet: #1f1f1b;
+    --text: #e6e5df;
+    --muted: #a3a6a6;
+    --line: rgba(230, 229, 223, 0.12);
+    --line-strong: rgba(230, 229, 223, 0.3);
+    --fwd: #ff7a6e;
+    --back: #7fb2ff;
+    --ok: #7fd19a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #121314;
+  --ground-2: #1c1e20;
+  --sheet: #1f1f1b;
+  --text: #e6e5df;
+  --muted: #a3a6a6;
+  --line: rgba(230, 229, 223, 0.12);
+  --line-strong: rgba(230, 229, 223, 0.3);
+  --fwd: #ff7a6e;
+  --back: #7fb2ff;
+  --ok: #7fd19a;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--text); font-family: var(--f-body); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button, select, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--fwd); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 600; line-height: 1.05; margin: 0; text-wrap: balance; }
+
+.page { box-sizing: border-box; max-width: 1240px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 36px; }
+.masthead { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 40px; align-items: end; }
+.eyebrow { grid-column: 1 / -1; margin: 0; font-family: var(--f-display); font-weight: 500; font-size: 0.82rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--fwd); }
+.masthead h1 { font-size: clamp(2.8rem, 7vw, 5rem); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
+.lede { margin: 0; max-width: 60ch; color: var(--muted); }
+
+/* ---------- The machine ---------- */
+.bench { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.machine { padding: 14px; border-radius: 14px; background: linear-gradient(160deg, var(--wood-2), var(--wood)); box-shadow: 0 18px 30px -18px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.12); }
+.face { padding: 16px 12px 14px; border-radius: 8px; background: radial-gradient(130% 100% at 50% 0%, var(--panel-2), var(--panel)); color: #d9d6cc; display: flex; flex-direction: column; gap: 14px; }
+.rotors { display: flex; justify-content: center; gap: clamp(12px, 4vw, 34px); }
+.rotor { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.rotor .name { font-family: var(--f-display); font-size: 0.7rem; letter-spacing: 0.14em; color: #8f8b7c; }
+.rotor .win { width: 38px; height: 40px; display: grid; place-items: center; border-radius: 4px; background: #efeadb; color: #1b1a17; font-family: var(--f-display); font-weight: 600; font-size: 1.4rem; box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.5), 0 0 0 3px #3b3c3d; }
+.turn { width: 38px; height: 20px; border: 0; border-radius: 4px; background: #34363a; color: #c9c5b8; font-size: 0.7rem; line-height: 1; }
+.turn:hover { background: #45484c; }
+.board { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.board .row { display: flex; gap: clamp(3px, 1vw, 8px); }
+.lamp { width: clamp(28px, 7.4vw, 44px); aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; background: var(--lamp-off); color: var(--lamp-ink); font-family: var(--f-display); font-weight: 600; font-size: clamp(0.8rem, 2.4vw, 1.05rem); box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6); }
+.lamp.on { background: radial-gradient(circle at 50% 45%, #fff6c9, var(--lamp-on) 60%, #e0a92c); color: #2a1d00; box-shadow: 0 0 18px rgba(255, 216, 107, 0.75); }
+.key { width: clamp(28px, 7.4vw, 44px); aspect-ratio: 1; padding: 0; border-radius: 50%; border: 3px solid var(--nickel); background: radial-gradient(circle at 40% 35%, #3a3b3d, #0e0e0f); color: #f4f2ea; font-family: var(--f-display); font-weight: 600; font-size: clamp(0.8rem, 2.4vw, 1.05rem); box-shadow: 0 3px 0 #0b0b0b; }
+.key:active, .key.down { transform: translateY(3px); box-shadow: 0 0 0 #0b0b0b; }
+.plugboard .sock { position: relative; width: clamp(26px, 7vw, 40px); height: 34px; padding: 0; border: 0; border-radius: 5px; background: #2a2b2d; color: #a9a597; font-family: var(--f-display); font-size: 0.72rem; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 2px; padding-top: 2px; }
+.plugboard .sock::after { content: ""; width: 9px; height: 9px; border-radius: 50%; background: #0c0c0d; box-shadow: 0 0 0 2px #4a4c4f; }
+.plugboard .sock.plugged::after { background: var(--plug, #c9a227); box-shadow: 0 0 0 2px #0c0c0d; }
+.plugboard .sock .mate { position: absolute; bottom: 1px; font-size: 0.62rem; color: var(--plug, #c9a227); }
+.plugboard .sock.picked { outline: 2px solid var(--lamp-on); }
+.plate { text-align: center; font-family: var(--f-display); font-size: 0.66rem; letter-spacing: 0.2em; color: #8f8b7c; text-transform: uppercase; }
+
+.side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.tape { padding: 14px 16px; border-radius: 6px; background: var(--sheet); border: 1px solid var(--line); }
+.tape h2 { font-size: 1rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.tape .lines { margin: 8px 0 10px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; align-items: baseline; }
+.tape .lines span { font-family: var(--f-display); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.tape .lines output { font-family: var(--f-type); font-size: 1.1rem; letter-spacing: 0.06em; word-spacing: 0.4em; min-height: 1.6em; overflow-wrap: anywhere; }
+.tape .lines output.out { color: var(--fwd); }
+.tape .hint { margin: 0 0 10px; font-size: 0.92rem; color: var(--muted); }
+.btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.btn { padding: 7px 13px; border: 1.5px solid var(--line-strong); border-radius: 6px; background: none; font-family: var(--f-display); font-weight: 500; font-size: 0.88rem; }
+.btn:hover { background: var(--ground-2); }
+.btn.primary { background: var(--text); color: var(--ground); border-color: var(--text); }
+.btn.primary:hover { opacity: 0.88; background: var(--text); }
+.btn:disabled { opacity: 0.4; cursor: default; }
+.keysheet { padding: 14px 16px; border-radius: 6px; border: 1px solid var(--line); background: var(--sheet); display: flex; flex-direction: column; gap: 10px; }
+.keysheet h2 { font-size: 1rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.ks-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px 10px; }
+.ks-grid label { display: flex; flex-direction: column; gap: 2px; font-family: var(--f-display); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.ks-grid select { padding: 4px 6px; border: 1px solid var(--line-strong); border-radius: 4px; background: var(--ground); font-family: var(--f-type); font-size: 1rem; text-transform: none; letter-spacing: 0; }
+.ks-plugs { display: flex; flex-direction: column; gap: 4px; font-family: var(--f-display); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.ks-plugs input { padding: 6px 8px; border: 1px solid var(--line-strong); border-radius: 4px; background: var(--ground); font-family: var(--f-type); font-size: 1rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.ks-note { margin: 0; font-size: 0.9rem; color: var(--muted); }
+.ks-note.err { color: var(--fwd); }
+
+/* ---------- The current ---------- */
+.sec-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 24px; margin-bottom: 10px; }
+.sec-head h2 { font-size: clamp(1.7rem, 3.4vw, 2.3rem); font-weight: 500; }
+.sec-head p { margin: 0; max-width: 62ch; color: var(--muted); }
+.wiring-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--line); background: var(--sheet); }
+#wiring { display: block; min-width: 660px; width: 100%; height: auto; }
+.w-faint { stroke: var(--line-strong); stroke-width: 0.8; fill: none; }
+.w-band { fill: var(--ground-2); }
+.w-fwd { stroke: var(--fwd); stroke-width: 2.6; fill: none; stroke-linejoin: round; }
+.w-back { stroke: var(--back); stroke-width: 2.6; fill: none; stroke-linejoin: round; stroke-dasharray: 7 3; }
+.w-txt { font-family: var(--f-display); font-size: 9px; fill: var(--muted); }
+.w-head { font-family: var(--f-display); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; fill: var(--text); text-transform: uppercase; }
+.w-win { fill: var(--text); font-weight: 700; }
+.w-key { fill: var(--fwd); }
+.w-lamp { fill: var(--back); }
+.w-dot-k { fill: var(--fwd); }
+.w-dot-l { fill: var(--back); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 20px; margin-top: 8px; font-size: 0.92rem; color: var(--muted); }
+.legend i { display: inline-block; width: 26px; height: 0; margin-right: 6px; vertical-align: middle; border-top: 3px solid var(--fwd); }
+.legend i.b { border-top: 3px dashed var(--back); }
+
+/* ---------- Breaking an intercept ---------- */
+.hut { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.form { padding: 18px; border-radius: 6px; background: var(--sheet); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 14px; }
+.form .meta { display: flex; flex-wrap: wrap; gap: 6px 24px; font-family: var(--f-type); font-size: 0.95rem; }
+.strip-wrap { overflow-x: auto; padding-bottom: 4px; }
+.strip { display: grid; grid-auto-flow: column; grid-auto-columns: 22px; grid-template-rows: auto auto auto; row-gap: 2px; width: max-content; font-family: var(--f-type); font-size: 1.05rem; text-align: center; }
+.strip .idx { font-family: var(--f-display); font-size: 0.6rem; color: var(--muted); }
+.strip .ct { padding: 2px 0; border-bottom: 1px solid var(--line); }
+.strip .cr { padding: 2px 0; color: var(--muted); }
+.strip .cr.on { color: var(--text); background: var(--ground-2); }
+.strip .cr.clash { color: #fff; background: var(--fwd); }
+.strip .ct.hit { color: var(--fwd); }
+.drag { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.drag .pos { font-family: var(--f-type); font-size: 1.05rem; min-width: 11ch; }
+.verdict { margin: 0; font-size: 0.98rem; min-height: 1.6em; }
+.verdict b { color: var(--fwd); }
+.verdict.ok b { color: var(--ok); }
+.map { display: flex; flex-wrap: wrap; gap: 3px; }
+.map button { width: 18px; height: 18px; padding: 0; border-radius: 3px; border: 1px solid var(--line-strong); background: none; font-size: 0; }
+.map button.out { background: repeating-linear-gradient(135deg, var(--fwd) 0 2px, transparent 2px 5px); border-color: var(--fwd); }
+.map button.maybe { background: var(--ok); border-color: var(--ok); }
+.map button.here { outline: 2px solid var(--text); outline-offset: 1px; }
+.bombe { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px 20px; align-items: center; padding-top: 12px; border-top: 1px dashed var(--line-strong); }
+.drums { display: flex; gap: 8px; }
+.drum { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 40% 35%, #4a4d50, #1b1c1d); color: #f2efe4; font-family: var(--f-display); font-weight: 600; font-size: 1.15rem; box-shadow: 0 0 0 3px #8c3a2a; }
+.bombe .out { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.bombe p { margin: 0; }
+.decrypt { padding: 12px 14px; border-radius: 6px; background: var(--ground-2); }
+.decrypt .de { font-family: var(--f-type); font-size: 1.05rem; letter-spacing: 0.04em; overflow-wrap: anywhere; }
+.decrypt .en { margin-top: 6px; font-style: italic; color: var(--muted); }
+
+/* ---------- History ---------- */
+.history { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 20px 40px; padding-top: 24px; border-top: 1px solid var(--line-strong); }
+.history h2 { font-size: 1.9rem; font-weight: 500; margin-bottom: 12px; }
+.timeline { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.timeline li { display: grid; grid-template-columns: 5.4em minmax(0, 1fr); gap: 12px; }
+.timeline .yr { font-family: var(--f-display); font-weight: 600; font-size: 1.05rem; line-height: 1.5; color: var(--fwd); }
+.timeline p { margin: 0; font-size: 0.97rem; }
+.count { display: flex; flex-direction: column; gap: 8px; }
+.count dl { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 14px; font-size: 0.95rem; }
+.count dt { color: var(--muted); }
+.count dd { margin: 0; font-family: var(--f-type); text-align: right; font-variant-numeric: tabular-nums; }
+.count dd.total { font-size: 1.1rem; color: var(--fwd); }
+.count p { margin: 0; font-size: 0.95rem; }
+.sources { grid-column: 1 / -1; margin: 0; font-size: 0.85rem; color: var(--muted); }
+.sources a { color: inherit; text-underline-offset: 3px; }
+
+@media (max-width: 960px) {
+  .bench, .history { grid-template-columns: minmax(0, 1fr); }
+  .masthead { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .bombe { grid-template-columns: minmax(0, 1fr); }
+  .ks-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .key:active, .key.down { transform: none; }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="enigma" defer></script>
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Machines &amp; Messages · Germany, 1930–1945</p>
+    <h1>Enigma</h1>
+    <p class="lede">The German armed forces trusted this typewriter-sized box with their secrets. Each key press turns the rotors and sends a current through a new tangle of wires to light a different lamp. It uses the real wirings of the Army’s rotors. Type a message, then find the one flaw that let codebreakers read it.</p>
+  </header>
+
+  <section class="bench" aria-label="The machine">
+    <div class="machine">
+      <div class="face">
+        <div class="rotors" id="rotors"></div>
+        <div class="board" id="lamps" aria-label="Lampboard"></div>
+        <div class="board" id="keys" aria-label="Keyboard"></div>
+        <div class="board plugboard" id="plugs" aria-label="Plugboard"></div>
+        <div class="plate">Steckerbrett · click two sockets to connect them</div>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="tape">
+        <h2>Paper tape</h2>
+        <div class="lines">
+          <span>Typed</span><output id="t-in"></output>
+          <span>Lamps</span><output id="t-out" class="out"></output>
+        </div>
+        <p class="hint" id="t-hint">Type on your keyboard or click the keys. Backspace takes back a letter.</p>
+        <div class="btns">
+          <button type="button" class="btn primary" id="back">Decode it: reset and type the lamps</button>
+          <button type="button" class="btn" id="clear">New message</button>
+        </div>
+      </div>
+      <div class="keysheet">
+        <h2>Today’s key</h2>
+        <div class="ks-grid" id="ks"></div>
+        <label class="ks-plugs" for="plugtext">Plugboard pairs (up to ten)<input id="plugtext" autocomplete="off" spellcheck="false" placeholder="AB CD EF"></label>
+        <p class="ks-note" id="ks-note">Reflector B. Changing the key starts a new message.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="wire-h">
+    <div class="sec-head">
+      <h2 id="wire-h">Follow the current</h2>
+      <p id="wire-say">Press a key. The current runs through the plugboard, right to left through three rotors, around the reflector, and back by a different route to a lamp.</p>
+    </div>
+    <div class="wiring-wrap"><svg id="wiring" viewBox="0 0 660 432" role="img" aria-label="The path of the current through the machine for the last key pressed"></svg></div>
+    <div class="legend"><span><i></i>Out from the key</span><span><i class="b"></i>Back to the lamp</span><span>Small letters show where each rotor’s alphabet sits right now.</span></div>
+  </section>
+
+  <section aria-labelledby="hut-h">
+    <div class="sec-head">
+      <h2 id="hut-h">Break an intercept</h2>
+      <p>Because the reflector sends the current back by a different wire, no letter can ever come out as itself. Codebreakers used that to place a guessed phrase, called a crib, in a message.</p>
+    </div>
+    <div class="hut">
+      <div class="form">
+        <div class="meta"><span>Intercept no. 1</span><span>80 letters</span><span>Made up for this exhibit, in the style of real traffic</span></div>
+        <p class="ks-note">Messages like this one often said <i>Keine besonderen Ereignisse</i>, “nothing to report”. Slide the crib along the message. A red square means a letter would have turned into itself, which Enigma can’t do, so the crib isn’t there.</p>
+        <div class="strip-wrap" id="strip-wrap"><div class="strip" id="strip"></div></div>
+        <div class="drag">
+          <button type="button" class="btn" id="left" aria-label="Move the crib left">◀ Left</button>
+          <span class="pos" id="pos"></span>
+          <button type="button" class="btn" id="right" aria-label="Move the crib right">Right ▶</button>
+          <button type="button" class="btn" id="all">Check every position</button>
+        </div>
+        <p class="verdict" id="verdict" aria-live="polite"></p>
+        <div class="map" id="map" aria-label="Every position for the crib"></div>
+        <div class="bombe">
+          <div class="drums" aria-hidden="true"><span class="drum" id="d0">A</span><span class="drum" id="d1">A</span><span class="drum" id="d2">A</span></div>
+          <div class="out">
+            <p>A captured key sheet gives you today’s rotors, rings and plugs: <span class="ks-note" id="cap"></span>. Only the starting position is secret, and it changed with every message. The bombe tries all 17,576 starting positions against the crib.</p>
+            <div class="btns"><button type="button" class="btn primary" id="run">Run the bombe here</button></div>
+            <p class="verdict" id="bv" aria-live="polite"></p>
+            <div class="decrypt" id="decrypt" hidden><div class="de" id="de"></div><div class="en">“To the group commander. Nothing to report. Weather clear, visibility twenty kilometres.”</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="history">
+    <div>
+      <h2>Breaking it took Poles, Britons and one careless operator</h2>
+      <ol class="timeline">
+        <li><span class="yr">1918</span><p>German engineer Arthur Scherbius invents the Enigma at the end of the First World War and sells it to businesses. The German military adopts it in the 1920s and adds the plugboard.</p></li>
+        <li><span class="yr">Dec 1932</span><p>Marian Rejewski, a 27-year-old mathematician at the Polish Cipher Bureau, uses the theory of permutations to work out the wiring of the military rotors. With Henryk Zygalski and Jerzy Różycki he reads Enigma for years. He noticed that most messages began with <i>ANX</i>, German for “to” plus an X as a space.</p></li>
+        <li><span class="yr">July 1939</span><p>Five weeks before the war, at a meeting near Warsaw on 26 and 27 July, the Poles show French and British codebreakers what they have done and give each a reconstructed Enigma.</p></li>
+        <li><span class="yr">Mar 1940</span><p>The first British bombe, named <i>Victory</i>, arrives at Bletchley Park on 18 March. Alan Turing designed it and Harold “Doc” Keen of the British Tabulating Machine Company built it. It tested all 17,576 rotor positions against a crib.</p></li>
+        <li><span class="yr">1941</span><p>Mavis Lever spotted an Italian message with no letter L in it. The operator had been told to send a dummy message and had pressed L over and over, so every letter except L could appear. The crib it gave helped lead to the British victory at Cape Matapan.</p></li>
+        <li><span class="yr">Feb 1942</span><p>The German Navy gives its U-boats a four-rotor Enigma, and Bletchley Park is shut out of their messages for many months.</p></li>
+      </ol>
+    </div>
+    <div class="count">
+      <h2>How many keys?</h2>
+      <dl>
+        <dt>Three rotors chosen from five, in order</dt><dd>60</dd>
+        <dt>Starting positions</dt><dd>17,576</dd>
+        <dt>Ten plugboard cables</dt><dd>150,738,274,937,250</dd>
+        <dt>All together</dt><dd class="total">158,962,555,217,826,360,000</dd>
+      </dl>
+      <p>That is about 159 quintillion settings, too many to try one by one. The flaw and the cribs cut the search down to something a room of bombes could finish in hours.</p>
+    </div>
+    <p class="sources">Sources: <a href="https://en.wikipedia.org/wiki/Enigma_rotor_details" target="_blank" rel="noopener">Enigma rotor details</a> (wirings, notches and the test message AAAAA → BDZGO, which this machine reproduces), <a href="https://en.wikipedia.org/wiki/Cryptanalysis_of_the_Enigma" target="_blank" rel="noopener">Cryptanalysis of the Enigma</a>, <a href="https://en.wikipedia.org/wiki/Enigma_machine" target="_blank" rel="noopener">Enigma machine</a> and <a href="https://en.wikipedia.org/wiki/Bombe" target="_blank" rel="noopener">Bombe</a> on Wikipedia. The intercept and its key are invented.</p>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const mod = (n) => ((n % 26) + 26) % 26;
+  const idx = (ch) => A.indexOf(ch);
+
+  /* ================================================================
+     The Army's rotors I to V and reflector B, with their turnover notches
+     ================================================================ */
+  const ROTORS = {
+    I: ['EKMFLGDQVZNTOWYHXUSPAIBRCJ', 'Q'],
+    II: ['AJDKSIRUXBLHWTMCQGZNPYFVOE', 'E'],
+    III: ['BDFHJLCPRTXVZNYEIWGAKMUSQO', 'V'],
+    IV: ['ESOVPZJAYQUIRHXLNFTGKDCMWB', 'J'],
+    V: ['VZBRGITYUPSDNHLXAWMJQOFECK', 'Z'],
+  };
+  const WIRE = {};
+  for (const [n, [w, notch]] of Object.entries(ROTORS)) {
+    const fw = [...w].map(idx);
+    const bw = [];
+    fw.forEach((o, i) => { bw[o] = i; });
+    WIRE[n] = { fw, bw, notch: idx(notch) };
+  }
+  const REFL = [...'YRUHQSLDPXNGOKMIEBFZCWVJAT'].map(idx);
+
+  // The rotors step before the current flows. The middle rotor steps twice in a row at its notch: the famous double step.
+  function stepped(names, [l, m, r]) {
+    let L = l, M = m;
+    if (m === WIRE[names[1]].notch) { M = mod(m + 1); L = mod(l + 1); } else if (r === WIRE[names[2]].notch) M = mod(m + 1);
+    return [L, M, mod(r + 1)];
+  }
+  const through = (w, c, pos, ring) => { const sh = pos - ring; return mod(w[mod(c + sh)] - sh); };
+  // The current's path: [key, after plugboard, after right, middle, left rotor, after reflector, back through left, middle, right, lamp]
+  function trace(cfg, pos, c) {
+    const t = [c];
+    let x = cfg.plugs[c]; t.push(x);
+    for (const i of [2, 1, 0]) { x = through(WIRE[cfg.names[i]].fw, x, pos[i], cfg.rings[i]); t.push(x); }
+    x = REFL[x]; t.push(x);
+    for (const i of [0, 1, 2]) { x = through(WIRE[cfg.names[i]].bw, x, pos[i], cfg.rings[i]); t.push(x); }
+    t.push(cfg.plugs[x]);
+    return t;
+  }
+  function encipher(cfg, start, text) {
+    let pos = start.slice();
+    let out = '';
+    for (const ch of text) { pos = stepped(cfg.names, pos); out += A[trace(cfg, pos, idx(ch))[9]]; }
+    return out;
+  }
+  const plugsFrom = (pairs) => {
+    const p = [...Array(26).keys()];
+    for (const [a, b] of pairs) { p[idx(a)] = idx(b); p[idx(b)] = idx(a); }
+    return p;
+  };
+  // Check against the published test message before anything else.
+  if (encipher({ names: ['I', 'II', 'III'], rings: [0, 0, 0], plugs: plugsFrom([]) }, [0, 0, 0], 'AAAAA') !== 'BDZGO') console.error('Enigma self-test failed');
+
+  /* ================================================================
+     The machine on the bench
+     ================================================================ */
+  const ROWS = ['QWERTZUIO', 'ASDFGHJK', 'PYXCVBNML'];
+  const PLUG_COLORS = ['#c9a227', '#d9653b', '#58a6d6', '#8fc46a', '#c86fc9', '#e0d36a', '#6ad0c0', '#e58aa0', '#a0a7ff', '#d0a070'];
+  let cfg = { names: ['I', 'II', 'III'], rings: [0, 0, 0], plugs: plugsFrom([]) };
+  let pairs = [];
+  let pos = [0, 0, 0];
+  let start = pos.slice();
+  let history = [];
+  let tapeIn = '', tapeOut = '';
+  let lastTrace = null;
+  let picked = null;
+  let lampTimer = 0;
+
+  function buildFace() {
+    $('rotors').innerHTML = ['Left', 'Middle', 'Right'].map((n, i) => `
+      <div class="rotor">
+        <button type="button" class="turn" data-turn="${i}" data-d="-1" aria-label="Turn the ${n.toLowerCase()} rotor back">▲</button>
+        <div class="win" id="win${i}" aria-live="off"></div>
+        <button type="button" class="turn" data-turn="${i}" data-d="1" aria-label="Turn the ${n.toLowerCase()} rotor forward">▼</button>
+        <span class="name" id="rn${i}"></span>
+      </div>`).join('');
+    $('lamps').innerHTML = ROWS.map((r) => `<div class="row">${[...r].map((c) => `<span class="lamp" id="lamp-${c}">${c}</span>`).join('')}</div>`).join('');
+    $('keys').innerHTML = ROWS.map((r) => `<div class="row">${[...r].map((c) => `<button type="button" class="key" id="key-${c}" data-key="${c}">${c}</button>`).join('')}</div>`).join('');
+    $('plugs').innerHTML = ROWS.map((r) => `<div class="row">${[...r].map((c) => `<button type="button" class="sock" id="sock-${c}" data-sock="${c}" aria-label="Socket ${c}">${c}<span class="mate"></span></button>`).join('')}</div>`).join('');
+  }
+  function drawFace() {
+    pos.forEach((p, i) => { $(`win${i}`).textContent = A[p]; $(`rn${i}`).textContent = cfg.names[i]; });
+    for (const c of A) {
+      const s = $(`sock-${c}`);
+      const pi = pairs.findIndex((p) => p.includes(c));
+      s.classList.toggle('plugged', pi >= 0);
+      s.classList.toggle('picked', picked === c);
+      s.style.setProperty('--plug', pi >= 0 ? PLUG_COLORS[pi] : '');
+      s.querySelector('.mate').textContent = pi >= 0 ? pairs[pi].replace(c, '') : '';
+      s.setAttribute('aria-label', pi >= 0 ? `Socket ${c}, plugged to ${pairs[pi].replace(c, '')}` : `Socket ${c}, empty`);
+    }
+    $('t-in').textContent = groups(tapeIn);
+    $('t-out').textContent = groups(tapeOut);
+    $('back').disabled = !tapeOut || autoTyping;
+    $('plugtext').value = pairs.join(' ');
+  }
+  const groups = (s) => s.replace(/(.{5})/g, '$1 ').trim();
+  function lightLamp(c) {
+    document.querySelectorAll('.lamp.on').forEach((l) => l.classList.remove('on'));
+    if (c) $(`lamp-${c}`).classList.add('on');
+    clearTimeout(lampTimer);
+    if (c) lampTimer = setTimeout(() => lightLamp(null), 1400);
+  }
+
+  function press(ch) {
+    if (!tapeIn) start = pos.slice();
+    history.push(pos.slice());
+    pos = stepped(cfg.names, pos);
+    const t = trace(cfg, pos, idx(ch));
+    lastTrace = t;
+    tapeIn += ch;
+    tapeOut += A[t[9]];
+    lightLamp(A[t[9]]);
+    drawFace();
+    drawWiring();
+  }
+  function unpress() {
+    if (!tapeIn || autoTyping) return;
+    pos = history.pop();
+    tapeIn = tapeIn.slice(0, -1);
+    tapeOut = tapeOut.slice(0, -1);
+    lastTrace = null;
+    lightLamp(null);
+    drawFace();
+    drawWiring();
+  }
+  function newMessage() {
+    tapeIn = '';
+    tapeOut = '';
+    history = [];
+    lastTrace = null;
+    lightLamp(null);
+    drawFace();
+    drawWiring();
+  }
+
+  let autoTyping = false;
+  function decodeBack() {
+    if (!tapeOut || autoTyping) return;
+    const text = tapeOut;
+    pos = start.slice();
+    newMessage();
+    autoTyping = true;
+    $('t-hint').textContent = 'Same starting position, typing the lamp letters back in…';
+    let i = 0;
+    const tick = () => {
+      if (i >= text.length) {
+        autoTyping = false;
+        $('t-hint').textContent = 'The lamps spell out the original. Enigma undoes itself when the rotors start in the same place.';
+        drawFace();
+        return;
+      }
+      press(text[i++]);
+      setTimeout(tick, 110);
+    };
+    drawFace();
+    tick();
+  }
+
+  $('keys').addEventListener('click', (e) => {
+    const k = e.target.closest('[data-key]');
+    if (k && !autoTyping) press(k.dataset.key);
+  });
+  $('rotors').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-turn]');
+    if (!b || autoTyping) return;
+    const i = Number(b.dataset.turn);
+    pos[i] = mod(pos[i] + Number(b.dataset.d));
+    newMessage();
+  });
+  $('plugs').addEventListener('click', (e) => {
+    const s = e.target.closest('[data-sock]');
+    if (!s || autoTyping) return;
+    const c = s.dataset.sock;
+    const pi = pairs.findIndex((p) => p.includes(c));
+    if (pi >= 0) { pairs.splice(pi, 1); picked = null; applyPlugs(); return; }
+    if (!picked) { picked = c; drawFace(); return; }
+    if (picked === c) { picked = null; drawFace(); return; }
+    if (pairs.length >= 10) { picked = null; note('Operators had ten cables. Unplug one first.', true); drawFace(); return; }
+    pairs.push(picked + c);
+    picked = null;
+    applyPlugs();
+  });
+  function applyPlugs() {
+    cfg.plugs = plugsFrom(pairs);
+    note('Reflector B. Changing the key starts a new message.');
+    newMessage();
+  }
+  const note = (t, err) => { const n = $('ks-note'); n.textContent = t; n.classList.toggle('err', !!err); };
+  $('plugtext').addEventListener('change', (e) => {
+    const parts = e.target.value.toUpperCase().split(/[^A-Z]+/).filter(Boolean);
+    const seen = new Set();
+    for (const p of parts) {
+      if (p.length !== 2 || p[0] === p[1] || seen.has(p[0]) || seen.has(p[1])) {
+        note(`“${p}” isn’t a pair of two different letters that aren’t used yet.`, true);
+        e.target.value = pairs.join(' ');
+        return;
+      }
+      seen.add(p[0]); seen.add(p[1]);
+    }
+    if (parts.length > 10) { note('Ten pairs at most: operators had ten cables.', true); return; }
+    pairs = parts;
+    applyPlugs();
+  });
+  $('back').addEventListener('click', decodeBack);
+  $('clear').addEventListener('click', () => { start = pos.slice(); newMessage(); $('t-hint').textContent = 'Type on your keyboard or click the keys. Backspace takes back a letter.'; });
+  document.addEventListener('keydown', (e) => {
+    if (e.target.closest('input, select, textarea') || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key === 'Backspace') { e.preventDefault(); unpress(); return; }
+    const ch = e.key.length === 1 ? e.key.toUpperCase() : '';
+    if (ch >= 'A' && ch <= 'Z' && !autoTyping) {
+      e.preventDefault();
+      press(ch);
+      const k = $(`key-${ch}`);
+      k.classList.add('down');
+      setTimeout(() => k.classList.remove('down'), 140);
+    }
+  });
+
+  // The key sheet: rotor order and ring settings
+  function buildKeysheet() {
+    const names = Object.keys(ROTORS);
+    $('ks').innerHTML = ['Left', 'Middle', 'Right'].map((n, i) => `
+      <label for="rot${i}">${n} rotor<select id="rot${i}" data-rot="${i}">${names.map((r) => `<option${r === cfg.names[i] ? ' selected' : ''}>${r}</option>`).join('')}</select></label>`).join('')
+      + ['Left', 'Middle', 'Right'].map((n, i) => `
+      <label for="ring${i}">${n} ring<select id="ring${i}" data-ring="${i}">${[...A].map((c, j) => `<option value="${j}"${j === cfg.rings[i] ? ' selected' : ''}>${String(j + 1).padStart(2, '0')} · ${c}</option>`).join('')}</select></label>`).join('');
+  }
+  $('ks').addEventListener('change', (e) => {
+    const t = e.target;
+    if (t.dataset.rot) {
+      const i = Number(t.dataset.rot);
+      const other = cfg.names.indexOf(t.value);
+      if (other >= 0 && other !== i) cfg.names[other] = cfg.names[i];
+      cfg.names[i] = t.value;
+      cfg.names.forEach((n, j) => { $(`rot${j}`).value = n; });
+    } else if (t.dataset.ring) {
+      cfg.rings[Number(t.dataset.ring)] = Number(t.value);
+    }
+    newMessage();
+  });
+
+  /* ================================================================
+     Following the current
+     ================================================================ */
+  const RY = (i) => 40 + i * 14.4;
+  const COL = { ref: 74, L: [84, 168], M: [204, 288], R: [324, 408], entry: 432, P: [456, 536], key: 574, lamp: 618 };
+  function drawWiring() {
+    let s = '';
+    const heads = [['Reflector B', 40], [`Left · ${cfg.names[0]}`, 126], [`Middle · ${cfg.names[1]}`, 246], [`Right · ${cfg.names[2]}`, 366], ['Plugs', 496], ['Key', 574], ['Lamp', 618]];
+    for (const [t, x] of heads) s += `<text class="w-head" x="${x}" y="18" text-anchor="middle">${t}</text>`;
+    for (const name of ['L', 'M', 'R']) s += `<rect class="w-band" x="${COL[name][0]}" y="30" width="${COL[name][1] - COL[name][0]}" height="${RY(25) - 20}" rx="4"/>`;
+    s += `<rect class="w-band" x="${COL.P[0]}" y="30" width="${COL.P[1] - COL.P[0]}" height="${RY(25) - 20}" rx="4"/>`;
+    // the fixed wiring inside each rotor at its present turn
+    [['L', 0], ['M', 1], ['R', 2]].forEach(([name, i]) => {
+      const [xa, xb] = COL[name];
+      for (let c = 0; c < 26; c++) {
+        const o = through(WIRE[cfg.names[i]].fw, c, pos[i], cfg.rings[i]);
+        s += `<line class="w-faint" x1="${xb}" y1="${RY(c)}" x2="${xa}" y2="${RY(o)}"/>`;
+      }
+      for (let c = 0; c < 26; c++) s += `<text class="w-txt${c === 0 ? ' w-win' : ''}" x="${xb + 9}" y="${RY(c) + 3}" text-anchor="middle">${A[mod(c + pos[i])].toLowerCase()}</text>`;
+    });
+    // reflector pairs
+    for (let c = 0; c < 26; c++) {
+      const o = REFL[c];
+      if (o < c) continue;
+      const d = 10 + Math.abs(o - c) * 1.6;
+      s += `<path class="w-faint" d="M${COL.L[0]} ${RY(c)} C${COL.L[0] - d} ${RY(c)} ${COL.L[0] - d} ${RY(o)} ${COL.L[0]} ${RY(o)}"/>`;
+    }
+    // plugboard pairs and straight-through wires
+    for (let c = 0; c < 26; c++) s += `<line class="w-faint" x1="${COL.P[1]}" y1="${RY(c)}" x2="${COL.P[0]}" y2="${RY(cfg.plugs[c])}"/>`;
+    for (let c = 0; c < 26; c++) {
+      s += `<text class="w-txt" x="${COL.entry}" y="${RY(c) + 3}" text-anchor="middle">${A[c]}</text>`;
+      s += `<text class="w-txt" x="${COL.key}" y="${RY(c) + 3}" text-anchor="middle">${A[c]}</text>`;
+      s += `<text class="w-txt" x="${COL.lamp}" y="${RY(c) + 3}" text-anchor="middle">${A[c]}</text>`;
+    }
+    if (lastTrace) {
+      const t = lastTrace;
+      const fwd = [[COL.key - 8, t[0]], [COL.P[1], t[0]], [COL.P[0], t[1]], [COL.R[1], t[1]], [COL.R[0], t[2]], [COL.M[1], t[2]], [COL.M[0], t[3]], [COL.L[1], t[3]], [COL.L[0], t[4]]];
+      const back = [[COL.L[0], t[5]], [COL.L[1], t[6]], [COL.M[0], t[6]], [COL.M[1], t[7]], [COL.R[0], t[7]], [COL.R[1], t[8]], [COL.P[0], t[8]], [COL.P[1], t[9]], [COL.lamp - 9, t[9]]];
+      const pts = (a) => a.map(([x, r]) => `${x},${RY(r)}`).join(' ');
+      const d = 10 + Math.abs(t[5] - t[4]) * 1.6;
+      s += `<polyline class="w-fwd" points="${pts(fwd)}"/>`;
+      s += `<path class="w-fwd" d="M${COL.L[0]} ${RY(t[4])} C${COL.L[0] - d} ${RY(t[4])} ${COL.L[0] - d} ${RY(t[5])} ${COL.L[0]} ${RY(t[5])}"/>`;
+      s += `<polyline class="w-back" points="${pts(back)}"/>`;
+      s += `<circle class="w-dot-k" cx="${COL.key}" cy="${RY(t[0])}" r="7" fill-opacity="0.18"/><text class="w-txt w-key" x="${COL.key}" y="${RY(t[0]) + 3}" text-anchor="middle" font-weight="700">${A[t[0]]}</text>`;
+      s += `<circle class="w-dot-l" cx="${COL.lamp}" cy="${RY(t[9])}" r="7" fill-opacity="0.18"/><text class="w-txt w-lamp" x="${COL.lamp}" y="${RY(t[9]) + 3}" text-anchor="middle" font-weight="700">${A[t[9]]}</text>`;
+      $('wire-say').textContent = `${A[t[0]]} went in and lit ${A[t[9]]}. The reflector joined ${A[t[4]]} to ${A[t[5]]}, a different row, so the current comes back along another path. That is why a key can never light its own lamp.`;
+    } else {
+      $('wire-say').textContent = 'Press a key. The current runs through the plugboard, right to left through three rotors, around the reflector, and back by a different route to a lamp.';
+    }
+    $('wiring').innerHTML = s;
+  }
+
+  /* ================================================================
+     The intercept and the bombe
+     ================================================================ */
+  const KEY = { names: ['II', 'IV', 'I'], rings: [2, 10, 21], pairs: ['AT', 'BL', 'DF', 'GJ', 'HM', 'NW', 'OP', 'QY', 'RZ', 'VX'] };
+  const KCFG = { names: KEY.names, rings: KEY.rings, plugs: plugsFrom(KEY.pairs) };
+  const PLAIN = 'ANXGRUPPENKOMMANDEURXKEINEBESONDERENEREIGNISSEXWETTERKLARXSICHTZWANZIGXKILOMETER';
+  const SECRET = [idx('U'), idx('H'), idx('L')];
+  const CT = encipher(KCFG, SECRET, PLAIN);
+  const CRIB = 'KEINEBESONDERENEREIGNISSE';
+  const LAST = CT.length - CRIB.length;
+  let k = 0;
+  const checked = new Set();
+  const clashes = (at) => [...CRIB].reduce((n, ch, i) => n + (CT[at + i] === ch ? 1 : 0), 0);
+  $('cap').textContent = `rotors ${KEY.names.join(' ')}, rings ${KEY.rings.map((r) => String(r + 1).padStart(2, '0')).join(' ')}, plugs ${KEY.pairs.join(' ')}`;
+
+  function drawStrip() {
+    let h = '';
+    for (let i = 0; i < CT.length; i++) {
+      const ci = i - k;
+      const inCrib = ci >= 0 && ci < CRIB.length;
+      const clash = inCrib && CRIB[ci] === CT[i];
+      h += `<span class="idx" style="grid-column:${i + 1};grid-row:1">${i % 5 === 0 ? i : ''}</span>`;
+      h += `<span class="ct${clash ? ' hit' : ''}" style="grid-column:${i + 1};grid-row:2">${CT[i]}</span>`;
+      h += `<span class="cr${inCrib ? ' on' : ''}${clash ? ' clash' : ''}" style="grid-column:${i + 1};grid-row:3">${inCrib ? CRIB[ci] : ''}</span>`;
+    }
+    $('strip').innerHTML = h;
+    $('pos').textContent = `Position ${k} of ${LAST}`;
+    const n = clashes(k);
+    checked.add(k);
+    const v = $('verdict');
+    v.classList.toggle('ok', n === 0);
+    v.innerHTML = n ? `<b>Ruled out.</b> ${n} letter${n === 1 ? '' : 's'} would have turned into ${n === 1 ? 'itself' : 'themselves'}.` : '<b>Possible.</b> No letter turns into itself here. Run the bombe to test it.';
+    $('left').disabled = k === 0;
+    $('right').disabled = k === LAST;
+    $('run').disabled = n > 0 || bombeBusy;
+    drawMap();
+    const wrap = $('strip-wrap');
+    const x = k * 22;
+    if (x < wrap.scrollLeft || x + CRIB.length * 22 > wrap.scrollLeft + wrap.clientWidth) wrap.scrollLeft = Math.max(0, x - 44);
+  }
+  function drawMap() {
+    let h = '';
+    for (let i = 0; i <= LAST; i++) {
+      const cls = checked.has(i) ? (clashes(i) ? 'out' : 'maybe') : '';
+      h += `<button type="button" class="${cls}${i === k ? ' here' : ''}" data-at="${i}" aria-label="Position ${i}${cls === 'out' ? ', ruled out' : cls === 'maybe' ? ', possible' : ''}"></button>`;
+    }
+    $('map').innerHTML = h;
+  }
+  $('left').addEventListener('click', () => { if (k > 0) { k--; drawStrip(); } });
+  $('right').addEventListener('click', () => { if (k < LAST) { k++; drawStrip(); } });
+  $('map').addEventListener('click', (e) => { const b = e.target.closest('[data-at]'); if (b) { k = Number(b.dataset.at); drawStrip(); } });
+  $('all').addEventListener('click', () => {
+    for (let i = 0; i <= LAST; i++) checked.add(i);
+    drawStrip();
+    const out = [...Array(LAST + 1).keys()].filter((i) => clashes(i)).length;
+    $('verdict').innerHTML = `<b>${out} of ${LAST + 1} positions ruled out</b> by the flaw alone. The green ones are still possible, and the bombe has to test each of them.`;
+    $('verdict').classList.remove('ok');
+  });
+
+  // The bombe: try all 17,576 starting positions with the captured rotors, rings and plugs.
+  function search(at) {
+    const hits = [];
+    for (let s = 0; s < 17576; s++) {
+      let p = [Math.floor(s / 676), Math.floor(s / 26) % 26, s % 26];
+      for (let i = 0; i < at; i++) p = stepped(KCFG.names, p);
+      let ok = true;
+      for (let i = 0; i < CRIB.length && ok; i++) {
+        p = stepped(KCFG.names, p);
+        if (A[trace(KCFG, p, idx(CRIB[i]))[9]] !== CT[at + i]) ok = false;
+      }
+      if (ok) hits.push([Math.floor(s / 676), Math.floor(s / 26) % 26, s % 26]);
+    }
+    return hits;
+  }
+  let bombeBusy = false;
+  let misses = 0;
+  $('run').addEventListener('click', () => {
+    if (bombeBusy || clashes(k)) return;
+    bombeBusy = true;
+    $('run').disabled = true;
+    $('decrypt').hidden = true;
+    const at = k;
+    const hits = search(at);
+    const t0 = performance.now();
+    const spin = (t) => {
+      const e = t - t0;
+      const n = Math.min(17575, Math.floor((e / 1400) * 17576));
+      $('d0').textContent = A[Math.floor(n / 676)];
+      $('d1').textContent = A[Math.floor(n / 26) % 26];
+      $('d2').textContent = A[n % 26];
+      $('bv').textContent = `Testing… ${n.toLocaleString('en-US')} of 17,576`;
+      if (e < 1400) { requestAnimationFrame(spin); return; }
+      bombeBusy = false;
+      const v = $('bv');
+      if (!hits.length) {
+        misses++;
+        v.className = 'verdict';
+        v.innerHTML = `<b>No stop.</b> None of the 17,576 starting positions turns the crib into this stretch of the message, so the crib isn’t at position ${at}. Try another possible position.${misses >= 2 ? ' Hint: this phrase usually came right after the address, near the start of a message.' : ''}`;
+      } else {
+        const h = hits[0];
+        h.forEach((x, i) => { $(`d${i}`).textContent = A[x]; });
+        v.className = 'verdict ok';
+        v.innerHTML = `<b>Stop at ${h.map((x) => A[x]).join('')}.</b> With the rotors starting at ${h.map((x) => A[x]).join(' ')}, the whole message comes out in German:`;
+        $('de').textContent = groups(encipher(KCFG, h, CT));
+        $('decrypt').hidden = false;
+      }
+      drawStrip();
+    };
+    requestAnimationFrame(spin);
+  });
+
+  buildFace();
+  buildKeysheet();
+  drawFace();
+  // Open with a short message already typed so the tape and the wiring show something.
+  for (const ch of 'WETTER') press(ch);
+  drawStrip();
+})();
+</script>
+</body>
+</html>
