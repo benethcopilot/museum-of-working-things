@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Slide Rule</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Architects+Daughter&display=swap">
+<style>
+:root {
+  /* Layout: the rule runs the full width like it lies on an engineer's desk; under it, the hairline readings, the nudge controls and a lesson on green engineering paper; then why it works and its history. */
+  --ground: #e4e9df;
+  --ground-2: #d6ddcf;
+  --pad: #eef3e3;
+  --grid: rgba(64, 128, 88, 0.16);
+  --text: #1e2521;
+  --muted: #56625a;
+  --line: rgba(30, 37, 33, 0.14);
+  --line-strong: rgba(30, 37, 33, 0.32);
+  --accent: #b3291f;
+  --good: #2c6e49;
+  /* The rule keeps its colors in both themes. */
+  --celluloid: #f6f3e9;
+  --slide: #f1ede0;
+  --ink: #141414;
+  --red: #b3261e;
+  --f-display: "Archivo", "Arial Narrow", sans-serif;
+  --f-body: "Archivo", "Segoe UI", system-ui, sans-serif;
+  --f-hand: "Architects Daughter", "Comic Sans MS", cursive;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #111513;
+    --ground-2: #1b211d;
+    --pad: #18201b;
+    --grid: rgba(120, 200, 150, 0.1);
+    --text: #e3e8e2;
+    --muted: #9ea9a1;
+    --line: rgba(227, 232, 226, 0.12);
+    --line-strong: rgba(227, 232, 226, 0.3);
+    --accent: #ff7f72;
+    --good: #7fd19a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #111513;
+  --ground-2: #1b211d;
+  --pad: #18201b;
+  --grid: rgba(120, 200, 150, 0.1);
+  --text: #e3e8e2;
+  --muted: #9ea9a1;
+  --line: rgba(227, 232, 226, 0.12);
+  --line-strong: rgba(227, 232, 226, 0.3);
+  --accent: #ff7f72;
+  --good: #7fd19a;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--text); font-family: var(--f-body); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-stretch: 70%; font-weight: 800; line-height: 1; margin: 0; text-transform: uppercase; letter-spacing: 0.01em; text-wrap: balance; }
+
+.page { box-sizing: border-box; max-width: 1240px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 30px; }
+.masthead { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 40px; align-items: end; }
+.eyebrow { grid-column: 1 / -1; margin: 0; font-size: 0.78rem; font-weight: 700; font-stretch: 85%; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
+.masthead h1 { font-size: clamp(3rem, 8vw, 6rem); }
+.lede { margin: 0; max-width: 60ch; color: var(--muted); }
+
+/* ---------- The rule ---------- */
+.rule-wrap { border-radius: 10px; padding: 14px 0; background: linear-gradient(#4b3a2a, #3a2c1f); box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4); }
+#rule { display: block; width: 100%; height: auto; touch-action: none; user-select: none; -webkit-user-select: none; cursor: ew-resize; }
+#rule:focus-visible { outline: 3px solid #ffd27a; outline-offset: 2px; }
+.tk { stroke: var(--ink); stroke-width: 1; fill: none; }
+.tk.red { stroke: var(--red); }
+.num { font-family: var(--f-display); font-stretch: 75%; font-weight: 600; font-size: 12px; fill: var(--ink); text-anchor: middle; }
+.num.s { font-size: 8.5px; font-weight: 500; }
+.num.red { fill: var(--red); }
+.num.pi { font-style: italic; font-weight: 700; }
+.sname { font-family: var(--f-display); font-stretch: 75%; font-weight: 800; font-size: 14px; fill: var(--ink); text-anchor: middle; }
+.sname.red { fill: var(--red); }
+.sform { font-family: var(--f-display); font-stretch: 75%; font-size: 11px; fill: #5a564c; text-anchor: middle; }
+
+.under { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 20px; align-items: start; }
+.reads { display: flex; flex-direction: column; gap: 12px; }
+.readings { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.rd { padding: 8px 8px 6px; border-radius: 6px; background: var(--ground-2); text-align: center; }
+.rd span { display: block; font-weight: 800; font-stretch: 75%; font-size: 0.85rem; letter-spacing: 0.06em; color: var(--muted); }
+.rd span.red { color: var(--accent); }
+.rd b { display: block; font-stretch: 80%; font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+.rd b.off { font-size: 0.8rem; font-weight: 400; color: var(--muted); padding-block: 0.3rem; }
+.nudges { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; align-items: center; font-size: 0.9rem; }
+.nudges .grp { display: flex; flex-wrap: wrap; gap: 4px; }
+.nb { min-width: 2.6em; padding: 5px 8px; border: 1.5px solid var(--line-strong); border-radius: 6px; background: none; font-weight: 700; font-size: 0.85rem; }
+.nb:hover { background: var(--ground-2); }
+.keys { margin: 0; font-size: 0.85rem; color: var(--muted); }
+.check { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+
+.pad { position: relative; padding: 18px 20px; border-radius: 4px; background-color: var(--pad); background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 16px 16px; border: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 4px; }
+.tab { padding: 4px 10px; border: 1.5px solid var(--line-strong); border-radius: 999px; background: none; font-size: 0.82rem; font-weight: 600; font-stretch: 85%; }
+.tab[aria-pressed="true"] { background: var(--text); color: var(--ground); border-color: var(--text); }
+.tab.done::after { content: " ✓"; color: var(--good); }
+.tab[aria-pressed="true"].done::after { color: var(--ground); }
+.pad h2 { font-size: 1.8rem; }
+.pad .intro { margin: 0; font-family: var(--f-hand); font-size: 1.05rem; line-height: 1.5; }
+.steps { margin: 0; padding-left: 1.5em; display: flex; flex-direction: column; gap: 6px; }
+.steps li { padding: 2px 6px; border-radius: 4px; }
+.steps li.done { color: var(--muted); }
+.steps li.done::marker { color: var(--good); }
+.steps li.now { background: rgba(179, 41, 31, 0.08); font-weight: 600; }
+.steps li .ans { display: block; font-family: var(--f-hand); font-weight: 400; font-size: 1.05rem; color: var(--good); }
+.choices { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.choices button { padding: 4px 12px; border: 1.5px solid var(--line-strong); border-radius: 6px; background: var(--ground); font-variant-numeric: tabular-nums; }
+.choices button.right { border-color: var(--good); color: var(--good); font-weight: 700; }
+.choices button.wrong { border-color: var(--accent); color: var(--accent); text-decoration: line-through; }
+.pad .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn { padding: 7px 14px; border: 1.5px solid var(--line-strong); border-radius: 6px; background: none; font-weight: 700; font-size: 0.88rem; }
+.btn:hover { background: var(--ground-2); }
+.btn.primary { background: var(--accent); color: var(--ground); border-color: var(--accent); }
+.btn.primary:hover { opacity: 0.9; background: var(--accent); }
+.quiz { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.quiz .q { font-family: var(--f-hand); font-size: 1.3rem; }
+.quiz input { width: 8em; padding: 5px 8px; border: 1.5px solid var(--line-strong); border-radius: 6px; background: var(--ground); font-variant-numeric: tabular-nums; }
+.qres { margin: 0; font-size: 0.95rem; min-height: 1.5em; }
+.qres b { color: var(--good); }
+.qres.miss b { color: var(--accent); }
+
+/* ---------- Why and when ---------- */
+.why { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px 40px; align-items: start; }
+.why h2 { font-size: 2rem; margin-bottom: 10px; }
+.why p { margin: 0 0 10px; max-width: 62ch; }
+.why svg { display: block; width: 100%; max-width: 520px; height: auto; }
+.why .bar-a { fill: var(--accent); }
+.why .bar-b { fill: var(--good); }
+.why .axis { stroke: var(--text); stroke-width: 1; }
+.why .t { font-family: var(--f-body); font-size: 12px; fill: var(--text); }
+.why .tm { font-family: var(--f-body); font-size: 11px; fill: var(--muted); }
+.timeline { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.timeline li { display: grid; grid-template-columns: 4em minmax(0, 1fr); gap: 12px; }
+.timeline .yr { font-weight: 800; font-stretch: 75%; font-size: 1.2rem; line-height: 1.4; color: var(--accent); }
+.timeline p { margin: 0; font-size: 0.96rem; }
+.why .sources { grid-column: 1 / -1; max-width: none; margin: 0; font-size: 0.85rem; color: var(--muted); padding-top: 14px; border-top: 1px solid var(--line-strong); }
+.sources a { color: inherit; text-underline-offset: 3px; }
+
+@media (max-width: 960px) {
+  .under, .why { grid-template-columns: minmax(0, 1fr); }
+  .masthead { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .readings { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="slide-rule" defer></script>
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Numbers &amp; Elements · 1622–1976</p>
+    <h1>Slide Rule</h1>
+    <p class="lede">For three hundred and fifty years engineers multiplied by sliding one ruler along another. Bridges, jet engines and the trip to the Moon were worked out this way, to about three figures, with the decimal point kept in their heads.</p>
+  </header>
+
+  <section aria-label="The slide rule">
+    <div class="rule-wrap">
+      <svg id="rule" viewBox="0 -10 1100 290" tabindex="0" role="slider" aria-label="Slide rule. Drag the middle strip to move the slide and drag the glass cursor to move the hairline. Arrow keys move the cursor; Shift with arrow keys moves the slide." aria-valuetext=""></svg>
+    </div>
+  </section>
+
+  <section class="under">
+    <div class="reads">
+      <div class="readings" id="readings" aria-live="off"></div>
+      <div class="nudges">
+        <span>Slide</span>
+        <span class="grp"><button type="button" class="nb" data-n="s" data-d="-0.01" aria-label="Move the slide left a lot">◀◀</button><button type="button" class="nb" data-n="s" data-d="-0.001" aria-label="Move the slide left a little">◀</button><button type="button" class="nb" data-n="s" data-d="0.001" aria-label="Move the slide right a little">▶</button><button type="button" class="nb" data-n="s" data-d="0.01" aria-label="Move the slide right a lot">▶▶</button></span>
+        <span>Cursor</span>
+        <span class="grp"><button type="button" class="nb" data-n="c" data-d="-0.01" aria-label="Move the cursor left a lot">◀◀</button><button type="button" class="nb" data-n="c" data-d="-0.001" aria-label="Move the cursor left a little">◀</button><button type="button" class="nb" data-n="c" data-d="0.001" aria-label="Move the cursor right a little">▶</button><button type="button" class="nb" data-n="c" data-d="0.01" aria-label="Move the cursor right a lot">▶▶</button></span>
+      </div>
+      <p class="keys">Drag the middle strip to move the slide, and drag the glass to move the hairline. With the rule selected, the arrow keys move the hairline and Shift with the arrows moves the slide.</p>
+      <label class="check" for="show"><input type="checkbox" id="show" checked> Show the readings under the hairline</label>
+    </div>
+
+    <div class="pad" aria-labelledby="lesson-h">
+      <div class="tabs" id="tabs" role="group" aria-label="Lessons"></div>
+      <h2 id="lesson-h"></h2>
+      <p class="intro" id="intro"></p>
+      <ol class="steps" id="steps"></ol>
+      <div class="row"><button type="button" class="btn primary" id="showme">Show me this step</button><button type="button" class="btn" id="again">Start the lesson again</button></div>
+      <div class="quiz" id="quiz" hidden>
+        <span class="q" id="qtext"></span>
+        <input id="qans" inputmode="decimal" autocomplete="off" aria-label="Your answer">
+        <button type="button" class="btn" id="qcheck">Check</button>
+        <button type="button" class="btn" id="qnew">New problem</button>
+      </div>
+      <p class="qres" id="qres" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="why">
+    <div>
+      <h2>Why sliding multiplies</h2>
+      <p>On the D scale, each number sits at a distance from the left end equal to its logarithm. The logarithm of 2 times 3 is the logarithm of 2 plus the logarithm of 3. Sliding C along D adds those two lengths, so the hairline lands on 6.</p>
+      <svg viewBox="0 0 520 120" aria-label="A bar for log 2 and a bar for log 3 laid end to end reach the point for 6 on a logarithmic scale.">
+        <rect class="bar-a" x="20" y="20" width="135.5" height="18" rx="2"/>
+        <rect class="bar-b" x="155.5" y="20" width="214.7" height="18" rx="2"/>
+        <text class="t" x="87" y="14" text-anchor="middle">log 2</text>
+        <text class="t" x="263" y="14" text-anchor="middle">log 3</text>
+        <line class="axis" x1="20" x2="470" y1="64" y2="64"/>
+        <g class="tm" text-anchor="middle">
+          <line class="axis" x1="20" x2="20" y1="58" y2="70"/><text x="20" y="86">1</text>
+          <line class="axis" x1="155.5" x2="155.5" y1="58" y2="70"/><text x="155.5" y="86">2</text>
+          <line class="axis" x1="234.7" x2="234.7" y1="58" y2="70"/><text x="234.7" y="86">3</text>
+          <line class="axis" x1="290.9" x2="290.9" y1="58" y2="70"/><text x="290.9" y="86">4</text>
+          <line class="axis" x1="370.2" x2="370.2" y1="54" y2="74"/><text x="370.2" y="86" font-weight="700">6</text>
+          <line class="axis" x1="470" x2="470" y1="58" y2="70"/><text x="470" y="86">10</text>
+        </g>
+        <text class="tm" x="20" y="110">Equal steps on this scale multiply, not add.</text>
+      </svg>
+      <p>The rule never shows where the decimal point goes. 2 × 3, 20 × 3 and 0.2 × 0.3 all land on the same spot. Engineers estimated the size of every answer in their heads first, which kept them in close touch with their numbers.</p>
+    </div>
+    <div>
+      <h2>Three and a half centuries</h2>
+      <ol class="timeline">
+        <li><span class="yr">1614</span><p>John Napier publishes his logarithms, which turn multiplying into adding.</p></li>
+        <li><span class="yr">1620</span><p>Edmund Gunter of Oxford draws a logarithmic scale on a single rule. With a pair of dividers it can multiply and divide.</p></li>
+        <li><span class="yr">c. 1622</span><p>William Oughtred of Cambridge slides two of Gunter’s scales against each other and makes the first slide rule.</p></li>
+        <li><span class="yr">1859</span><p>Amédée Mannheim, a French artillery lieutenant, makes the C scale match D and does most of the work on them. Most later rules follow his layout.</p></li>
+        <li><span class="yr">1969</span><p>Aluminium Pickett slide rules fly on the Apollo missions. Buzz Aldrin’s N600-ES went to the Moon with him on Apollo 11.</p></li>
+        <li><span class="yr">1972</span><p>The HP-35, the first handheld scientific calculator, goes on sale for $395. By 1976 the TI-30 costs under $25, and slide rules disappear from desks within a few years.</p></li>
+        <li><span class="yr">1980</span><p>Texas schools hold their last slide rule contest in the University Interscholastic League.</p></li>
+      </ol>
+    </div>
+    <p class="sources">Sources: <a href="https://en.wikipedia.org/wiki/Slide_rule" target="_blank" rel="noopener">Slide rule</a> on Wikipedia (Gunter, Oughtred, Mannheim, the Apollo Pickett, the HP-35 and TI-30, and the Texas contest); <a href="https://www.gutenberg.org/ebooks/42216" target="_blank" rel="noopener">Florian Cajori, On the History of Gunter’s Scale and the Slide Rule During the Seventeenth Century</a>; the <a href="https://www.oughtred.org/" target="_blank" rel="noopener">Oughtred Society</a>. The rule drawn here has the A, B, CI, C, D and L scales of a student Mannheim rule, with the π mark on C and D.</p>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const lg = Math.log10;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ================================================================
+     The scales
+     ================================================================ */
+  const X0 = 100, LEN = 900;
+  const L1 = 15, L2 = 10, L3 = 7, L4 = 4.5;
+  function cdTicks() {
+    const out = [];
+    for (let n = 100; n <= 1000;) {
+      let len, label = null, small = false;
+      if (n % 100 === 0) { len = L1; label = n === 1000 ? '1' : String(n / 100); }
+      else if (n < 200) {
+        if (n % 10 === 0) { len = L2; label = String((n % 100) / 10); small = true; } else if (n % 5 === 0) len = L3; else len = L4;
+      } else if (n % 50 === 0) len = L2;
+      else if (n % 10 === 0) len = L3;
+      else len = L4;
+      out.push({ v: n / 100, len, label, small });
+      n += n < 200 ? 1 : n < 400 ? 2 : 5;
+    }
+    return out;
+  }
+  function abTicks() {
+    const out = [];
+    for (const dec of [1, 10]) {
+      for (let n = dec === 1 ? 100 : 105; n <= 1000;) {
+        let len, label = null;
+        if (n % 100 === 0) { len = L1; label = String((n / 100) * dec); }
+        else if (n < 200) len = n % 50 === 0 ? L2 : n % 10 === 0 ? L3 : L4;
+        else if (n < 500) len = n % 50 === 0 ? L2 : L3;
+        else len = L4;
+        out.push({ v: (n / 100) * dec, len, label, small: false });
+        n += n < 200 ? 5 : n < 500 ? 10 : 20;
+      }
+    }
+    return out;
+  }
+  function lTicks() {
+    const out = [];
+    for (let n = 0; n <= 1000; n += 5) {
+      const len = n % 100 === 0 ? L1 : n % 50 === 0 ? L2 : n % 10 === 0 ? L3 : L4;
+      const label = n % 100 === 0 ? (n === 0 ? '0' : n === 1000 ? '1' : `.${n / 100}`) : null;
+      out.push({ v: n / 1000, len, label, small: false });
+    }
+    return out;
+  }
+  const POS = {
+    D: (v) => X0 + LEN * lg(v),
+    A: (v) => X0 + (LEN * lg(v)) / 2,
+    CI: (v) => X0 + LEN * (1 - lg(v)),
+    L: (v) => X0 + LEN * v,
+  };
+  // Ticks hang from a baseline: dir +1 points down, -1 points up.
+  function drawScale(ticks, pos, base, dir, red) {
+    let d = '', t = '';
+    for (const k of ticks) {
+      const x = pos(k.v);
+      d += `M${x.toFixed(2)} ${base}v${dir * k.len}`;
+      if (k.label) {
+        const y = dir > 0 ? base + k.len + (k.small ? 8 : 11) : base - k.len - (k.small ? 2 : 3);
+        t += `<text class="num${k.small ? ' s' : ''}${red ? ' red' : ''}" x="${x.toFixed(2)}" y="${y}">${k.label}</text>`;
+      }
+    }
+    return `<path class="tk${red ? ' red' : ''}" d="${d}"/>${t}`;
+  }
+  function piMark(base, dir) {
+    const x = POS.D(Math.PI);
+    const y = dir > 0 ? base + L1 + 11 : base - L1 - 3;
+    return `<path class="tk" d="M${x.toFixed(2)} ${base}v${dir * L1}"/><text class="num pi" x="${x.toFixed(2)}" y="${y}">π</text>`;
+  }
+  const CD = cdTicks(), AB = abTicks(), LT = lTicks();
+  const name = (letter, y, form, red) => `<text class="sname${red ? ' red' : ''}" x="46" y="${y}">${letter}</text><text class="sform" x="1062" y="${y}">${form}</text>`;
+
+  $('rule').innerHTML = `
+    <defs>
+      <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9aa1a7"/><stop offset="0.5" stop-color="#d7dbde"/><stop offset="1" stop-color="#8d949a"/></linearGradient>
+    </defs>
+    <g id="slide">
+      <rect x="0" y="62" width="1100" height="108" fill="#f1ede0"/>
+      <line x1="0" x2="1100" y1="62.5" y2="62.5" stroke="#8a8578"/>
+      <line x1="0" x2="1100" y1="169.5" y2="169.5" stroke="#8a8578"/>
+      ${drawScale(AB, POS.A, 62, 1)}
+      ${drawScale(CD, POS.CI, 132, -1, true)}
+      ${drawScale(CD, POS.D, 170, -1)}
+      ${piMark(170, -1)}
+      ${name('B', 92, 'x²')}${name('CI', 116, '1/x', true)}${name('C', 154, 'x')}
+    </g>
+    <rect x="0" y="0" width="1100" height="61" fill="#f6f3e9"/>
+    <rect x="0" y="171" width="1100" height="99" fill="#f6f3e9"/>
+    <line x1="0" x2="1100" y1="61" y2="61" stroke="#6b675d" stroke-width="1.5"/>
+    <line x1="0" x2="1100" y1="171" y2="171" stroke="#6b675d" stroke-width="1.5"/>
+    ${drawScale(AB, POS.A, 61, -1)}
+    ${drawScale(CD, POS.D, 171, 1)}
+    ${piMark(171, 1)}
+    ${drawScale(LT, POS.L, 268, -1)}
+    ${name('A', 40, 'x²')}${name('D', 200, 'x')}${name('L', 250, 'lg x')}
+    <rect x="0" y="-10" width="16" height="290" rx="3" fill="url(#metal)"/>
+    <rect x="1084" y="-10" width="16" height="290" rx="3" fill="url(#metal)"/>
+    <g id="cursor">
+      <rect x="-30" y="-8" width="60" height="286" rx="5" fill="rgba(210, 228, 236, 0.28)" stroke="rgba(70, 82, 92, 0.55)"/>
+      <rect x="-33" y="-10" width="66" height="9" rx="3" fill="url(#metal)"/>
+      <rect x="-33" y="271" width="66" height="9" rx="3" fill="url(#metal)"/>
+      <line x1="0" x2="0" y1="-1" y2="271" stroke="#c0261c" stroke-width="1.3"/>
+    </g>`;
+
+  /* ================================================================
+     Slide and cursor positions, as fractions of the scale length
+     ================================================================ */
+  let s = 0, c = 0.5;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const near = (a, b) => Math.abs(a - b) < 0.0045;
+  const fmt = (v) => (v >= 100 ? v.toFixed(0) : v.toPrecision(3));
+  function readings() {
+    const u = c - s;
+    const onD = c >= -0.0005 && c <= 1.0005, onC = u >= -0.0005 && u <= 1.0005;
+    return [
+      ['A', onD ? fmt(10 ** (2 * c)) : null],
+      ['B', onC ? fmt(10 ** (2 * u)) : null],
+      ['CI', onC ? fmt(10 ** (1 - u)) : null, true],
+      ['C', onC ? fmt(10 ** u) : null],
+      ['D', onD ? fmt(10 ** c) : null],
+      ['L', onD ? c.toFixed(3) : null],
+    ];
+  }
+  function draw() {
+    $('slide').setAttribute('transform', `translate(${(s * LEN).toFixed(2)} 0)`);
+    $('cursor').setAttribute('transform', `translate(${(X0 + c * LEN).toFixed(2)} 0)`);
+    const r = readings();
+    const show = $('show').checked;
+    $('readings').innerHTML = r.map(([n, v, red]) => `<div class="rd"><span class="${red ? 'red' : ''}">${n}</span>${!show ? '<b class="off">hidden</b>' : v == null ? '<b class="off">off the scale</b>' : `<b>${v}</b>`}</div>`).join('');
+    $('rule').setAttribute('aria-valuetext', r.filter(([, v]) => v != null).map(([n, v]) => `${n} ${v}`).join(', '));
+    evaluate();
+  }
+  function set(ns, nc) {
+    s = clamp(ns, -1.05, 1.05);
+    c = clamp(nc, -0.06, 1.06);
+    draw();
+  }
+
+  // Dragging: the glass moves the cursor, the middle strip moves the slide, the body moves the cursor to where you press.
+  const svg = $('rule');
+  let drag = null;
+  function toSvg(e) {
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    return pt.matrixTransform(svg.getScreenCTM().inverse());
+  }
+  svg.addEventListener('pointerdown', (e) => {
+    const p = toSvg(e);
+    const cx = X0 + c * LEN;
+    stopAnim();
+    if (Math.abs(p.x - cx) < 30) drag = { mode: 'c', grab: p.x - cx };
+    else if (p.y > 62 && p.y < 170) drag = { mode: 's', grab: p.x - s * LEN };
+    else { drag = { mode: 'c', grab: 0 }; set(s, (p.x - X0) / LEN); }
+    svg.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+  svg.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const p = toSvg(e);
+    if (drag.mode === 'c') set(s, (p.x - drag.grab - X0) / LEN);
+    else set((p.x - drag.grab) / LEN, c);
+  });
+  const end = () => { drag = null; };
+  svg.addEventListener('pointerup', end);
+  svg.addEventListener('pointercancel', end);
+  svg.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault();
+    stopAnim();
+    const d = (e.key === 'ArrowLeft' ? -1 : 1) * (e.altKey ? 0.0005 : 0.002);
+    if (e.shiftKey) set(s + d, c); else set(s, c + d);
+  });
+  document.querySelector('.nudges').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-n]');
+    if (!b) return;
+    stopAnim();
+    const d = Number(b.dataset.d);
+    if (b.dataset.n === 's') set(s + d, c); else set(s, c + d);
+  });
+  $('show').addEventListener('change', draw);
+
+  // Gliding to a target for "Show me"
+  let anim = 0;
+  function stopAnim() { cancelAnimationFrame(anim); anim = 0; }
+  function glide(ts, tc) {
+    stopAnim();
+    if (reduceMotion) { set(ts, tc); return; }
+    const s0 = s, c0 = c, t0 = performance.now(), dur = 700;
+    const stepf = (t) => {
+      const k = Math.min(1, (t - t0) / dur);
+      const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+      set(s0 + (ts - s0) * e, c0 + (tc - c0) * e);
+      anim = k < 1 ? requestAnimationFrame(stepf) : 0;
+    };
+    anim = requestAnimationFrame(stepf);
+  }
+
+  /* ================================================================
+     Lessons
+     ================================================================ */
+  const D = (v) => lg(v);
+  const LESSONS = [
+    {
+      title: 'Multiply 2 × 3',
+      intro: 'Every multiplication is two moves. Put the 1 of C over the first number on D, then put the hairline over the second number on C.',
+      steps: [
+        { text: 'Slide C so its left 1 sits over 2 on D.', target: () => [D(2), c], done: () => near(s, D(2)) },
+        { text: 'Move the hairline to 3 on C.', target: () => [D(2), D(2) + D(3)], done: () => near(s, D(2)) && near(c - s, D(3)) },
+        { text: 'Read D under the hairline.', read: () => 'D says 6.00. So 2 × 3 = 6.' },
+      ],
+    },
+    {
+      title: 'Off the end: 3.5 × 4',
+      intro: 'Sometimes the second number runs off the end of the rule. Then you use the 1 at the other end of C.',
+      steps: [
+        { text: 'Slide C so its left 1 sits over 3.5 on D.', target: () => [D(3.5), c], done: () => near(s, D(3.5)) },
+        { text: 'Look for 4 on C. It hangs past the end of D, with nothing under it. So slide C the other way, until its right 1 sits over 3.5 on D.', target: () => [D(3.5) - 1, c], done: () => near(s, D(3.5) - 1) },
+        { text: 'Move the hairline to 4 on C.', target: () => [D(3.5) - 1, D(3.5) - 1 + D(4)], done: () => near(s, D(3.5) - 1) && near(c - s, D(4)) },
+        { text: 'Read D under the hairline.', read: () => 'D says 1.40. 3.5 × 4 is a bit more than 3 × 4 = 12, so the answer is 14.0.' },
+      ],
+    },
+    {
+      title: 'Divide 8.4 ÷ 2.4',
+      intro: 'Division runs multiplication backwards: line up the two numbers, then read at the 1 of C.',
+      steps: [
+        { text: 'Move the hairline to 8.4 on D.', target: () => [s, D(8.4)], done: () => near(c, D(8.4)) },
+        { text: 'Slide C until 2.4 sits under the hairline.', target: () => [D(8.4) - D(2.4), D(8.4)], done: () => near(c, D(8.4)) && near(c - s, D(2.4)) },
+        { text: 'Move the hairline to the left 1 of C.', target: () => [D(8.4) - D(2.4), D(8.4) - D(2.4)], done: () => near(s, D(8.4) - D(2.4)) && near(c, s) },
+        { text: 'Read D under the hairline.', read: () => 'D says 3.50. So 8.4 ÷ 2.4 = 3.5.' },
+      ],
+    },
+    {
+      title: 'Squares and roots',
+      intro: 'The A scale is two D scales squeezed into the same length, so anything on A is the square of what sits under it on D.',
+      steps: [
+        { text: 'Move the hairline to 3 on D.', target: () => [s, D(3)], done: () => near(c, D(3)) },
+        { text: 'Read A under the hairline.', read: () => 'A says 9.00. 3 squared is 9.' },
+        { text: 'Now the other way. Move the hairline to 50 on A, in its right half.', target: () => [s, D(50) / 2], done: () => near(c, D(50) / 2) },
+        { text: 'Read D under the hairline.', read: () => 'D says 7.07, the square root of 50.' },
+      ],
+    },
+    {
+      title: 'Where’s the decimal point?',
+      intro: '23.5 × 0.042. The rule only knows the digits. You supply the decimal point by making a rough guess first.',
+      steps: [
+        { text: 'Slide C so its left 1 sits over 2.35 on D.', target: () => [D(2.35), c], done: () => near(s, D(2.35)) },
+        { text: 'Move the hairline to 4.2 on C.', target: () => [D(2.35), D(2.35) + D(4.2)], done: () => near(s, D(2.35)) && near(c - s, D(4.2)) },
+        { text: 'D says 9.87. 23.5 × 0.042 is roughly 20 × 0.05. Which is the answer?', choose: { options: ['98.7', '9.87', '0.987', '0.0987'], answer: '0.987', why: 'Right. 20 × 0.05 = 1, so the answer is close to 1: 0.987.' } },
+      ],
+    },
+    {
+      title: 'Using the π mark',
+      intro: 'Circles come up constantly in engineering, so C and D have a mark at π. How far does a wheel 2.5 feet across roll in one turn?',
+      steps: [
+        { text: 'Slide C so its left 1 sits over the π mark on D.', target: () => [D(Math.PI), c], done: () => near(s, D(Math.PI)) },
+        { text: 'Move the hairline to 2.5 on C.', target: () => [D(Math.PI), D(Math.PI) + D(2.5)], done: () => near(s, D(Math.PI)) && near(c - s, D(2.5)) },
+        { text: 'Read D under the hairline.', read: () => 'D says 7.85. The wheel rolls about 7.85 feet in one turn.' },
+      ],
+    },
+    { title: 'Try your own', quiz: true, intro: 'Work it on the rule, then type what you read with the decimal point in place. A good slide rule answer is within about 1%.' },
+  ];
+  let li = 0, done = [], chosen = null;
+  const finished = new Set();
+
+  function openLesson(i) {
+    li = i;
+    const L = LESSONS[i];
+    done = (L.steps || []).map(() => false);
+    chosen = null;
+    $('lesson-h').textContent = L.title;
+    $('intro').textContent = L.intro;
+    $('quiz').hidden = !L.quiz;
+    $('steps').hidden = !!L.quiz;
+    $('showme').hidden = !!L.quiz;
+    $('again').hidden = !!L.quiz;
+    $('qres').textContent = '';
+    if (L.quiz && !quiz.a) newProblem();
+    drawSteps.sig = '';
+    drawTabs();
+    evaluate();
+  }
+  function drawTabs() {
+    $('tabs').innerHTML = LESSONS.map((L, i) => `<button type="button" class="tab${finished.has(i) ? ' done' : ''}" data-l="${i}" aria-pressed="${i === li}">${L.title}</button>`).join('');
+  }
+  $('tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-l]'); if (b) openLesson(Number(b.dataset.l)); });
+
+  function evaluate() {
+    const L = LESSONS[li];
+    if (!L || !L.steps) return;
+    for (let i = 0; i < L.steps.length; i++) {
+      if (done[i]) continue;
+      const st = L.steps[i];
+      if (st.read) { done[i] = st.read(); continue; }
+      if (st.choose) break;
+      if (st.done()) { done[i] = true; continue; }
+      break;
+    }
+    if (done.every(Boolean) && !finished.has(li)) { finished.add(li); drawTabs(); }
+    drawSteps();
+  }
+  function drawSteps() {
+    const L = LESSONS[li];
+    const now = done.indexOf(false);
+    const sig = `${li}|${done.map((d) => (typeof d === 'string' ? d : d ? 1 : 0)).join('|')}|${chosen}`;
+    if (sig === drawSteps.sig) return;
+    drawSteps.sig = sig;
+    $('steps').innerHTML = L.steps.map((st, i) => {
+      const cls = done[i] ? 'done' : i === now ? 'now' : '';
+      let extra = '';
+      if (typeof done[i] === 'string') extra = `<span class="ans">${done[i]}</span>`;
+      if (st.choose && done.slice(0, i).every(Boolean)) {
+        extra = `<span class="choices">${st.choose.options.map((o) => `<button type="button" data-pick="${o}" class="${chosen === o ? (o === st.choose.answer ? 'right' : 'wrong') : ''}">${o}</button>`).join('')}</span>`;
+        if (chosen === st.choose.answer) extra += `<span class="ans">${st.choose.why}</span>`;
+        else if (chosen) extra += '<span class="ans" style="color:var(--accent)">Not quite. Compare it with your rough guess.</span>';
+      }
+      return `<li class="${cls}">${st.text}${extra}</li>`;
+    }).join('');
+    $('showme').disabled = now < 0 || !L.steps[now] || !L.steps[now].target;
+  }
+  $('steps').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-pick]');
+    if (!b) return;
+    const L = LESSONS[li];
+    const i = L.steps.findIndex((st) => st.choose);
+    if (done.slice(0, i).some((d) => !d)) return;
+    chosen = b.dataset.pick;
+    if (chosen === L.steps[i].choose.answer) done[i] = true;
+    evaluate();
+  });
+  $('showme').addEventListener('click', () => {
+    const L = LESSONS[li];
+    const st = L.steps && L.steps[done.indexOf(false)];
+    if (st && st.target) { const [ts, tc] = st.target(); glide(ts, tc); }
+  });
+  $('again').addEventListener('click', () => { glide(0, 0.5); openLesson(li); });
+
+  // Your own problems
+  const quiz = { a: 0, b: 0 };
+  function newProblem() {
+    const r = () => Math.round((1.1 + Math.random() * 8.8) * 10) / 10;
+    const scale = [1, 10, 0.1][Math.floor(Math.random() * 3)];
+    quiz.a = Math.round(r() * scale * 100) / 100;
+    quiz.b = r();
+    $('qtext').textContent = `${quiz.a} × ${quiz.b} =`;
+    $('qans').value = '';
+    $('qres').textContent = '';
+  }
+  function checkProblem() {
+    const g = parseFloat($('qans').value.replace(',', '.'));
+    const exact = quiz.a * quiz.b;
+    if (!Number.isFinite(g)) { $('qres').textContent = 'Type a number first.'; return; }
+    const off = Math.abs(g - exact) / exact;
+    const q = $('qres');
+    q.classList.toggle('miss', off > 0.01);
+    q.innerHTML = off <= 0.01
+      ? `<b>Good reading.</b> The exact answer is ${+exact.toPrecision(6)}; you were within ${(off * 100).toFixed(1)}%.`
+      : off > 5 ? `<b>Check the decimal point.</b> The exact answer is ${+exact.toPrecision(6)}. Estimate the size first.` : `<b>Not quite.</b> The exact answer is ${+exact.toPrecision(6)}, ${(off * 100).toFixed(0)}% from yours.`;
+  }
+  $('qcheck').addEventListener('click', checkProblem);
+  $('qans').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); checkProblem(); } });
+  $('qnew').addEventListener('click', newProblem);
+
+  openLesson(0);
+  set(0, 0.5);
+})();
+</script>
+</body>
+</html>
