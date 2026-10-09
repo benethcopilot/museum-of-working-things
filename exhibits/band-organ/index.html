@@ -191,6 +191,20 @@ h1 {
 .legend { margin: 0; font-size: 0.86rem; color: var(--muted); }
 
 /* ---------- About ---------- */
+.punch { display: flex; flex-direction: column; gap: 12px; padding-top: 22px; border-top: 3px double var(--line-strong); }
+.punch h2 { margin: 0; font-family: var(--f-display); font-weight: 400; font-size: 1.6rem; }
+.punch .intro { margin: 0; max-width: 70ch; color: var(--muted); }
+.punch-bar { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.punch-bar label { display: flex; align-items: center; gap: 6px; }
+.punch-bar input[type="range"] { width: 130px; accent-color: var(--accent); }
+.seg { display: inline-flex; border: 1.5px solid var(--line-strong); border-radius: 4px; overflow: hidden; }
+.seg button { padding: 5px 12px; border: 0; background: none; font: inherit; color: inherit; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.sheet { overflow-x: auto; padding: 10px; border-radius: 6px; background: #f3ead2; border: 1px solid var(--line); }
+.chords { display: grid; gap: 2px; margin-bottom: 6px; }
+.chords select { width: 100%; padding: 2px; border: 1px solid rgba(23, 32, 52, 0.3); border-radius: 3px; background: #fbf5e3; color: #172034; font: inherit; font-size: 0.85rem; }
+#grid { display: block; touch-action: none; cursor: pointer; }
+.punch .note { margin: 0; font-size: 0.92rem; color: var(--muted); }
 .about { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 48px; padding-top: 22px; border-top: 3px double var(--line-strong); }
 .about h2 { margin: 0 0 6px; font-family: var(--f-display); font-weight: 400; font-size: 1.25rem; }
 .about p { margin: 0 0 10px; max-width: 64ch; }
@@ -254,6 +268,19 @@ h1 {
       <canvas id="roll" role="img" aria-label="The paper roll passing over the tracker bar"></canvas>
       <p class="legend">Holes across the roll, left to right, in the order of a Wurlitzer 150 roll: stops, snare drum, trombones, basses, accompaniment, melody, trumpets, bass drum and cymbal, rewind.</p>
     </div>
+  </section>
+
+  <section class="punch" aria-labelledby="punch-h">
+    <h2 id="punch-h">Punch your own roll</h2>
+    <p class="intro">Write a tune of eight bars on the sheet: one row for each note of the scale of G, one column for each beat. Choose a chord for each bar. The organ’s arranger, the same one that set every tune above, adds the basses, the accompaniment, the trumpets and the drums.</p>
+    <div class="punch-bar">
+      <span class="seg" role="group" aria-label="Dance"><button type="button" data-style="waltz" aria-pressed="true">Waltz</button><button type="button" data-style="march" aria-pressed="false">March</button><button type="button" data-style="polka" aria-pressed="false">Polka</button></span>
+      <label for="ptempo">Tempo <input type="range" id="ptempo" min="80" max="220" value="168"><output id="ptempo-o" for="ptempo">168</output></label>
+      <button type="button" class="btn primary" id="pplay">Play my roll</button>
+      <button type="button" class="btn" id="pclear">Blank sheet</button>
+    </div>
+    <div class="sheet"><div class="chords" id="pchords"></div><svg id="grid" role="img" aria-label="The melody sheet. Click a square to punch a note on that beat."></svg></div>
+    <p class="note">A note keeps sounding until the next one, as the organ’s pipes would. The tune plays once through, then the organ carries on with Roll 1.</p>
   </section>
 
   <section class="about">
@@ -1295,6 +1322,150 @@ K:G
     });
     els.program.append(box);
   }
+
+  /* ================================================================
+     Punch your own roll: the sheet becomes ABC, and the arranger does the rest
+     ================================================================ */
+  const ROWS = ['g', 'f', 'e', 'd', 'c', 'B', 'A', 'G', 'F', 'E', 'D'];   // top to bottom, in G major (F means F sharp)
+  const ROWNAME = { g: 'G', f: 'F♯', e: 'E', d: 'D', c: 'C', B: 'B', A: 'A', G: 'G', F: 'F♯', E: 'E', D: 'D' };
+  const PCHORDS = ['G', 'C', 'D', 'D7', 'Em', 'Am'];
+  const STYLES = {
+    waltz: { slots: 3, M: '3/4', L: '1/4', barBeats: 3, bpm: 168, kind: 'waltz' },
+    march: { slots: 4, M: '4/4', L: '1/4', barBeats: 4, bpm: 132, kind: 'two-step' },
+    polka: { slots: 4, M: '2/4', L: '1/8', barBeats: 2, bpm: 112, kind: 'polka' },
+  };
+  const BARS_N = 8;
+  let pstyle = 'waltz';
+  let pchords = ['G', 'G', 'C', 'G', 'D7', 'G', 'D7', 'G'];
+  let pnotes = [];       // one entry per slot: a row letter, or null
+  function defaultTune() {
+    // An original little waltz, so the sheet opens with something to hear
+    const w = ['d', null, 'B', 'G', null, 'B', 'c', null, 'e', 'd', null, null, 'c', null, 'A', 'B', null, 'G', 'A', 'B', 'c', 'G', null, null];
+    return w;
+  }
+  pnotes = defaultTune();
+  function resizeNotes() {
+    const n = BARS_N * STYLES[pstyle].slots;
+    if (pnotes.length !== n) pnotes = Array.from({ length: n }, (_, i) => pnotes[i] ?? null);
+  }
+  const CW = 26, RH = 20, LW = 34;
+  function drawSheet() {
+    resizeNotes();
+    const S = STYLES[pstyle], n = BARS_N * S.slots;
+    const W = LW + n * CW + 4, H = ROWS.length * RH + 4;
+    const grid = $id('grid');
+    grid.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    grid.setAttribute('width', W);
+    grid.setAttribute('height', H);
+    let s = `<rect width="${W}" height="${H}" fill="#f3ead2"/>`;
+    ROWS.forEach((r, i) => {
+      const y = 2 + i * RH;
+      s += `<rect x="${LW}" y="${y}" width="${n * CW}" height="${RH}" fill="${i % 2 ? '#efe3c4' : '#f6eed8'}"/>`;
+      s += `<text x="${LW - 6}" y="${y + 14}" text-anchor="end" font-size="11" fill="#4d4636" font-family="Old Standard TT, Georgia, serif">${ROWNAME[r]}</text>`;
+    });
+    for (let c = 0; c <= n; c++) {
+      const x = LW + c * CW;
+      const bar = c % S.slots === 0;
+      s += `<line x1="${x}" x2="${x}" y1="2" y2="${H - 2}" stroke="${bar ? '#6d5a35' : 'rgba(109,90,53,0.25)'}" stroke-width="${bar ? 1.6 : 1}"/>`;
+    }
+    // punched holes, with a faint line showing how long each note holds
+    let last = null;
+    for (let c = 0; c < n; c++) {
+      const r = pnotes[c];
+      if (r) {
+        const y = 2 + ROWS.indexOf(r) * RH + RH / 2;
+        let len = 1;
+        while (c + len < n && !pnotes[c + len]) len++;
+        s += `<rect x="${LW + c * CW + 4}" y="${y - 3}" width="${len * CW - 8}" height="6" rx="3" fill="rgba(163,34,43,0.25)"/>`;
+        s += `<rect x="${LW + c * CW + 5}" y="${y - 7}" width="${CW - 10}" height="14" rx="4" fill="#2a1d14"/>`;
+        last = r;
+      }
+    }
+    void last;
+    grid.innerHTML = s;
+    const box = $id('pchords');
+    box.style.gridTemplateColumns = `${LW - 2}px repeat(${BARS_N}, ${S.slots * CW - 2}px)`;
+    box.innerHTML = '<span></span>' + pchords.map((ch, b) => `<select data-bar="${b}" aria-label="Chord for bar ${b + 1}">${PCHORDS.map((o) => `<option${o === ch ? ' selected' : ''}>${o}</option>`).join('')}</select>`).join('');
+  }
+  function $id(id) { return document.getElementById(id); }
+  $id('grid').addEventListener('click', (e) => {
+    const S = STYLES[pstyle];
+    const pt = $id('grid').createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    const p = pt.matrixTransform($id('grid').getScreenCTM().inverse());
+    const c = Math.floor((p.x - LW) / CW), r = Math.floor((p.y - 2) / RH);
+    if (c < 0 || c >= BARS_N * S.slots || r < 0 || r >= ROWS.length) return;
+    pnotes[c] = pnotes[c] === ROWS[r] ? null : ROWS[r];
+    drawSheet();
+  });
+  $id('pchords').addEventListener('change', (e) => {
+    const b = e.target.dataset.bar;
+    if (b !== undefined) pchords[Number(b)] = e.target.value;
+  });
+  document.querySelectorAll('[data-style]').forEach((btn) => btn.addEventListener('click', () => {
+    const old = STYLES[pstyle].slots;
+    pstyle = btn.dataset.style;
+    const S = STYLES[pstyle];
+    if (S.slots !== old) {
+      // keep the notes that fall on the same beat positions
+      const next = Array(BARS_N * S.slots).fill(null);
+      for (let b = 0; b < BARS_N; b++) for (let k = 0; k < Math.min(old, S.slots); k++) next[b * S.slots + k] = pnotes[b * old + k] ?? null;
+      pnotes = next;
+    }
+    $id('ptempo').value = S.bpm;
+    $id('ptempo-o').textContent = S.bpm;
+    document.querySelectorAll('[data-style]').forEach((x) => x.setAttribute('aria-pressed', String(x === btn)));
+    drawSheet();
+  }));
+  $id('ptempo').addEventListener('input', (e) => { $id('ptempo-o').textContent = e.target.value; });
+  $id('pclear').addEventListener('click', () => { pnotes = Array(BARS_N * STYLES[pstyle].slots).fill(null); drawSheet(); });
+
+  function toABC() {
+    const S = STYLES[pstyle];
+    let abc = `M:${S.M}\nL:${S.L}\nK:G\n|`;
+    let held = null;      // the note still sounding from the bar before
+    for (let b = 0; b < BARS_N; b++) {
+      let bar = `"${pchords[b]}"`;
+      let k = 0;
+      while (k < S.slots) {
+        const c = b * S.slots + k;
+        let pitch = pnotes[c];
+        let tie = false;
+        if (!pitch && k === 0 && held) { pitch = held; tie = true; }
+        if (!pitch) {
+          let len = 1;
+          while (k + len < S.slots && !pnotes[c + len]) len++;
+          bar += `z${len > 1 ? len : ''} `;
+          k += len;
+          continue;
+        }
+        let len = 1;
+        while (k + len < S.slots && !pnotes[c + len]) len++;
+        const crosses = k + len === S.slots && b < BARS_N - 1 && !pnotes[(b + 1) * S.slots];
+        bar += `${pitch}${len > 1 ? len : ''}${crosses ? '-' : ''} `;
+        held = crosses ? pitch : null;
+        void tie;
+        k += len;
+      }
+      abc += ` ${bar}|`;
+    }
+    return abc + ']';
+  }
+  $id('pplay').addEventListener('click', () => {
+    if (!pnotes.some(Boolean)) { els.label.textContent = 'The sheet is blank. Punch some notes first.'; return; }
+    const S = STYLES[pstyle];
+    const spec = { roll: 1, title: 'Your roll', by: 'Punched by you', kind: S.kind, style: pstyle, bpm: Number($id('ptempo').value), barBeats: S.barBeats, abc: toABC() };
+    let song;
+    try { song = arrange(spec); } catch (err) { els.label.textContent = 'The organ couldn’t read that roll. Try changing a note.'; return; }
+    const at = TUNES.findIndex((t) => t.title === 'Your roll');
+    const i = at >= 0 ? at : TUNES.length;
+    TUNES[i] = spec;
+    SONGS[i] = song;
+    start(i);
+    document.querySelector('.console').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+  });
+  drawSheet();
 
   buildFacade();
   showTune(0);
