@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Jacquard Loom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..800;1,6..96,400&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  /* Layout: the weaver's bench in three parts left to right: the design on point paper, the chain of punched cards it becomes, and the loom with the cloth growing under it; the history of cards that led to computers follows. */
+  --ground: #e9e6e8;
+  --ground-2: #dcd7da;
+  --paper: #fbfaf6;
+  --rule: rgba(176, 52, 64, 0.22);
+  --rule-strong: rgba(176, 52, 64, 0.55);
+  --ink: #2a1d22;
+  --text: #22181c;
+  --muted: #5e5258;
+  --line: rgba(34, 24, 28, 0.14);
+  --line-strong: rgba(34, 24, 28, 0.32);
+  --silk: #8e1b2c;
+  --gold: #b88a1d;
+  --card: #d9c49a;
+  --f-display: "Bodoni Moda", "Bodoni 72", "Didot", Georgia, serif;
+  --f-body: "Crimson Pro", "Iowan Old Style", Georgia, serif;
+  --f-data: "DM Mono", "Consolas", "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #141012;
+    --ground-2: #1f191c;
+    --paper: #1c1719;
+    --rule: rgba(255, 140, 150, 0.16);
+    --rule-strong: rgba(255, 140, 150, 0.45);
+    --ink: #f2e6ea;
+    --text: #efe6e9;
+    --muted: #b0a2a8;
+    --line: rgba(239, 230, 233, 0.12);
+    --line-strong: rgba(239, 230, 233, 0.3);
+    --silk: #e2707f;
+    --gold: #e6b84a;
+    --card: #6b5a3a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #141012;
+  --ground-2: #1f191c;
+  --paper: #1c1719;
+  --rule: rgba(255, 140, 150, 0.16);
+  --rule-strong: rgba(255, 140, 150, 0.45);
+  --ink: #f2e6ea;
+  --text: #efe6e9;
+  --muted: #b0a2a8;
+  --line: rgba(239, 230, 233, 0.12);
+  --line-strong: rgba(239, 230, 233, 0.3);
+  --silk: #e2707f;
+  --gold: #e6b84a;
+  --card: #6b5a3a;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--text); font-family: var(--f-body); font-size: 18px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 500; line-height: 1.05; margin: 0; text-wrap: balance; }
+
+.page { box-sizing: border-box; max-width: 1240px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 34px; }
+.masthead { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 40px; align-items: end; }
+.eyebrow { grid-column: 1 / -1; margin: 0; font-family: var(--f-data); font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--silk); }
+.masthead h1 { font-size: clamp(2.8rem, 7vw, 5.2rem); font-style: italic; font-weight: 400; }
+.lede { margin: 0; max-width: 60ch; color: var(--muted); }
+
+/* ---------- The bench ---------- */
+.bench { display: grid; grid-template-columns: minmax(0, 0.95fr) auto minmax(0, 1.2fr); gap: 22px; align-items: start; }
+.col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.col h2 { font-size: 1.45rem; }
+.col .sub { margin: 0; font-size: 0.95rem; color: var(--muted); }
+.paperbox { padding: 10px; background: var(--paper); border: 1px solid var(--line); }
+#paper { display: block; width: 100%; aspect-ratio: 1; touch-action: none; cursor: crosshair; }
+.chain { padding: 8px 10px; background: var(--ground-2); border-radius: 4px; }
+#cards { display: block; width: 124px; height: auto; }
+.loom { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--line); background: var(--paper); }
+#shed { display: block; width: 100%; height: auto; }
+#cloth { display: block; width: 100%; aspect-ratio: 1; image-rendering: auto; }
+.status { margin: 0; font-family: var(--f-data); font-size: 0.82rem; color: var(--muted); min-height: 2.6em; }
+.status b { color: var(--silk); font-weight: 500; }
+
+.controls { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 30px; align-items: start; }
+.grp { display: flex; flex-direction: column; gap: 8px; }
+.grp h3 { font-family: var(--f-data); font-size: 0.74rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.btn { padding: 6px 13px; border: 1.5px solid var(--line-strong); border-radius: 3px; background: none; font-size: 0.95rem; }
+.btn:hover { background: var(--ground-2); }
+.btn.primary { background: var(--silk); border-color: var(--silk); color: #fff8f6; }
+.btn.primary:hover { opacity: 0.9; background: var(--silk); }
+.btn[aria-pressed="true"] { border-color: var(--silk); color: var(--silk); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.row input[type="text"] { width: 6em; padding: 5px 8px; border: 1.5px solid var(--line-strong); border-radius: 3px; background: var(--paper); font-family: var(--f-data); text-transform: uppercase; letter-spacing: 0.1em; }
+.swatch { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border: 1.5px solid var(--line-strong); border-radius: 3px; background: none; font-size: 0.92rem; }
+.swatch i { display: inline-block; width: 26px; height: 14px; border-radius: 2px; }
+.swatch[aria-pressed="true"] { border-color: var(--text); box-shadow: inset 0 0 0 1px var(--text); }
+
+/* ---------- How it works and history ---------- */
+.how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 30px; }
+.how h3 { font-size: 1.4rem; margin-bottom: 6px; }
+.how p { margin: 0 0 8px; font-size: 1rem; }
+.how blockquote { margin: 0 0 8px; padding-left: 12px; border-left: 2px solid var(--gold); font-style: italic; }
+.history { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 20px 40px; padding-top: 24px; border-top: 1px solid var(--line-strong); }
+.history h2 { font-size: 2rem; margin-bottom: 12px; }
+.timeline { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.timeline li { display: grid; grid-template-columns: 4.6em minmax(0, 1fr); gap: 12px; }
+.timeline .yr { font-family: var(--f-data); font-size: 0.85rem; line-height: 2; color: var(--silk); }
+.timeline p { margin: 0; font-size: 1rem; }
+.aside p { margin: 0 0 10px; font-size: 1rem; }
+.sources { grid-column: 1 / -1; margin: 0; font-size: 0.88rem; color: var(--muted); }
+.sources a { color: inherit; text-underline-offset: 3px; }
+
+@media (max-width: 1000px) {
+  .bench { grid-template-columns: minmax(0, 1fr) auto; }
+  .bench .loomcol { grid-column: 1 / -1; }
+  .how, .history, .controls { grid-template-columns: minmax(0, 1fr); }
+  .masthead { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .bench { grid-template-columns: minmax(0, 1fr); }
+  .chain { overflow-x: auto; }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="jacquard" defer></script>
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Machines &amp; Messages · Lyon, 1804</p>
+    <h1>Jacquard Loom</h1>
+    <p class="lede">A silk weaver once needed a helper to pull the right threads for every row of a pattern. Joseph Marie Jacquard replaced the helper with a chain of punched cards. Draw a design, turn it into cards, and weave it.</p>
+  </header>
+
+  <section class="bench" aria-label="The weaver’s bench">
+    <div class="col">
+      <h2>The design</h2>
+      <p class="sub">Squared point paper, one square per thread crossing. Coloured squares show the warp on top.</p>
+      <div class="paperbox"><canvas id="paper" width="352" height="352" aria-label="Point paper design, 32 by 32 squares. Click or drag to colour squares."></canvas></div>
+    </div>
+    <div class="col">
+      <h2>Cards</h2>
+      <p class="sub" id="cardcount">32 cards</p>
+      <div class="chain"><svg id="cards" viewBox="0 0 124 392" role="img" aria-label="The chain of punched cards, one per row of the design"></svg></div>
+    </div>
+    <div class="col loomcol">
+      <h2>The loom</h2>
+      <p class="sub">Each card lifts the warp threads that line up with its holes. The shuttle carries the weft under them and over the rest.</p>
+      <div class="loom">
+        <svg id="shed" viewBox="0 0 512 96" aria-hidden="true"></svg>
+        <canvas id="cloth" width="512" height="512" aria-label="The woven cloth"></canvas>
+      </div>
+      <p class="status" id="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="controls" aria-label="Controls">
+    <div class="grp">
+      <h3>Weave</h3>
+      <div class="row">
+        <button type="button" class="btn primary" id="one">Throw the shuttle once</button>
+        <button type="button" class="btn" id="all">Weave the whole design</button>
+        <button type="button" class="btn" id="cut">Cut off the cloth</button>
+      </div>
+      <h3>Silk</h3>
+      <div class="row" id="silks"></div>
+    </div>
+    <div class="grp">
+      <h3>Designs to start from</h3>
+      <div class="row" id="designs"></div>
+      <div class="row"><label for="initials">Your initials</label><input type="text" id="initials" maxlength="4" value="JMJ" autocomplete="off"><button type="button" class="btn" id="weave-name">Put them on the paper</button></div>
+      <div class="row"><button type="button" class="btn" id="invert">Swap warp and weft</button><button type="button" class="btn" id="clear">Blank paper</button></div>
+    </div>
+  </section>
+
+  <section class="how">
+    <div>
+      <h3>Holes lift threads</h3>
+      <p>For each throw of the shuttle, the loom presses one card against a row of rods. Where there is a hole, a rod passes through and its hook stays in place, and a rising bar lifts that hook’s warp thread. Where there is no hole, the rod is pushed aside and its thread stays down.</p>
+    </div>
+    <div>
+      <h3>Weaving by numbers</h3>
+      <p>Every hole is a yes or a no. A pattern became a stack of decisions that a machine could follow without understanding it, and that anyone could swap for another stack. This 32 by 32 design needs 32 cards. Real Jacquard looms read hundreds of holes from every card.</p>
+    </div>
+    <div>
+      <h3>From silk to computers</h3>
+      <blockquote>“The Analytical Engine weaves algebraical patterns just as the Jacquard-loom weaves flowers and leaves.”</blockquote>
+      <p>Ada Lovelace, writing in 1843 about Charles Babbage’s design for a calculating engine that would read its instructions from punched cards.</p>
+    </div>
+  </section>
+
+  <section class="history">
+    <div>
+      <h2>A chain of cards to the computer</h2>
+      <ol class="timeline">
+        <li><span class="yr">1725</span><p>Basile Bouchon, a Lyon weaver’s son, controls a loom with a roll of punched paper. Jean-Baptiste Falcon soon replaces the roll with separate pasteboard cards.</p></li>
+        <li><span class="yr">1804</span><p>Joseph Marie Jacquard builds a loom that reads a chain of cards automatically, one per throw of the shuttle, so a single weaver can make patterned silk.</p></li>
+        <li><span class="yr">1805</span><p>Napoleon and Josephine visit Lyon in April to see the new loom.</p></li>
+        <li><span class="yr">1839</span><p>A portrait of Jacquard is woven in silk on his loom. It takes 24,000 punched cards. Charles Babbage owns a copy.</p></li>
+        <li><span class="yr">1843</span><p>Ada Lovelace compares Babbage’s Analytical Engine, which would read instructions from punched cards, to the Jacquard loom.</p></li>
+        <li><span class="yr">1886</span><p>Lyon weavers produce the <i>Livre de Prières</i>, a prayer book woven entirely in silk, page by page, from punched cards.</p></li>
+        <li><span class="yr">1890</span><p>Herman Hollerith counts the United States census with punched cards and tabulating machines. Punched cards carry computer data until the 1980s.</p></li>
+      </ol>
+    </div>
+    <div class="aside">
+      <h2>Warp and weft</h2>
+      <p>The warp is the set of long threads stretched on the loom. The weft is the thread the shuttle carries across. Every square on the point paper is one place where they cross, and the only question for that square is which one lies on top.</p>
+      <p>Plain weave alternates every square. Twill steps each row over by one, which makes the diagonal lines you can see in denim.</p>
+    </div>
+    <p class="sources">Sources: <a href="https://en.wikipedia.org/wiki/Jacquard_machine" target="_blank" rel="noopener">Jacquard machine</a> and <a href="https://en.wikipedia.org/wiki/Joseph_Marie_Jacquard" target="_blank" rel="noopener">Joseph Marie Jacquard</a> on Wikipedia (Bouchon, Falcon, the card mechanism, the 1805 visit, the portrait, the woven prayer book and Hollerith); <a href="https://www.computerhistory.org/babbage/adalovelace/" target="_blank" rel="noopener">Computer History Museum on Ada Lovelace</a> and the <a href="https://www.cs.yale.edu/homes/tap/Files/ada-lovelace-notes.html" target="_blank" rel="noopener">Yale transcription of her 1843 notes</a>.</p>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const N = 32;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+  /* ================================================================
+     The design: true means the warp lies on top
+     ================================================================ */
+  let design = Array.from({ length: N }, () => Array(N).fill(false));
+  const DESIGNS = {
+    'Plain weave': (r, c) => (r + c) % 2 === 0,
+    Twill: (r, c) => (((c - r) % 4) + 4) % 4 < 2,
+    Diamonds: (r, c) => {
+      const a = Math.abs((c % 16) - 7.5) + Math.abs((r % 16) - 7.5);
+      return Math.floor(a) % 6 < 3;
+    },
+    Flower: (r, c) => {
+      const x = c - 15.5, y = r - 15.5;
+      const d = Math.hypot(x, y), t = Math.atan2(y, x);
+      if (d < 2.6) return false;
+      if (d < 8 + 4 * Math.cos(5 * t)) return true;
+      if (d > 13.2 && d < 14.8) return true;
+      return (r + c) % 2 === 0 && d > 14.8;
+    },
+  };
+  function fromRule(f) { design = Array.from({ length: N }, (_, r) => Array.from({ length: N }, (_, c) => f(r, c))); }
+  function initials(text) {
+    const t = (text || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4) || 'JMJ';
+    const cv = document.createElement('canvas');
+    cv.width = N;
+    cv.height = N;
+    const x = cv.getContext('2d', { willReadFrequently: true });
+    x.fillStyle = '#000';
+    x.fillRect(0, 0, N, N);
+    x.fillStyle = '#fff';
+    x.textAlign = 'center';
+    x.textBaseline = 'middle';
+    const size = t.length <= 2 ? 15 : t.length === 3 ? 12 : 9;
+    x.font = `700 ${size}px "DM Mono", monospace`;
+    x.fillText(t, N / 2, N / 2 + 1);
+    const px = x.getImageData(0, 0, N, N).data;
+    // letters in warp, with a dotted border above and below
+    design = Array.from({ length: N }, (_, r) => Array.from({ length: N }, (_, c) => px[(r * N + c) * 4] > 110));
+    for (const r of [3, 28]) for (let c = 2; c <= 29; c++) if (!design[r][c]) design[r][c] = c % 2 === 0;
+  }
+
+  /* ================================================================
+     Point paper
+     ================================================================ */
+  const paper = $('paper');
+  const pctx = paper.getContext('2d');
+  const PS = 352 / N;
+  function drawPaper() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    if (paper.width !== 352 * dpr) { paper.width = 352 * dpr; paper.height = 352 * dpr; }
+    pctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    pctx.clearRect(0, 0, 352, 352);
+    pctx.fillStyle = css('--paper');
+    pctx.fillRect(0, 0, 352, 352);
+    pctx.fillStyle = css('--ink');
+    for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (design[r][c]) pctx.fillRect(c * PS + 1, r * PS + 1, PS - 2, PS - 2);
+    for (let i = 0; i <= N; i++) {
+      pctx.strokeStyle = i % 8 === 0 ? css('--rule-strong') : css('--rule');
+      pctx.lineWidth = i % 8 === 0 ? 1.4 : 0.7;
+      pctx.beginPath(); pctx.moveTo(i * PS, 0); pctx.lineTo(i * PS, 352); pctx.stroke();
+      pctx.beginPath(); pctx.moveTo(0, i * PS); pctx.lineTo(352, i * PS); pctx.stroke();
+    }
+    // mark the row being read
+    if (cardIdx != null) {
+      const r = rowOfCard(cardIdx);
+      pctx.strokeStyle = css('--gold');
+      pctx.lineWidth = 2.5;
+      pctx.strokeRect(1, r * PS + 1, 350, PS - 2);
+    }
+  }
+  let painting = null;
+  function cellAt(e) {
+    const b = paper.getBoundingClientRect();
+    const c = Math.floor(((e.clientX - b.left) / b.width) * N), r = Math.floor(((e.clientY - b.top) / b.height) * N);
+    return r >= 0 && r < N && c >= 0 && c < N ? [r, c] : null;
+  }
+  paper.addEventListener('pointerdown', (e) => {
+    const rc = cellAt(e);
+    if (!rc) return;
+    painting = !design[rc[0]][rc[1]];
+    design[rc[0]][rc[1]] = painting;
+    paper.setPointerCapture(e.pointerId);
+    changed();
+  });
+  paper.addEventListener('pointermove', (e) => {
+    if (painting == null) return;
+    const rc = cellAt(e);
+    if (rc && design[rc[0]][rc[1]] !== painting) { design[rc[0]][rc[1]] = painting; changed(); }
+  });
+  const endPaint = () => { painting = null; };
+  paper.addEventListener('pointerup', endPaint);
+  paper.addEventListener('pointercancel', endPaint);
+
+  /* ================================================================
+     The chain of cards: the bottom row of the drawing is woven first
+     ================================================================ */
+  const rowOfCard = (k) => N - 1 - (k % N);
+  let cardIdx = 0;
+  function drawCards() {
+    let s = '';
+    const ch = 12.2;
+    for (let k = 0; k < N; k++) {
+      const r = rowOfCard(k);
+      const y = 4 + k * ch;
+      const now = k === cardIdx % N;
+      s += `<rect x="2" y="${y}" width="120" height="${ch - 2.4}" rx="1.5" style="fill:var(--card);${now ? 'stroke:var(--silk);stroke-width:2' : ''}"/>`;
+      let holes = '';
+      for (let c = 0; c < N; c++) if (design[r][c]) holes += `M${(7 + c * 3.5).toFixed(1)} ${(y + (ch - 2.4) / 2).toFixed(1)}m-1.2 0a1.2 1.2 0 1 0 2.4 0a1.2 1.2 0 1 0 -2.4 0`;
+      s += `<path d="${holes}" style="fill:var(--ground)"/>`;
+    }
+    s += `<path d="M2 ${4 + N * ch + 2}h120" style="stroke:var(--line-strong)"/>`;
+    $('cards').innerHTML = s;
+  }
+
+  /* ================================================================
+     The loom and the cloth
+     ================================================================ */
+  const SILKS = [
+    { name: 'Gold on crimson', warp: '#d9ad3c', weft: '#7d1426' },
+    { name: 'Ivory on black', warp: '#f1ead8', weft: '#1e1b1c' },
+    { name: 'White on indigo', warp: '#eef0f3', weft: '#22346e' },
+    { name: 'Rose on green', warp: '#e7a3ad', weft: '#234a38' },
+  ];
+  let silk = 0;
+  const W = 64, CS = 8;            // the cloth is two repeats wide; 64 picks show at once
+  let woven = [];                  // rows of the design, oldest first
+  const cloth = $('cloth');
+  const cctx = cloth.getContext('2d');
+  let tiles = null;
+  function makeTiles() {
+    const shade = (hex, f) => {
+      const n = parseInt(hex.slice(1), 16);
+      const ch = (v) => Math.max(0, Math.min(255, Math.round(v * f)));
+      return `rgb(${ch((n >> 16) & 255)},${ch((n >> 8) & 255)},${ch(n & 255)})`;
+    };
+    const tile = (color, vertical) => {
+      const t = document.createElement('canvas');
+      t.width = CS * 2;
+      t.height = CS * 2;
+      const x = t.getContext('2d');
+      x.scale(2, 2);
+      x.fillStyle = shade(color, 0.55);
+      x.fillRect(0, 0, CS, CS);
+      const g = vertical ? x.createLinearGradient(0, 0, CS, 0) : x.createLinearGradient(0, 0, 0, CS);
+      g.addColorStop(0, shade(color, 0.7));
+      g.addColorStop(0.45, shade(color, 1.18));
+      g.addColorStop(1, shade(color, 0.7));
+      x.fillStyle = g;
+      if (vertical) x.fillRect(0.8, 0, CS - 1.6, CS); else x.fillRect(0, 0.8, CS, CS - 1.6);
+      return t;
+    };
+    const s = SILKS[silk];
+    tiles = { up: tile(s.warp, true), down: tile(s.weft, false) };
+  }
+  function drawCloth() {
+    cctx.fillStyle = css('--ground-2');
+    cctx.fillRect(0, 0, 512, 512);
+    const show = woven.slice(-W);
+    // the newest pick lies at the top, next to the reed
+    show.forEach((r, i) => {
+      const y = (show.length - 1 - i) * CS;
+      for (let c = 0; c < W; c++) cctx.drawImage(design[r][c % N] ? tiles.up : tiles.down, c * CS, y, CS, CS);
+    });
+    if (!show.length) {
+      cctx.fillStyle = css('--muted');
+      cctx.font = '16px "Crimson Pro", Georgia, serif';
+      cctx.textAlign = 'center';
+      cctx.fillText('No cloth yet. Throw the shuttle.', 256, 256);
+    }
+  }
+  function drawShed(lifted, shuttleX) {
+    const s = SILKS[silk];
+    let low = '', high = '';
+    for (let c = 0; c < W; c++) {
+      const x = c * CS + CS / 2;
+      const up = lifted && design[lifted.r][c % N];
+      const line = `<path d="M${x} 0V${up ? 40 : 58}L${x} 96" style="stroke:${s.warp};stroke-width:3;opacity:${up ? 1 : 0.55}"/>`;
+      if (up) high += line; else low += line;
+    }
+    const sh = shuttleX == null ? '' : `<g transform="translate(${shuttleX} 50)"><path d="M-512 0H0" style="stroke:${s.weft};stroke-width:3"/><path d="M0 -6H34L44 0L34 6H0Z" style="fill:#6b4a2a;stroke:#3a2716"/></g>`;
+    $('shed').innerHTML = `<rect width="512" height="96" style="fill:var(--paper)"/><rect y="0" width="512" height="6" style="fill:#6b4a2a"/>${low}${sh}${high}<rect y="90" width="512" height="6" style="fill:#3a2716"/>`;
+  }
+
+  let busy = false, stopAll = false;
+  function pick(fast) {
+    return new Promise((resolve) => {
+      const r = rowOfCard(cardIdx);
+      const holes = design[r].filter(Boolean).length;
+      $('status').innerHTML = `Card <b>${(cardIdx % N) + 1}</b> of ${N}, drawing row ${r + 1}: <b>${holes}</b> hole${holes === 1 ? '' : 's'}, so ${holes} of every ${N} warp threads lift.`;
+      drawPaper();
+      drawCards();
+      const dur = reduceMotion ? 0 : fast ? 90 : 520;
+      const t0 = performance.now();
+      const step = (t) => {
+        const k = dur ? Math.min(1, (t - t0) / dur) : 1;
+        drawShed({ r }, -50 + k * 610);
+        if (k < 1) { requestAnimationFrame(step); return; }
+        woven.push(r);
+        if (woven.length > 400) woven = woven.slice(-W);
+        cardIdx++;
+        drawCloth();
+        drawShed(null, null);
+        resolve();
+      };
+      requestAnimationFrame(step);
+    });
+  }
+  async function weaveOne() {
+    if (busy) return;
+    busy = true;
+    await pick(false);
+    busy = false;
+    drawCards();
+    drawPaper();
+  }
+  async function weaveAll() {
+    if (busy) { stopAll = true; return; }
+    busy = true;
+    stopAll = false;
+    $('all').textContent = 'Stop';
+    for (let i = 0; i < N && !stopAll; i++) await pick(true);
+    busy = false;
+    $('all').textContent = 'Weave the whole design';
+    $('status').innerHTML += stopAll ? '' : ' <b>Done.</b> The chain loops round, so the next throw starts the pattern again.';
+    drawCards();
+    drawPaper();
+  }
+  $('one').addEventListener('click', weaveOne);
+  $('all').addEventListener('click', weaveAll);
+  $('cut').addEventListener('click', () => { if (busy) return; woven = []; cardIdx = 0; drawCloth(); drawCards(); drawPaper(); $('status').textContent = 'The cloth is cut off the loom. The first card is ready.'; });
+
+  /* ================================================================
+     Controls
+     ================================================================ */
+  function changed() {
+    const holes = design.flat().filter(Boolean).length;
+    $('cardcount').textContent = `${N} cards, ${holes} holes`;
+    drawPaper();
+    drawCards();
+  }
+  $('designs').innerHTML = Object.keys(DESIGNS).map((n) => `<button type="button" class="btn" data-design="${n}">${n}</button>`).join('');
+  $('designs').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-design]');
+    if (!b || busy) return;
+    fromRule(DESIGNS[b.dataset.design]);
+    changed();
+  });
+  $('weave-name').addEventListener('click', () => { if (busy) return; initials($('initials').value); changed(); });
+  $('invert').addEventListener('click', () => { if (busy) return; design = design.map((row) => row.map((v) => !v)); changed(); });
+  $('clear').addEventListener('click', () => { if (busy) return; design = Array.from({ length: N }, () => Array(N).fill(false)); changed(); });
+  $('silks').innerHTML = SILKS.map((s, i) => `<button type="button" class="swatch" data-silk="${i}" aria-pressed="${i === silk}"><i style="background:linear-gradient(90deg, ${s.warp} 50%, ${s.weft} 50%)"></i>${s.name}</button>`).join('');
+  $('silks').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-silk]');
+    if (!b) return;
+    silk = Number(b.dataset.silk);
+    document.querySelectorAll('[data-silk]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    makeTiles();
+    drawCloth();
+    drawShed(null, null);
+  });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { drawPaper(); drawCloth(); });
+
+  // Open with the flower drawn and part of it already woven.
+  fromRule(DESIGNS.Flower);
+  makeTiles();
+  for (let i = 0; i < 20; i++) { woven.push(rowOfCard(cardIdx)); cardIdx++; }
+  changed();
+  drawCloth();
+  drawShed(null, null);
+  $('status').innerHTML = `Twenty cards woven. Card <b>21</b> is next. Throw the shuttle, or change the design and keep weaving.`;
+  document.fonts && document.fonts.ready.then(() => { drawPaper(); });
+})();
+</script>
+</body>
+</html>

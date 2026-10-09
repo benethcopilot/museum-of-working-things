@@ -87,6 +87,11 @@
       "slug": "telegraph", "hall": "machines", "title": "Telegraph Office", "ages": "8 and up",
       "blurb": "Tap Morse on a brass key and sounder, price a telegram by the word, and send the Wright brothers’ 1903 telegram down the line.",
       "try": "Send SOS with the space bar"
+    },
+    {
+      "slug": "jacquard", "hall": "machines", "title": "Jacquard Loom", "ages": "7 and up",
+      "blurb": "Draw a pattern on point paper, punch it into a chain of cards and weave it in silk on the 1804 loom that led to computer punched cards.",
+      "try": "Weave your initials"
     }
   ]
 }
