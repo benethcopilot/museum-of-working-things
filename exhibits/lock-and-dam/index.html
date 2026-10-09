@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Lock and Dam No. 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@700;800&family=Overpass:ital,wght@0,400;0,600;0,700;1,400&family=Overpass+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  /* Layout: the lock cut lengthwise fills the top like an engineering sheet; the lockmaster's console sits under it beside the log; how it works, the history and the site plan follow. */
+  --ground: #e2e6e4;
+  --ground-2: #d3d9d6;
+  --paper: #f1f3f1;
+  --text: #1b2326;
+  --muted: #536067;
+  --line: rgba(27, 35, 38, 0.14);
+  --line-strong: rgba(27, 35, 38, 0.32);
+  --accent: #1d6a5b;
+  --warn: #9a5b00;
+  /* The console and the drawing are physical objects: they keep their colors in both themes. */
+  --steel: #283033;
+  --steel-2: #343d41;
+  --steel-3: #445056;
+  --steel-ink: #e9e7df;
+  --steel-muted: #a6b0b2;
+  --safety: #f2b705;
+  --lamp-red: #e5483b;
+  --lamp-green: #45cf76;
+  --f-display: "Big Shoulders Stencil Display", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --f-body: "Overpass", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "Overpass Mono", "Consolas", "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #101415;
+    --ground-2: #192123;
+    --paper: #161d1f;
+    --text: #e3e8e6;
+    --muted: #9aa7aa;
+    --line: rgba(227, 232, 230, 0.12);
+    --line-strong: rgba(227, 232, 230, 0.3);
+    --accent: #6cc8b1;
+    --warn: #f2b705;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #101415;
+  --ground-2: #192123;
+  --paper: #161d1f;
+  --text: #e3e8e6;
+  --muted: #9aa7aa;
+  --line: rgba(227, 232, 230, 0.12);
+  --line-strong: rgba(227, 232, 230, 0.3);
+  --accent: #6cc8b1;
+  --warn: #f2b705;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--text); font-family: var(--f-body); font-size: 16.5px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--safety); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 800; line-height: 1; margin: 0; letter-spacing: 0.01em; text-wrap: balance; }
+
+.page { box-sizing: border-box; max-width: 1240px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 30px; }
+.masthead { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 40px; align-items: end; }
+.eyebrow { grid-column: 1 / -1; margin: 0; font-family: var(--f-mono); font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+.masthead h1 { font-size: clamp(3rem, 8vw, 5.6rem); text-transform: uppercase; }
+.lede { margin: 0; max-width: 60ch; color: var(--muted); }
+
+/* ---------- The drawing ---------- */
+.sheet { border: 1.5px solid var(--line-strong); border-radius: 4px; background: #eef2ef; overflow: hidden; }
+.sheet svg { display: block; width: 100%; height: auto; }
+.sheet-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; padding: 6px 12px; border-top: 1.5px solid #9aa39f; background: #e4e9e6; color: #2a3438; font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.water { fill: #587767; fill-opacity: 0.86; }
+.surf { stroke: #a8c6b7; stroke-width: 2; }
+.gate { fill: #48525a; stroke: #2b3236; stroke-width: 1; }
+.ghost { fill: none; stroke: #48525a; stroke-width: 1.2; stroke-dasharray: 4 3; }
+.void { fill: #3b5449; stroke: #233029; stroke-width: 1.2; stroke-dasharray: 6 3; }
+.valve { fill: #f2b705; stroke: #3d3000; stroke-width: 1; }
+.flow { fill: none; stroke: #d6efe4; stroke-width: 3; stroke-dasharray: 6 9; stroke-linecap: round; opacity: 0; }
+.flow.on { opacity: 0.95; animation: run 0.5s linear infinite; }
+@keyframes run { to { stroke-dashoffset: -15; } }
+.lbl { font-family: var(--f-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.06em; fill: #22303a; }
+.lbl.light { fill: #e6f0eb; }
+.paint { font-family: var(--f-display); font-weight: 800; font-size: 11px; fill: #6e675a; }
+.dim { stroke: #22303a; stroke-width: 1; fill: none; }
+.lamp { stroke: #1d2326; stroke-width: 1.5; }
+
+/* ---------- Console and log ---------- */
+.desk { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr); gap: 20px; align-items: start; }
+.console { padding: 16px; border-radius: 10px; background: linear-gradient(var(--steel-2), var(--steel)); color: var(--steel-ink); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 14px 26px -16px rgba(0, 0, 0, 0.6); display: flex; flex-direction: column; gap: 14px; }
+.console h2 { font-size: 1.3rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--safety); }
+.controls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.ctl { padding: 10px; border-radius: 8px; background: rgba(0, 0, 0, 0.22); border: 1px solid rgba(255, 255, 255, 0.07); display: flex; flex-direction: column; gap: 8px; }
+.ctl h3 { font-family: var(--f-mono); font-size: 0.74rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--steel-muted); line-height: 1.3; }
+.state { display: flex; align-items: center; gap: 8px; font-family: var(--f-mono); font-size: 0.86rem; }
+.dot { width: 12px; height: 12px; border-radius: 50%; background: var(--lamp-red); box-shadow: 0 0 8px rgba(229, 72, 59, 0.6); flex: none; }
+.dot.open { background: var(--lamp-green); box-shadow: 0 0 8px rgba(69, 207, 118, 0.6); }
+.dot.moving { background: var(--safety); box-shadow: 0 0 8px rgba(242, 183, 5, 0.6); }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.key { padding: 7px 4px 6px; border-radius: 6px; border: 1px solid #12171a; background: linear-gradient(#58646a, #3f4a4f); color: var(--steel-ink); font-family: var(--f-mono); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; box-shadow: 0 3px 0 #12171a; }
+.key:active { transform: translateY(2px); box-shadow: 0 1px 0 #12171a; }
+.key[aria-pressed="true"] { background: linear-gradient(#2b3337, #222a2d); color: var(--safety); box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5); transform: translateY(2px); }
+.bigrow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.big { padding: 11px 18px 10px; border-radius: 8px; border: 1px solid #3d3000; background: var(--safety); color: #1d1600; font-weight: 700; font-size: 1rem; box-shadow: 0 3px 0 #7a5c00; }
+.big:active { transform: translateY(2px); box-shadow: 0 1px 0 #7a5c00; }
+.big:disabled { opacity: 0.45; cursor: default; transform: none; }
+.bigrow p { margin: 0; font-size: 0.9rem; color: var(--steel-muted); flex: 1 1 200px; }
+.gauges { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.gauge { padding: 8px 10px; border-radius: 6px; background: #161c1e; border: 1px solid rgba(255, 255, 255, 0.06); }
+.gauge span { display: block; font-family: var(--f-mono); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--steel-muted); }
+.gauge b { display: block; font-family: var(--f-mono); font-weight: 600; font-size: 1.25rem; color: #9ff0c0; font-variant-numeric: tabular-nums; }
+.gauge b.hot { color: var(--safety); }
+.gauge small { font-size: 0.7rem; color: var(--steel-muted); }
+
+.log { padding: 18px 18px 16px; border-radius: 10px; background: var(--paper); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
+.log h2 { font-size: 1.5rem; text-transform: uppercase; }
+.log .trip { margin: 0; font-size: 0.95rem; color: var(--muted); }
+.steps { margin: 0; padding-left: 1.6em; display: flex; flex-direction: column; gap: 4px; font-size: 0.95rem; }
+.steps li { padding: 3px 6px; border-radius: 5px; }
+.steps li.done { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line-strong); }
+.steps li.now { background: var(--ground-2); font-weight: 600; }
+.msg { margin: 0; padding: 10px 12px; border-radius: 6px; border-left: 4px solid var(--accent); background: var(--ground-2); font-size: 0.95rem; min-height: 3.2em; }
+.msg.warn { border-left-color: var(--warn); }
+.log .foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; font-family: var(--f-mono); font-size: 0.8rem; color: var(--muted); }
+.ghost-btn { padding: 6px 12px; border-radius: 6px; border: 1.5px solid var(--line-strong); background: none; font-size: 0.85rem; }
+.ghost-btn:hover { background: var(--ground-2); }
+
+/* ---------- How it works ---------- */
+.how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 30px; }
+.how h2 { font-size: 1.7rem; text-transform: uppercase; margin-bottom: 8px; }
+.how p { margin: 0 0 8px; font-size: 0.97rem; }
+.how svg { display: block; width: 100%; max-width: 300px; height: auto; margin: 6px 0 10px; }
+.how .d-water { fill: #587767; fill-opacity: 0.35; }
+.how .d-wall { fill: var(--ground-2); stroke: var(--line-strong); }
+.how .d-gate { stroke: var(--text); stroke-width: 5; stroke-linecap: round; }
+.how .d-arrow { stroke: var(--accent); stroke-width: 2; fill: none; }
+.how .d-head { fill: var(--accent); }
+.how .d-text { font-family: var(--f-mono); font-size: 10px; fill: var(--muted); }
+
+/* ---------- History ---------- */
+.history { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 20px 40px; padding-top: 24px; border-top: 1px solid var(--line-strong); }
+.history h2 { font-size: 2rem; text-transform: uppercase; margin-bottom: 12px; }
+.timeline { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.timeline li { display: grid; grid-template-columns: 4.2em minmax(0, 1fr); gap: 12px; }
+.timeline .yr { font-family: var(--f-display); font-weight: 800; font-size: 1.5rem; line-height: 1.1; color: var(--accent); }
+.timeline p { margin: 0; font-size: 0.97rem; }
+.plan svg { display: block; width: 100%; max-width: 380px; height: auto; }
+.plan .p-land { fill: var(--ground-2); }
+.plan .p-river { fill: #587767; fill-opacity: 0.45; }
+.plan .p-struct { fill: var(--text); }
+.plan .p-line { stroke: var(--text); stroke-width: 3; }
+.plan .p-text { font-family: var(--f-mono); font-size: 11px; fill: var(--text); }
+.plan .p-small { font-family: var(--f-mono); font-size: 10px; fill: var(--muted); }
+.plan figcaption { font-size: 0.9rem; color: var(--muted); margin-top: 6px; }
+.plan figure { margin: 0; }
+.facts { margin: 14px 0 0; padding: 0; list-style: none; font-size: 0.95rem; display: flex; flex-direction: column; gap: 4px; }
+.facts b { font-family: var(--f-mono); font-weight: 600; }
+.sources { grid-column: 1 / -1; margin: 0; font-size: 0.85rem; color: var(--muted); }
+.sources a { color: inherit; text-underline-offset: 3px; }
+
+@media (max-width: 980px) {
+  .desk, .history { grid-template-columns: minmax(0, 1fr); }
+  .how { grid-template-columns: minmax(0, 1fr); }
+  .masthead { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gauges { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flow.on { animation: none; stroke-dasharray: none; opacity: 0.6; }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="lock-and-dam" defer></script>
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Machines &amp; Messages · Mississippi River mile 847.9</p>
+    <h1>Lock and Dam No. 1</h1>
+    <p class="lede">Between Minneapolis and St. Paul the Mississippi drops 35.9 feet at the Ford Dam. Boats climb that step in a concrete box with gates at each end. You run the lock. There are no pumps here, only valves, gates and gravity.</p>
+  </header>
+
+  <section aria-label="The lock, cut lengthwise">
+    <div class="sheet">
+      <svg id="scene" viewBox="0 0 1000 392" role="img" aria-label="Lock and Dam No. 1 cut lengthwise: the river above on the left, the lock chamber in the middle, the river below on the right, and the culvert that carries water under the chamber."></svg>
+      <div class="sheet-foot"><span>Section along the lock · river flows left to right</span><span>Heights drawn 4 × true scale</span></div>
+    </div>
+  </section>
+
+  <section class="desk">
+    <div class="console" aria-label="Lockmaster’s console">
+      <h2>Lockmaster’s console</h2>
+      <div class="controls">
+        <div class="ctl" data-part="gateU">
+          <h3>Upper gates</h3>
+          <div class="state"><span class="dot" id="dot-gateU"></span><span id="st-gateU">Closed</span></div>
+          <div class="pair">
+            <button type="button" class="key" data-do="gateU" data-v="1" aria-label="Open the upper gates">Open</button>
+            <button type="button" class="key" data-do="gateU" data-v="0" aria-label="Close the upper gates">Close</button>
+          </div>
+        </div>
+        <div class="ctl" data-part="valveF">
+          <h3>Filling valve</h3>
+          <div class="state"><span class="dot" id="dot-valveF"></span><span id="st-valveF">Closed</span></div>
+          <div class="pair">
+            <button type="button" class="key" data-do="valveF" data-v="1" aria-label="Open the filling valve">Open</button>
+            <button type="button" class="key" data-do="valveF" data-v="0" aria-label="Close the filling valve">Close</button>
+          </div>
+        </div>
+        <div class="ctl" data-part="valveE">
+          <h3>Emptying valve</h3>
+          <div class="state"><span class="dot" id="dot-valveE"></span><span id="st-valveE">Closed</span></div>
+          <div class="pair">
+            <button type="button" class="key" data-do="valveE" data-v="1" aria-label="Open the emptying valve">Open</button>
+            <button type="button" class="key" data-do="valveE" data-v="0" aria-label="Close the emptying valve">Close</button>
+          </div>
+        </div>
+        <div class="ctl" data-part="gateL">
+          <h3>Lower gates</h3>
+          <div class="state"><span class="dot" id="dot-gateL"></span><span id="st-gateL">Closed</span></div>
+          <div class="pair">
+            <button type="button" class="key" data-do="gateL" data-v="1" aria-label="Open the lower gates">Open</button>
+            <button type="button" class="key" data-do="gateL" data-v="0" aria-label="Close the lower gates">Close</button>
+          </div>
+        </div>
+      </div>
+      <div class="bigrow">
+        <button type="button" class="big" id="wave">Wave the towboat in</button>
+        <p>Turns the signal light green so the pilot moves the boat.</p>
+      </div>
+      <div class="gauges">
+        <div class="gauge"><span>River above</span><b id="g-up">35.9 ft</b></div>
+        <div class="gauge"><span>Chamber</span><b id="g-ch">35.9 ft</b></div>
+        <div class="gauge"><span>River below</span><b>0.0 ft</b></div>
+        <div class="gauge"><span>Push on upper gates</span><b id="g-pu">none</b></div>
+        <div class="gauge"><span>Push on lower gates</span><b id="g-pl">1,126 tons</b></div>
+        <div class="gauge"><span>Sent downstream</span><b id="g-sent">0.0</b><small>million gallons</small></div>
+      </div>
+    </div>
+
+    <div class="log">
+      <h2>Lock log</h2>
+      <p class="trip" id="trip"></p>
+      <ol class="steps" id="steps"></ol>
+      <p class="msg" id="msg" aria-live="polite"></p>
+      <div class="foot"><span id="count">Boats locked through: 0</span><button type="button" class="ghost-btn" id="restart">Start over</button></div>
+    </div>
+  </section>
+
+  <section class="how">
+    <div>
+      <h2>Gravity does the lifting</h2>
+      <p>Opening the filling valve lets the river above run down through a tunnel called a culvert and up through ports in the chamber floor. The water stops rising when it matches the river above, because water finds its own level.</p>
+      <p>To lower a boat, the emptying valve lets the chamber drain to the river below. A full chamber holds about 6 million gallons above the river below. That much water would run the dam’s four turbines for about two minutes.</p>
+    </div>
+    <div>
+      <h2>Why the gates point upstream</h2>
+      <svg viewBox="0 0 300 130" aria-label="Seen from above, the two leaves of a miter gate meet in a V pointing upstream, and the water pushes them together.">
+        <rect class="d-water" x="0" y="20" width="300" height="90"/>
+        <rect class="d-wall" x="0" y="4" width="300" height="16"/>
+        <rect class="d-wall" x="0" y="110" width="300" height="16"/>
+        <line class="d-gate" x1="170" y1="22" x2="138" y2="65"/>
+        <line class="d-gate" x1="170" y1="108" x2="138" y2="65"/>
+        <path class="d-arrow" d="M40 45 H110 M40 65 H118 M40 85 H110"/>
+        <path class="d-head" d="M110 41 l8 4 l-8 4 Z M118 61 l8 4 l-8 4 Z M110 81 l8 4 l-8 4 Z"/>
+        <text class="d-text" x="8" y="100">HIGH WATER</text>
+        <text class="d-text" x="210" y="100">LOW WATER</text>
+        <text class="d-text" x="200" y="68">flow →</text>
+      </svg>
+      <p>Seen from above, each pair of gates meets in a shallow V that points upstream. The higher water pushes the two leaves against each other, so the harder the river pushes, the tighter they seal. Miter gates are credited to Leonardo da Vinci in the late 1400s.</p>
+    </div>
+    <div>
+      <h2>Why you must level first</h2>
+      <p>Water pushes harder the deeper it is. With the full lift on one side, the push on a pair of these 56-foot gates is at least 1,100 tons. No gate machinery can swing that, and the lock’s controls won’t try.</p>
+      <p>The lower gates are the tall ones. They hold back the whole lift plus the water below it. The upper gates only reach down to the upper sill, a concrete step at the head of the chamber that you can see when the chamber is empty.</p>
+    </div>
+  </section>
+
+  <section class="history">
+    <div>
+      <h2>A dam built twice as high</h2>
+      <ol class="timeline">
+        <li><span class="yr">1907</span><p>The first lock and dam finished on the Mississippi opens near Meeker Island, upstream of today’s Lock 1. On May 19 the <i>Itura</i> is the first boat through. It was then called Lock and Dam No. 2.</p></li>
+        <li><span class="yr">1910</span><p>Congress changes the plan. Instead of two low dams, Lock and Dam No. 1 will be a high dam that can make water power, and the lock is raised to a lift of 35.9 feet. Its pool will drown the Meeker Island dam.</p></li>
+        <li><span class="yr">1912</span><p>Engineers cut five feet off the top of the Meeker Island dam so boats can pass over it. Part of its old lock wall still stands in the river.</p></li>
+        <li><span class="yr">1917</span><p>On July 3 the lock opens with the lighthouse tender <i>Dandelion</i> carrying dignitaries from both cities. Its upper gates are the old lower gates from Meeker Island, floated downstream and reused.</p></li>
+        <li><span class="yr">1924</span><p>Henry Ford finishes a powerhouse on the east end of the dam to run his new Twin Cities car assembly plant on the bluff above. People start calling it the Ford Dam.</p></li>
+        <li><span class="yr">1932</span><p>After part of the lock failed in 1929 and stopped river traffic, a second chamber is finished beside the first. Lock 1 is still the only twin lock in the Corps of Engineers’ St. Paul District.</p></li>
+        <li><span class="yr">1983</span><p>A five-year rebuilding ends, and computer controls replace much of the old manual and hydraulic machinery.</p></li>
+        <li><span class="yr">2015</span><p>The Upper St. Anthony Falls lock in Minneapolis closes for good to slow invasive carp moving up the river. Lock 1 still opens each season for barges and pleasure boats.</p></li>
+      </ol>
+    </div>
+    <div class="plan">
+      <figure>
+        <svg viewBox="0 0 380 300" aria-label="Site plan: the river runs south. The twin locks are on the west bank, the dam crosses the river, and the powerhouse is on the east bank. The Ford Parkway Bridge crosses just upstream.">
+          <rect class="p-land" x="0" y="0" width="380" height="300"/>
+          <path class="p-river" d="M140 0 C150 70 130 120 140 170 C150 220 135 260 145 300 L245 300 C235 260 250 220 240 170 C230 120 250 70 240 0 Z"/>
+          <line class="p-line" x1="110" y1="60" x2="270" y2="60"/>
+          <text class="p-small" x="10" y="56">Ford Parkway Bridge</text>
+          <line class="p-line" x1="162" y1="150" x2="230" y2="150"/>
+          <rect class="p-struct" x="134" y="128" width="11" height="52"/>
+          <rect class="p-struct" x="148" y="128" width="11" height="52"/>
+          <rect class="p-struct" x="226" y="140" width="24" height="22"/>
+          <text class="p-text" x="20" y="148">Twin locks</text>
+          <text class="p-text" x="256" y="148">Powerhouse</text>
+          <text class="p-text" x="168" y="142">Dam</text>
+          <text class="p-small" x="10" y="250">Minneapolis</text>
+          <text class="p-small" x="10" y="263">(west bank)</text>
+          <text class="p-small" x="290" y="250">St. Paul</text>
+          <text class="p-small" x="290" y="263">(east bank)</text>
+          <text class="p-small" x="160" y="230">flow ↓</text>
+          <text class="p-small" x="10" y="20">N ↑</text>
+        </svg>
+        <figcaption>The site from above, not to scale. The Minnesota River joins a little farther south.</figcaption>
+      </figure>
+      <ul class="facts">
+        <li><b>56 × 400 ft</b> each chamber</li>
+        <li><b>35.9 ft</b> lift, second highest on the Mississippi until 1963</li>
+        <li><b>574 ft</b> concrete dam, the only Ambursen-type dam on the river</li>
+      </ul>
+    </div>
+    <p class="sources">Sources: <a href="https://tile.loc.gov/storage-services/master/pnp/habshaer/mn/mn0300/mn0384/data/mn0384data.pdf" target="_blank" rel="noopener">Historic American Engineering Record MN-62, Lock and Dam No. 1</a> (John O. Anfinson, 1993); <a href="https://en.wikipedia.org/wiki/Lock_and_Dam_No._1" target="_blank" rel="noopener">Lock and Dam No. 1</a> and <a href="https://en.wikipedia.org/wiki/Lock_(water_navigation)" target="_blank" rel="noopener">Lock (water navigation)</a> on Wikipedia; <a href="https://www.nps.gov/miss/planyourvisit/lockdam1.htm" target="_blank" rel="noopener">National Park Service, Mississippi National River and Recreation Area</a>; <a href="https://www.npr.org/2015/06/22/414897901/after-waterway-closure-minneapolis-sees-an-end-to-river-shipping" target="_blank" rel="noopener">NPR on the 2015 lock closure</a>. The towboat and its trips are made up for the exhibit; the push on the gates and the water per lockage are worked out from the lock’s size.</p>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+
+  /* ================================================================
+     The lock, in feet. Levels are measured up from the river below.
+     ================================================================ */
+  const U = 35.9;                 // the river above: the lift
+  const FLOOR = -14;              // chamber floor
+  const SILL = U - 14;            // top of the upper sill
+  const TOP = 40;                 // top of the lock walls
+  const VY = 4.4, Y0 = 290;       // drawing: 4.4 px per foot of height, the river below at y = 290
+  const yOf = (l) => Y0 - l * VY;
+  const XU = 290, XL = 736, GW = 6;
+  const BOAT = 291;               // towboat and barge, end to end, in px
+  const GAL_PER_FT = 56 * 400 * 7.48052;
+  const K = 0.66;                 // valve flow: sets how fast the chamber fills (time is sped up)
+  const TONS = (h) => Math.round((0.5 * 62.4 * h * h * 56) / 2000);
+  const POS = { up: { wait: 760, in: 360, out: -340 }, down: { wait: -20, in: 400, out: 1050 } };
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const toward = (v, t, d) => (v < t ? Math.min(t, v + d) : Math.max(t, v - d));
+  const fmt = (n) => n.toLocaleString('en-US');
+
+  /* ================================================================
+     The drawing
+     ================================================================ */
+  const yU = yOf(U), y0 = yOf(0), yF = yOf(FLOOR), yS = yOf(SILL), yT = yOf(TOP);
+  function gaugeMarks() {
+    let s = '';
+    for (let l = 0; l <= 35; l++) {
+      const y = yOf(l);
+      s += `<line x1="304" x2="${l % 5 ? 309 : 316}" y1="${y}" y2="${y}" stroke="#8a8272" stroke-width="1.2"/>`;
+      if (l % 5 === 0) s += `<text class="paint" x="319" y="${y + 4}">${l}</text>`;
+    }
+    for (let y = yT + 10; y < yF; y += 12) s += `<line x1="470" x2="482" y1="${y}" y2="${y}" stroke="#9b9384" stroke-width="2"/>`;
+    return s;
+  }
+  function boatSVG(loaded, dir) {
+    const top = loaded ? -17 : -48, bot = loaded ? 40 : 9;
+    const cargo = loaded
+      ? `<path d="M14 ${top} Q50 ${top - 30} 92 ${top - 8} Q140 ${top - 32} 200 ${top} Z" fill="#c8a46a"/>`
+      : `<rect x="12" y="${top - 6}" width="196" height="6" fill="#6a3225"/>`;
+    const art = `
+      <path d="M0 ${top} H214 V${bot} H22 Z" fill="#7b3b2c"/>
+      <rect x="4" y="${top}" width="210" height="4" fill="#5a2a20"/>
+      ${cargo}
+      <rect x="214" y="-34" width="4" height="26" fill="#22282c"/>
+      <path d="M216 -9 H284 Q293 -9 293 4 V30 H226 L216 20 Z" fill="#22282c"/>
+      <rect x="216" y="-9" width="77" height="3" fill="#b3392c"/>
+      <rect x="226" y="-42" width="58" height="33" fill="#efeee8"/>
+      <rect x="230" y="-34" width="50" height="5" fill="#2f4550" opacity="0.55"/>
+      <rect x="228" y="-46" width="54" height="4" fill="#b3392c"/>
+      <rect x="232" y="-72" width="48" height="26" fill="#efeee8"/>
+      <rect x="276" y="-90" width="5" height="18" fill="#22282c"/>
+      <rect x="238" y="-100" width="36" height="28" fill="#efeee8"/>
+      <rect x="240" y="-95" width="32" height="9" fill="#2f4550"/>
+      <rect x="236" y="-103" width="40" height="3" fill="#b3392c"/>`;
+    return dir === 'up' ? art : `<g transform="translate(${BOAT} 0) scale(-1 1)">${art}</g>`;
+  }
+  function voidPath() {
+    const pts = [[240, yS], [240, 372], [806, 372], [806, yF], [792, yF], [792, 358]];
+    for (const px of [620, 520, 420]) pts.push([px + 5, 358], [px + 5, yF], [px - 5, yF], [px - 5, 358]);
+    pts.push([254, 358], [254, yS]);
+    return 'M' + pts.map((p) => p.join(' ')).join(' L') + ' Z';
+  }
+  $('scene').innerHTML = `
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c3d8e2"/><stop offset="1" stop-color="#eef2ef"/></linearGradient>
+      <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="7" fill="#c8c2b5"/><line x1="0" y1="0" x2="0" y2="7" stroke="#9a9384" stroke-width="1.2"/></pattern>
+    </defs>
+    <rect width="1000" height="392" fill="url(#sky)"/>
+    <path d="M0 40 C50 36 110 46 160 52 C190 56 210 70 226 ${yU + 4} L0 ${yU + 4} Z" fill="#b8b09d"/>
+    <path d="M0 40 C50 36 110 46 160 52 C190 56 210 70 226 ${yU + 4}" fill="none" stroke="#968d78" stroke-width="5"/>
+    <path d="M1000 44 C950 42 900 50 860 58 C830 64 812 90 800 ${y0 + 4} L1000 ${y0 + 4} Z" fill="#b8b09d"/>
+    <path d="M1000 44 C950 42 900 50 860 58 C830 64 812 90 800 ${y0 + 4}" fill="none" stroke="#968d78" stroke-width="5"/>
+    <g fill="#6f8a5b"><circle cx="24" cy="34" r="12"/><circle cx="48" cy="30" r="14"/><circle cx="80" cy="36" r="11"/><circle cx="118" cy="40" r="13"/><circle cx="930" cy="38" r="13"/><circle cx="958" cy="34" r="12"/><circle cx="986" cy="38" r="11"/><circle cx="896" cy="44" r="12"/></g>
+    <rect x="200" y="${yT}" width="660" height="${yF - yT}" fill="#d6d1c6"/>
+    <rect x="200" y="${yT}" width="660" height="5" fill="#b9b2a4"/>
+    <line x1="470" x2="470" y1="${yT}" y2="${yF}" stroke="#9b9384" stroke-width="2"/>
+    <line x1="482" x2="482" y1="${yT}" y2="${yF}" stroke="#9b9384" stroke-width="2"/>
+    ${gaugeMarks()}
+    <g id="boat"></g>
+    <rect class="water" x="0" y="${yU}" width="${XU + GW}" height="${yS - yU}"/>
+    <rect class="water" id="wC" x="${XU + GW}" y="${yU}" width="${XL + GW - XU - GW}" height="${yF - yU}"/>
+    <rect class="water" x="${XL + GW}" y="${y0}" width="${1000 - XL - GW}" height="${yF - y0}"/>
+    <line class="surf" x1="0" x2="${XU + GW}" y1="${yU}" y2="${yU}"/>
+    <line class="surf" id="sC" x1="${XU + GW}" x2="${XL + GW}" y1="${yU}" y2="${yU}"/>
+    <line class="surf" x1="${XL + GW}" x2="1000" y1="${y0}" y2="${y0}"/>
+    <path d="M0 ${yS} H${XU + GW} V${yF} H1000 V392 H0 Z" fill="url(#hatch)"/>
+    <path class="void" d="${voidPath()}"/>
+    <path class="flow" id="flowF" d="M247 ${yS + 3} V365 H520"/>
+    <path class="flow" id="flowE" d="M520 365 H799 V${yF + 2}"/>
+    <rect class="valve" id="vF" x="327" y="358" width="7" height="14"/>
+    <rect class="valve" id="vE" x="697" y="358" width="7" height="14"/>
+    <rect class="gate" id="gU" x="${XU}" y="${yT}" width="${GW}" height="${yS - yT}"/>
+    <rect class="ghost" id="gUo" x="${XU}" y="${yT}" width="${GW}" height="${yS - yT}" opacity="0"/>
+    <rect class="gate" id="gL" x="${XL}" y="${yT}" width="${GW}" height="${yF - yT}"/>
+    <rect class="ghost" id="gLo" x="${XL}" y="${yT}" width="${GW}" height="${yF - yT}" opacity="0"/>
+    <g>
+      <line class="dim" x1="706" x2="726" y1="${y0}" y2="${y0}"/>
+      <line class="dim" x1="706" x2="726" y1="${yU}" y2="${yU}"/>
+      <line class="dim" x1="716" x2="716" y1="${yU + 6}" y2="${y0 - 6}"/>
+      <path d="M716 ${yU} l-4 8 h8 Z M716 ${y0} l-4 -8 h8 Z" fill="#22303a"/>
+      <text class="lbl" transform="translate(711 ${(yU + y0) / 2}) rotate(-90)" text-anchor="middle">LIFT 35.9 FT</text>
+    </g>
+    <rect x="276" y="${yT - 18}" width="3" height="18" fill="#3b4246"/>
+    <circle class="lamp" id="lampU" cx="277.5" cy="${yT - 22}" r="5"/>
+    <rect x="752" y="${yT - 18}" width="3" height="18" fill="#3b4246"/>
+    <circle class="lamp" id="lampL" cx="753.5" cy="${yT - 22}" r="5"/>
+    <text class="lbl" x="${XU + 3}" y="${yT - 34}" text-anchor="middle">UPPER GATES</text>
+    <text class="lbl" x="${XL + 3}" y="${yT - 34}" text-anchor="middle">LOWER GATES</text>
+    <text class="lbl light" x="12" y="${yS - 8}">RIVER ABOVE · POOL 1</text>
+    <text class="lbl light" x="990" y="${yF - 6}" text-anchor="end">RIVER BELOW · POOL 2</text>
+    <text class="lbl" x="330" y="386" text-anchor="middle">FILLING VALVE</text>
+    <text class="lbl" x="700" y="386" text-anchor="middle">EMPTYING VALVE</text>
+    <text class="lbl" x="520" y="386" text-anchor="middle">CULVERT (HIDDEN IN WALL)</text>`;
+
+  /* ================================================================
+     State
+     ================================================================ */
+  let C, gateU, gateL, valveF, valveE, boat, trip, done, sent, through, count, lastWarn, lastLevel;
+  const LIGHT = { red: '#e5483b', green: '#45cf76' };
+  let lights = { U: 'red', L: 'red' };
+
+  const STEPS = {
+    up: [
+      ['Empty the chamber down to the river below: open the emptying valve.', () => gateU.v === 0 && C < 0.05],
+      ['Open the lower gates.', () => gateL.v >= 1],
+      ['Wave the towboat into the lock.', () => boat.phase === 'in'],
+      ['Close the lower gates behind it.', () => gateL.v === 0 && boat.phase === 'in'],
+      ['Close the emptying valve and open the filling valve.', () => valveE.v === 0 && valveF.v > 0],
+      ['Wait while the chamber fills to the river above.', () => C > U - 0.05],
+      ['Open the upper gates.', () => gateU.v >= 1],
+      ['Wave the towboat out, up the river.', () => boat.phase === 'gone'],
+    ],
+    down: [
+      ['Fill the chamber to the river above and open the upper gates.', () => gateU.v >= 1],
+      ['Wave the towboat into the lock.', () => boat.phase === 'in'],
+      ['Close the upper gates behind it.', () => gateU.v === 0 && boat.phase === 'in'],
+      ['Close the filling valve and open the emptying valve.', () => valveF.v === 0 && valveE.v > 0],
+      ['Wait while the chamber drains to the river below.', () => C < 0.05],
+      ['Open the lower gates.', () => gateL.v >= 1],
+      ['Wave the towboat out, down the river.', () => boat.phase === 'gone'],
+    ],
+  };
+
+  function start() {
+    C = U;
+    gateU = { v: 0, cmd: 0 };
+    gateL = { v: 0, cmd: 0 };
+    valveF = { v: 0, cmd: 0 };
+    valveE = { v: 0, cmd: 0 };
+    trip = 0;
+    sent = 0;
+    count = 0;
+    through = '';
+    lastWarn = '';
+    lastLevel = 'top';
+    newTrip('up');
+    say('A towboat pushing a barge of sand is waiting below the lock, bound up the river to Minneapolis. The chamber is still full from the last boat, so the towboat can’t come in yet. Start by opening the emptying valve.');
+  }
+  function newTrip(dir) {
+    trip++;
+    boat = { dir, loaded: dir === 'up', x: POS[dir].wait, target: null, phase: 'waiting' };
+    done = STEPS[dir].map(() => false);
+    $('boat').innerHTML = boatSVG(boat.loaded, dir);
+    $('trip').textContent = dir === 'up'
+      ? `Trip ${trip} · upbound to Minneapolis, with a barge of sand`
+      : `Trip ${trip} · downbound to St. Paul, with the barge empty`;
+    kick();
+  }
+
+  /* ================================================================
+     Running the lock
+     ================================================================ */
+  const NAMES = { gateU: 'upper gates', gateL: 'lower gates', valveF: 'filling valve', valveE: 'emptying valve' };
+  const parts = () => ({ gateU, gateL, valveF, valveE });
+  function boatCrosses(gx) {
+    if (!boat.phase.startsWith('moving')) return boat.x < gx + GW && boat.x + BOAT > gx;
+    const a = Math.min(boat.x, boat.target), b = Math.max(boat.x, boat.target) + BOAT;
+    return a < gx + GW && b > gx;
+  }
+  function command(part, v) {
+    const p = parts()[part];
+    if (part === 'gateU' || part === 'gateL') {
+      const other = part === 'gateU' ? gateL : gateU;
+      const head = part === 'gateU' ? U - C : C;
+      if (v === 1 && p.cmd !== 1) {
+        if (other.cmd === 1 || other.v > 0) {
+          say(`Close the ${part === 'gateU' ? 'lower' : 'upper'} gates first. With both ends open, the river above would pour straight through the lock.`, true);
+          return;
+        }
+        if (head > 0.05) {
+          say(`The ${NAMES[part]} won’t move. ${head.toFixed(1)} feet of water presses them shut with at least ${fmt(TONS(head))} tons of force. ${part === 'gateU' ? 'Fill the chamber until it matches the river above.' : 'Empty the chamber until it matches the river below.'}`, true);
+          return;
+        }
+      }
+      if (v === 0 && p.cmd !== 0 && boatCrosses(part === 'gateU' ? XU : XL)) {
+        say('Hold the gates open until the towboat is clear of them.', true);
+        return;
+      }
+    }
+    p.cmd = v;
+    kick();
+  }
+  function wave() {
+    const up = boat.dir === 'up';
+    if (boat.phase === 'waiting') {
+      const g = up ? gateL : gateU;
+      if (g.v < 1) {
+        say(`The ${up ? 'lower' : 'upper'} gates are closed, so the light stays red and the pilot waits. ${up ? 'Empty the chamber, then open the lower gates.' : 'Fill the chamber, then open the upper gates.'}`, true);
+        return;
+      }
+      boat.phase = 'moving-in';
+      boat.target = POS[boat.dir].in;
+      lights[up ? 'L' : 'U'] = 'green';
+      say('Green light. The pilot eases the towboat into the chamber, and a deckhand will tie it off to the wall.');
+    } else if (boat.phase === 'in') {
+      const g = up ? gateU : gateL;
+      if (g.v < 1) {
+        say(`The ${up ? 'upper' : 'lower'} gates are closed. ${up ? 'Fill the chamber to the river above, then open them.' : 'Drain the chamber to the river below, then open them.'}`, true);
+        return;
+      }
+      boat.phase = 'moving-out';
+      boat.target = POS[boat.dir].out;
+      lights[up ? 'U' : 'L'] = 'green';
+      say(up ? 'Green light. The towboat pushes out into Pool 1, 35.9 feet higher than it came in.' : 'Green light. The towboat heads out into Pool 2, on its way down to St. Paul.');
+    }
+    kick();
+  }
+
+  /* ================================================================
+     The water and the boat, step by step
+     ================================================================ */
+  function step(dt) {
+    let active = false;
+    for (const v of [valveF, valveE]) if (v.v !== v.cmd) { v.v = toward(v.v, v.cmd, dt * 1.2); active = true; }
+    for (const g of [gateU, gateL]) if (g.v !== g.cmd) { g.v = toward(g.v, g.cmd, dt * 0.6); active = true; }
+    const fIn = valveF.v * K * Math.sqrt(Math.max(0, U - C));
+    const fOut = valveE.v * K * Math.sqrt(Math.max(0, C));
+    if (gateU.v > 0) C = U;
+    else if (gateL.v > 0) C = 0;
+    else C = clamp(C + (fIn - fOut) * dt, 0, U);
+    sent += (fOut + (gateL.v > 0 ? fIn : 0)) * dt * GAL_PER_FT;
+    if (fIn > 1e-3 || fOut > 1e-3) active = true;
+
+    if (boat.phase.startsWith('moving')) {
+      boat.x = toward(boat.x, boat.target, dt * 150);
+      active = true;
+      if (boat.x === boat.target) {
+        lights = { U: 'red', L: 'red' };
+        if (boat.phase === 'moving-in') {
+          boat.phase = 'in';
+          say(boat.dir === 'up'
+            ? 'The towboat is tied off in the chamber. Close the lower gates behind it.'
+            : 'The towboat is in the chamber, its empty barge riding high. Close the upper gates behind it.');
+        } else {
+          boat.phase = 'gone';
+          count++;
+          const next = boat.dir === 'up' ? 'down' : 'up';
+          setTimeout(() => {
+            newTrip(next);
+            say(next === 'down'
+              ? 'The towboat has unloaded its sand upriver and is back above the lock with the barge empty, bound for St. Paul. See how high the empty barge floats. This time the boat goes down.'
+              : 'The towboat is back below the lock with another barge of sand. Bring it up again.');
+          }, 1400);
+        }
+      }
+    }
+    return active;
+  }
+
+  function warnings() {
+    let w = '';
+    if (gateU.v > 0 && valveE.cmd) w = 'Water is running from the river above, through the open upper gates and out the emptying valve. Close the emptying valve: it wastes water and the current pulls at the boat.';
+    else if (gateL.v > 0 && valveF.cmd) w = 'Water is running from the river above through the filling valve and straight out the open lower gates. Close the filling valve until the gates are shut.';
+    else if (valveF.cmd && valveE.cmd) w = 'Both valves are open, so water runs from the river above straight through to the river below and the chamber stalls partway. Close one of them.';
+    if (w && w !== lastWarn) say(w, true);
+    lastWarn = w;
+    const level = C > U - 0.05 ? 'top' : C < 0.05 ? 'bottom' : 'mid';
+    if (level !== lastLevel && !w) {
+      if (level === 'top' && gateU.v === 0) say('The chamber matches the river above, and no pump ran. Gravity lifted the water, and the water lifted the boat. The upper gates can open now.');
+      if (level === 'bottom' && gateL.v === 0) say('The chamber matches the river below. The lower gates can open now.');
+    }
+    lastLevel = level;
+  }
+
+  /* ================================================================
+     Drawing each frame
+     ================================================================ */
+  const lab = (o, open, shut) => (o.v === o.cmd ? (o.v ? open : shut) : o.cmd ? 'Opening' : 'Closing');
+  function draw() {
+    const yc = yOf(C);
+    $('wC').setAttribute('y', yc);
+    $('wC').setAttribute('height', yF - yc);
+    $('sC').setAttribute('y1', yc);
+    $('sC').setAttribute('y2', yc);
+    $('gU').setAttribute('opacity', 1 - 0.9 * gateU.v);
+    $('gUo').setAttribute('opacity', gateU.v);
+    $('gL').setAttribute('opacity', 1 - 0.9 * gateL.v);
+    $('gLo').setAttribute('opacity', gateL.v);
+    $('vF').setAttribute('y', 358 - 14 * valveF.v);
+    $('vE').setAttribute('y', 358 - 14 * valveE.v);
+    $('flowF').classList.toggle('on', valveF.v > 0.05 && (U - C > 0.02 || gateL.v > 0));
+    $('flowE').classList.toggle('on', valveE.v > 0.05 && (C > 0.02 || gateU.v > 0));
+    const cx = boat.x + BOAT / 2;
+    const level = cx < XU + GW ? U : cx > XL ? 0 : C;
+    $('boat').setAttribute('transform', `translate(${boat.x} ${yOf(level)})`);
+    $('boat').style.display = boat.phase === 'gone' ? 'none' : '';
+    $('lampU').setAttribute('fill', LIGHT[lights.U]);
+    $('lampL').setAttribute('fill', LIGHT[lights.L]);
+
+    for (const [k, o] of Object.entries(parts())) {
+      const dot = $(`dot-${k}`);
+      dot.className = `dot${o.v !== o.cmd ? ' moving' : o.v ? ' open' : ''}`;
+      $(`st-${k}`).textContent = lab(o, 'Open', 'Closed');
+      document.querySelectorAll(`[data-do="${k}"]`).forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.v) === o.cmd)));
+    }
+    $('g-ch').textContent = `${C.toFixed(1)} ft`;
+    const hu = gateU.v > 0 ? 0 : U - C, hl = gateL.v > 0 ? 0 : C;
+    $('g-pu').textContent = hu > 0.05 ? `${fmt(TONS(hu))} tons` : 'none';
+    $('g-pl').textContent = hl > 0.05 ? `${fmt(TONS(hl))} tons` : 'none';
+    $('g-pu').classList.toggle('hot', hu > 0.05);
+    $('g-pl').classList.toggle('hot', hl > 0.05);
+    $('g-sent').textContent = (sent / 1e6).toFixed(1);
+    $('count').textContent = `Boats locked through: ${count}`;
+
+    const w = $('wave');
+    const moving = boat.phase.startsWith('moving');
+    w.disabled = moving || boat.phase === 'gone';
+    w.textContent = moving ? 'Towboat moving' : boat.phase === 'in' ? 'Wave the towboat out' : 'Wave the towboat in';
+
+    const steps = STEPS[boat.dir];
+    for (let i = 0; i < steps.length; i++) {
+      if (done[i]) continue;
+      if (steps[i][1]()) done[i] = true;
+      break;
+    }
+    const sig = boat.dir + done.join();
+    if (sig !== drawSteps.sig) {
+      drawSteps.sig = sig;
+      const now = done.indexOf(false);
+      $('steps').innerHTML = steps.map(([t], i) => `<li class="${done[i] ? 'done' : i === now ? 'now' : ''}">${t}</li>`).join('');
+    }
+  }
+  const drawSteps = { sig: '' };
+
+  const say = (text, warn) => { const m = $('msg'); m.textContent = text; m.classList.toggle('warn', !!warn); };
+
+  let running = false, last = 0;
+  function kick() {
+    if (running) return;
+    running = true;
+    last = performance.now();
+    requestAnimationFrame(frame);
+  }
+  function frame(t) {
+    const dt = Math.min(0.05, Math.max(0, (t - last) / 1000));
+    last = t;
+    const active = step(dt);
+    warnings();
+    draw();
+    if (active) requestAnimationFrame(frame);
+    else running = false;
+  }
+
+  document.querySelector('.controls').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-do]');
+    if (b) command(b.dataset.do, Number(b.dataset.v));
+  });
+  $('wave').addEventListener('click', wave);
+  $('restart').addEventListener('click', () => { drawSteps.sig = ''; start(); draw(); });
+
+  start();
+  draw();
+})();
+</script>
+</body>
+</html>

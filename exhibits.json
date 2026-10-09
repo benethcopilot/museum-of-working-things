@@ -59,7 +59,11 @@
       "try": "Decide where tellurium goes"
     },
     { "slug": "slide-rule", "hall": "numbers", "title": "Slide Rule", "status": "planned", "blurb": "Multiply by sliding two scales, the way engineers did until the 1970s." },
-    { "slug": "lock-and-dam", "hall": "machines", "title": "Lock and Dam No. 1", "status": "planned", "blurb": "Raise a barge on the Mississippi between Minneapolis and St. Paul." },
+    {
+      "slug": "lock-and-dam", "hall": "machines", "title": "Lock and Dam No. 1", "ages": "7 and up",
+      "blurb": "Work the gates and valves of the Mississippi’s Ford Dam lock and lift a towboat 35.9 feet using nothing but gravity.",
+      "try": "Try to open a gate before the water is level"
+    },
     { "slug": "enigma", "hall": "machines", "title": "Enigma Machine", "status": "planned", "blurb": "Encrypt a message with real rotor wirings and find the flaw codebreakers used." },
     { "slug": "telegraph", "hall": "machines", "title": "Telegraph Office", "status": "planned", "blurb": "Tap out Morse code and pay for your telegram by the word." }
   ]
