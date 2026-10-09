@@ -195,6 +195,15 @@ h1 {
 }
 .ev:hover { background: var(--ground-2); border-color: var(--text); }
 .ev:disabled { opacity: 0.45; cursor: default; }
+.puzzles { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.puzzle { padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: 6px; }
+.puzzle.solved { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.puzzle p { margin: 0; font-size: 0.92rem; }
+.puzzle .q { font-weight: 600; }
+.puzzle .a { margin-top: 4px; color: var(--muted); }
+.puzzle.solved .a { color: var(--text); }
+.puzzle .a b { color: var(--accent); }
+.puzzle button { margin-top: 6px; padding: 0; border: 0; background: none; font: inherit; font-size: 0.88rem; color: var(--accent); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .ev:disabled:hover { background: none; border-color: var(--line-strong); }
 .ev .k { font-size: 0.86rem; font-weight: 500; color: var(--muted); }
 .ev .v { font-family: var(--f-display); font-size: 1.45rem; line-height: 1.1; }
@@ -293,6 +302,10 @@ h1 {
         <label for="date">Date</label>
         <input type="date" id="date">
       </div>
+    </div>
+    <div>
+      <p class="label">Sky puzzles</p>
+      <ul class="puzzles" id="puzzles" aria-live="polite"></ul>
     </div>
     <p class="hint">Drag the instrument round to turn the rete through the day. On a phone, swipe sideways. With the instrument focused, the arrow keys turn it a quarter hour and Home returns to now.</p>
 
@@ -819,7 +832,93 @@ h1 {
         els[k].textContent = events[k] == null ? 'none' : fmt.time.format(events[k]);
       }
     }
+    checkPuzzles();
   }
+
+  /* ---------- Sky puzzles: solved by turning the rete ---------- */
+  const starNamed = (n) => STARS.find((s) => s.name === n);
+  function starAlt(st, t) {
+    const lst = mod(gmst(t) + city.lon, 360);
+    const H = wrap180(lst - st.ra);
+    return { alt: altAz(H, st.dec, city.lat)[0], H };
+  }
+  function sunAlt(t) {
+    const s = sunAt(t);
+    return { alt: altAz(s.H, s.dec, city.lat)[0], H: s.H };
+  }
+  const neverRises = (st) => st.dec < city.lat - 90 + 0.5;
+  const neverSets = (st) => st.dec > 90 - city.lat - 0.5;
+  const PUZZLES = [
+    {
+      q: 'Turn the rete until Sirius, the brightest star, is just rising in the south-east.',
+      impossible: () => (neverRises(starNamed('Sirius')) ? `From ${city.name}, Sirius never rises at all.` : null),
+      ok: (t) => { const s = starAlt(starNamed('Sirius'), t); return Math.abs(s.alt) < 1.2 && s.H < 0; },
+      why: 'Its flame sits right on the horizon line, on the eastern side of the plate.',
+    },
+    {
+      q: 'Find the moment Arcturus stands highest, due south.',
+      impossible: () => null,
+      ok: (t) => { const s = starAlt(starNamed('Arcturus'), t); return Math.abs(s.H) < 2 && s.alt > 0; },
+      why: 'A star is highest when the rete carries it across the meridian, the straight line from the top of the plate to the bottom.',
+    },
+    {
+      q: 'Find when the sky gets fully dark tonight: the sun 18° below the horizon after sunset.',
+      impossible: () => {
+        const noon = solarNoon(displayTime);
+        let low = 90;
+        for (let k = 0; k <= 48; k++) low = Math.min(low, sunAlt(noon + k * 1800000).alt);
+        return low > -18 ? `On this date the sun never gets 18° below the horizon in ${city.name}. The sky stays in twilight all night.` : null;
+      },
+      ok: (t) => { const s = sunAlt(t); return Math.abs(s.alt + 18) < 0.8 && s.H > 0; },
+      why: 'On the plate the sun has sunk well below the horizon, among the night-hour curves. Astronomers call this the end of astronomical twilight.',
+    },
+    {
+      q: 'Turn to the moment Betelgeuse sets in the west.',
+      impossible: () => (neverRises(starNamed('Betelgeuse')) ? `From ${city.name}, Betelgeuse never rises.` : neverSets(starNamed('Betelgeuse')) ? `From ${city.name}, Betelgeuse never sets.` : null),
+      ok: (t) => { const s = starAlt(starNamed('Betelgeuse'), t); return Math.abs(s.alt) < 1.2 && s.H > 0; },
+      why: 'Its flame meets the horizon on the western side of the plate.',
+    },
+  ];
+  const solved = PUZZLES.map(() => null);
+  let impossible = PUZZLES.map(() => null);
+  let puzzleKey = '';
+  function drawPuzzles() {
+    $('puzzles').innerHTML = PUZZLES.map((p, i) => {
+      const imp = impossible[i];
+      const s = solved[i];
+      const answer = imp || (s ? `Solved at <b>${fmt.time.format(s)}</b>, ${fmt.date.format(s)}. ${p.why}` : 'Not yet. Turn the rete and watch the plate.');
+      return `<li class="puzzle${s || imp ? ' solved' : ''}"><p class="q">${p.q}</p><p class="a">${answer}</p>${!s && !imp ? `<button type="button" data-hint="${i}">Show me</button>` : ''}</li>`;
+    }).join('');
+  }
+  function checkPuzzles() {
+    // A new plate starts the puzzles afresh; a new date only re-checks which puzzles are possible.
+    const key = `${city.name}|${fmt.iso.format(displayTime)}`;
+    if (key !== puzzleKey) {
+      if (puzzleKey.split('|')[0] !== city.name) solved.fill(null);
+      puzzleKey = key;
+      impossible = PUZZLES.map((p) => p.impossible());
+      drawPuzzles();
+    }
+    let changed = false;
+    PUZZLES.forEach((p, i) => {
+      if (!solved[i] && !impossible[i] && p.ok(displayTime)) { solved[i] = displayTime; changed = true; }
+    });
+    if (changed) drawPuzzles();
+  }
+  $('puzzles').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-hint]');
+    if (!b) return;
+    const p = PUZZLES[Number(b.dataset.hint)];
+    // search the next 24 hours, two minutes at a time, then refine
+    for (let k = 1; k <= 720; k++) {
+      const t = displayTime + k * 120000;
+      if (p.ok(t)) { turnTo(t, false); return; }
+    }
+    for (let k = 1; k <= 720; k++) {
+      const t = displayTime - k * 120000;
+      if (p.ok(t)) { turnTo(t, false); return; }
+    }
+  });
   function schedule() {
     if (!pending) pending = requestAnimationFrame(update);
   }
