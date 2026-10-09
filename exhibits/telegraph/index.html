@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Telegraph Office</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Libre+Franklin:ital,wght@0,400;0,600;0,700;1,400&family=Courier+Prime:wght@400;700&display=swap">
+<style>
+:root {
+  /* Layout: the operator's desk first (key, sounder, register tape and what you've sent), then the counter where a telegram is priced by the word and sent down the line, then copying by ear, then the history. */
+  --ground: #e2e6de;
+  --ground-2: #d3d9cf;
+  --paper: #f1e6c2;
+  --paper-ink: #2a2414;
+  --text: #1c231f;
+  --muted: #55615a;
+  --line: rgba(28, 35, 31, 0.14);
+  --line-strong: rgba(28, 35, 31, 0.32);
+  --accent: #2b5a40;
+  --brass: #9c7426;
+  --signal: #a3312a;
+  /* The desk and its instruments keep their colors in both themes. */
+  --wood: #6a4226;
+  --wood-2: #81532f;
+  --brass-hi: #d9b45e;
+  --tape: #efe6c9;
+  --f-display: "Rozha One", "Bodoni 72", "Didot", Georgia, serif;
+  --f-body: "Libre Franklin", "Franklin Gothic Medium", "Segoe UI", system-ui, sans-serif;
+  --f-type: "Courier Prime", "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #111613;
+    --ground-2: #1b221d;
+    --paper: #2a2617;
+    --paper-ink: #efe6c9;
+    --text: #e5e8e1;
+    --muted: #9fa9a1;
+    --line: rgba(229, 232, 225, 0.12);
+    --line-strong: rgba(229, 232, 225, 0.3);
+    --accent: #7cc39a;
+    --brass: #d6ad55;
+    --signal: #ff8a7a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #111613;
+  --ground-2: #1b221d;
+  --paper: #2a2617;
+  --paper-ink: #efe6c9;
+  --text: #e5e8e1;
+  --muted: #9fa9a1;
+  --line: rgba(229, 232, 225, 0.12);
+  --line-strong: rgba(229, 232, 225, 0.3);
+  --accent: #7cc39a;
+  --brass: #d6ad55;
+  --signal: #ff8a7a;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--text); font-family: var(--f-body); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--brass); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 400; line-height: 1.05; margin: 0; text-wrap: balance; }
+
+.page { box-sizing: border-box; max-width: 1200px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 36px; }
+.masthead { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 40px; align-items: end; }
+.eyebrow { grid-column: 1 / -1; margin: 0; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
+.masthead h1 { font-size: clamp(2.8rem, 7vw, 5rem); }
+.lede { margin: 0; max-width: 60ch; color: var(--muted); }
+
+/* ---------- The desk ---------- */
+.desk { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.bench { border-radius: 12px; overflow: hidden; background: linear-gradient(var(--wood-2), var(--wood)); box-shadow: 0 16px 28px -18px rgba(0, 0, 0, 0.6); }
+.bench svg { display: block; width: 100%; height: auto; touch-action: none; user-select: none; -webkit-user-select: none; cursor: pointer; }
+.bench svg:focus-visible { outline: 3px solid var(--brass-hi); outline-offset: -3px; }
+.tape-wrap { padding: 10px 12px 12px; background: rgba(0, 0, 0, 0.18); }
+.tape-wrap canvas { display: block; width: 100%; height: 46px; border-radius: 3px; background: var(--tape); }
+.tape-wrap p { margin: 6px 0 0; font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: #e9dcbc; }
+.copy { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.panel { padding: 16px 18px; border-radius: 8px; background: var(--paper); color: var(--paper-ink); border: 1px solid var(--line); }
+.panel h2 { font-size: 1.5rem; }
+.recv { margin: 8px 0 0; min-height: 2.6em; font-family: var(--f-type); font-size: 1.35rem; letter-spacing: 0.06em; overflow-wrap: anywhere; }
+.recv .cursor { display: inline-block; width: 0.6em; border-bottom: 2px solid currentColor; }
+.symbol { margin: 2px 0 0; font-family: var(--f-type); font-size: 1rem; color: var(--muted); min-height: 1.6em; }
+.panel .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: 10px; font-size: 0.9rem; }
+.how { margin: 0; font-size: 0.95rem; color: var(--muted); }
+.how kbd { padding: 1px 6px; border: 1px solid var(--line-strong); border-radius: 4px; font-family: var(--f-type); font-size: 0.9em; }
+.seg { display: inline-flex; border: 1.5px solid var(--line-strong); border-radius: 6px; overflow: hidden; }
+.seg button { padding: 5px 12px; border: 0; background: none; font-size: 0.88rem; }
+.seg button[aria-pressed="true"] { background: var(--text); color: var(--ground); }
+.btn { padding: 7px 14px; border: 1.5px solid var(--line-strong); border-radius: 6px; background: none; font-weight: 600; font-size: 0.9rem; }
+.btn:hover { background: var(--ground-2); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--ground); }
+.btn.primary:hover { opacity: 0.9; background: var(--accent); }
+.btn:disabled { opacity: 0.4; cursor: default; }
+.chart { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; }
+@media (max-width: 520px) { .chart { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.chart button { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 5px; background: var(--ground); font-size: 0.85rem; }
+.chart button:hover { border-color: var(--line-strong); }
+.chart b { font-family: var(--f-type); font-weight: 700; }
+.chart span { font-family: var(--f-type); letter-spacing: 0.08em; color: var(--muted); }
+.chart-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+.chart-head h3 { font-size: 1.15rem; }
+
+/* ---------- The counter ---------- */
+.sec-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 24px; margin-bottom: 12px; }
+.sec-head h2 { font-size: clamp(1.8rem, 3.6vw, 2.5rem); }
+.sec-head p { margin: 0; max-width: 62ch; color: var(--muted); }
+.counter { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.blank { padding: 20px 22px; border-radius: 4px; background: var(--paper); color: var(--paper-ink); border: 1px solid var(--line); box-shadow: 0 10px 22px -18px rgba(0, 0, 0, 0.5); display: flex; flex-direction: column; gap: 12px; }
+.blank .title { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; border-bottom: 2px solid currentColor; padding-bottom: 6px; }
+.blank .title h3 { font-size: 1.7rem; letter-spacing: 0.04em; }
+.blank .title span { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.75; }
+.field { display: flex; flex-direction: column; gap: 2px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.85; }
+.field input, .field textarea, .field select { padding: 4px 2px; border: 0; border-bottom: 1px dashed rgba(42, 36, 20, 0.45); background: transparent; font-family: var(--f-type); font-size: 1.05rem; letter-spacing: 0.02em; text-transform: none; font-weight: 400; }
+.field textarea { resize: vertical; min-height: 7.5em; line-height: 1.55; }
+.field select { border: 1px solid rgba(42, 36, 20, 0.35); border-radius: 4px; padding: 5px 6px; background: transparent; }
+.field select option { color: #1c231f; background: #f1e6c2; }
+.field .free { font-weight: 400; text-transform: none; letter-spacing: 0; opacity: 0.8; }
+.bill { display: flex; flex-direction: column; gap: 12px; }
+.bill .total { padding: 16px 18px; border-radius: 8px; border: 1.5px solid var(--line-strong); }
+.bill .total .big { font-family: var(--f-display); font-size: 3rem; line-height: 1; color: var(--accent); }
+.bill dl { margin: 10px 0 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; font-size: 0.93rem; font-variant-numeric: tabular-nums; }
+.bill dt { color: var(--muted); }
+.bill dd { margin: 0; text-align: right; font-family: var(--f-type); }
+.bill .tip { margin: 0; font-size: 0.93rem; color: var(--muted); }
+.bill .tip b { color: var(--text); }
+.send-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.out-pad { margin: 0; padding: 12px 14px; border-radius: 6px; background: var(--ground-2); font-family: var(--f-type); font-size: 1rem; min-height: 3.2em; overflow-wrap: anywhere; }
+.out-label { margin: 0; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+
+/* ---------- Copy by ear ---------- */
+.ear { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.ear .panel { display: flex; flex-direction: column; gap: 10px; }
+.ear input { padding: 8px 10px; border: 1.5px solid var(--line-strong); border-radius: 6px; background: var(--ground); font-family: var(--f-type); font-size: 1.2rem; letter-spacing: 0.1em; text-transform: uppercase; width: 100%; box-sizing: border-box; }
+.ear .res { margin: 0; min-height: 1.6em; }
+.ear .res b { color: var(--accent); }
+.ear .res.miss b { color: var(--signal); }
+.score { font-family: var(--f-type); color: var(--muted); }
+.ear .notes p { margin: 0 0 10px; }
+
+/* ---------- History ---------- */
+.history { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 20px 40px; padding-top: 24px; border-top: 1px solid var(--line-strong); }
+.history h2 { font-size: 2rem; margin-bottom: 12px; }
+.timeline { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.timeline li { display: grid; grid-template-columns: 3.4em minmax(0, 1fr); gap: 14px; }
+.timeline .yr { font-family: var(--f-display); font-size: 1.35rem; line-height: 1.2; color: var(--brass); }
+.timeline p { margin: 0; font-size: 0.97rem; }
+.codes h3 { font-size: 1.35rem; margin-bottom: 8px; }
+.codes table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+.codes th, .codes td { padding: 4px 6px; border-bottom: 1px solid var(--line); text-align: left; }
+.codes td { font-family: var(--f-type); letter-spacing: 0.12em; }
+.codes th { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.codes p { margin: 10px 0 0; font-size: 0.93rem; color: var(--muted); }
+.sources { grid-column: 1 / -1; margin: 0; font-size: 0.85rem; color: var(--muted); }
+.sources a { color: inherit; text-underline-offset: 3px; }
+
+@media (max-width: 940px) {
+  .desk, .counter, .ear, .history { grid-template-columns: minmax(0, 1fr); }
+  .masthead { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="telegraph" defer></script>
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Machines &amp; Messages · 1844–2006</p>
+    <h1>Telegraph Office</h1>
+    <p class="lede">For a century, the fastest way to send news was a brass key, a wire and an operator who could hear letters in clicks. Tap out Morse code yourself, then write a telegram, pay for it by the word and send it down the line.</p>
+  </header>
+
+  <section class="desk" aria-label="The operator’s desk">
+    <div class="bench">
+      <svg id="desk" viewBox="0 62 520 148" tabindex="0" role="button" aria-label="Telegraph key. Press and hold, or hold the space bar, to send." aria-pressed="false">
+        <defs>
+          <linearGradient id="brass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ecc979"/><stop offset="0.5" stop-color="#b98d36"/><stop offset="1" stop-color="#8a6420"/></linearGradient>
+          <linearGradient id="woodg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a5a34"/><stop offset="1" stop-color="#5b371d"/></linearGradient>
+        </defs>
+        <path d="M44 176 C120 204 260 206 330 186" fill="none" stroke="#2a1d12" stroke-width="3"/>
+        <rect x="26" y="156" width="250" height="28" rx="4" fill="url(#woodg)"/>
+        <rect x="26" y="156" width="250" height="4" rx="2" fill="#9b6a40"/>
+        <rect x="76" y="128" width="26" height="30" rx="3" fill="url(#brass)"/>
+        <rect x="168" y="146" width="16" height="11" rx="2" fill="#c9cdd0"/>
+        <rect x="132" y="138" width="5" height="20" fill="#7a5a20"/>
+        <g id="lever">
+          <rect x="46" y="128" width="208" height="11" rx="4" fill="url(#brass)"/>
+          <rect x="171" y="138" width="10" height="5" fill="#c9cdd0"/>
+          <rect x="212" y="104" width="36" height="25" rx="5" fill="#1d1d1d"/>
+          <ellipse cx="230" cy="104" rx="18" ry="5" fill="#3a3a3a"/>
+        </g>
+        <circle cx="89" cy="133" r="5" fill="#6d4e16"/>
+        <text x="150" y="200" text-anchor="middle" font-family="Libre Franklin, sans-serif" font-size="10" letter-spacing="2" fill="#f0dfbd">KEY</text>
+        <rect x="304" y="168" width="196" height="18" rx="3" fill="url(#woodg)"/>
+        <rect x="350" y="116" width="26" height="54" rx="4" fill="#26221e"/>
+        <rect x="350" y="132" width="26" height="22" fill="#9a5b2c"/>
+        <rect x="384" y="116" width="26" height="54" rx="4" fill="#26221e"/>
+        <rect x="384" y="132" width="26" height="22" fill="#9a5b2c"/>
+        <rect x="462" y="104" width="16" height="66" rx="3" fill="url(#brass)"/>
+        <rect x="336" y="74" width="6" height="22" fill="#7a5a20"/>
+        <g id="arm">
+          <rect x="330" y="98" width="148" height="9" rx="3" fill="url(#brass)"/>
+          <rect x="350" y="107" width="60" height="6" fill="#5c5f62"/>
+        </g>
+        <circle cx="470" cy="102" r="5" fill="#6d4e16"/>
+        <text x="402" y="200" text-anchor="middle" font-family="Libre Franklin, sans-serif" font-size="10" letter-spacing="2" fill="#f0dfbd">SOUNDER</text>
+      </svg>
+      <div class="tape-wrap">
+        <canvas id="tape" height="46" aria-hidden="true"></canvas>
+        <p>Register tape · the first telegraphs embossed dots and dashes on a paper strip</p>
+      </div>
+    </div>
+
+    <div class="copy">
+      <div class="panel">
+        <h2>What you’ve sent</h2>
+        <p class="recv" id="recv" aria-live="polite"></p>
+        <p class="symbol" id="sym"></p>
+        <p class="how">Hold the key, or hold <kbd>Space</kbd>. A quick tap is a dot, a longer press is a dash. Pause between letters and a little longer between words.</p>
+        <div class="row">
+          <span>Sound</span>
+          <span class="seg" role="group" aria-label="Sound"><button type="button" data-snd="sounder" aria-pressed="true">Sounder clicks</button><button type="button" data-snd="tone" aria-pressed="false">Radio tone</button></span>
+          <span id="wpm" class="score"></span>
+          <button type="button" class="btn" id="wipe">Clear</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="chart-head"><h3>International Morse</h3><span class="how">Tap a letter to hear it.</span></div>
+        <div class="chart" id="chart"></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="counter-h">
+    <div class="sec-head">
+      <h2 id="counter-h">Send a telegram</h2>
+      <p>You paid for the first ten words and then for every word after that. The address and the signature went free. This blank holds the telegram the Wright brothers sent home from Kitty Hawk.</p>
+    </div>
+    <div class="counter">
+      <form class="blank" id="blank" autocomplete="off">
+        <div class="title"><h3>Telegram</h3><span id="stamp">Received at Dayton, Ohio · Dec. 17, 1903</span></div>
+        <label class="field" for="to"><span>To <span class="free">(free)</span></span><input id="to" value="Bishop M. Wright, Dayton, Ohio"></label>
+        <label class="field" for="body"><span>Message <span class="free">(counted)</span></span><textarea id="body" rows="5">Success four flights Thursday morning all against twenty-one mile per hour wind started from level with engine power alone average speed through air thirty-one miles longest 57 seconds inform press home Christmas.</textarea></label>
+        <label class="field" for="sig"><span>Signed <span class="free">(free)</span></span><input id="sig" value="Orevelle Wright"></label>
+        <label class="field" for="route">Rate<select id="route">
+          <option value="25,2">A nearby town · 25¢ for ten words, 2¢ each after</option>
+          <option value="40,3">New York to Washington · 40¢, then 3¢</option>
+          <option value="100,7" selected>New York to Chicago · $1.00, then 7¢</option>
+          <option value="250,17">New York to San Francisco · $2.50, then 17¢</option>
+        </select></label>
+        <div class="send-row">
+          <button type="submit" class="btn primary" id="send">Send it down the line</button>
+          <span class="seg" role="group" aria-label="Line"><button type="button" data-line="american" aria-pressed="true">Landline, American Morse</button><button type="button" data-line="intl" aria-pressed="false">Radio, International</button></span>
+          <button type="button" class="btn" id="stop" hidden>Stop</button>
+        </div>
+        <div class="send-row">
+          <button type="button" class="btn" id="wright">Load the Wright telegram</button>
+          <button type="button" class="btn" id="blankit">Write your own</button>
+        </div>
+      </form>
+      <div class="bill">
+        <div class="total">
+          <div class="big" id="cost">$2.54</div>
+          <dl>
+            <dt>Words in the message</dt><dd id="w">32</dd>
+            <dt>First ten words</dt><dd id="base">$1.00</dd>
+            <dt id="extra-l">Extra words</dt><dd id="extra">$1.54</dd>
+          </dl>
+        </div>
+        <p class="tip" id="tip"></p>
+        <p class="out-label">At the other end</p>
+        <p class="out-pad" id="out" aria-live="polite">Press send and the receiving operator copies each letter as it clicks in.</p>
+        <p class="tip">The Wrights’ telegram arrived with two mistakes made along the wire: the flight lasted 59 seconds, not 57, and Orville’s name came through as “Orevelle”.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="ear-h">
+    <div class="sec-head">
+      <h2 id="ear-h">Copy by ear</h2>
+      <p>Operators didn’t count dots. They heard each letter as a rhythm, the way you hear a word. Listen and type what you hear.</p>
+    </div>
+    <div class="ear">
+      <div class="panel">
+        <div class="send-row">
+          <button type="button" class="btn primary" id="play">Play the word</button>
+          <label class="how" for="speed">Speed <select id="speed"><option value="8">Slow</option><option value="13" selected>Medium</option><option value="20">Fast</option></select></label>
+          <span class="score" id="score">0 of 0</span>
+        </div>
+        <label class="how" for="guess">What did you hear?</label>
+        <input id="guess" autocomplete="off" spellcheck="false" maxlength="16">
+        <div class="send-row"><button type="button" class="btn" id="check">Check</button><button type="button" class="btn" id="nextw">Next word</button></div>
+        <p class="res" id="res" aria-live="polite"></p>
+      </div>
+      <div class="notes">
+        <p>The words are ones that turn up in telegrams again and again: arrive, money, home, train, safe. Start slow. When a letter sticks, tap it in the chart above and listen to it a few times.</p>
+        <p>Landline operators listened to a sounder. Its arm clicks down when the key closes and clacks up when it opens, and the time between the two is the dot or the dash. Radio operators, from the 1900s on, heard a tone instead.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="history">
+    <div>
+      <h2>A century on the wire</h2>
+      <ol class="timeline">
+        <li><span class="yr">1844</span><p>On May 24 Samuel Morse sends “What hath God wrought” from the Capitol in Washington to Alfred Vail at the railroad depot in Baltimore. The paper tape Vail received is in the Library of Congress.</p></li>
+        <li><span class="yr">1861</span><p>The first transcontinental telegraph is finished on October 24. The Pony Express stops running two days later.</p></li>
+        <li><span class="yr">1865</span><p>Europe adopts a simpler version of the code, which becomes International Morse. American railroads and telegraph companies keep Morse’s original, now called American Morse.</p></li>
+        <li><span class="yr">1895</span><p>A Western Union officer works out that the average telegram, not counting newspaper dispatches, runs just under fourteen words. People went to great lengths to stay inside the cheap first ten.</p></li>
+        <li><span class="yr">1903</span><p>The Wright brothers’ news goes from Kitty Hawk to Dayton on a key made by J. H. Bunnell &amp; Co. That key is now at the Smithsonian’s National Air and Space Museum.</p></li>
+        <li><span class="yr">1912</span><p>An international radio conference in London makes International Morse the code for radio messages.</p></li>
+        <li><span class="yr">2006</span><p>Western Union sends its last telegrams in January. By then it handled about 20,000 a year, at around $10 each.</p></li>
+      </ol>
+    </div>
+    <div class="codes">
+      <h3>Two Morse codes</h3>
+      <table>
+        <thead><tr><th scope="col">Letter</th><th scope="col">American</th><th scope="col">International</th></tr></thead>
+        <tbody id="codes"></tbody>
+      </table>
+      <p>American Morse had dashes of different lengths and gaps inside some letters. O was dot, space, dot. It was quick to send but easy to get wrong, and a gap inside a letter could be heard as two letters.</p>
+    </div>
+    <p class="sources">Sources: <a href="https://airandspace.si.edu/collection-objects/telegraph-key-wright-1903-flight/nasm_A19710854000" target="_blank" rel="noopener">National Air and Space Museum, telegraph key used for the Wright brothers’ 1903 telegram</a> (the telegram’s text and its two errors); <a href="https://en.wikipedia.org/wiki/American_Morse_code" target="_blank" rel="noopener">American Morse code</a> and <a href="https://en.wikipedia.org/wiki/First_transcontinental_telegraph" target="_blank" rel="noopener">First transcontinental telegraph</a> on Wikipedia; an <a href="https://newspapers.lib.unb.ca/sites/default/files/serials/pdf/155/22867/22867-0012.pdf" target="_blank" rel="noopener">1895 newspaper report on telegraph rates</a> (the 25¢ rate, extra words at one fifteenth of the ten-word rate, and the fourteen-word average); a 19th-century Western Union rate list in the <a href="https://search.library.wisc.edu/digital/A2B6RPH7FWO2WK8Y/text/A6HLCKJGV32YNY8G" target="_blank" rel="noopener">University of Wisconsin digital collections</a> (the Washington, Chicago and San Francisco rates); <a href="https://www.nbcnews.com/id/wbna11147506" target="_blank" rel="noopener">NBC News on the end of the telegram</a>. American Morse timings here are approximate.</p>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+
+  /* ================================================================
+     The two codes
+     ================================================================ */
+  const INTL = {
+    A: '.-', B: '-...', C: '-.-.', D: '-..', E: '.', F: '..-.', G: '--.', H: '....', I: '..', J: '.---', K: '-.-', L: '.-..', M: '--',
+    N: '-.', O: '---', P: '.--.', Q: '--.-', R: '.-.', S: '...', T: '-', U: '..-', V: '...-', W: '.--', X: '-..-', Y: '-.--', Z: '--..',
+    0: '-----', 1: '.----', 2: '..---', 3: '...--', 4: '....-', 5: '.....', 6: '-....', 7: '--...', 8: '---..', 9: '----.',
+    '.': '.-.-.-', ',': '--..--', '?': '..--..', '-': '-....-', '/': '-..-.',
+  };
+  // American Morse: a space is the long gap inside a letter, L is the long dash, Z the longer dash for zero.
+  const AMER = {
+    A: '.-', B: '-...', C: '.. .', D: '-..', E: '.', F: '.-.', G: '--.', H: '....', I: '..', J: '-.-.', K: '-.-', L: 'L', M: '--',
+    N: '-.', O: '. .', P: '.....', Q: '..-.', R: '. ..', S: '...', T: '-', U: '..-', V: '...-', W: '.--', X: '.-..', Y: '.. ..', Z: '... .',
+    0: 'Z', 1: '.--.', 2: '..-..', 3: '...-.', 4: '....-', 5: '---', 6: '......', 7: '--..', 8: '-....', 9: '-..-',
+    '.': '..--..', ',': '.-.-',
+  };
+  const REV = Object.fromEntries(Object.entries(INTL).map(([k, v]) => [v, k]));
+  // Element lengths in units: [mark lengths], gap inside a letter, gap between letters, gap between words.
+  const TIMING = {
+    intl: { '.': 1, '-': 3, gap: 1, longGap: 1, letter: 3, word: 7 },
+    american: { '.': 1, '-': 2, L: 4, Z: 5, gap: 1, longGap: 2, letter: 3, word: 6 },
+  };
+
+  /* ================================================================
+     Sound: a sounder's click and clack, or a radio tone
+     ================================================================ */
+  let ac = null, master = null, noise = null;
+  let sound = 'sounder';
+  function audio() {
+    if (!ac) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      ac = new AC();
+      master = ac.createGain();
+      master.gain.value = 0.55;
+      master.connect(ac.destination);
+      noise = ac.createBuffer(1, Math.floor(ac.sampleRate * 0.05), ac.sampleRate);
+      const d = noise.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3);
+    }
+    if (ac.state === 'suspended') ac.resume();
+    return ac;
+  }
+  function click(when, down, dest) {
+    const src = ac.createBufferSource();
+    src.buffer = noise;
+    const bp = ac.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.value = down ? 2300 : 1400;
+    bp.Q.value = 2.5;
+    const g = ac.createGain();
+    g.gain.setValueAtTime(down ? 1.1 : 0.7, when);
+    g.gain.exponentialRampToValueAtTime(0.001, when + 0.04);
+    src.connect(bp).connect(g).connect(dest);
+    src.start(when);
+    src.stop(when + 0.05);
+    const o = ac.createOscillator();
+    o.frequency.value = down ? 190 : 260;
+    const og = ac.createGain();
+    og.gain.setValueAtTime(0.35, when);
+    og.gain.exponentialRampToValueAtTime(0.001, when + 0.05);
+    o.connect(og).connect(dest);
+    o.start(when);
+    o.stop(when + 0.06);
+  }
+  let liveOsc = null, liveGain = null;
+  function soundDown() {
+    if (!audio()) return;
+    const t = ac.currentTime;
+    if (sound === 'sounder') { click(t, true, master); return; }
+    liveOsc = ac.createOscillator();
+    liveOsc.frequency.value = 640;
+    liveGain = ac.createGain();
+    liveGain.gain.setValueAtTime(0, t);
+    liveGain.gain.linearRampToValueAtTime(0.28, t + 0.006);
+    liveOsc.connect(liveGain).connect(master);
+    liveOsc.start(t);
+  }
+  function soundUp() {
+    if (!ac) return;
+    const t = ac.currentTime;
+    if (sound === 'sounder') { click(t, false, master); return; }
+    if (liveOsc) {
+      liveGain.gain.cancelScheduledValues(t);
+      liveGain.gain.setValueAtTime(liveGain.gain.value, t);
+      liveGain.gain.linearRampToValueAtTime(0, t + 0.008);
+      liveOsc.stop(t + 0.02);
+      liveOsc = null;
+    }
+  }
+
+  /* ================================================================
+     The key, the sounder and the register tape
+     ================================================================ */
+  const marks = [];            // [{a, b}] in ms on performance.now()
+  let tapeClock = () => performance.now();
+  let tapeMarks = marks;
+  function setInstruments(down) {
+    $('lever').setAttribute('transform', down ? 'rotate(4 89 133)' : '');
+    $('arm').setAttribute('transform', down ? 'rotate(-3 470 102)' : '');
+  }
+  const tape = $('tape');
+  const tctx = tape.getContext('2d');
+  let tapeRun = false, tapeIdleSince = 0;
+  function drawTape() {
+    const w = tape.clientWidth, h = 46, dpr = Math.min(2, window.devicePixelRatio || 1);
+    if (tape.width !== Math.round(w * dpr)) { tape.width = Math.round(w * dpr); tape.height = Math.round(h * dpr); }
+    tctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    tctx.clearRect(0, 0, w, h);
+    tctx.fillStyle = 'rgba(120, 90, 40, 0.12)';
+    tctx.fillRect(0, h / 2 - 0.5, w, 1);
+    const now = tapeClock();
+    const span = 4200;
+    const x = (t) => w - 20 - ((now - t) / span) * (w - 20);
+    tctx.fillStyle = '#3b2c18';
+    for (const m of tapeMarks) {
+      const b = m.b ?? now;
+      if (b < now - span) continue;
+      const x0 = Math.max(0, x(m.a)), x1 = x(Math.min(b, now));
+      if (x1 < 0) continue;
+      tctx.beginPath();
+      tctx.roundRect ? tctx.roundRect(x0, h / 2 - 3.5, Math.max(3, x1 - x0), 7, 3.5) : tctx.rect(x0, h / 2 - 3.5, Math.max(3, x1 - x0), 7);
+      tctx.fill();
+    }
+  }
+  function tapeLoop() {
+    drawTape();
+    const active = (tapeMarks.length && tapeMarks[tapeMarks.length - 1].b == null) || tapeClock() - tapeIdleSince < 4300 || playing;
+    if (active) requestAnimationFrame(tapeLoop);
+    else tapeRun = false;
+  }
+  function kickTape() {
+    if (tapeRun) return;
+    tapeRun = true;
+    requestAnimationFrame(tapeLoop);
+  }
+
+  /* ================================================================
+     Keying by hand, with a decoder that learns your speed
+     ================================================================ */
+  let unit = 110, down = false, downAt = 0, sym = '', received = '';
+  let letterTimer = 0, wordTimer = 0;
+  function keyDown() {
+    if (down || playing) return;
+    down = true;
+    downAt = performance.now();
+    clearTimeout(letterTimer);
+    clearTimeout(wordTimer);
+    tapeClock = () => performance.now();
+    tapeMarks = marks;
+    marks.push({ a: downAt, b: null });
+    if (marks.length > 400) marks.splice(0, marks.length - 400);
+    soundDown();
+    setInstruments(true);
+    $('desk').setAttribute('aria-pressed', 'true');
+    kickTape();
+  }
+  function keyUp() {
+    if (!down) return;
+    down = false;
+    const now = performance.now();
+    const d = now - downAt;
+    marks[marks.length - 1].b = now;
+    tapeIdleSince = now;
+    soundUp();
+    setInstruments(false);
+    $('desk').setAttribute('aria-pressed', 'false');
+    if (d < 2 * unit) { sym += '.'; unit = 0.75 * unit + 0.25 * d; } else { sym += '-'; unit = 0.75 * unit + 0.25 * (d / 3); }
+    unit = Math.max(45, Math.min(300, unit));
+    $('wpm').textContent = `About ${Math.round(1200 / unit)} words a minute`;
+    drawRecv();
+    letterTimer = setTimeout(endLetter, unit * 2.6);
+  }
+  function endLetter() {
+    received += REV[sym] || '?';
+    if (received.length > 80) received = received.slice(-80);
+    sym = '';
+    drawRecv();
+    wordTimer = setTimeout(() => { if (received && !received.endsWith(' ')) { received += ' '; drawRecv(); } }, unit * 4.4);
+  }
+  function drawRecv() {
+    $('recv').innerHTML = `${received.replace(/&/g, '&amp;').replace(/</g, '&lt;')}<span class="cursor"></span>`;
+    $('sym').textContent = sym ? `${sym.replace(/\./g, '·').replace(/-/g, '−')}  ${REV[sym] ? `= ${REV[sym]}` : ''}` : ' ';
+  }
+  const desk = $('desk');
+  desk.addEventListener('pointerdown', (e) => { e.preventDefault(); desk.setPointerCapture(e.pointerId); keyDown(); });
+  desk.addEventListener('pointerup', keyUp);
+  desk.addEventListener('pointercancel', keyUp);
+  desk.addEventListener('lostpointercapture', keyUp);
+  document.addEventListener('keydown', (e) => {
+    if (e.code !== 'Space' || (e.target instanceof Element && e.target.closest('input, textarea, select, button'))) return;
+    e.preventDefault();
+    if (!e.repeat) keyDown();
+  });
+  document.addEventListener('keyup', (e) => { if (e.code === 'Space') keyUp(); });
+  desk.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.repeat) keyDown(); });
+  desk.addEventListener('keyup', (e) => { if (e.key === 'Enter') keyUp(); });
+  $('wipe').addEventListener('click', () => { received = ''; sym = ''; drawRecv(); });
+  document.querySelectorAll('[data-snd]').forEach((b) => b.addEventListener('click', () => {
+    sound = b.dataset.snd;
+    document.querySelectorAll('[data-snd]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  }));
+
+  /* ================================================================
+     Sending a whole message: build the timing, then play it
+     ================================================================ */
+  function timeline(text, code, unitMs) {
+    const T = TIMING[code];
+    const table = code === 'intl' ? INTL : AMER;
+    const out = { marks: [], letters: [], end: 0 };
+    let t = 0;
+    const words = text.toUpperCase().replace(/-/g, code === 'intl' ? '-' : ' ').split(/\s+/).filter(Boolean);
+    words.forEach((word, wi) => {
+      if (wi) t += (T.word - T.letter) * unitMs;
+      [...word].forEach((ch, ci) => {
+        const pat = table[ch];
+        if (!pat) return;
+        if (ci) t += T.letter * unitMs;
+        let first = true;
+        for (const el of pat) {
+          if (el === ' ') { t += (T.longGap - T.gap) * unitMs; continue; }
+          if (!first) t += T.gap * unitMs;
+          const len = (T[el] || 1) * unitMs;
+          out.marks.push({ a: t, b: t + len });
+          t += len;
+          first = false;
+        }
+        out.letters.push({ t, ch });
+      });
+      out.letters.push({ t: t + 1, ch: ' ' });
+    });
+    out.end = t + 400;
+    return out;
+  }
+  let playing = null;
+  function play(text, code, wpm, voice, onLetter, onDone, farnsworth) {
+    stopPlaying();
+    if (!audio()) return;
+    const unitMs = 1200 / (farnsworth ? Math.max(wpm, 15) : wpm);
+    let tl = timeline(text, code, unitMs);
+    // For learners: letters at a steady speed with longer gaps between them.
+    if (farnsworth && wpm < 15) tl = stretchGaps(tl, 1200 / wpm / unitMs);
+    const out = ac.createGain();
+    out.connect(master);
+    const t0 = ac.currentTime + 0.12;
+    if (voice === 'sounder') {
+      for (const m of tl.marks) { click(t0 + m.a / 1000, true, out); click(t0 + m.b / 1000, false, out); }
+    } else {
+      const o = ac.createOscillator();
+      o.frequency.value = 640;
+      const g = ac.createGain();
+      g.gain.value = 0;
+      for (const m of tl.marks) {
+        g.gain.setTargetAtTime(0.28, t0 + m.a / 1000, 0.003);
+        g.gain.setTargetAtTime(0, t0 + m.b / 1000, 0.003);
+      }
+      o.connect(g).connect(out);
+      o.start(t0);
+      o.stop(t0 + tl.end / 1000 + 0.2);
+    }
+    const clock = () => (ac.currentTime - t0) * 1000;
+    playing = { out, tl, clock, li: 0, onLetter, onDone };
+    tapeClock = clock;
+    tapeMarks = tl.marks;
+    kickTape();
+    const step = () => {
+      if (!playing) return;
+      const now = clock();
+      const on = tl.marks.some((m) => now >= m.a && now < m.b);
+      setInstruments(on);
+      while (playing.li < tl.letters.length && tl.letters[playing.li].t <= now) onLetter(tl.letters[playing.li++].ch);
+      if (now >= tl.end) { const done = playing.onDone; playing = null; setInstruments(false); tapeIdleSince = tapeClock(); done && done(); return; }
+      requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+  // Widen the gaps between letters by k, leaving the marks inside each letter alone.
+  function stretchGaps(tl, k) {
+    const out = { marks: [], letters: [], end: 0 };
+    let shift = 0, mi = 0, prevEnd = null;
+    for (const l of tl.letters) {
+      let first = true;
+      while (mi < tl.marks.length && tl.marks[mi].b <= l.t + 0.5) {
+        const m = tl.marks[mi++];
+        if (first && prevEnd !== null) shift += (m.a - prevEnd) * (k - 1);
+        first = false;
+        out.marks.push({ a: m.a + shift, b: m.b + shift });
+        prevEnd = m.b;
+      }
+      out.letters.push({ t: l.t + shift, ch: l.ch });
+    }
+    out.end = tl.end + shift;
+    return out;
+  }
+  function stopPlaying() {
+    if (!playing) return;
+    try { playing.out.disconnect(); } catch (e) { /* already gone */ }
+    const done = playing.onDone;
+    playing = null;
+    setInstruments(false);
+    done && done(true);
+  }
+
+  // The chart: tap a letter to hear it
+  $('chart').innerHTML = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'].map((c) => `<button type="button" data-ch="${c}" aria-label="${c}: ${INTL[c].replace(/\./g, 'dot ').replace(/-/g, 'dash ').trim()}"><b>${c}</b><span>${INTL[c].replace(/\./g, '·').replace(/-/g, '−')}</span></button>`).join('');
+  $('chart').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-ch]');
+    if (b) play(b.dataset.ch, 'intl', 15, sound, () => {}, () => {});
+  });
+  $('codes').innerHTML = [...'COLRYZP'].map((c) => {
+    const fmt = (p) => p.replace(/\./g, '·').replace(/-/g, '−').replace(/L/g, '—').replace(/Z/g, '——').replace(/ /g, '  ');
+    return `<tr><td>${c}</td><td>${fmt(AMER[c])}</td><td>${fmt(INTL[c])}</td></tr>`;
+  }).join('');
+
+  /* ================================================================
+     The counter: words, money and the line
+     ================================================================ */
+  const WRIGHT = {
+    to: 'Bishop M. Wright, Dayton, Ohio',
+    body: 'Success four flights Thursday morning all against twenty-one mile per hour wind started from level with engine power alone average speed through air thirty-one miles longest 57 seconds inform press home Christmas.',
+    sig: 'Orevelle Wright',
+  };
+  let line = 'american';
+  const money = (c) => (c >= 100 ? `$${(c / 100).toFixed(2)}` : `${c}¢`);
+  function price() {
+    const words = $('body').value.trim().split(/\s+/).filter(Boolean).length;
+    const [base, per] = $('route').value.split(',').map(Number);
+    const extra = Math.max(0, words - 10);
+    const total = base + extra * per;
+    $('w').textContent = words;
+    $('base').textContent = money(base);
+    $('extra-l').textContent = `${extra} extra word${extra === 1 ? '' : 's'} at ${per}¢`;
+    $('extra').textContent = money(extra * per);
+    $('cost').textContent = money(total);
+    $('tip').innerHTML = words > 10
+      ? `Cut <b>${extra}</b> word${extra === 1 ? '' : 's'} and this costs <b>${money(base)}</b>. Senders dropped little words like the, a and I, and left out punctuation.`
+      : words ? `<b>Ten words or fewer</b> all cost the same, so this is as cheap as a telegram gets on this line.` : 'Write a message to see what it costs.';
+  }
+  ['body', 'route'].forEach((id) => $(id).addEventListener('input', price));
+  $('route').addEventListener('change', price);
+  $('wright').addEventListener('click', () => { $('to').value = WRIGHT.to; $('body').value = WRIGHT.body; $('sig').value = WRIGHT.sig; $('stamp').textContent = 'Received at Dayton, Ohio · Dec. 17, 1903'; price(); });
+  $('blankit').addEventListener('click', () => { $('to').value = ''; $('body').value = ''; $('sig').value = ''; $('stamp').textContent = 'Your telegram'; price(); $('to').focus(); });
+  document.querySelectorAll('[data-line]').forEach((b) => b.addEventListener('click', () => {
+    line = b.dataset.line;
+    document.querySelectorAll('[data-line]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  }));
+  $('blank').addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (playing) return;
+    const parts = [$('to').value, $('body').value, $('sig').value].map((s) => s.trim()).filter(Boolean);
+    if (!parts.length) { $('out').textContent = 'There’s nothing on the blank to send yet.'; return; }
+    const text = parts.join(' ').replace(/[^A-Za-z0-9.,\s-]/g, ' ');
+    let copy = '';
+    $('out').textContent = '';
+    $('send').disabled = true;
+    $('stop').hidden = false;
+    play(text, line, 20, line === 'american' ? 'sounder' : 'tone', (ch) => { copy += ch; $('out').textContent = copy; }, (stopped) => {
+      $('send').disabled = false;
+      $('stop').hidden = true;
+      if (stopped) $('out').textContent = `${copy.trim()} … (stopped)`;
+    });
+  });
+  $('stop').addEventListener('click', stopPlaying);
+
+  /* ================================================================
+     Copy by ear
+     ================================================================ */
+  const WORDS = ['HOME', 'SAFE', 'ARRIVE', 'MONEY', 'TRAIN', 'SEND', 'LOVE', 'WIRE', 'STOP', 'BABY', 'SOON', 'WELL', 'COME', 'NEWS', 'BOAT', 'WIN', 'MEET', 'NOON', 'SOS', 'TODAY'];
+  let word = '', tries = 0, right = 0, heard = false;
+  function newWord() {
+    let w;
+    do { w = WORDS[Math.floor(Math.random() * WORDS.length)]; } while (w === word);
+    word = w;
+    heard = false;
+    $('guess').value = '';
+    $('res').textContent = 'Press play and listen.';
+    $('res').className = 'res';
+  }
+  $('play').addEventListener('click', () => {
+    heard = true;
+    play(word, 'intl', Number($('speed').value), sound, () => {}, () => { $('guess').focus(); }, true);
+  });
+  function check() {
+    const g = $('guess').value.trim().toUpperCase();
+    if (!g) { $('res').textContent = heard ? 'Type what you heard first.' : 'Press play first.'; return; }
+    tries++;
+    const pat = [...word].map((c) => INTL[c].replace(/\./g, '·').replace(/-/g, '−')).join('  ');
+    if (g === word) {
+      right++;
+      $('res').className = 'res';
+      $('res').innerHTML = `<b>Right: ${word}.</b> ${pat}`;
+    } else {
+      $('res').className = 'res miss';
+      $('res').innerHTML = `<b>It was ${word}.</b> ${pat}. Play it again and listen for each letter.`;
+    }
+    $('score').textContent = `${right} of ${tries}`;
+  }
+  $('check').addEventListener('click', check);
+  $('guess').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); check(); } });
+  $('nextw').addEventListener('click', newWord);
+
+  price();
+  drawRecv();
+  drawTape();
+  newWord();
+  window.addEventListener('resize', drawTape);
+})();
+</script>
+</body>
+</html>

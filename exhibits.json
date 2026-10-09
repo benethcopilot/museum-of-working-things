@@ -69,6 +69,10 @@
       "blurb": "Type on an Army Enigma with the real rotor wirings, follow the current through it, and break an intercept the way Bletchley Park did.",
       "try": "Run the bombe on the intercept"
     },
-    { "slug": "telegraph", "hall": "machines", "title": "Telegraph Office", "status": "planned", "blurb": "Tap out Morse code and pay for your telegram by the word." }
+    {
+      "slug": "telegraph", "hall": "machines", "title": "Telegraph Office", "ages": "8 and up",
+      "blurb": "Tap Morse on a brass key and sounder, price a telegram by the word, and send the Wright brothers’ 1903 telegram down the line.",
+      "try": "Send SOS with the space bar"
+    }
   ]
 }
