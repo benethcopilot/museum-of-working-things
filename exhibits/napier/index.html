@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Napier’s Bones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica:ital@0;1&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+:root {
+  /* Layout: the walnut board with its ivory rods on the left, the reckoning worked out on the right like a page from Napier's 1617 book, with red rubrics; the history follows. */
+  --ground: #e3e2dc;
+  --ground-2: #d5d4cc;
+  --page: #f4f2ea;
+  --text: #211d18;
+  --muted: #5d574e;
+  --line: rgba(33, 29, 24, 0.14);
+  --line-strong: rgba(33, 29, 24, 0.32);
+  --rubric: #9b2d20;
+  --tint-a: rgba(155, 45, 32, 0.2);
+  --tint-b: rgba(40, 92, 140, 0.2);
+  --walnut: #4a3121;
+  --ivory: #f1ead6;
+  --engrave: #1d1813;
+  --f-display: "IM Fell DW Pica", "IM Fell English", Georgia, serif;
+  --f-body: "EB Garamond", Garamond, Georgia, serif;
+  --f-fig: "EB Garamond", Garamond, Georgia, serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #13120f;
+    --ground-2: #1e1c18;
+    --page: #1b1915;
+    --text: #ece7dc;
+    --muted: #aba395;
+    --line: rgba(236, 231, 220, 0.12);
+    --line-strong: rgba(236, 231, 220, 0.3);
+    --rubric: #ef8a74;
+    --tint-a: rgba(239, 138, 116, 0.28);
+    --tint-b: rgba(120, 175, 230, 0.26);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #13120f;
+  --ground-2: #1e1c18;
+  --page: #1b1915;
+  --text: #ece7dc;
+  --muted: #aba395;
+  --line: rgba(236, 231, 220, 0.12);
+  --line-strong: rgba(236, 231, 220, 0.3);
+  --rubric: #ef8a74;
+  --tint-a: rgba(239, 138, 116, 0.28);
+  --tint-b: rgba(120, 175, 230, 0.26);
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--text); font-family: var(--f-body); font-size: 18px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--rubric); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 400; line-height: 1.05; margin: 0; text-wrap: balance; }
+.fig, .sumfig, .answer, .partials, .inputs input, .tray button, .timeline .yr, .fig-in { font-feature-settings: "lnum" 1, "tnum" 1; }
+
+.page { box-sizing: border-box; max-width: 1180px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 34px; }
+.masthead { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 40px; align-items: end; }
+.eyebrow { grid-column: 1 / -1; margin: 0; font-size: 0.85rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--rubric); }
+.masthead h1 { font-size: clamp(2.8rem, 7vw, 5rem); }
+.lede { margin: 0; max-width: 58ch; color: var(--muted); }
+
+/* ---------- Board and reckoning ---------- */
+.work { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 26px; align-items: start; }
+.boardwrap { padding: 14px; border-radius: 6px; background: linear-gradient(160deg, #5a3c28, var(--walnut)); box-shadow: 0 16px 28px -18px rgba(0, 0, 0, 0.6); overflow-x: auto; }
+#board { display: block; max-width: 100%; height: auto; margin-inline: auto; }
+.rod { fill: var(--ivory); stroke: #b9ad8e; stroke-width: 1; }
+.rod-head { fill: #e6dcc0; }
+.cellline { stroke: #b9ad8e; stroke-width: 1; }
+.diag { stroke: #8f846a; stroke-width: 1; }
+.fig { font-family: var(--f-fig); fill: var(--engrave); text-anchor: middle; }
+.fig.head { font-size: 26px; }
+.fig.t { font-size: 17px; }
+.fig.u { font-size: 17px; }
+.fig.idx { font-size: 22px; fill: #7a2418; }
+.rowband { fill: rgba(255, 220, 140, 0.32); }
+.tri-a { fill: rgba(155, 45, 32, 0.24); }
+.tri-b { fill: rgba(40, 92, 140, 0.24); }
+.sumfig { font-family: var(--f-fig); font-size: 24px; fill: #f6eedb; text-anchor: middle; }
+.carry { font-family: var(--f-body); font-size: 12px; fill: #f3c07a; text-anchor: middle; }
+.idxbtn { cursor: pointer; }
+.idxbtn:hover rect, .idxbtn:focus rect { fill: #fff3d2; }
+.idxbtn:focus { outline: none; }
+.bonebtn { cursor: pointer; }
+.tray { margin-top: 12px; display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; }
+.tray button { width: 40px; padding: 6px 0 4px; border: 1px solid #b9ad8e; border-radius: 3px; background: var(--ivory); color: var(--engrave); font-family: var(--f-fig); font-size: 1.3rem; line-height: 1; box-shadow: 0 2px 0 #2a1c12; }
+.tray button:hover { background: #fff8e4; }
+.tray-note { margin: 8px 0 0; text-align: center; font-size: 0.85rem; color: #e9dcc0; }
+
+.reckon { padding: 20px 22px; border-radius: 4px; background: var(--page); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 12px; }
+.reckon h2 { font-size: 1.7rem; color: var(--rubric); }
+.inputs { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: end; }
+.inputs label { display: flex; flex-direction: column; gap: 2px; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.inputs input { width: 7em; padding: 5px 8px; border: 1.5px solid var(--line-strong); border-radius: 3px; background: var(--ground); font-family: var(--f-fig); font-size: 1.4rem; letter-spacing: 0.08em; }
+.btn { padding: 6px 12px; border: 1.5px solid var(--line-strong); border-radius: 3px; background: none; font-size: 0.95rem; }
+.btn:hover { background: var(--ground-2); }
+.steps { margin: 0; padding-left: 1.4em; display: flex; flex-direction: column; gap: 3px; }
+.steps li { font-size: 1rem; }
+.steps .fig-in { font-family: var(--f-fig); font-size: 1.1em; }
+.answer { font-family: var(--f-fig); font-size: 2.2rem; line-height: 1.1; }
+.answer small { display: block; font-family: var(--f-body); font-size: 0.95rem; color: var(--muted); }
+.partials { border-collapse: collapse; font-family: var(--f-fig); font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+.partials td { padding: 1px 8px; text-align: right; }
+.partials td.lab { font-family: var(--f-body); font-size: 0.9rem; color: var(--muted); text-align: left; }
+.partials tr.sum td { border-top: 1.5px solid var(--text); }
+.partials tr button { padding: 0; border: 0; background: none; font: inherit; color: var(--rubric); text-decoration: underline; text-underline-offset: 3px; }
+.partials tr.on td { background: var(--tint-a); }
+.say { margin: 0; font-size: 1rem; }
+
+/* ---------- History ---------- */
+.notes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 30px; }
+.notes h3 { font-size: 1.4rem; margin-bottom: 6px; color: var(--rubric); }
+.notes p { margin: 0 0 8px; font-size: 1rem; }
+.history { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 20px 40px; padding-top: 24px; border-top: 1px solid var(--line-strong); }
+.history h2 { font-size: 2rem; margin-bottom: 12px; }
+.timeline { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.timeline li { display: grid; grid-template-columns: 3.6em minmax(0, 1fr); gap: 12px; }
+.timeline .yr { font-family: var(--f-fig); font-size: 1.25rem; line-height: 1.3; color: var(--rubric); }
+.timeline p { margin: 0; font-size: 1rem; }
+.aside p { margin: 0 0 10px; font-size: 1rem; }
+.sources { grid-column: 1 / -1; margin: 0; font-size: 0.88rem; color: var(--muted); }
+.sources a { color: inherit; text-underline-offset: 3px; }
+
+@media (max-width: 920px) {
+  .work, .history, .notes { grid-template-columns: minmax(0, 1fr); }
+  .masthead { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="napier" defer></script>
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Numbers &amp; Elements · Edinburgh, 1617</p>
+    <h1>Napier’s Bones</h1>
+    <p class="lede">The same Scottish laird who invented logarithms made a set of ivory rods that turn long multiplication into adding small numbers. Lay the rods side by side, pick a row, and add along the diagonals.</p>
+  </header>
+
+  <section class="work" aria-label="The board and the reckoning">
+    <div class="boardwrap">
+      <svg id="board" viewBox="0 0 440 560" role="img" aria-label="Napier's board with the index rod on the left and the chosen rods beside it"></svg>
+      <div class="tray" id="tray" role="group" aria-label="Add a rod"></div>
+      <p class="tray-note">Add rods from the box above, or click a rod on the board to take it off. Click a number on the left-hand rod to read that row.</p>
+    </div>
+
+    <div class="reckon">
+      <h2>The reckoning</h2>
+      <div class="inputs">
+        <label for="num">Number on the board<input id="num" inputmode="numeric" maxlength="6" value="425" autocomplete="off"></label>
+        <label for="by">Multiply by<input id="by" inputmode="numeric" maxlength="3" value="6" autocomplete="off"></label>
+      </div>
+      <div id="out"></div>
+    </div>
+  </section>
+
+  <section class="notes">
+    <div>
+      <h3>Why the diagonals work</h3>
+      <p>Each square holds a product from the times table, split into tens above the slanted line and units below it. Reading along a row, the units of one rod and the tens of the next rod belong to the same place value, so the slanted strips line them up for you to add.</p>
+    </div>
+    <div>
+      <h3>Bigger multipliers</h3>
+      <p>To multiply by 913, read row 9, row 1 and row 3 separately, shift each one by its place, and add the three lines. You only ever need the times table up to 9, and the rods have already done that part.</p>
+    </div>
+    <div>
+      <h3>Four tables on every rod</h3>
+      <p>Napier’s rods were square, made of metal, wood or ivory, with a different times table engraved on each of the four faces. A small set could make any number by turning the rods to the faces needed.</p>
+    </div>
+  </section>
+
+  <section class="history">
+    <div>
+      <h2>From the laird of Merchiston</h2>
+      <ol class="timeline">
+        <li><span class="yr">1614</span><p>John Napier of Merchiston, near Edinburgh, publishes his logarithms. The bones are a separate invention, and a much simpler one.</p></li>
+        <li><span class="yr">1617</span><p>His book <i>Rabdologiae</i> describes the rods. He coined the word rabdology, counting with rods. It is printed in Edinburgh the year he dies.</p></li>
+        <li><span class="yr">1623</span><p>Wilhelm Schickard in Germany designs a calculating machine that builds rotating Napier’s rods into an adding mechanism.</p></li>
+        <li><span class="yr">1891</span><p>Henri Genaille invents a version, later called the Genaille–Lucas rulers, that shows the carries with printed arrows, so you can read the answer without adding at all.</p></li>
+      </ol>
+    </div>
+    <div class="aside">
+      <h2>Adding instead of multiplying</h2>
+      <p>The bones, the logarithms and the slide rule all do the same trick: they turn multiplying, which is slow and error-prone, into adding, which almost anyone can do reliably. That idea runs through four centuries of calculating machines.</p>
+      <p>Napier’s bones also do division, by finding the largest row that fits, and with an extra rod they can extract square roots.</p>
+    </div>
+    <p class="sources">Sources: <a href="https://en.wikipedia.org/wiki/Napier%27s_bones" target="_blank" rel="noopener">Napier’s bones</a> (the board, the rods, the worked examples 425 × 6 and 825 × 913, and the Genaille–Lucas rulers), <a href="https://en.wikipedia.org/wiki/John_Napier" target="_blank" rel="noopener">John Napier</a> and <a href="https://en.wikipedia.org/wiki/Wilhelm_Schickard" target="_blank" rel="noopener">Wilhelm Schickard</a> on Wikipedia.</p>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const C = 46, GAP = 3, X0 = 14, Y0 = 14, MAXB = 7;
+
+  let bones = [4, 2, 5];
+  let by = '6';
+  let row = 6;        // the row shown on the board
+
+  const boneX = (i) => X0 + (C + GAP) * (i + 1);
+  const rowY = (k) => Y0 + C * k;          // k = 1..9; header at k = 0
+
+  function rowGroups(k) {
+    // products along a row, then the slanted sums from the right with carries
+    const n = bones.length;
+    const t = bones.map((d) => Math.floor((d * k) / 10)), u = bones.map((d) => (d * k) % 10);
+    const groups = [];
+    for (let g = 0; g <= n; g++) {
+      const parts = [];
+      if (g <= n - 1) parts.push(u[n - 1 - g]);
+      if (g >= 1) parts.push(t[n - g]);
+      groups.push(parts);
+    }
+    let carry = 0;
+    const digits = groups.map((parts) => {
+      const s = parts.reduce((a, b) => a + b, 0) + carry;
+      const cin = carry;
+      carry = Math.floor(s / 10);
+      return { parts, cin, sum: s, digit: s % 10, cout: carry };
+    });
+    if (carry) digits.push({ parts: [], cin: carry, sum: carry, digit: carry, cout: 0 });
+    return { t, u, digits };
+  }
+
+  /* ================================================================
+     The board
+     ================================================================ */
+  function drawBoard() {
+    const n = bones.length;
+    const W = boneX(Math.max(n, 3)) + C + X0;
+    $('board').setAttribute('viewBox', `0 0 ${W} 560`);
+    $('board').style.width = `${W}px`;
+    let s = `<rect x="0" y="0" width="${W}" height="560" fill="transparent"/>`;
+    // the row being read
+    if (row) s += `<rect class="rowband" x="${X0 - 4}" y="${rowY(row) - 2}" width="${boneX(n - 1) + C - X0 + 8}" height="${C + 4}" rx="4"/>`;
+    // index rod
+    s += `<rect class="rod" x="${X0}" y="${Y0}" width="${C}" height="${C * 10}" rx="3"/>`;
+    for (let k = 1; k <= 9; k++) {
+      s += `<g class="idxbtn" data-row="${k}" tabindex="0" role="button" aria-label="Read row ${k}"><rect x="${X0 + 1}" y="${rowY(k) + 1}" width="${C - 2}" height="${C - 2}" fill="${k === row ? '#fff3d2' : 'transparent'}"/><text class="fig idx" x="${X0 + C / 2}" y="${rowY(k) + C * 0.68}">${k}</text></g>`;
+      s += `<line class="cellline" x1="${X0}" x2="${X0 + C}" y1="${rowY(k)}" y2="${rowY(k)}"/>`;
+    }
+    // the rods
+    const groupsOf = row ? rowGroups(row) : null;
+    bones.forEach((d, i) => {
+      const x = boneX(i);
+      s += `<g class="bonebtn" data-bone="${i}" role="button" tabindex="0" aria-label="Rod ${d}. Click to take it off the board.">`;
+      s += `<rect class="rod" x="${x}" y="${Y0}" width="${C}" height="${C * 10}" rx="3"/><rect class="rod-head" x="${x + 1}" y="${Y0 + 1}" width="${C - 2}" height="${C - 2}" rx="2"/>`;
+      s += `<text class="fig head" x="${x + C / 2}" y="${Y0 + C * 0.7}">${d}</text>`;
+      for (let k = 1; k <= 9; k++) {
+        const y = rowY(k), p = d * k;
+        if (row === k) {
+          // shade the two triangles by which slanted sum they join
+          const g = bones.length - 1 - i;
+          s += `<path class="${g % 2 ? 'tri-b' : 'tri-a'}" d="M${x + C} ${y}L${x + C} ${y + C}L${x} ${y + C}Z"/>`;
+          s += `<path class="${(g + 1) % 2 ? 'tri-b' : 'tri-a'}" d="M${x} ${y}L${x + C} ${y}L${x} ${y + C}Z"/>`;
+        }
+        s += `<line class="cellline" x1="${x}" x2="${x + C}" y1="${y}" y2="${y}"/><line class="diag" x1="${x}" y1="${y + C}" x2="${x + C}" y2="${y}"/>`;
+        s += `<text class="fig t" x="${x + C * 0.3}" y="${y + C * 0.42}">${Math.floor(p / 10)}</text><text class="fig u" x="${x + C * 0.7}" y="${y + C * 0.86}">${p % 10}</text>`;
+      }
+      s += '</g>';
+    });
+    // the slanted sums written under the board
+    if (groupsOf) {
+      const ny = Y0 + C * 10 + 34;
+      groupsOf.digits.forEach((dg, g) => {
+        let x;
+        if (g === 0) x = boneX(n - 1) + C * 0.7;
+        else if (g < n) x = boneX(n - g);
+        else if (g === n) x = boneX(0) + C * 0.3;
+        else x = boneX(0) - C * 0.4;
+        const lead = g === groupsOf.digits.length - 1 && dg.digit === 0 && g > 0;
+        if (!lead) s += `<text class="sumfig" x="${x}" y="${ny}">${dg.digit}</text>`;
+        if (dg.cin) s += `<text class="carry" x="${x + 13}" y="${ny - 18}">+${dg.cin}</text>`;
+      });
+    }
+    $('board').innerHTML = s;
+  }
+
+  /* ================================================================
+     The reckoning
+     ================================================================ */
+  const num = () => Number(bones.join('')) || 0;
+  function rowValue(k) {
+    const { digits } = rowGroups(k);
+    return Number(digits.map((d) => d.digit).reverse().join('')) || 0;
+  }
+  function explainRow(k) {
+    const { t, u, digits } = rowGroups(k);
+    const n = bones.length;
+    let li = `<li>Row ${k} reads ${bones.map((_, i) => `<span class="fig-in">${t[i]}/${u[i]}</span>`).join(', ')}.</li>`;
+    digits.forEach((dg, g) => {
+      if (g === digits.length - 1 && dg.sum === 0 && g > 0) return;
+      const parts = dg.parts.map(String);
+      if (dg.cin) parts.push(`${dg.cin} carried`);
+      const place = ['units', 'tens', 'hundreds', 'thousands', 'ten thousands', 'hundred thousands', 'millions'][g] || `place ${g + 1}`;
+      const sum = parts.length > 1 ? `${parts.join(' + ')} = ${dg.sum}` : `${dg.sum}`;
+      li += `<li>${place[0].toUpperCase() + place.slice(1)}: ${sum}${dg.sum >= 10 ? `, write ${dg.digit} and carry ${dg.cout}` : ''}.</li>`;
+    });
+    void n;
+    return li;
+  }
+  function drawOut() {
+    const out = $('out');
+    if (!bones.length) { out.innerHTML = '<p class="say">Put some rods on the board first.</p>'; return; }
+    const m = by.replace(/\D/g, '');
+    if (!m) { out.innerHTML = '<p class="say">Type a number to multiply by.</p>'; return; }
+    const N = num();
+    if (m.length === 1) {
+      const k = Number(m);
+      if (k === 0) { out.innerHTML = '<p class="say">Anything times 0 is 0, so there is no row 0 on the rods.</p>'; return; }
+      out.innerHTML = `<ol class="steps">${explainRow(k)}</ol><div class="answer">${N} × ${k} = ${(N * k).toLocaleString('en-US')}<small>Add along the slanted strips from the right, carrying as you go.</small></div>`;
+      return;
+    }
+    // several digits: one row per digit, shifted by place
+    const ds = [...m].map(Number);
+    let rows = '', total = 0;
+    ds.forEach((d, i) => {
+      const place = ds.length - 1 - i;
+      const v = d ? rowValue(d) * 10 ** place : 0;
+      total += v;
+      rows += `<tr class="${d === row ? 'on' : ''}"><td class="lab">${d ? `<button type="button" data-show="${d}">row ${d}</button>` : 'row 0'} × ${(10 ** place).toLocaleString('en-US')}</td><td>${v.toLocaleString('en-US')}</td></tr>`;
+    });
+    rows += `<tr class="sum"><td class="lab">add them</td><td>${total.toLocaleString('en-US')}</td></tr>`;
+    out.innerHTML = `<p class="say">Read one row for each digit of ${m}, shift it to its place, and add. Click a row to see it on the board.</p><table class="partials"><tbody>${rows}</tbody></table><div class="answer">${N} × ${Number(m)} = ${total.toLocaleString('en-US')}<small>${total === N * Number(m) ? 'Check: correct.' : ''}</small></div>`;
+  }
+  function render() { drawBoard(); drawOut(); }
+
+  /* ================================================================
+     Controls
+     ================================================================ */
+  $('tray').innerHTML = [...'0123456789'].map((d) => `<button type="button" data-add="${d}" aria-label="Add rod ${d}">${d}</button>`).join('');
+  $('tray').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-add]');
+    if (!b) return;
+    if (bones.length >= MAXB) return;
+    bones.push(Number(b.dataset.add));
+    if (bones.length > 1 && bones[0] === 0) bones.shift();
+    $('num').value = bones.join('');
+    render();
+  });
+  function removeBone(i) {
+    bones.splice(i, 1);
+    $('num').value = bones.join('');
+    render();
+  }
+  $('board').addEventListener('click', (e) => {
+    const r = e.target.closest('[data-row]');
+    if (r) { row = Number(r.dataset.row); if (by.length <= 1) { by = String(row); $('by').value = by; } render(); return; }
+    const b = e.target.closest('[data-bone]');
+    if (b) removeBone(Number(b.dataset.bone));
+  });
+  $('board').addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const r = e.target.closest('[data-row]');
+    const b = e.target.closest('[data-bone]');
+    if (r || b) { e.preventDefault(); e.target.dispatchEvent(new MouseEvent('click', { bubbles: true })); }
+  });
+  $('num').addEventListener('input', (e) => {
+    const v = e.target.value.replace(/\D/g, '').replace(/^0+(?=\d)/, '').slice(0, MAXB);
+    bones = v ? [...v].map(Number) : [];
+    render();
+  });
+  $('by').addEventListener('input', (e) => {
+    by = e.target.value.replace(/\D/g, '').slice(0, 3);
+    const ds = [...by].map(Number).filter(Boolean);
+    if (by.length === 1 && Number(by) > 0) row = Number(by);
+    else if (ds.length && !ds.includes(row)) row = ds[ds.length - 1];
+    render();
+  });
+  $('out').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-show]');
+    if (b) { row = Number(b.dataset.show); render(); }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
