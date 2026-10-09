@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Broad Street Pump</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Azeret+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  /* Layout: Snow's map of Soho takes most of the width with his casebook of pumps beside it; under them the day-by-day chart of the outbreak; then his reasoning in his own words, and the history. */
+  --ground: #e5e5df;
+  --ground-2: #d7d8d0;
+  --map: #f2f1ea;
+  --text: #1d1c1a;
+  --muted: #5a5952;
+  --line: rgba(29, 28, 26, 0.14);
+  --line-strong: rgba(29, 28, 26, 0.32);
+  --street: #8d8a80;
+  --death: #1d1c1a;
+  --faded: rgba(29, 28, 26, 0.18);
+  --accent: #a3271f;
+  --accent-soft: rgba(163, 39, 31, 0.12);
+  --water: #1f5f7a;
+  --f-display: "Libre Caslon Display", "Big Caslon", "Iowan Old Style", Georgia, serif;
+  --f-body: "Libre Caslon Text", "Iowan Old Style", Georgia, serif;
+  --f-data: "Azeret Mono", "Consolas", "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #121312;
+    --ground-2: #1c1d1b;
+    --map: #191a18;
+    --text: #e8e6de;
+    --muted: #a3a197;
+    --line: rgba(232, 230, 222, 0.12);
+    --line-strong: rgba(232, 230, 222, 0.3);
+    --street: #6f6d65;
+    --death: #ece9df;
+    --faded: rgba(236, 233, 223, 0.18);
+    --accent: #ff7a6b;
+    --accent-soft: rgba(255, 122, 107, 0.14);
+    --water: #7cc3e0;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #121312;
+  --ground-2: #1c1d1b;
+  --map: #191a18;
+  --text: #e8e6de;
+  --muted: #a3a197;
+  --line: rgba(232, 230, 222, 0.12);
+  --line-strong: rgba(232, 230, 222, 0.3);
+  --street: #6f6d65;
+  --death: #ece9df;
+  --faded: rgba(236, 233, 223, 0.18);
+  --accent: #ff7a6b;
+  --accent-soft: rgba(255, 122, 107, 0.14);
+  --water: #7cc3e0;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--text); font-family: var(--f-body); font-size: 16.5px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 400; line-height: 1.05; margin: 0; text-wrap: balance; }
+
+.page { box-sizing: border-box; max-width: 1240px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 34px; }
+.masthead { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 40px; align-items: end; }
+.eyebrow { grid-column: 1 / -1; margin: 0; font-family: var(--f-data); font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+.masthead h1 { font-size: clamp(2.8rem, 7vw, 5.2rem); }
+.lede { margin: 0; max-width: 60ch; color: var(--muted); }
+
+/* ---------- Map and casebook ---------- */
+.study { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(280px, 1fr); gap: 24px; align-items: start; }
+.mapframe { padding: 8px; border: 1px solid var(--line-strong); background: var(--map); }
+.mapframe .inner { border: 3px double var(--line-strong); }
+#map { display: block; width: 100%; height: auto; }
+.street { fill: none; stroke: var(--street); stroke-width: 1.4; stroke-linecap: round; }
+.dots { fill: var(--death); transition: fill 0.2s; }
+.dots.fade { fill: var(--faded); }
+.dots.hot { fill: var(--accent); }
+.cellf { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.2; }
+.cello { fill: none; stroke: var(--water); stroke-width: 1; stroke-dasharray: 5 4; opacity: 0.8; }
+.ring { fill: none; stroke: var(--accent); stroke-width: 1; stroke-dasharray: 3 4; }
+.ringt { font-family: var(--f-data); font-size: 11px; fill: var(--accent); paint-order: stroke; stroke: var(--map); stroke-width: 4px; }
+.pump { cursor: pointer; }
+.pump circle { fill: var(--map); stroke: var(--water); stroke-width: 2.5; }
+.pump .core { fill: var(--water); stroke: none; }
+.pump text { font-family: var(--f-data); font-size: 12px; fill: var(--water); paint-order: stroke; stroke: var(--map); stroke-width: 4px; }
+.pump.on circle { stroke: var(--accent); stroke-width: 3.5; }
+.pump.on .core { fill: var(--accent); }
+.pump.on text { fill: var(--accent); font-weight: 600; }
+.pump:focus { outline: none; }
+.pump:focus-visible circle { stroke-width: 5; }
+.pump .x { stroke: var(--accent); stroke-width: 3; stroke-linecap: round; }
+.scalebar { stroke: var(--text); stroke-width: 2; }
+.scalet { font-family: var(--f-data); font-size: 11px; fill: var(--text); }
+.mapnote { margin: 8px 2px 0; font-size: 0.85rem; color: var(--muted); }
+
+.casebook { display: flex; flex-direction: column; gap: 14px; }
+.casebook h2 { font-size: 1.9rem; }
+.casebook .sub { margin: 0; font-size: 0.95rem; color: var(--muted); }
+.rows { display: flex; flex-direction: column; gap: 3px; }
+.prow { display: grid; grid-template-columns: 8.4em minmax(0, 1fr) 3ch; gap: 8px; align-items: center; padding: 3px 6px; border: 1px solid transparent; border-radius: 4px; background: none; text-align: left; font-size: 0.92rem; }
+.prow:hover { background: var(--ground-2); }
+.prow[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.prow .bar { height: 10px; border-radius: 0 4px 4px 0; background: var(--water); min-width: 2px; }
+.prow[aria-pressed="true"] .bar { background: var(--accent); }
+.prow .n { font-family: var(--f-data); font-size: 0.85rem; text-align: right; font-variant-numeric: tabular-nums; }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { padding: 7px 13px; border: 1.5px solid var(--line-strong); border-radius: 4px; background: none; font-size: 0.9rem; }
+.btn:hover { background: var(--ground-2); }
+.btn[aria-pressed="true"] { background: var(--text); color: var(--ground); border-color: var(--text); }
+.verdict { margin: 0; padding: 12px 14px; border-left: 3px solid var(--accent); background: var(--ground-2); font-size: 0.97rem; min-height: 4.8em; }
+.verdict b { font-weight: 700; }
+
+/* ---------- The outbreak by day ---------- */
+.sec-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 24px; margin-bottom: 10px; }
+.sec-head h2 { font-size: clamp(1.8rem, 3.4vw, 2.4rem); }
+.sec-head p { margin: 0; max-width: 62ch; color: var(--muted); }
+.chartbox { position: relative; padding: 14px 12px 8px; border: 1px solid var(--line); background: var(--map); }
+.chart-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.seg { display: inline-flex; border: 1.5px solid var(--line-strong); border-radius: 4px; overflow: hidden; }
+.seg button { padding: 5px 12px; border: 0; background: none; font-size: 0.88rem; }
+.seg button[aria-pressed="true"] { background: var(--text); color: var(--ground); }
+.chart-title { font-family: var(--f-data); font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+#chart { display: block; width: 100%; height: auto; }
+.bar-d { fill: var(--water); }
+.bar-d.after { fill: var(--street); }
+.bar-hit { fill: transparent; }
+.grid { stroke: var(--line); stroke-width: 1; }
+.axis-t { font-family: var(--f-data); font-size: 11px; fill: var(--muted); }
+.mark { stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.mark-t { font-family: var(--f-data); font-size: 11px; fill: var(--accent); }
+.tip { position: absolute; pointer-events: none; padding: 6px 9px; border-radius: 4px; background: var(--text); color: var(--ground); font-family: var(--f-data); font-size: 0.78rem; white-space: nowrap; transform: translate(-50%, -110%); }
+.tablewrap { overflow-x: auto; margin-top: 8px; }
+.tablewrap table { border-collapse: collapse; font-family: var(--f-data); font-size: 0.8rem; font-variant-numeric: tabular-nums; }
+.tablewrap th, .tablewrap td { padding: 3px 10px; border-bottom: 1px solid var(--line); text-align: right; }
+.tablewrap th:first-child, .tablewrap td:first-child { text-align: left; }
+
+/* ---------- Snow's reasoning ---------- */
+.reason { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 30px; }
+.reason h3 { font-size: 1.45rem; margin-bottom: 6px; }
+.reason p { margin: 0 0 8px; font-size: 0.97rem; }
+.reason blockquote { margin: 0 0 8px; padding-left: 12px; border-left: 2px solid var(--line-strong); font-style: italic; font-size: 0.97rem; }
+.history { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 20px 40px; padding-top: 24px; border-top: 1px solid var(--line-strong); }
+.history h2 { font-size: 2rem; margin-bottom: 12px; }
+.timeline { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.timeline li { display: grid; grid-template-columns: 8em minmax(0, 1fr); gap: 12px; }
+.timeline .yr { font-family: var(--f-data); font-size: 0.85rem; line-height: 1.9; color: var(--accent); }
+.timeline p { margin: 0; font-size: 0.97rem; }
+.aside p { margin: 0 0 10px; font-size: 0.97rem; }
+.sources { grid-column: 1 / -1; margin: 0; font-size: 0.85rem; color: var(--muted); }
+.sources a { color: inherit; text-underline-offset: 3px; }
+
+@media (max-width: 960px) {
+  .study, .history { grid-template-columns: minmax(0, 1fr); }
+  .reason { grid-template-columns: minmax(0, 1fr); }
+  .masthead { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dots { transition: none; }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="broad-street" defer></script>
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Life Science · Soho, London, 1854</p>
+    <h1>Broad Street Pump</h1>
+    <p class="lede">In the first days of September 1854, cholera killed hundreds of people in a few streets of Soho. Most doctors blamed bad air. A physician named John Snow marked every death on a map and asked a different question: where did these people get their water?</p>
+  </header>
+
+  <section class="study" aria-label="Snow’s map and casebook">
+    <figure style="margin:0">
+      <div class="mapframe"><div class="inner">
+        <svg id="map" viewBox="0 0 840 790" role="img" aria-label="Map of Soho with 578 cholera deaths marked as dots and 13 water pumps. The deaths cluster around the pump on Broad Street."></svg>
+      </div></div>
+      <figcaption class="mapnote">Each dot is one death, stacked beside the house where it happened, as on Snow’s own map. Positions from the 1992 digitization of Snow’s map by the National Center for Geographic Information and Analysis.</figcaption>
+    </figure>
+
+    <div class="casebook">
+      <h2>Snow’s casebook</h2>
+      <p class="sub">Choose a pump to see which deaths were closer to it than to any other pump.</p>
+      <div class="rows" id="rows" role="group" aria-label="Deaths nearest each pump"></div>
+      <div class="tools">
+        <button type="button" class="btn" id="cells" aria-pressed="false">Show every pump’s area</button>
+        <button type="button" class="btn" id="handle" aria-pressed="false">Take the Broad Street handle off</button>
+      </div>
+      <p class="verdict" id="verdict" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section aria-labelledby="days-h">
+    <div class="sec-head">
+      <h2 id="days-h">The outbreak, day by day</h2>
+      <p>Snow’s table of the 616 fatal cases, by the day each person fell ill and the day each died. The handle came off on September 8.</p>
+    </div>
+    <div class="chartbox" id="chartbox">
+      <div class="chart-tools">
+        <span class="chart-title" id="chart-title">People who fell ill, per day</span>
+        <span class="seg" role="group" aria-label="Which count"><button type="button" data-series="1" aria-pressed="true">Fell ill</button><button type="button" data-series="2" aria-pressed="false">Died</button></span>
+        <button type="button" class="btn" id="tbl" aria-pressed="false">Show as a table</button>
+      </div>
+      <svg id="chart" viewBox="0 0 880 270" role="img" aria-label="Bar chart of cholera cases per day from August 19 to September 30, 1854"></svg>
+      <div class="tip" id="tip" hidden></div>
+      <div class="tablewrap" id="tablewrap" hidden></div>
+    </div>
+  </section>
+
+  <section class="reason" aria-label="Snow’s reasoning">
+    <div>
+      <h3>The deaths that didn’t fit</h3>
+      <p>A few people died far from Broad Street. Snow went and asked.</p>
+      <blockquote>“There were only ten deaths in houses situated decidedly nearer to another street-pump. In five of these cases the families of the deceased persons informed me that they always sent to the pump in Broad Street, as they preferred the water… In three other cases, the deceased were children who went to school near the pump in Broad Street.”</blockquote>
+    </div>
+    <div>
+      <h3>The brewery</h3>
+      <p>The brewery on Broad Street stood next to the pump, yet none of its workers caught cholera. They were given a daily allowance of beer and drank no water from the well. Brewing boils the water, which kills what is in it.</p>
+      <p>Cases like this, where people who didn’t drink the water stayed well, are the evidence that convinces.</p>
+    </div>
+    <div>
+      <h3>The handle</h3>
+      <blockquote>“I had an interview with the Board of Guardians of St. James’s parish, on the evening of Thursday, the 7th September… In consequence of what I said, the handle of the pump was removed on the following day.”</blockquote>
+      <p>Snow himself said the outbreak was already falling, partly because so many people had fled. The chart shows it.</p>
+    </div>
+  </section>
+
+  <section class="history">
+    <div>
+      <h2>From bad air to bad water</h2>
+      <ol class="timeline">
+        <li><span class="yr">1849</span><p>John Snow publishes his first essay arguing that cholera spreads through something swallowed, not breathed.</p></li>
+        <li><span class="yr">Aug 31, 1854</span><p>New cases jump from a handful a day to 56 on August 31 and 143 on September 1. Within a week three quarters of the people living nearby have fled.</p></li>
+        <li><span class="yr">Sep 8, 1854</span><p>After Snow meets the parish Board of Guardians, the pump’s handle is removed.</p></li>
+        <li><span class="yr">1855</span><p>Snow publishes his map in the second edition of <i>On the Mode of Communication of Cholera</i>. He also shows that houses supplied by the Southwark and Vauxhall water company, which drew from the sewage-laden Thames, had about fourteen times the cholera deaths of houses supplied from cleaner water upriver.</p></li>
+        <li><span class="yr">1855</span><p>The Reverend Henry Whitehead, a curate who first doubted Snow, traces the source: the well had been dug three feet from an old cesspit, and water from washing a sick baby’s nappies had drained into it.</p></li>
+        <li><span class="yr">1992</span><p>A replica pump without a handle is set up near the original spot, now Broadwick Street.</p></li>
+      </ol>
+    </div>
+    <div class="aside">
+      <h2>Why it matters</h2>
+      <p>The authorities put the handle back once the outbreak was over and kept blaming bad air. Snow did not live to see germ theory accepted. His method outlived the argument: count the cases, put them on a map, find what the sick have in common, and look hard at the ones who don’t fit.</p>
+      <p>That is still how outbreaks are traced, and it is why this map is called the founding moment of epidemiology.</p>
+      <p>This page measures straight-line distance to each pump. Snow’s version used walking distance through the streets.</p>
+    </div>
+    <p class="sources">Sources: <a href="https://vincentarelbundock.github.io/Rdatasets/doc/HistData/Snow.deaths.html" target="_blank" rel="noopener">HistData “Snow” datasets</a> (death and pump positions digitized by Rusty Dodson and Waldo Tobler, NCGIA, from Snow’s map; Snow’s daily table of attacks and deaths); <a href="https://en.wikipedia.org/wiki/1854_Broad_Street_cholera_outbreak" target="_blank" rel="noopener">1854 Broad Street cholera outbreak</a> on Wikipedia, including Snow’s words quoted from his 1855 book; John Snow, <a href="https://collections.nlm.nih.gov/ext/cholera/PDF/0050707.pdf" target="_blank" rel="noopener"><i>On the Mode of Communication of Cholera</i></a>, 2nd edition, 1855, at the U.S. National Library of Medicine.</p>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+
+  /* ================================================================
+     Snow's data, already turned into map coordinates: 50 px = 100 m
+     ================================================================ */
+  const STREETS = 'M676.9 10.2L723 9.4M563.1 12.2L676.9 10.2M479.7 14.2L563.1 12.2M420 15.6L479.7 14.2M388.6 16.3L420 15.6M379.8 16.5L388.6 16.3M266.6 18.8L379.8 16.5M208.2 20L266.6 18.8M175.2 20.7L208.2 20M163.9 21L175.2 20.7M89.6 22.9L163.9 21M9.5 25.2L89.6 22.9M324.1 34.5L379.8 16.5M723 9.4L814.2 8.7L815.2 39.1M272.8 40.5L266.6 18.8M94.9 42.3L163.9 21M89.6 22.9L94.9 42.3M278.6 49.3L324.1 34.5M278.6 49.3L272.8 40.5M712.4 50L776.8 41.8L815.2 39.1M712.4 50L715.9 23.1L723 9.4M698.7 51.7L712.4 50M698.7 51.7L676.9 10.2M236.3 61.5L234.1 52.5L272.8 40.5M645.6 62.7L698.7 51.7M645.6 62.7L634.8 28.3L615.3 32.9L609.4 28L605.9 19.1M26.6 63.9L94.9 42.3M221.2 65.9L236.3 61.5M208.2 20L221.2 65.9M10.3 68.2L26.6 63.9M10.3 68.2L9.5 25.2M620 68.8L645.6 62.7M588.5 74.2L620 68.8M588.5 74.2L563.1 12.2M189.7 75L221.2 65.9M189.7 75L175.2 20.7M815.2 39.1L816.4 81.8M548 81.9L579.1 75.9L588.5 74.2M281.2 85.2L283.8 78.7L278.6 49.3M807.7 85.8L816.4 81.8M765.4 78.6L799.2 66.9L807.7 85.8M509.7 89L530.8 85.2L548 81.9M509.7 89L479.7 14.2M416.2 91.2L388.6 16.3M249.6 94.3L281.2 85.2M247.3 95.5L249.6 94.3M236.3 61.5L247.3 95.5M110.1 98.1L189.7 75M94.9 42.3L110.1 98.1M455.3 98.9L477.1 94.9L509.7 89M452.2 99.5L455.3 98.9M548 81.9L556.6 120.5L559.4 120M605.9 124.5L588.5 74.2M609.4 139L643.4 124.6M605.9 124.5L609.4 139M541.2 153.6L596.7 127.2L605.9 124.5M541.2 153.6L509.7 89M609.4 139L615.5 157.4L620.4 163.9M519 164.8L541.2 153.6M562.1 194.5L541.2 153.6M452.2 99.5L420 15.6M816.4 81.8L817.1 106.6M807.7 85.8L817.1 106.6M398.2 109.5L452.2 99.5M26.6 63.9L52.2 109.9M247.3 95.5L199.3 110.8M199.3 110.8L189.7 75M381.4 112.7L398.2 109.5M54.6 114.3L110.1 98.1M52.2 109.9L54.6 114.3M698.7 51.7L727.1 115.7M356 117.5L381.4 112.7M324.1 34.5L356 117.5M817.1 106.6L817.4 118.1M620 68.8L643.4 124.6M313.7 125.5L356 117.5M306.9 96.5L313.7 125.5M52.2 109.9L11.4 125.8M11.4 125.8L10.3 68.2M294.5 129.1L313.7 125.5M291.5 129.7L294.5 129.1M281.2 85.2L291.5 129.7M258.6 136.3L291.5 129.7M249.6 94.3L258.6 136.3M776.8 137.5L817.4 118.1M776.8 137.5L759.7 101.2L727.1 115.7M233.4 141.1L258.6 136.3M15.9 143.4L37.2 137M11.4 125.8L15.9 143.4M208.8 146.1L233.4 141.1M208.8 146.1L199.3 110.8M643.4 124.6L653.5 148.5M381.4 112.7L391.3 152M171.6 153.9L208.8 146.1M125 163.7L171.6 153.9M110.1 98.1L125 163.7M620.4 163.9L653.5 148.5M727.1 115.7L695 132.3L711.1 167.9M91.3 169.2L125 163.7M85.5 170.5L91.3 169.2M54.6 114.3L85.5 170.5M785.3 176.2L793.2 172.5L776.8 137.5M494.4 177.1L519 164.8M455.3 98.9L494.4 177.1M620.4 163.9L624.7 178M353.2 161.5L314.6 179M294.5 129.1L314.6 179M519 164.8L523.5 175.6L518 179.3M26 182.6L85.5 170.5M15.9 143.4L26 182.6M669.4 186.4L711.1 167.9M653.5 148.5L669.4 186.4M12.5 186.6L26 182.6M12.5 186.6L11.4 125.8M760.1 188.1L785.3 176.2M293 188.7L314.6 179M293 188.7L279.2 156.4M494.4 177.1L450.7 199.5M734.7 200L760.1 188.1M624.7 178L632.4 202.9L669.4 186.4M711.1 167.9L727.2 203.5L734.7 200M430 204.5L412.5 164.3L398.2 109.5M567.3 204.7L624.7 178M562.1 194.5L567.3 204.7M536.7 207.6L562.1 194.5M233.4 141.1L239.1 183.9L237.7 188L247.8 209.1L293 188.7M669.4 186.4L672.6 194.1L683.1 217.7M515.1 218.7L536.7 207.6M515.1 218.7L494.4 177.1M201.8 223.7L179.8 180.2L171.6 153.9M140.6 226.4L137.9 215.3L125 163.7M107.8 234.2L140.6 226.4M91.3 169.2L96.5 197.5L100.2 197.2L107.8 234.2M474.5 239.3L515.1 218.7M341.9 242.4L430 204.5M314.6 179L341.9 242.4M633.2 246L638.5 242.1L637.3 239.9L683.1 217.7M616.9 239.5L626.9 234.3L633.2 246M450.4 252L474.5 239.3M430 204.5L450.4 252M618.7 253L633.2 246M817.4 118.1L821.2 253.4M785.3 176.2L821.2 253.4M147.4 254.4L201.8 223.7M147.4 254.4L140.6 226.4M683.1 217.7L699.7 254.8M821.2 253.4L821.4 258.1M429.2 263.2L450.4 252M597.4 263.7L618.7 253M567.3 204.7L597.4 263.7M284.8 267L341.9 242.4M542.2 269.6L515.1 218.7M536.7 207.6L556.2 244.1L567.5 269.9M797.3 271.2L821.4 258.1M760.1 188.1L790.1 255.6L797.3 271.2M597.4 263.7L603.9 276.2M773.3 285.5L797.3 271.2M734.7 200L758.1 251.7L773.3 285.5M508.9 286.8L542.2 269.6M474.5 239.3L479.1 248.2L487.1 265.1L495.1 261.2L508.9 286.8M235.6 288.2L284.8 267M235.6 288.2L201.8 223.7M618.7 253L631 278.9L612.8 288.5M603.9 276.2L612.8 288.5M580.5 289.7L603.9 276.2M163.5 293.7L151.6 271.5L147.4 254.4M508.9 286.8L494.3 294.8M558.2 302.4L580.5 289.7M558.2 302.4L542.2 269.6M284.8 267L286.9 303.4M560.8 307.8L558.2 302.4M200.4 308L235.6 288.2M773.3 285.5L725.3 312.7M699.7 254.8L718.8 298L725.3 312.7M99.4 314.5L163.5 293.7M177.9 320.7L200.4 308M177.9 320.7L163.5 293.7M535.6 321L560.8 307.8M210.9 321.2L232.5 307.8M210.9 321.2L200.4 308M294.9 325.7L317.7 308.7M286.9 303.4L286.2 313.2L294.9 325.7M52.5 329.7L99.4 314.5M107.8 234.2L28.5 259.8L52.5 329.7M317.7 308.7L332.9 330.5M560.8 307.8L575.3 332.5M509.8 334.8L535.6 321M612.8 288.5L633.9 338.2M687.1 339.1L664.5 294.2L661.8 293.8L653.5 274.8L699.7 254.8M286.9 303.4L227.6 342.2M227.6 342.2L210.9 321.2M725.3 312.7L738.5 342.6M490.3 345.2L509.8 334.8M450.4 252L490.3 345.2M332.9 330.5L342.7 345.5M549.5 346.5L575.3 332.5M535.6 321L549.5 346.5M580.5 289.7L603.7 340L606.3 344.2L613.8 342.5L616.1 347.3L633.9 338.2M308.8 347.7L332.9 330.5M294.9 325.7L308.8 347.7M317.7 308.7L358.2 296.3L381.9 348.8M308.8 347.7L311.8 352.4M490.3 345.2L472.6 353.1M633.9 338.2L643.2 359.1M821.4 258.1L824.3 360M342.7 345.5L317.9 362M311.8 352.4L317.9 362M244.2 363L294.9 325.7M244.2 363L227.6 342.2M738.5 342.6L747.6 363.2M356.1 365.9L381.9 348.8M342.7 345.5L356.1 365.9M810.8 368.1L824.3 360M773.3 285.5L788.3 319L810.8 368.1M549.5 346.5L560.8 368.2M472.6 353.1L441.6 368.3M441.6 368.3L419.4 320.9L430.3 314.4M311.8 352.4L300.4 360.4L294.1 362L277.6 375.2M133.3 378.6L177.9 320.7M99.4 314.5L112.8 363.2L133.3 378.6M602.6 379.4L621.9 369.1L630.4 364.6L643.2 359.1M575.3 332.5L602.6 379.4M209.8 380.2L177.9 320.7M533 380.8L509.8 334.8M560.8 368.2L534.6 384M534.6 384L533 380.8M331.9 384.1L356.1 365.9M317.9 362L331.9 384.1M212.9 385.6L244.2 363M209.8 380.2L212.9 385.6M602.6 379.4L607.8 387.6M655.1 388.8L681.3 370.3L697.2 359.5L710 354.6L713.6 354.6L738.5 342.6M643.2 359.1L653.9 385.5L655.1 388.8M441.6 368.3L400.2 389.5M381.9 348.8L400.2 389.5M612.6 396.6L631.8 382.8M607.8 387.6L612.6 396.6M763 398.2L780.4 387.3L810.8 368.1M747.6 363.2L763 398.2M824.3 360L825.4 399.9M810.8 368.1L825.4 399.9M496.4 402.4L533 380.8M472.6 353.1L479.6 369.4L493.7 397.1L496.4 402.4M607.8 387.6L581.3 402.5M560.8 368.2L574.4 390.6L581.3 402.5M307.6 403.8L331.9 384.1M307.6 403.8L292.3 381.4M825.4 399.9L825.5 403.9M356.1 365.9L378.5 406.4M108.6 410.7L133.3 378.6M86.6 369.5L93.2 401.2L108.6 410.7M622 412.7L655.1 388.8M612.6 396.6L622 412.7M622 412.7L619.8 414.2M378.5 406.4L383.2 415M472.1 416.8L496.4 402.4M289.1 418.3L307.6 403.8M244.2 363L289.1 418.3M581.3 402.5L552.1 418.8L534.6 384M357.5 421.6L378.5 406.4M331.9 384.1L357.5 421.6M463 422.2L472.1 416.8M452.6 402.3L463 422.2M598.3 428.5L619.8 414.2M581.3 402.5L588.5 415.3L598.3 428.5M94.5 428.9L108.6 410.7M672.4 430.1L686.4 417.4L695.5 410.2L703.4 401.3L712.5 389.5L731.4 375.5L747.6 363.2M655.1 388.8L662.2 407.5L672.4 430.1M598.3 428.5L593.3 431.6M445.3 432.7L463 422.2M778.5 433.5L825.5 403.9M763 398.2L767.6 408.6L778.5 433.5M94.5 428.9L93.5 424.5L55.4 434.8M55.4 434.8L27.2 344.4L52.5 329.7M431.4 441.9L445.3 432.7M400.2 389.5L418 422L431.4 441.9M593.3 431.6L601.3 442M672.4 430.1L687.3 443.1M212.9 385.6L246.8 444.2M825.5 403.9L826.7 446.6M691.4 447.3L701.5 438.7L722.1 423.8L763 398.2M687.3 443.1L691.4 447.3M593.3 431.6L566.6 448.1M55.4 434.8L17.4 450.9M17.4 450.9L12.5 186.6M641 453.6L672.4 430.1M619.8 414.2L641 453.6M289.1 418.3L318.2 454.4M431.4 441.9L414.5 454.5M601.3 442L582.3 455.8M691.4 447.3L700.8 458.7M629.3 462.2L641 453.6M629.3 462.2L617.3 443.6M793.3 466.9L826.7 446.6M778.5 433.5L793.3 466.9M620.1 469.6L626 464.5L629.3 462.2M601.3 442L620.1 469.6M142.7 470.5L209.8 380.2M142.7 470.5L103 440.1L95.3 432L94.5 428.9M414.5 454.5L391.6 471.5M357.5 421.6L391.6 471.5M655.8 471.6L687.3 443.1M641 453.6L655.8 471.6M608.1 479.9L620.1 469.6M246.8 444.2L178.6 486.3M271.3 486.8L318.2 454.4M246.8 444.2L271.3 486.8M391.6 471.5L370.8 487.1M370.8 487.1L323.1 424.4M793.3 466.9L805.3 490.5M700.8 458.7L667.6 490.6M660.6 480.8L667.6 490.6M271.3 486.8L275.1 491.9M167.2 492.8L142.7 470.5M441.3 493.8L414.5 454.5M589.6 495.6L603.1 484.1L608.1 479.9M589.6 495.6L573.9 476L563.1 462.7L541 423.7M370.8 487.1L354.4 499.3M318.2 454.4L354.4 499.3M655.8 471.6L626.6 500.7M626.6 500.7L608.1 479.9M576.6 507.5L583.9 500.5L589.6 495.6M793.3 466.9L735.3 508.9M700.8 458.7L735.3 508.9M574.3 509.7L576.6 507.5M496.4 402.4L498 405.7L529.4 452L554.4 485.4L574.3 509.7M667.6 490.6L677.9 510.1M354.4 499.3L334.1 515.1M677.9 510.1L684.3 522.1M397.5 526.2L441.3 493.8M397.5 526.2L370.8 487.1M626.6 500.7L624.1 505.5L622.1 507.3L614.6 512.9L609.4 517.8L595.5 529.1M576.6 507.5L595.5 529.1M745.6 531L760.5 521L774.7 510.4L785 502.9L805.3 490.5M735.3 508.9L745.6 531M334.1 515.1L326.3 521.2L298.2 533.6M275.1 491.9L293.4 525L298.2 533.6M684.3 522.1L665.2 534.8M595.5 529.1L600 534.9M546.9 535.7L560.8 522.7L574.3 509.7M472.1 416.8L509.8 485.6L529.2 512.8L546.9 535.7M472.7 539.7L441.3 493.8M91.1 539.8L142.7 470.5M91.1 539.8L55.4 434.8M694 540.4L735.3 508.9M684.3 522.1L694 540.4M298.2 533.6L302.4 540.6M19.1 541.5L17.4 450.9M192.2 545.1L275.1 491.9M290.9 546L302.4 540.6M302.4 540.6L308.2 551M756.4 554.1L817.8 514.5L805.3 490.5M745.6 531L756.4 554.1M192.2 545.1L184.3 532L149.3 555M616.4 555.8L677.9 510.1M600 534.9L616.4 555.8M523.7 557.2L546.9 535.7M445.3 432.7L477 494.2L523.7 557.2M616.4 555.8L618 557.8M826.7 446.6L829.9 557.9M606 568.6L603.7 566L618 557.8M250.3 568.9L290.9 546M548.3 569.3L561.3 555L568 562.2L600 534.9M588.1 569.6L603.2 556.9M594.8 549.4L581.8 562.4L588.1 569.6M756.4 554.1L765.3 571.4M269.6 571.4L308.2 551M429.5 573.1L472.7 539.7M429.5 573.1L397.5 526.2M804.8 573.2L829.9 557.9M334.1 515.1L372 574.7M595.1 578.6L606 568.6M588.1 569.6L595.1 578.6M499.7 579.4L514.3 566L523.7 557.2M499.7 579.4L472.7 539.7M606 568.6L614.8 579.4M251.9 583.7L269.6 571.4M441.9 590.6L429.5 573.1M718.8 591.4L765.3 571.4M694 540.4L708.6 571.6L718.8 591.4M52.6 591.6L91.1 539.8M52.6 591.6L19.1 541.5M774 591.8L804.8 573.2M765.3 571.4L774 591.8M149.3 555L123.3 574.3L119.9 578L120.5 582.7L119.4 585L108 593M618 557.8L625 575.3L633.2 594.6M372 574.7L333.7 596.8M308.2 551L333.7 596.8M176.5 596.9L149.3 555M633.2 594.6L612.3 598.6L605.9 589.9M517.2 602L536.8 585.5M517.2 602L499.7 579.4M416.6 595.7L423 604.5L441.9 590.6M636.8 605.9L655.1 594.7L681.1 578.8M633.2 594.6L636.8 605.9M52.6 591.6L20.4 613.7M20.4 613.7L19.1 541.5M636.8 605.9L638.9 612.4L640 615.1M459.2 616.4L475.8 601.3L499.7 579.4M459.2 616.4L441.9 590.6M333.7 596.8L298.5 621.1M298.5 621.1L269.6 571.4M640 615.1L589 621.4M542.8 603.2L569.3 582L577.7 591.7L581.5 593.5L586.4 599.4L589 621.4M829.9 557.9L831.7 621.5M804.8 573.2L831.7 621.5M132.7 622.5L176.5 596.9M333.7 596.8L349.9 626M298.5 621.1L289 626.5M537.7 628.6L589 621.4M537.7 628.6L517.2 602M289 626.5L285.3 629.2M338.8 632.4L349.9 626M831.7 621.5L793.5 640.3M774 591.8L786.2 618L792.7 636.4L793.5 640.3M640 615.1L645.9 628.8L651.1 640.5M289 626.5L298.6 641.4M320.3 643.1L338.8 632.4M831.7 621.5L831.8 626.5L832.3 643.3M618.6 645.4L651.1 640.5M424.5 648.4L459.2 616.4M372 574.7L398.2 616.4L424.5 648.4M424.5 648.4L417.3 647.4M88.4 648.9L132.7 622.5M88.4 648.9L52.6 591.6M793.5 640.3L794.7 646.4L795 653M471.2 654.3L459.2 616.4M471.2 654.3L424.5 648.4M486.9 656.3L487.7 635.1L496.8 626.3M486.9 656.3L481.8 655.6L471.2 654.3M803.1 660L832.3 643.3M795 653L803.1 660M795 653L756.2 662.7M718.8 591.4L733.2 619.1L756.2 662.7M417.3 647.4L370.5 662.9M349.9 626L370.5 662.9M756.2 662.7L745.7 665.1M564.4 666.5L551.9 645.8L537.7 628.6M564.4 666.5L486.9 656.3M101.7 669.4L88.4 648.9M745.7 665.1L720.2 671.6M720.2 671.6L689 609.8M720.2 671.6L714.1 673M585 674.1L569.4 668.3L564.4 666.5M370.5 662.9L323.2 678.6M714.1 673L691.6 678.8L684.6 680.9L671.8 685.5M651.1 640.5L653 645L664.6 667.9L671.8 685.5M803.1 660L817.4 687.6M671.8 685.5L665.5 688.4L658.4 689.3L650 690L640.7 688.8L624.8 684.9L593.8 677.3L585 674.1M323.2 678.6L287 690.5L279.2 690.6M279.2 690.6L192.2 545.1M671.8 685.5L674 690.8M573.1 692.3L585 674.1M66.3 693.1L101.7 669.4M370.5 662.9L371.7 665.3L375.2 671.8L379.5 677.6L386.1 683.9L395.2 690.8L407.3 696.6M179.4 698L132.7 622.5M279.2 690.6L267.8 690.7L241.2 707.4M241.2 707.4L176.5 596.9M179.4 698L153.7 712.6L141.5 699.2L128.9 685.2L117.6 670.1M674 690.8L629 713.7M775.5 715.1L817.4 687.6M775.5 715.1L745.7 665.1M499.9 716.3L509.6 714.3L517.8 712.7L525 710.5L530.4 708.8L537.7 706.1L545.6 702.3L553.6 699L560.8 696.1L564.3 694.3L573.1 692.3M499.9 716.3L471.2 654.3M832.3 643.3L834.4 717.1M817.4 687.6L834.4 717.1M25 720.9L66.3 693.1M22.4 722.6L25 720.9M22.4 722.6L20.4 613.7M674 690.8L684.3 688.1L711.7 729.1M629 713.7L594.1 731.4M573.1 692.3L594.1 731.4M713.2 732.4L741.2 714.3L714.1 673M711.7 729.1L713.2 732.4M241.2 707.4L200.9 732.8M200.9 732.8L179.4 698M713.2 732.4L719.7 741.3M792.6 743.7L834.4 717.1M792.6 743.7L775.5 715.1M200.9 732.8L168.4 753.2M168.4 753.2L101.7 669.4M667.4 754.7L711.7 729.1M834.4 717.1L834.5 720.5L835.6 759.9L802.8 760.9M802.8 760.9L792.6 743.7M657.8 760.9L667.4 754.7M657.8 760.9L629 713.7M802.8 760.9L765 762M765 762L792.6 743.7M765 762L733.2 762.9M719.7 741.3L733.2 762.9M733.2 762.9L680.4 764.4M680.4 764.4L719.7 741.3M680.4 764.4L677.8 764.5L673.5 764.6M667.4 754.7L673.5 764.6M673.5 764.6L650.6 765.3M650.6 765.3L657.8 760.9M421.3 766.5L438.5 757.4M650.6 765.3L613.8 766.5M613.8 766.5L594.1 731.4M613.8 766.5L524.6 769.3M594.1 731.4L524.6 769.3M524.6 769.3L499.9 716.3M524.6 769.3L446.2 771.2M438.5 757.4L446.2 771.2M446.2 771.2L424.4 771.7M421.3 766.5L424.4 771.7M424.4 771.7L379.2 773M323.2 678.6L379.2 773M379.2 773L329.1 774.5M329.1 774.5L279.2 690.6M329.1 774.5L230 777.3M200.9 732.8L230 777.3M230 777.3L188.2 778.5M168.4 753.2L188.2 778.5M188.2 778.5L122.5 780.4M66.3 693.1L122.5 780.4M122.5 780.4L65.1 782.1M25 720.9L65.1 782.1M65.1 782.1L23.5 783.3L22.4 722.6M427.2 704.4L433.9 686.3L417.3 647.4M427.2 704.4L426.1 707.1M407.3 696.6L417.1 703.7L426.1 707.1M426.1 707.1L435.6 710L445.1 713.2L451.8 714.8M451.8 714.8L455.4 715.7L463.2 716.5L479.4 717.1L489.9 717.4L495.5 716.6L499.9 716.3M456.4 750.2L462.8 747.3M451.8 714.8L448.4 732.5L456.4 750.2M438.5 757.4L456.4 750.2M407.3 696.6L394 720.6L421.3 766.5';
+  const DEATHS = [519.4,390.2,333.9,317,572.7,436,601,445.3,498.1,296.8,530.3,500.5,495.1,417,390.2,351.6,597.7,359.8,396.3,462.8,425.5,265.5,457.1,370.9,369.3,351.7,568.5,416.1,668.4,228.9,315.6,411.4,506.8,409.7,591.7,435.3,597,443,383.6,453.8,467.3,345.9,431.2,355.1,449.6,425.8,533.8,307.5,455.4,352.4,388.7,352.3,389.5,457,515.4,278,380.3,362,450.3,262.9,535,245.6,466,364.2,627.5,312.4,482.8,450.2,489.4,436.6,524.3,374.7,494.4,389.2,511,390.9,577.9,476.6,500.2,286.6,332.4,318.4,467,344.8,510.3,432.7,561.6,364,639.3,235.7,384.9,344.3,467,274.3,632.1,326,667.5,227.5,400,515.7,628.9,336.4,390.8,455.9,424.2,265.9,417.3,331,429.8,191.1,492.3,250.9,547.1,288.3,582.3,444.4,469.1,394.5,571.9,298.9,463.6,384.3,564.9,507.8,301.2,403.2,736.9,585.5,398.6,208.3,314.4,409.7,380.1,448.3,643.5,239.4,359.1,416.6,524.3,495.8,630.2,248.6,448.7,354.5,414.8,408.3,610.3,385.4,635.6,334.6,349.4,349.1,540,306.2,667.3,375.3,715.8,383.6,528.9,501.8,545.5,417,574.3,372.2,468.7,273,425.3,426.8,558.5,317.5,600.6,97,630.8,250.1,534.8,308.9,599.2,365.5,498.6,298.4,472.6,381.8,597,284.9,482.2,364.5,517.7,286.2,541.5,291.3,612,281.1,582.3,201.5,353.9,376.6,366.5,363.5,336.7,329.7,548,483.1,520.9,317.5,587.8,453,624.7,326,300,346.4,681.5,375.3,505.7,429.2,368.2,365.9,255.6,584.9,509.7,293.1,565.9,509.2,680.4,373.6,575.6,349.1,355.7,375.7,497.8,387.4,294.2,284.2,599.5,446.3,261.8,575.3,607.4,454,505.7,326.1,501.6,458.4,467.7,367.7,534.5,397.4,514.6,319.3,602.4,96.4,419.4,390.4,312.1,406.6,408.2,464.9,397.8,206.2,434.8,433.5,590.7,434.3,520.5,370.3,545.3,264.8,363.1,384.5,355.4,471.9,528.9,310.2,510.7,323.6,468.2,392.7,623.1,248.2,531.8,499.5,501.3,328,595.9,441.6,502.3,419.3,571.4,373.9,559.4,430.4,591.1,239.4,497.4,415.3,509.5,504.2,428.7,468.7,642,227.3,371.3,398.5,568,415,306.4,336.6,565.4,370,366.2,329.1,539.3,305,367.5,364.9,372.4,359.7,626.7,640.5,430.1,387,428.4,431.6,418.7,388.6,628.1,244,372.9,361,510.3,280.8,402.4,372.4,616.8,307,541.2,409.6,509.9,322.2,568.9,135.5,606.3,273.3,563.7,506.1,410,450.6,464.4,386.1,529.1,387,368.4,393.6,366.8,394.5,578,407.4,551.6,343,507.3,346.2,361.9,354.6,465.9,415.9,590,345.3,372.2,450.9,496.3,388.4,344.3,371.5,400.8,373.2,485.5,358.1,448.6,446.7,462,380.9,435.9,434.9,413.6,375.8,422.7,266.5,462.8,369.5,578.9,329.4,540.9,307.5,465.2,275,300.9,328.3,359.9,379.7,477.3,487.2,295.3,627.8,257.1,588.2,605.9,266.6,399.1,374.1,429.3,385.4,475.7,380,428.3,383.5,448.9,263.3,474.2,380.8,521.1,275.6,280.6,188.3,451.1,378.1,649.2,230.5,482.2,364.5,520.5,273.6,474.7,434.3,591.3,352.2,535.6,310.4,520.4,491.2,463.6,294.4,333.5,324.8,719.8,578.2,395.1,389.4,673.1,224.8,324.7,394.5,510.2,294.8,496.4,416,527,441.1,423.9,388.5,497.3,354.1,496.2,352.5,454.9,351,585.2,306.8,416.9,315.6,483.6,363.8,392.3,383.4,628.8,245.6,485,428.1,455.8,369.4,329.7,356.4,472.6,381.8,473.9,342.3,638,486.9,391.6,351,544.4,478.1,391.4,357.7,567.1,510.8,617.5,381,319,356,613.3,390.2,562.1,337,409.1,449.5,527,379.4,409.5,393.3,640.8,491.4,336.1,351.8,380.1,460.6,471.6,363.9,303.1,411.8,529.2,254.2,527.9,255.2,575.4,446.5,604.6,442.5,547.3,323.9,528.4,440.3,388.6,377.8,458.3,420.8,580.8,442.9,592.5,264.3,608.1,272.3,479.6,229.4,406.2,455.3,362.6,356.2,390.7,384.4,509.1,472.2,356.9,375.2,320.5,354.6,567.3,331.3,412.6,374.1,477,408.1,588,346.6,455.8,203.4,484.2,405.8,603.5,488,628.8,466.7,493.2,252.5,486.5,359.7,604.2,339.6,490.9,355.5,463,382.6,628.4,297.3,541.5,277.2,489.1,226.3,534.1,213.2,386.9,458.7,641.2,244.5,594.8,440.3,513.2,316.6,419.3,330.3,374.9,344.9,682,364.9,535.3,214.9,525.2,389.4,504.4,463.4,623,326.5,613.2,383.7,389.6,385.1,615.1,389.2,425.3,463.1,457.8,372.9,396.4,368.5,319.8,398,256.3,586.7,540,278,502.3,295.1,604.3,478.1,614.9,382.8,609.3,578.5,642.9,229,459.2,260.3,449.4,355.5,596.2,360.6,537.7,301.9,320.9,399.4,654.6,228.1,472.2,412.6,364.7,301.3,538.9,303.4,616.1,381.7,388.2,385.9,504.9,299.2,535.8,266.7,505.8,462.8,477.4,409.4,612.1,384.6,624.7,251,531.9,392.2,423.9,421.2,643.6,230.5,469.8,395.7,607.9,380.3,654.2,227,465.1,341.7,622.5,299.8,417.5,316.8,550.8,341.6,652.6,440.3,521.2,384.8,470.8,427.2,422.9,386.4,278.6,397.9,385.1,210,420.8,392.3,491.9,383,525.4,380.2,393.1,357.1,568.6,330.4,361.8,366.8,496.9,330.8,434,236.9,506.9,428.1,332.7,336.2,477.2,302.7,304.3,413.5,419.5,468,496,329.2,410.5,395.1,521.9,369.6,428.3,264.4,653.4,225.9,276.8,342.4,627.5,337,449.3,374.9,579.3,240.3,512.5,502,626.8,298,435.6,236.4,466.4,305.7,558.7,291.2,450.8,237.9,604,373.9,416.9,407.3,292.3,384.6,377.6,502.8,587.3,439.7,501.3,349.5,510.8,503.2,557.9,343.2,450.2,376.5,440.2,216.5,519.4,364.7,277.9,343.8,509.4,396.5,468.5,305.1,618.2,236.3,466.1,343.4,460.5,377.5,458.5,374.2,512.5,314.9,441.6,376.6,337.2,353,447.2,263.4,560.3,290.2,625.3,298.6,527.9,387.9,412.3,398.5,529.8,236.6,618.9,379.8,589.7,432.7,545.6,289,498.7,453.2,503,296.7,386.6,343.4,447.4,447.4,537.9,250.8,403.2,404.9,511.3,296.6,515.8,320.6,578.4,347.1,488.7,397.5,461.3,379.1,457.4,206.2,495.2,327.4,578.9,285,330.7,319.9,547.2,416.3,441.7,215.8,644.9,233.1,474.2,380.8,574.8,438.7,282,338.3,367.4,328.6,452.5,237.1,426.8,265.1,254,366.6,459.3,284.1,676.7,522.6,626.1,586.1,644.2,232,553.6,421.7,326.8,327,504,297.9,643.4,446.5,557.7,427.4,510.3,397.9,566,493.5,568.6,375.5,525.6,247.8,651.8,235.1,652.8,224.2,480.4,230.9,508,347.6,398.9,514.2,422.1,336.3,576.9,348,311.2,405.3,313.3,408,625.6,364.6,553.1,320.5,549.4,273.4,414.2,424,591.4,426.9,494.4,326.1,387.9,342.8,437,236.3,514.1,500.6,543.1,290.5,387.4,120.7,550.3,473.1,359.2,387,620.2,379.2,403.6,371.9,491.1,464.5,518.9,287.9,393.8,362.9,569.8,374.8,602.3,513.5,508.2,426.8,647.2,399.7,555,423.4,660.6,225.1,469.5,196.1,502.7,404,389.7,341.9,345.1,412.5,621.1,317.2,550.8,272.8,508.4,319.2,378.9,362.6,498.9,414.4,530.3,313.1,411.2,396.6,485.9,455.3,520.4,391.4,506.9,228.4,448.5,373.2,558.4,428.7,283.2,339.6,617.1,234.5,555.8,424.7,341.4,380.9,500.4,231.9,364.3,322.2,316.7,412.8,361.7,385.3,386.3,213.8,505.9,393.8,470.7,397.4,494,234.9,422.3,422.2,518.2,441.4,508.8,291.7,526.8,388.5,374.4,322,449.4,238.1,538.5,278.9,578.5,484.5,594.1,438.9,651.8,449.3,605.7,372.7,467.5,391.2,572.8,373,466.6,389.8,385.7,211.5,624,299.3,422.6,313.9,315.1,367.8,503.5,205,520.8,178.6,511.5,431.8,514,318,393.6,389.8,486.4,398.4,482.2,144.1,605.8,455.3,479.1,377.9,300.4,390.9,558.7,344.8,619.1,399,360.4,386.1,489,412,502.5,351.4,388.1,457.7,515.9,394.6,319.1,415.9,566.9,413.6,465.6,387.9,375.7,321.5,505.8,301.2,308.9,396.9,509,349,516.1,388,514.8,393.1,521.9,490,553.2,163.8,317.8,414.2,543.6,169.5,487.2,255.6,610.7,254.6,529.5,311.9,410.9,452.2,459.5,376.1,477.2,379.1,519.3,370.9,544.4,289.9,593.3,437.6,603.9,267.5,573.8,437.5,509,320.5,453.8,349.5,556.7,426.3,461.1,366.7,443,429.9,461.9,368.2,592.5,436.3,703.6,363.3,461.3,349.3,590.9,319.2];
+  const PUMPS = [["Oxford Market",272.6,50.4],["Castle St E",389.2,19.1],["Oxford St #1",508.9,75.3],["Oxford St #2",584,54.5],["Gt Marlborough",274.7,199.7],["Crown Chapel",283.2,307.3],["Broad St",468.6,358.6],["Warwick",373,573.6],["Briddle St",516.1,547.1],["So Soho",661.7,482.4],["Dean St",785.7,458.1],["Coventry St",640.3,692.7],["Vigo St",290,689.9]];
+  const DAYS = [["08-19",1,1],["08-20",1,0],["08-21",1,2],["08-22",0,0],["08-23",1,0],["08-24",1,2],["08-25",0,0],["08-26",1,0],["08-27",1,1],["08-28",1,0],["08-29",1,1],["08-30",8,2],["08-31",56,3],["09-01",143,70],["09-02",116,127],["09-03",54,76],["09-04",46,71],["09-05",36,45],["09-06",20,37],["09-07",28,32],["09-08",12,30],["09-09",11,24],["09-10",5,18],["09-11",5,15],["09-12",1,6],["09-13",3,13],["09-14",0,6],["09-15",1,8],["09-16",4,6],["09-17",2,5],["09-18",3,2],["09-19",0,3],["09-20",0,0],["09-21",2,0],["09-22",1,2],["09-23",1,3],["09-24",1,0],["09-25",1,0],["09-26",1,2],["09-27",1,0],["09-28",0,2],["09-29",0,1],["09-30",0,0]];
+  const W = 840, H = 790;
+  const P = PUMPS.map(([label, x, y]) => ({ label, x, y }));
+  const BROAD = P.findIndex((p) => p.label === 'Broad St');
+  const deaths = [];
+  for (let i = 0; i < DEATHS.length; i += 2) deaths.push([DEATHS[i], DEATHS[i + 1]]);
+  const nearest = deaths.map(([x, y]) => {
+    let bi = 0, bd = Infinity;
+    P.forEach((p, i) => { const d = (p.x - x) ** 2 + (p.y - y) ** 2; if (d < bd) { bd = d; bi = i; } });
+    return bi;
+  });
+  const counts = P.map((_, i) => nearest.filter((n) => n === i).length);
+
+  // The area closer to pump i than to any other: cut the map by the half-way line to every other pump.
+  function cell(i) {
+    let poly = [[0, 0], [W, 0], [W, H], [0, H]];
+    const p = P[i];
+    P.forEach((q, j) => {
+      if (j === i) return;
+      const nx = q.x - p.x, ny = q.y - p.y, mx = (p.x + q.x) / 2, my = (p.y + q.y) / 2;
+      const side = (pt) => (pt[0] - mx) * nx + (pt[1] - my) * ny;
+      const out = [];
+      for (let k = 0; k < poly.length; k++) {
+        const a = poly[k], b = poly[(k + 1) % poly.length];
+        const sa = side(a), sb = side(b);
+        if (sa <= 0) out.push(a);
+        if ((sa <= 0) !== (sb <= 0)) { const t = sa / (sa - sb); out.push([a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])]); }
+      }
+      poly = out;
+    });
+    return 'M' + poly.map((pt) => pt.map((v) => v.toFixed(1)).join(' ')).join('L') + 'Z';
+  }
+  const CELLS = P.map((_, i) => cell(i));
+
+  /* ================================================================
+     The map
+     ================================================================ */
+  const dotPath = (idx) => idx.map((k) => { const [x, y] = deaths[k]; return `M${(x - 2.6).toFixed(1)} ${y}a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0 -5.2 0`; }).join('');
+  let svg = `<rect width="${W}" height="${H}" fill="transparent"/>`;
+  svg += `<g id="cellsg"></g><g id="selcell"></g>`;
+  svg += `<path class="street" d="${STREETS}"/>`;
+  svg += '<g id="ringsg"></g>';
+  P.forEach((_, i) => { svg += `<path class="dots" id="dots${i}" d="${dotPath(nearest.map((n, k) => (n === i ? k : -1)).filter((k) => k >= 0))}"/>`; });
+  P.forEach((p, i) => {
+    const left = p.x > W - 120;
+    svg += `<g class="pump" id="pump${i}" data-p="${i}" tabindex="0" role="button" aria-label="${p.label} pump, ${counts[i]} deaths nearest">
+      <circle cx="${p.x}" cy="${p.y}" r="7.5"/><circle class="core" cx="${p.x}" cy="${p.y}" r="2.6"/>
+      ${i === BROAD ? `<path class="x" id="xmark" d="M${p.x - 11} ${p.y - 11}l22 22M${p.x + 11} ${p.y - 11}l-22 22" opacity="0"/>` : ''}
+      <text x="${left ? p.x - 12 : p.x + 12}" y="${p.y + 4}" text-anchor="${left ? 'end' : 'start'}">${p.label}</text>
+    </g>`;
+  });
+  svg += `<g transform="translate(24 ${H - 26})"><line class="scalebar" x1="0" x2="150" y1="0" y2="0"/><line class="scalebar" x1="0" x2="0" y1="-5" y2="5"/><line class="scalebar" x1="50" x2="50" y1="-4" y2="4"/><line class="scalebar" x1="100" x2="100" y1="-4" y2="4"/><line class="scalebar" x1="150" x2="150" y1="-5" y2="5"/>
+    <text class="scalet" x="0" y="-9" text-anchor="middle">0</text><text class="scalet" x="50" y="-9" text-anchor="middle">100</text><text class="scalet" x="100" y="-9" text-anchor="middle">200</text><text class="scalet" x="150" y="-9" text-anchor="middle">300 m</text></g>`;
+  $('map').innerHTML = svg;
+
+  let sel = null, showCells = false, handleOff = false;
+  function drawMap() {
+    $('cellsg').innerHTML = showCells ? CELLS.map((d) => `<path class="cello" d="${d}"/>`).join('') : '';
+    $('selcell').innerHTML = sel != null ? `<path class="cellf" d="${CELLS[sel]}"/>` : '';
+    P.forEach((_, i) => {
+      $(`dots${i}`).setAttribute('class', `dots${sel == null ? '' : i === sel ? ' hot' : ' fade'}`);
+      $(`pump${i}`).classList.toggle('on', i === sel);
+    });
+    $('ringsg').innerHTML = sel != null ? [100, 200, 300].map((m) => {
+      const r = m / 2, p = P[sel];
+      return `<circle class="ring" cx="${p.x}" cy="${p.y}" r="${r}"/><text class="ringt" x="${p.x + r * 0.7071 + 3}" y="${p.y - r * 0.7071 - 3}">${m} m</text>`;
+    }).join('') : '';
+    $('xmark').setAttribute('opacity', handleOff ? '1' : '0');
+    drawRows();
+    say();
+  }
+  function drawRows() {
+    const order = P.map((_, i) => i).sort((a, b) => counts[b] - counts[a]);
+    const max = Math.max(...counts);
+    $('rows').innerHTML = order.map((i) => `<button type="button" class="prow" data-p="${i}" aria-pressed="${i === sel}"><span>${P[i].label}</span><span class="bar" style="width:${(counts[i] / max) * 100}%"></span><span class="n">${counts[i]}</span></button>`).join('');
+  }
+  function within(i, m) {
+    const p = P[i];
+    return deaths.filter(([x, y]) => Math.hypot(x - p.x, y - p.y) <= m / 2).length;
+  }
+  function say() {
+    const v = $('verdict');
+    if (handleOff && sel == null) {
+      v.innerHTML = '<b>Handle off, September 8.</b> Look at the chart below: new cases had already dropped from 143 on September 1 to 12 on September 8. Removing the handle helped stop a second wave, but the outbreak was already burning out.';
+      return;
+    }
+    if (sel == null) {
+      v.innerHTML = `<b>${deaths.length} deaths</b> are on the map. Pick a pump, or press the one where the dots crowd thickest.`;
+      return;
+    }
+    const n = counts[sel];
+    const share = Math.round((n / deaths.length) * 100);
+    if (sel === BROAD) {
+      v.innerHTML = `<b>${n} of ${deaths.length} deaths (${share}%)</b> were closer to the Broad Street pump than to any other. ${within(sel, 100)} were within 100 metres of it and ${within(sel, 200)} within 200.`;
+    } else {
+      v.innerHTML = `<b>${n} death${n === 1 ? '' : 's'}</b> were closest to the ${P[sel].label} pump. ${n > 30 ? 'Many of these sit near the edge of its area, toward Broad Street.' : 'Its neighbourhood was spared.'}`;
+    }
+  }
+  function choose(i) { sel = sel === i ? null : i; drawMap(); }
+  $('map').addEventListener('click', (e) => { const g = e.target.closest('[data-p]'); if (g) choose(Number(g.dataset.p)); });
+  $('map').addEventListener('keydown', (e) => {
+    const g = e.target.closest('[data-p]');
+    if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); choose(Number(g.dataset.p)); }
+  });
+  $('rows').addEventListener('click', (e) => { const b = e.target.closest('[data-p]'); if (b) choose(Number(b.dataset.p)); });
+  $('cells').addEventListener('click', () => { showCells = !showCells; $('cells').setAttribute('aria-pressed', String(showCells)); drawMap(); });
+  $('handle').addEventListener('click', () => {
+    handleOff = !handleOff;
+    $('handle').setAttribute('aria-pressed', String(handleOff));
+    $('handle').textContent = handleOff ? 'Put the handle back' : 'Take the Broad Street handle off';
+    if (handleOff) sel = null;
+    drawMap();
+    drawChart();
+  });
+
+  /* ================================================================
+     The outbreak by day
+     ================================================================ */
+  let series = 1;
+  const MONTHS = { '08': 'Aug', '09': 'Sep' };
+  const label = (md) => `${MONTHS[md.slice(0, 2)]} ${Number(md.slice(3))}`;
+  const CX0 = 44, CX1 = 866, CY0 = 18, CY1 = 232;
+  function drawChart() {
+    const n = DAYS.length, bw = (CX1 - CX0) / n, ymax = 150;
+    const y = (v) => CY1 - (v / ymax) * (CY1 - CY0);
+    let s = '';
+    for (const t of [0, 50, 100, 150]) s += `<line class="grid" x1="${CX0}" x2="${CX1}" y1="${y(t)}" y2="${y(t)}"/><text class="axis-t" x="${CX0 - 8}" y="${y(t) + 4}" text-anchor="end">${t}</text>`;
+    const handleIdx = DAYS.findIndex((d) => d[0] === '09-08');
+    DAYS.forEach((d, i) => {
+      const v = d[series];
+      const x = CX0 + i * bw + 1;
+      const h = CY1 - y(v);
+      const after = handleOff && i > handleIdx;
+      if (v > 0) s += `<path class="bar-d${after ? ' after' : ''}" d="M${x.toFixed(1)} ${CY1}v${(-Math.max(0, h - 3)).toFixed(1)}q0 -3 3 -3h${(bw - 8).toFixed(1)}q3 0 3 3v${Math.max(0, h - 3).toFixed(1)}Z"/>`;
+      s += `<rect class="bar-hit" data-i="${i}" x="${(CX0 + i * bw).toFixed(1)}" y="${CY0}" width="${bw.toFixed(1)}" height="${CY1 - CY0}"/>`;
+      if (['08-19', '08-26', '09-01', '09-08', '09-15', '09-22', '09-29'].includes(d[0])) s += `<text class="axis-t" x="${(x + (bw - 2) / 2).toFixed(1)}" y="${CY1 + 18}" text-anchor="middle">${label(d[0])}</text>`;
+    });
+    const hx = CX0 + handleIdx * bw + bw / 2;
+    s += `<line class="mark" x1="${hx}" x2="${hx}" y1="${CY0 - 6}" y2="${CY1}"/><text class="mark-t" x="${hx + 6}" y="${CY0 + 6}">Handle removed, Sep 8</text>`;
+    s += `<line class="grid" x1="${CX0}" x2="${CX1}" y1="${CY1}" y2="${CY1}" style="stroke:var(--line-strong)"/>`;
+    $('chart').innerHTML = s;
+    $('chart-title').textContent = series === 1 ? 'People who fell ill, per day' : 'Deaths, per day';
+    $('tablewrap').innerHTML = `<table><thead><tr><th scope="col">Date, 1854</th><th scope="col">Fell ill</th><th scope="col">Died</th></tr></thead><tbody>${DAYS.map((d) => `<tr><td>${label(d[0])}</td><td>${d[1]}</td><td>${d[2]}</td></tr>`).join('')}<tr><td>Date unknown</td><td>45</td><td>0</td></tr></tbody></table>`;
+  }
+  document.querySelectorAll('[data-series]').forEach((b) => b.addEventListener('click', () => {
+    series = Number(b.dataset.series);
+    document.querySelectorAll('[data-series]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    drawChart();
+  }));
+  $('tbl').addEventListener('click', () => {
+    const on = $('tablewrap').hidden;
+    $('tablewrap').hidden = !on;
+    $('tbl').setAttribute('aria-pressed', String(on));
+    $('tbl').textContent = on ? 'Hide the table' : 'Show as a table';
+  });
+  const tip = $('tip');
+  $('chart').addEventListener('pointermove', (e) => {
+    const r = e.target.closest('[data-i]');
+    if (!r) { tip.hidden = true; return; }
+    const d = DAYS[Number(r.dataset.i)];
+    const box = $('chartbox').getBoundingClientRect();
+    tip.hidden = false;
+    tip.textContent = `${label(d[0])}: ${d[1]} fell ill, ${d[2]} died`;
+    tip.style.left = `${e.clientX - box.left}px`;
+    tip.style.top = `${e.clientY - box.top}px`;
+  });
+  $('chart').addEventListener('pointerleave', () => { tip.hidden = true; });
+
+  drawMap();
+  drawChart();
+})();
+</script>
+</body>
+</html>

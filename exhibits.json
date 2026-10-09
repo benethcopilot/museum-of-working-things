@@ -39,6 +39,11 @@
       "try": "Crack Mystery Molly’s genes"
     },
     {
+      "slug": "broad-street", "hall": "life", "title": "Broad Street Pump", "ages": "10 and up",
+      "blurb": "Find the source of the 1854 London cholera outbreak on John Snow’s map, using the real positions of 578 deaths and 13 pumps.",
+      "try": "Take the handle off and check the dates"
+    },
+    {
       "slug": "kintsugi", "hall": "making", "title": "Kintsugi Bowl", "ages": "All ages",
       "blurb": "Break a tea bowl, then mend it with lacquer and gold, one real step at a time.",
       "try": "Break a mended bowl again"

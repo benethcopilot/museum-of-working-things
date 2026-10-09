@@ -26,7 +26,7 @@ tools/check.mjs         checks the list, the folders and the links agree
 | --- | --- |
 | Sky & Time | Brass Astrolabe |
 | Music & Sound | Carousel Band Organ, Thirty-Note Music Box, Autoharp Chords |
-| Life Science | Litter Lab |
+| Life Science | Litter Lab, Broad Street Pump |
 | Making & Mending | Kintsugi Bowl, Ebru Tray, Letterpress Type Case |
 | Machines & Messages | Lock and Dam No. 1, Enigma Machine, Telegraph Office |
 | Numbers & Elements | Mendeleev's Table, Slide Rule |
