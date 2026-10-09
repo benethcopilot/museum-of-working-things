@@ -1,0 +1,826 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Letterpress Type Case</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  /* Layout: a print shop. The type case fills the top like a drawer pulled from the cabinet; below it the bench, with the composing stick on one side and the galley and press on the other; the proof, the steps, the words and the history follow. */
+  --ground: #dfe4dc;
+  --ground-2: #d1d8cd;
+  --card: #f7f5ef;
+  --text: #1c1e1d;
+  --muted: #535b56;
+  --line: rgba(28, 30, 29, 0.14);
+  --line-strong: rgba(28, 30, 29, 0.32);
+  --accent: #b3262d;
+  --accent-ink: #fff7f2;
+  /* The shop's objects keep their own colors in both themes. */
+  --wood: #8b5b34;
+  --wood-dark: #5e3a1f;
+  --metal: #9aa0a6;
+  --f-display: "Alfa Slab One", "Rockwell", "Clarendon", Georgia, serif;
+  --f-body: "Libre Caslon Text", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --f-mono: "IBM Plex Mono", "Consolas", "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #121614;
+    --ground-2: #1b201d;
+    --card: #1a1f1c;
+    --text: #ece9e1;
+    --muted: #a3aba5;
+    --line: rgba(236, 233, 225, 0.12);
+    --line-strong: rgba(236, 233, 225, 0.3);
+    --accent: #ff7369;
+    --accent-ink: #1c0807;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #121614;
+  --ground-2: #1b201d;
+  --card: #1a1f1c;
+  --text: #ece9e1;
+  --muted: #a3aba5;
+  --line: rgba(236, 233, 225, 0.12);
+  --line-strong: rgba(236, 233, 225, 0.3);
+  --accent: #ff7369;
+  --accent-ink: #1c0807;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--text); font-family: var(--f-body); font-size: 16.5px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 400; line-height: 1.08; margin: 0; text-wrap: balance; letter-spacing: 0.01em; }
+
+.page { box-sizing: border-box; max-width: 1220px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 34px; }
+.masthead { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 32px; align-items: end; }
+.eyebrow { grid-column: 1 / -1; margin: 0; font-family: var(--f-mono); font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.masthead h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); }
+.lede { margin: 0; max-width: 62ch; color: var(--muted); }
+
+/* ---------- The case ---------- */
+.drawer-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; margin-bottom: 10px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tab { padding: 7px 14px; border: 1.5px solid var(--line-strong); border-radius: 4px; background: none; font-size: 0.95rem; }
+.tab[aria-pressed="true"] { background: var(--text); border-color: var(--text); color: var(--ground); }
+.tab small { font-family: var(--f-mono); font-size: 0.75rem; opacity: 0.8; margin-left: 4px; }
+.drawer-head label { display: flex; align-items: center; gap: 8px; font-size: 0.92rem; color: var(--muted); }
+.drawer-head input { width: 17px; height: 17px; accent-color: var(--accent); margin: 0; }
+.case-scroll { overflow-x: auto; padding-bottom: 6px; }
+.case {
+  min-width: 860px;
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr)) 10px repeat(8, minmax(0, 1fr)) 10px repeat(7, minmax(0, 1fr));
+  grid-template-rows: repeat(7, 50px);
+  gap: 4px;
+  padding: 10px;
+  border-radius: 6px;
+  background: var(--wood-dark);
+  box-shadow: inset 0 0 0 3px #3f2613, 0 10px 24px -14px rgba(0, 0, 0, 0.6);
+}
+.box {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #6e4627, #a8774a 22%, #b98a5c);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.55);
+  color: #2a2b2d;
+  overflow: hidden;
+}
+.box .lbl { position: relative; z-index: 1; line-height: 1; color: #f7f2e6; text-shadow: 0 1px 0 rgba(0, 0, 0, 0.55); }
+.box .n { position: absolute; right: 4px; bottom: 2px; font-family: var(--f-mono); font-size: 10px; color: rgba(255, 247, 232, 0.75); }
+.box .pile { position: absolute; inset: auto 12% 6px 12%; height: 30%; border-radius: 2px; background: repeating-linear-gradient(90deg, #8d939a 0 3px, #b8bdc2 3px 6px); opacity: 0.85; }
+.box.spacebox .lbl { font-family: var(--f-mono); font-size: 11px; text-align: center; }
+.box:hover { filter: brightness(1.12); }
+.box.flash { animation: grab 0.35s ease-out; }
+@keyframes grab { 0% { box-shadow: inset 0 0 0 3px #ffd36b, inset 0 2px 4px rgba(0, 0, 0, 0.55); } 100% { box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.55); } }
+.box.empty .pile { display: none; }
+.box.empty .lbl { opacity: 0.45; }
+.case.unlabeled .box:not(.spacebox) .lbl { opacity: 0; }
+.case-note { margin: 8px 0 0; font-size: 0.9rem; color: var(--muted); }
+
+/* ---------- Bench ---------- */
+.bench { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px 28px; align-items: start; }
+.panel { display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 8px; background: var(--card); border: 1px solid var(--line); min-width: 0; }
+.panel h2 { font-size: 1.35rem; }
+.panel .sub { margin: -6px 0 0; font-size: 0.92rem; color: var(--muted); }
+.stick {
+  position: relative;
+  padding: 14px 10px 10px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #c9cdd1, #a5abb1);
+  box-shadow: inset 0 1px 0 #eef0f2, 0 2px 0 #6e747a;
+  overflow: hidden;
+}
+.stick-bed { position: relative; height: var(--h, 40px); width: var(--measure-px, 400px); max-width: 100%; border-left: 6px solid #6e747a; border-right: 2px dashed rgba(60, 64, 68, 0.55); background: rgba(80, 86, 92, 0.18); }
+.line { display: flex; align-items: stretch; height: 100%; }
+.line.compositor { transform: scaleY(-1); }
+.sort {
+  position: relative;
+  flex: none;
+  height: 100%;
+  box-sizing: border-box;
+  background: linear-gradient(90deg, #7f868d, #c5cad0 45%, #9aa1a8);
+  border-right: 1px solid rgba(40, 44, 48, 0.55);
+  overflow: hidden;
+}
+.sort .face { position: absolute; left: 0; bottom: 18%; line-height: 1; color: #1a1c1e; white-space: pre; font-kerning: none; }
+.sort::after { content: ""; position: absolute; left: 0; right: 0; bottom: 9%; height: 2px; background: rgba(40, 44, 48, 0.55); }
+.sort.space { background: linear-gradient(90deg, #5d636a, #7b828a); height: 78%; align-self: flex-end; }
+.sort.space::after { display: none; }
+.sort.thin { background: #b87333; }
+.gauge { display: flex; justify-content: space-between; gap: 10px; font-family: var(--f-mono); font-size: 0.82rem; color: var(--muted); }
+.gauge b { color: var(--text); font-weight: 500; }
+.gauge .over { color: var(--accent); }
+.typein { display: flex; flex-direction: column; gap: 4px; }
+.typein label { font-size: 0.9rem; color: var(--muted); }
+.typein input { padding: 9px 12px; border: 1.5px solid var(--line-strong); border-radius: 4px; background: var(--ground); font-family: var(--f-body); font-size: 1rem; }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.btn {
+  padding: 7px 13px 8px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 4px;
+  background: none;
+  font-size: 0.92rem;
+  transition: background-color 0.15s, opacity 0.15s;
+}
+.btn:hover { background: var(--ground-2); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { background: var(--accent); opacity: 0.9; }
+.btn:disabled { opacity: 0.4; cursor: default; }
+.btn:disabled:hover { background: none; }
+.btn.primary:disabled:hover { background: var(--accent); }
+.flipnote { margin: 0; font-size: 0.88rem; color: var(--muted); }
+.flipnote label { display: inline-flex; align-items: center; gap: 6px; color: var(--text); }
+.flipnote input { width: 16px; height: 16px; margin: 0; accent-color: var(--accent); }
+
+.chase {
+  position: relative;
+  padding: 18px;
+  border-radius: 4px;
+  background: #3b3f43;
+  box-shadow: inset 0 0 0 6px #2a2d30, inset 0 0 0 7px #55595e;
+  overflow: hidden;
+}
+.forme { display: flex; flex-direction: column; align-items: flex-start; gap: var(--lead, 3px); transform: scaleX(-1); transform-origin: center; }
+.forme .row-line { position: relative; }
+.forme .row-line::after { content: ""; position: absolute; left: 0; right: 0; bottom: calc(-1 * var(--lead, 3px)); height: var(--lead, 3px); background: #6d7378; }
+.forme .row-line:last-child::after { display: none; }
+.forme.inked .face { color: #050506; text-shadow: 0 0 1px rgba(0, 0, 0, 0.6); }
+.chase-empty { margin: 0; padding: 18px 6px; color: #b9bec3; font-size: 0.92rem; text-align: center; }
+.brayer { position: absolute; top: -10%; bottom: -10%; width: 34px; left: -60px; border-radius: 17px; background: linear-gradient(90deg, #111, #3a3a3c 40%, #0d0d0e); box-shadow: 0 0 16px rgba(0, 0, 0, 0.5); opacity: 0; pointer-events: none; }
+.brayer.go { animation: roll 1s ease-in-out; }
+@keyframes roll { 0% { left: -60px; opacity: 1; } 100% { left: calc(100% + 20px); opacity: 1; } }
+.sheet { position: absolute; inset: 6px; border-radius: 2px; background: #f4efe2; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); opacity: 0; pointer-events: none; }
+.sheet.go { animation: press 1.3s ease-in-out; }
+@keyframes press { 0% { opacity: 0; transform: translateY(-14%) scale(1.03); } 30% { opacity: 1; transform: none; } 65% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-18%) rotate(-1.5deg); } }
+.press-row { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.press-row label { display: flex; align-items: center; gap: 8px; font-size: 0.92rem; color: var(--muted); }
+.press-row select { padding: 6px 8px; border: 1.5px solid var(--line-strong); border-radius: 4px; background: var(--ground); }
+
+.toast { margin: 0; min-height: 1.6em; font-size: 0.95rem; }
+.toast b { color: var(--accent); }
+
+/* ---------- Proof ---------- */
+.proof { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 18px 28px; align-items: center; }
+.proof figure { margin: 0; display: grid; place-items: center; padding: 18px; border-radius: 8px; background: var(--ground-2); }
+.proof img { display: block; max-width: 100%; height: auto; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 18px 34px -16px rgba(0, 0, 0, 0.45); }
+.proof h2 { font-size: 1.6rem; margin-bottom: 6px; }
+.proof p { margin: 0 0 8px; }
+.proof .meta { font-family: var(--f-mono); font-size: 0.85rem; color: var(--muted); }
+
+/* ---------- Lessons ---------- */
+.sec-head h2 { font-size: clamp(1.6rem, 3vw, 2.1rem); margin-bottom: 12px; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 12px; counter-reset: step; }
+.steps li { counter-increment: step; padding: 14px 16px; border-radius: 8px; background: var(--card); border: 1px solid var(--line); }
+.steps li::before { content: counter(step); display: block; font-family: var(--f-display); font-size: 1.5rem; color: var(--accent); line-height: 1; margin-bottom: 4px; }
+.steps b { display: block; font-size: 1.05rem; }
+.steps span { font-size: 0.95rem; color: var(--muted); }
+.words { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.word { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 14px 16px; border-radius: 8px; background: var(--card); border: 1px solid var(--line); }
+.word h3 { font-size: 1.2rem; }
+.word p { margin: 0; font-size: 0.95rem; color: var(--muted); }
+.verdict { padding: 1px 9px; border: 2px solid currentColor; border-radius: 3px; font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; transform: rotate(-2deg); }
+.verdict.true { color: #2f7a45; }
+.verdict.myth { color: var(--accent); }
+.history { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 30px; padding-top: 22px; border-top: 1px solid var(--line-strong); }
+.history h2 { font-size: 1.3rem; margin-bottom: 6px; }
+.history p { margin: 0; font-size: 0.95rem; }
+.history .sources { grid-column: 1 / -1; font-size: 0.85rem; color: var(--muted); }
+.history a { color: inherit; text-underline-offset: 3px; }
+
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .verdict.true { color: #7fd19a; } }
+:root[data-theme="dark"] .verdict.true { color: #7fd19a; }
+@media (max-width: 900px) {
+  .bench, .proof { grid-template-columns: minmax(0, 1fr); }
+  .history { grid-template-columns: minmax(0, 1fr); }
+  .masthead { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .brayer.go, .sheet.go, .box.flash { animation: none; }
+  .btn { transition: none; }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="letterpress" defer></script>
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Making &amp; Mending · Printing</p>
+    <h1>Letterpress Type Case</h1>
+    <p class="lede">Before computers, every letter in a printed page was a small block of metal, picked by hand from a case like this one. Set a line, space it until it fits the stick exactly, then ink it and pull a print.</p>
+  </header>
+
+  <section aria-labelledby="case-h">
+    <div class="drawer-head">
+      <h2 id="case-h" style="font-size:1.35rem">The California job case</h2>
+      <div class="tabs" id="tabs" role="group" aria-label="Choose a case"></div>
+      <label for="unlabel"><input type="checkbox" id="unlabel"> Hide the labels, like a real case</label>
+    </div>
+    <div class="case-scroll"><div class="case" id="case" role="group" aria-label="Type case compartments"></div></div>
+    <p class="case-note">89 compartments. Small letters are on the left, sized by how often each letter is used, so the e box is the biggest. Capitals run A to Z on the right, except J and U, which early English printers did not use, so they come after Z. The numbers in each box count the pieces left.</p>
+  </section>
+
+  <section class="bench" aria-label="The bench">
+    <div class="panel">
+      <h2>Composing stick</h2>
+      <p class="sub">Type on your keyboard or tap the case. Each piece goes in left to right, nick up, so the line looks upside down. That is how compositors saw it.</p>
+      <div class="stick"><div class="stick-bed" id="stick"><div class="line compositor" id="stick-line"></div></div></div>
+      <div class="gauge"><span id="g-case"></span><span>Space left <b id="g-left"></b></span></div>
+      <div class="typein">
+        <label for="typein">Type here to set type (works on phones too)</label>
+        <input id="typein" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Start typing…">
+      </div>
+      <div class="row" aria-label="Spaces">
+        <button type="button" class="btn" data-space="sp3" title="The usual space between words">Word space</button>
+        <button type="button" class="btn" data-space="sp5">5-em</button>
+        <button type="button" class="btn" data-space="en">En quad</button>
+        <button type="button" class="btn" data-space="em">Em quad</button>
+        <button type="button" class="btn" id="back">Take out last piece</button>
+      </div>
+      <div class="row" aria-label="Finish the line">
+        <button type="button" class="btn primary" data-finish="justify">Justify</button>
+        <button type="button" class="btn primary" data-finish="center">Center</button>
+        <button type="button" class="btn primary" data-finish="left">Quad out left</button>
+      </div>
+      <p class="flipnote"><label for="flip"><input type="checkbox" id="flip"> Turn the stick around to read it</label></p>
+      <p class="toast" id="toast" aria-live="polite"></p>
+    </div>
+
+    <div class="panel">
+      <h2>Galley and press</h2>
+      <p class="sub">Finished lines wait here in a frame called a chase, with a thin strip of lead between them. Type is a mirror image, so it reads backwards here and right way round on paper.</p>
+      <div class="chase" id="chase"><div class="forme" id="forme"></div><div class="brayer" id="brayer"></div><div class="sheet" id="sheet"></div></div>
+      <div class="press-row">
+        <label for="ink">Ink <select id="ink">
+          <option value="black">Black</option>
+          <option value="red">Red</option>
+          <option value="blue">Blue</option>
+          <option value="two">Black and red (two runs)</option>
+        </select></label>
+        <button type="button" class="btn primary" id="print">Ink it and pull a print</button>
+      </div>
+      <div class="row">
+        <button type="button" class="btn" id="undo-line">Take back the last line</button>
+        <button type="button" class="btn" id="dist">Put all the type away</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="proof" id="proof" hidden aria-labelledby="proof-h">
+    <figure><img id="proof-img" alt=""></figure>
+    <div>
+      <h2 id="proof-h">Your print</h2>
+      <p class="meta" id="proof-meta"></p>
+      <p>Right-click or long-press the print to save it.</p>
+      <p><a class="btn primary" id="download" download="letterpress-print.png" href="#" hidden>Download the print</a></p>
+      <p style="color:var(--muted);font-size:.95rem">When the printing is done, compositors put every piece back in its own box. That job was called distributing the type.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="steps-h">
+    <div class="sec-head"><h2 id="steps-h">How a compositor set a page</h2></div>
+    <ol class="steps">
+      <li><b>Set the stick</b><span>Pick pieces of type, called sorts, from the case one at a time and drop them into the composing stick, left to right, nick up.</span></li>
+      <li><b>Space the words</b><span>A 3-em space, a third as wide as the type is tall, goes between words. Spaces are lower than the letters, so they never print.</span></li>
+      <li><b>Justify</b><span>Each line must fill the stick exactly, or it falls apart when you lift it. Add spaces between words, or quads at the ends, until the last piece slides in snugly.</span></li>
+      <li><b>Make up the page</b><span>Slide the lines onto a galley with a thin strip of lead between them, so the lines don’t crowd.</span></li>
+      <li><b>Lock up and print</b><span>Wedge the type tight in an iron chase, roll ink over it with a brayer, lay paper on top and press.</span></li>
+      <li><b>Distribute</b><span>Put every sort back in its own box, ready for the next job.</span></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="words-h">
+    <div class="sec-head"><h2 id="words-h">Words from the type case</h2></div>
+    <div class="words">
+      <div class="word"><span class="verdict true">True</span><h3>Upper case, lower case</h3><p>Before the combined case, printers kept capitals and small letters in two separate cases on a sloping stand. The capitals sat in the upper case and the small letters in the lower case.</p></div>
+      <div class="word"><span class="verdict true">True</span><h3>Leading</h3><p>Thin strips of lead went between lines of type to space them apart. Designers still call the space between lines leading, said like the metal.</p></div>
+      <div class="word"><span class="verdict true">True</span><h3>Font</h3><p>A font was a complete set of one size and style of type, sold with more of the common letters than the rare ones. That is why this case can run out of e’s.</p></div>
+      <div class="word"><span class="verdict myth">Probably not</span><h3>Out of sorts</h3><p>A sort is one piece of type, and printers did run short. But the phrase turns up in 1562, about a century before printers called their type sorts, so the printing story is probably not where it came from.</p></div>
+      <div class="word"><span class="verdict myth">Probably not</span><h3>Mind your p’s and q’s</h3><p>In metal type a small p and q are easy to mix up, so the printing story sounds right. The earliest known uses don’t mention printing at all, and nobody knows for sure where the phrase came from.</p></div>
+    </div>
+  </section>
+
+  <section class="history">
+    <div>
+      <h2>Before Gutenberg</h2>
+      <p>Movable type began in China, where Bi Sheng made letters of baked clay around the 1040s. In Korea, a Buddhist book called the Jikji was printed with metal type in 1377.</p>
+    </div>
+    <div>
+      <h2>Gutenberg’s shop</h2>
+      <p>Around 1450 in Mainz, Johannes Gutenberg combined metal type cast in a hand mould, an oil-based ink and a screw press. His Bible followed a few years later, and printing spread across Europe within decades.</p>
+    </div>
+    <div>
+      <h2>The California case</h2>
+      <p>J. L. Ringwalt described this layout in 1871, as San Francisco printers used it. Putting both cases in one tray was claimed to save a compositor more than half a mile of hand travel a day. Experienced typesetters could read what someone was setting just by watching which boxes their hand went to.</p>
+    </div>
+    <p class="sources">Sources: <a href="https://en.wikipedia.org/wiki/California_job_case" target="_blank" rel="noopener">California job case</a>, <a href="https://en.wikipedia.org/wiki/Composing_stick" target="_blank" rel="noopener">Composing stick</a> and <a href="https://en.wikipedia.org/wiki/Movable_type" target="_blank" rel="noopener">Movable type</a> on Wikipedia; <a href="https://www.etymonline.com/word/lower-case" target="_blank" rel="noopener">Etymonline on lower case</a>; The Phrase Finder on <a href="https://phrases.org.uk/meanings/out-of-sorts.html" target="_blank" rel="noopener">out of sorts</a> and <a href="https://www.phrases.org.uk/meanings/mind-your-ps-and-qs.html" target="_blank" rel="noopener">p’s and q’s</a>; Ringwalt’s <a href="https://books.google.com/books?id=ztQoAAAAYAAJ" target="_blank" rel="noopener">American Encyclopaedia of Printing</a> (1871). The type here is Libre Caslon, after William Caslon’s faces of the 1720s, and Alfa Slab One, in the style of wood poster type.</p>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const framed = (() => { try { return window.self !== window.top; } catch (err) { return true; } })();
+
+  /* ================================================================
+     The California job case: 89 compartments, after Ringwalt (1871)
+     [key, row, column, rowspan, colspan]; columns 9 and 18 are dividers
+     ================================================================ */
+  const LAYOUT = [
+    ['ffi', 1, 1], ['fl', 1, 2], ['sp5', 1, 3], ['sp4', 1, 4], ['’', 1, 5], ['k', 1, 6], ['e', 1, 7, 3, 2],
+    ['1', 1, 10], ['2', 1, 11], ['3', 1, 12], ['4', 1, 13], ['5', 1, 14], ['6', 1, 15], ['7', 1, 16], ['8', 1, 17],
+    ['$', 1, 19], ['£', 1, 20], ['–', 1, 21], ['Æ', 1, 22], ['Œ', 1, 23], ['æ', 1, 24], ['œ', 1, 25],
+    ['j', 2, 1], ['b', 2, 2, 2, 1], ['c', 2, 3, 2, 2], ['d', 2, 5, 2, 2], ['i', 2, 10, 2, 2], ['s', 2, 12, 2, 2], ['f', 2, 14, 2, 1], ['g', 2, 15, 2, 1], ['ff', 2, 16], ['9', 2, 17],
+    ['A', 2, 19], ['B', 2, 20], ['C', 2, 21], ['D', 2, 22], ['E', 2, 23], ['F', 2, 24], ['G', 2, 25],
+    ['?', 3, 1], ['fi', 3, 16], ['0', 3, 17],
+    ['H', 3, 19, 2, 1], ['I', 3, 20, 2, 1], ['K', 3, 21, 2, 1], ['L', 3, 22, 2, 1], ['M', 3, 23, 2, 1], ['N', 3, 24, 2, 1], ['O', 3, 25, 2, 1],
+    ['!', 4, 1], ['l', 4, 2, 2, 1], ['m', 4, 3, 2, 2], ['n', 4, 5, 2, 2], ['h', 4, 7, 2, 2], ['o', 4, 10, 2, 2], ['y', 4, 12, 2, 1], ['p', 4, 13, 2, 1], ['w', 4, 14, 2, 1], [',', 4, 15, 2, 1], ['en', 4, 16, 2, 1], ['em', 4, 17, 2, 1],
+    ['z', 5, 1], ['P', 5, 19, 2, 1], ['Q', 5, 20, 2, 1], ['R', 5, 21, 2, 1], ['S', 5, 22, 2, 1], ['T', 5, 23, 2, 1], ['V', 5, 24, 2, 1], ['W', 5, 25, 2, 1],
+    ['x', 6, 1], ['v', 6, 2, 2, 1], ['u', 6, 3, 2, 2], ['t', 6, 5, 2, 2], ['sp3', 6, 7, 2, 2], ['a', 6, 10, 2, 2], ['r', 6, 12, 2, 2], [';', 6, 14], [':', 6, 15], ['q23', 6, 16, 2, 2],
+    ['q', 7, 1], ['.', 7, 14], ['-', 7, 15], ['X', 7, 19], ['Y', 7, 20], ['Z', 7, 21], ['J', 7, 22], ['U', 7, 23], ['&', 7, 24], ['ffl', 7, 25],
+  ];
+  const SPACES = { sp5: 1 / 5, sp4: 1 / 4, sp3: 1 / 3, en: 1 / 2, em: 1, q23: 2 };
+  const SPACE_LABEL = { sp5: '5-em', sp4: '4-em', sp3: '3-em spaces', en: 'en quad', em: 'em quad', q23: '2- & 3-em quads' };
+  const SPACE_NAME = { sp5: '5-em space', sp4: '4-em space', sp3: '3-em space', en: 'en quad', em: 'em quad', q23: '2-em quad' };
+  const LIGS = ['ffi', 'ffl', 'ff', 'fi', 'fl'];
+  const FREQ = { e: 12.7, t: 9.1, a: 8.2, o: 7.5, i: 7.0, n: 6.7, s: 6.3, h: 6.1, r: 6.0, d: 4.3, l: 4.0, c: 2.8, u: 2.8, m: 2.4, w: 2.4, f: 2.2, g: 2.0, y: 2.0, p: 1.9, b: 1.5, v: 1.0, k: 0.8, j: 0.15, x: 0.15, q: 0.1, z: 0.07 };
+  const CASES = {
+    text: {
+      id: 'text', label: 'Caslon', note: '18 point', size: 18, lower: 32, upper: 16, figures: 8, ligs: 4, punct: 14, sym: 3,
+      font: '"Libre Caslon Text", "Iowan Old Style", Georgia, serif',
+    },
+    wood: {
+      id: 'wood', label: 'Wood type', note: '3-line, 36 point', size: 36, lower: 9, upper: 6, figures: 3, ligs: 0, punct: 4, sym: 0,
+      font: '"Alfa Slab One", "Rockwell", Georgia, serif',
+    },
+  };
+  const MEASURE = 288;   // the stick is set to 24 picas (288 points)
+  const LEAD = 2;        // two-point leads between lines
+
+  function stock(c, key) {
+    if (SPACES[key] !== undefined) return Infinity;
+    if (LIGS.includes(key)) return c.ligs;
+    if (/^[a-z]$/.test(key)) return Math.max(c.id === 'text' ? 3 : 2, Math.round((c.lower * FREQ[key]) / 8.2));
+    if (/^[A-Z]$/.test(key)) return Math.max(2, Math.round((c.upper * FREQ[key.toLowerCase()]) / 8.2));
+    if (/^[0-9]$/.test(key)) return c.figures;
+    if ('.,'.includes(key)) return c.punct;
+    if (';:!?’-'.includes(key)) return Math.max(1, Math.round(c.punct / 2));
+    return c.sym;
+  }
+  const counts = { text: {}, wood: {} };
+  for (const c of Object.values(CASES)) for (const [k] of LAYOUT) counts[c.id][k] = stock(c, k);
+
+  // Widths in points, measured from the faces themselves
+  const meas = document.createElement('canvas').getContext('2d');
+  function widthOf(c, key) {
+    if (SPACES[key] !== undefined) return SPACES[key] * c.size;
+    meas.font = `${c.size}px ${c.font}`;
+    return meas.measureText(key).width;
+  }
+
+  /* ================================================================
+     State
+     ================================================================ */
+  let current = 'text';
+  let stick = { caseId: null, sorts: [] };     // sorts: { key, w, kind: 'type' | 'space' | 'thin' }
+  let galley = [];                              // { caseId, sorts }
+  let k = 1.4;                                  // screen pixels per point
+  let ligNoted = false;
+
+  const caseEl = $('case');
+  function buildCase() {
+    const c = CASES[current];
+    caseEl.innerHTML = '';
+    for (const [key, r, col, rs = 1, cs = 1] of LAYOUT) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      const isSpace = SPACES[key] !== undefined;
+      b.className = `box${isSpace ? ' spacebox' : ''}`;
+      b.style.gridArea = `${r} / ${col} / span ${rs} / span ${cs}`;
+      b.dataset.key = key;
+      const n = counts[current][key];
+      const label = isSpace ? SPACE_LABEL[key] : key;
+      const size = isSpace ? 11 : Math.min(26, 12 + rs * 5 + (cs - 1) * 3);
+      b.innerHTML = `<span class="pile"></span><span class="lbl" style="font-family:${isSpace ? 'var(--f-mono)' : c.font};font-size:${size}px">${label}</span>${isSpace ? '' : `<span class="n">${n}</span>`}`;
+      b.classList.toggle('empty', n === 0);
+      b.setAttribute('aria-label', isSpace ? SPACE_NAME[key] : `${key}, ${n} left`);
+      b.addEventListener('click', () => pick(key));
+      caseEl.append(b);
+    }
+    caseEl.classList.toggle('unlabeled', $('unlabel').checked);
+    document.querySelectorAll('.tab').forEach((t) => t.setAttribute('aria-pressed', String(t.dataset.case === current)));
+  }
+  function refreshBox(key) {
+    const b = caseEl.querySelector(`.box[data-key="${CSS.escape(key)}"]`);
+    if (!b || SPACES[key] !== undefined) return;
+    const n = counts[current][key];
+    b.querySelector('.n').textContent = n;
+    b.classList.toggle('empty', n === 0);
+    b.setAttribute('aria-label', `${key}, ${n} left`);
+  }
+  function flash(key) {
+    if (reduceMotion) return;
+    const b = caseEl.querySelector(`.box[data-key="${CSS.escape(key)}"]`);
+    if (!b) return;
+    b.classList.remove('flash');
+    void b.offsetWidth;
+    b.classList.add('flash');
+  }
+  const say = (html) => { $('toast').innerHTML = html; };
+
+  /* ================================================================
+     Setting type
+     ================================================================ */
+  const used = (sorts) => sorts.reduce((s, x) => s + x.w, 0);
+  function pick(key) {
+    const c = CASES[current];
+    if (stick.sorts.length && stick.caseId !== current) {
+      say(`This line is set in ${CASES[stick.caseId].label}. Finish it before switching cases: each size of type lives in its own case.`);
+      return false;
+    }
+    const isSpace = SPACES[key] !== undefined;
+    if (!isSpace && counts[current][key] <= 0) {
+      say(`<b>Out of ${key}’s.</b> This font came with only ${stock(c, key)}. Printers ran short too, and had to change a word or borrow from another case.`);
+      flash(key);
+      return false;
+    }
+    const w = widthOf(c, key);
+    if (used(stick.sorts) + w > MEASURE + 0.01) {
+      say('The stick is full. Finish this line with Justify, Center or Quad out, then keep going on the next one.');
+      return false;
+    }
+    if (!isSpace) {
+      counts[current][key]--;
+      refreshBox(key);
+    }
+    stick.caseId = current;
+    stick.sorts.push({ key, w, kind: isSpace ? 'space' : 'type' });
+    flash(key);
+    if (!isSpace && current === 'text') ligate();
+    say('');
+    drawStick();
+    return true;
+  }
+  // f and i would collide, so they were cast as one piece.
+  function ligate() {
+    const s = stick.sorts;
+    const tail = (n) => s.slice(-n).map((x) => x.key).join('');
+    for (const [seq, lig, n] of [['ffi', 'ffi', 2], ['ffl', 'ffl', 2], ['ffi', 'ffi', 3], ['ffl', 'ffl', 3], ['ff', 'ff', 2], ['fi', 'fi', 2], ['fl', 'fl', 2]]) {
+      if (tail(n) !== seq || counts.text[lig] <= 0) continue;
+      const removed = s.splice(s.length - n, n);
+      for (const r of removed) { counts.text[r.key]++; refreshBox(r.key); }
+      counts.text[lig]--;
+      refreshBox(lig);
+      s.push({ key: lig, w: widthOf(CASES.text, lig), kind: 'type' });
+      if (!ligNoted) {
+        ligNoted = true;
+        setTimeout(() => say(`Swapped in the <b>${lig}</b> ligature: one piece of type, because the hook of the f would hit the next letter.`), 0);
+      }
+      return;
+    }
+  }
+  function takeBack() {
+    const s = stick.sorts.pop();
+    if (!s) return;
+    if (s.kind === 'type') {
+      counts[stick.caseId][s.key]++;
+      if (stick.caseId === current) refreshBox(s.key);
+    }
+    if (!stick.sorts.length) stick.caseId = null;
+    drawStick();
+  }
+
+  // Fill an amount with spaces, biggest first, then copper thins of half a point.
+  function fill(amount, em, maxUnit) {
+    const out = [];
+    let r = amount;
+    for (const key of ['q23', 'em', 'en', 'sp3', 'sp4', 'sp5']) {
+      if (SPACES[key] > maxUnit) continue;
+      const w = SPACES[key] * em;
+      while (r >= w - 0.01) { out.push({ key, w, kind: 'space' }); r -= w; }
+    }
+    while (r >= 0.5 - 0.01) { out.push({ key: 'thin', w: 0.5, kind: 'thin' }); r -= 0.5; }
+    return out;
+  }
+  function finish(how) {
+    if (!stick.sorts.length) { say('Set some type first.'); return; }
+    if (galley.length >= 7) { say('The chase is full. Print it, or take back a line.'); return; }
+    const c = CASES[stick.caseId];
+    let sorts = stick.sorts.slice();
+    while (sorts.length && sorts[sorts.length - 1].kind !== 'type') sorts.pop();
+    while (sorts.length && sorts[0].kind !== 'type') sorts.shift();
+    const R = MEASURE - used(sorts);
+    if (how === 'justify') {
+      const gaps = [];
+      sorts.forEach((x, i) => { if (x.kind !== 'type' && sorts[i - 1] && sorts[i - 1].kind === 'type') gaps.push(i); });
+      if (!gaps.length) how = 'center';
+      else {
+        const each = R / gaps.length;
+        const adds = gaps.map(() => fill(each, c.size, 0.5));
+        let rest = R - adds.reduce((s, a) => s + used(a), 0);
+        let g = 0;
+        while (rest >= 0.5 - 0.01) { adds[g % adds.length].push({ key: 'thin', w: 0.5, kind: 'thin' }); rest -= 0.5; g++; }
+        for (let j = gaps.length - 1; j >= 0; j--) sorts.splice(gaps[j] + 1, 0, ...adds[j]);
+      }
+    }
+    if (how === 'center') {
+      const half = Math.floor(R / 2 * 2) / 2;
+      sorts = [...fill(half, c.size, 3), ...sorts, ...fill(R - half, c.size, 3)];
+    } else if (how === 'left') {
+      sorts = [...sorts, ...fill(R, c.size, 3)];
+    }
+    galley.push({ caseId: stick.caseId, sorts });
+    stick = { caseId: null, sorts: [] };
+    say(how === 'justify' ? 'Justified: extra space went between the words until the line was tight.' : how === 'center' ? 'Centered: equal quads on both ends.' : 'Quadded out: quads fill the end of the line.');
+    drawStick();
+    drawForme();
+  }
+  function undoLine() {
+    const line = galley.pop();
+    if (!line) return;
+    for (const s of line.sorts) if (s.kind === 'type') counts[line.caseId][s.key]++;
+    buildCase();
+    drawForme();
+    say('The last line went back into its case.');
+  }
+  function distribute() {
+    for (const line of galley) for (const s of line.sorts) if (s.kind === 'type') counts[line.caseId][s.key]++;
+    for (const s of stick.sorts) if (s.kind === 'type') counts[stick.caseId][s.key]++;
+    galley = [];
+    stick = { caseId: null, sorts: [] };
+    buildCase();
+    drawStick();
+    drawForme();
+    say('All the type is back in its boxes.');
+  }
+
+  /* ================================================================
+     Drawing the stick and the forme
+     ================================================================ */
+  function sortHTML(s, c) {
+    const w = (s.w * k).toFixed(2);
+    if (s.kind !== 'type') return `<span class="sort ${s.kind}" style="width:${w}px" title="${s.kind === 'thin' ? 'copper thin space' : SPACE_NAME[s.key]}"></span>`;
+    return `<span class="sort" style="width:${w}px"><span class="face" style="font-family:${c.font};font-size:${(c.size * k).toFixed(2)}px">${s.key}</span></span>`;
+  }
+  function drawStick() {
+    const c = CASES[stick.caseId || current];
+    const bed = $('stick');
+    bed.style.setProperty('--measure-px', `${(MEASURE * k).toFixed(1)}px`);
+    bed.style.setProperty('--h', `${(c.size * k * 1.08).toFixed(1)}px`);
+    const line = $('stick-line');
+    line.className = `line${$('flip').checked ? '' : ' compositor'}`;
+    line.innerHTML = stick.sorts.map((s) => sortHTML(s, c)).join('');
+    const left = MEASURE - used(stick.sorts);
+    $('g-case').textContent = `${c.label}, ${c.note} · 24-pica measure`;
+    $('g-left').textContent = `${(left / 12).toFixed(1)} picas (${Math.round(left)} pt)`;
+    document.querySelectorAll('[data-finish]').forEach((b) => { b.disabled = !stick.sorts.length; });
+    $('back').disabled = !stick.sorts.length;
+  }
+  function drawForme() {
+    const f = $('forme');
+    f.style.setProperty('--lead', `${(LEAD * k).toFixed(1)}px`);
+    if (!galley.length) {
+      f.innerHTML = '';
+      f.insertAdjacentHTML('beforeend', '<p class="chase-empty" style="transform:scaleX(-1)">The chase is empty. Finish a line in the stick and it lands here.</p>');
+    } else {
+      f.innerHTML = galley.map((line) => {
+        const c = CASES[line.caseId];
+        return `<div class="row-line" style="height:${(c.size * k * 1.08).toFixed(1)}px"><div class="line">${line.sorts.map((s) => sortHTML(s, c)).join('')}</div></div>`;
+      }).join('');
+    }
+    $('print').disabled = !galley.length;
+    $('undo-line').disabled = !galley.length;
+  }
+  function sizeAll() {
+    const w = $('stick').parentElement.clientWidth - 20;
+    k = Math.max(0.8, Math.min(1.5, w / MEASURE));
+    drawStick();
+    drawForme();
+  }
+
+  /* ================================================================
+     Printing
+     ================================================================ */
+  const INKS = { black: '#1d1b1a', red: '#b5262c', blue: '#1f3f7a' };
+  let proofNo = 0;
+  try { proofNo = Number(localStorage.getItem('letterpress-proofs') || 0); } catch (err) { proofNo = 0; }
+  function grain(w, h) {
+    const c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    const g = c.getContext('2d');
+    const img = g.createImageData(w, h);
+    for (let i = 0; i < w * h; i++) {
+      const r = Math.random();
+      const v = 255 - r * r * r * 34;
+      img.data[i * 4] = v; img.data[i * 4 + 1] = v - 2; img.data[i * 4 + 2] = v - 7; img.data[i * 4 + 3] = 255;
+    }
+    g.putImageData(img, 0, 0);
+    return c;
+  }
+  function printCanvas(inkChoice) {
+    const S = 3;                         // pixels per point on the print
+    const margin = 36;
+    const height = galley.reduce((s, l) => s + CASES[l.caseId].size * 1.08, 0) + LEAD * (galley.length - 1);
+    const W = Math.round((MEASURE + margin * 2) * S), H = Math.round((height + margin * 2) * S);
+    const paper = document.createElement('canvas');
+    paper.width = W; paper.height = H;
+    const p = paper.getContext('2d');
+    p.fillStyle = '#f4efe2';
+    p.fillRect(0, 0, W, H);
+    p.drawImage(grain(W, H), 0, 0);
+    // Ink goes on its own layer, then loses a little where the roller missed.
+    const ink = document.createElement('canvas');
+    ink.width = W; ink.height = H;
+    const g = ink.getContext('2d');
+    let y = margin;
+    galley.forEach((line) => {
+      const c = CASES[line.caseId];
+      const color = inkChoice === 'two' ? (line.caseId === 'wood' ? INKS.red : INKS.black) : INKS[inkChoice];
+      g.font = `${c.size * S}px ${c.font}`;
+      g.textBaseline = 'alphabetic';
+      g.fillStyle = color;
+      g.shadowColor = color;
+      g.shadowBlur = 1.2 * S * 0.4;
+      let x = margin;
+      const base = y + c.size * 0.84;
+      for (const s of line.sorts) {
+        if (s.kind === 'type') g.fillText(s.key, x * S, base * S);
+        x += s.w;
+      }
+      y += c.size * 1.08 + LEAD;
+    });
+    g.shadowBlur = 0;
+    g.globalCompositeOperation = 'destination-out';
+    for (let i = 0; i < (W * H) / 260; i++) {
+      g.globalAlpha = 0.15 + Math.random() * 0.35;
+      g.beginPath();
+      g.arc(Math.random() * W, Math.random() * H, 0.6 + Math.random() * 1.6, 0, Math.PI * 2);
+      g.fill();
+    }
+    g.globalAlpha = 1;
+    g.globalCompositeOperation = 'source-over';
+    p.globalCompositeOperation = 'multiply';
+    p.drawImage(ink, 0, 0);
+    p.globalCompositeOperation = 'source-over';
+    return paper;
+  }
+  const wait = (ms) => new Promise((r) => setTimeout(r, reduceMotion ? 0 : ms));
+  let printing = false;
+  async function pull() {
+    if (!galley.length || printing) return;
+    printing = true;
+    $('print').disabled = true;
+    const inkChoice = $('ink').value;
+    if (!reduceMotion) {
+      const br = $('brayer');
+      br.classList.remove('go'); void br.offsetWidth; br.classList.add('go');
+      await wait(500);
+      $('forme').classList.add('inked');
+      await wait(550);
+      const sh = $('sheet');
+      sh.classList.remove('go'); void sh.offsetWidth; sh.classList.add('go');
+      await wait(1300);
+    }
+    const canvas = printCanvas(inkChoice);
+    const url = canvas.toDataURL('image/png');
+    proofNo++;
+    try { localStorage.setItem('letterpress-proofs', String(proofNo)); } catch (err) { /* optional */ }
+    $('proof').hidden = false;
+    $('proof-img').src = url;
+    const words = galley.map((l) => l.sorts.filter((s) => s.kind === 'type').map((s) => s.key).join('')).join(' / ');
+    $('proof-img').alt = `A letterpress print reading: ${words}`;
+    const date = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
+    const pieces = galley.reduce((s, l) => s + l.sorts.length, 0);
+    $('proof-meta').textContent = `Proof no. ${proofNo} · ${date} · ${galley.length} line${galley.length === 1 ? '' : 's'}, ${pieces} pieces of metal${inkChoice === 'two' ? ' · two runs through the press' : ''}`;
+    const dl = $('download');
+    dl.hidden = framed;
+    dl.href = url;
+    $('forme').classList.remove('inked');
+    $('proof').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
+    printing = false;
+    $('print').disabled = false;
+  }
+
+  /* ================================================================
+     Typing
+     ================================================================ */
+  const KEYMAP = { "'": '’', '"': '’', ' ': 'sp3' };
+  function typeChar(ch) {
+    const key = KEYMAP[ch] || ch;
+    if (key === 'sp3' || LAYOUT.some(([kk]) => kk === key)) return pick(key);
+    const shown = ch.replace(/[&<>"]/g, (x) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[x]));
+    say(`This case has no “${shown}”. A printer would have had to order one from a type foundry.`);
+    return false;
+  }
+  $('typein').addEventListener('input', (e) => {
+    const inp = e.target;
+    if (e.inputType && e.inputType.startsWith('delete')) takeBack();
+    else for (const ch of (e.data != null ? e.data : inp.value)) typeChar(ch);
+    inp.value = '';
+  });
+  $('typein').addEventListener('keydown', (e) => {
+    if (e.key === 'Backspace' && !e.target.value) { e.preventDefault(); takeBack(); }
+    else if (e.key === 'Enter') { e.preventDefault(); finish('center'); }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'select' || tag === 'textarea') return;
+    if (e.key === 'Backspace') { e.preventDefault(); takeBack(); return; }
+    if (e.key === 'Enter' && tag !== 'button' && tag !== 'a') { e.preventDefault(); finish('center'); return; }
+    if (e.key.length !== 1) return;
+    if (e.key === ' ' && (tag === 'button' || tag === 'a')) return;
+    e.preventDefault();
+    typeChar(e.key);
+  });
+
+  /* ================================================================
+     Controls and start
+     ================================================================ */
+  const tabs = $('tabs');
+  for (const c of Object.values(CASES)) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tab';
+    b.dataset.case = c.id;
+    b.innerHTML = `${c.label}<small>${c.note}</small>`;
+    b.addEventListener('click', () => { current = c.id; buildCase(); drawStick(); });
+    tabs.append(b);
+  }
+  $('unlabel').addEventListener('change', (e) => caseEl.classList.toggle('unlabeled', e.target.checked));
+  $('flip').addEventListener('change', drawStick);
+  document.querySelectorAll('[data-space]').forEach((b) => b.addEventListener('click', () => pick(b.dataset.space)));
+  document.querySelectorAll('[data-finish]').forEach((b) => b.addEventListener('click', () => finish(b.dataset.finish)));
+  $('back').addEventListener('click', takeBack);
+  $('undo-line').addEventListener('click', undoLine);
+  $('dist').addEventListener('click', distribute);
+  $('print').addEventListener('click', pull);
+
+  // A small broadside, already set, so the press has something on it.
+  function setSample() {
+    const lines = [['wood', 'FAIR DAY'], ['text', 'Rides, Music & Prize Pigs'], ['text', 'Saturday at Nine O’Clock']];
+    for (const [cid, text] of lines) {
+      current = cid;
+      for (const ch of text) typeChar(ch);
+      finish('center');
+    }
+    current = 'text';
+    say('A broadside is already set and waiting in the chase. Ink it and pull a print, or set a line of your own.');
+  }
+
+  const start = () => {
+    buildCase();
+    sizeAll();
+    setSample();
+    buildCase();
+    new ResizeObserver(sizeAll).observe($('stick').parentElement);
+  };
+  const fontsReady = document.fonts && document.fonts.load
+    ? Promise.all([document.fonts.load('18px "Libre Caslon Text"'), document.fonts.load('36px "Alfa Slab One"')]).catch(() => null)
+    : Promise.resolve();
+  let started = false;
+  const go = () => { if (!started) { started = true; start(); } };
+  fontsReady.then(go);
+  setTimeout(go, 2500);
+})();
+</script>
+</body>
+</html>

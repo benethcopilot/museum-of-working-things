@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Mendeleev’s Table</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=PT+Mono&display=swap">
+<style>
+:root {
+  /* Layout: chemical solitaire. A green card table holds the 1871 table being built; the deck and its messages sit beside it; the predictions, the discoveries and the history follow below. */
+  --ground: #e6e9e2;
+  --ground-2: #d8ddd4;
+  --card-ui: #f6f4ec;
+  --text: #1d211f;
+  --muted: #545c57;
+  --line: rgba(29, 33, 31, 0.14);
+  --line-strong: rgba(29, 33, 31, 0.32);
+  --accent: #a3282c;
+  --accent-ink: #fff6f2;
+  --good: #2f7a45;
+  /* The card table and the cards keep their colors in both themes. */
+  --felt: #2d5a43;
+  --felt-dark: #1e3f2f;
+  --paper: #f6efdc;
+  --ink: #2a2117;
+  --ink-soft: #6a5d48;
+  --red-ink: #a3282c;
+  --f-display: "Old Standard TT", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --f-body: "PT Serif", "Iowan Old Style", Georgia, serif;
+  --f-mono: "PT Mono", "Consolas", "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #111613;
+    --ground-2: #1a211c;
+    --card-ui: #18201b;
+    --text: #e9e6dc;
+    --muted: #a2aba4;
+    --line: rgba(233, 230, 220, 0.12);
+    --line-strong: rgba(233, 230, 220, 0.3);
+    --accent: #ff7d72;
+    --accent-ink: #1c0807;
+    --good: #7fd19a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #111613;
+  --ground-2: #1a211c;
+  --card-ui: #18201b;
+  --text: #e9e6dc;
+  --muted: #a2aba4;
+  --line: rgba(233, 230, 220, 0.12);
+  --line-strong: rgba(233, 230, 220, 0.3);
+  --accent: #ff7d72;
+  --accent-ink: #1c0807;
+  --good: #7fd19a;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--text); font-family: var(--f-body); font-size: 16.5px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 700; line-height: 1.08; margin: 0; text-wrap: balance; }
+sub { font-size: 0.72em; line-height: 0; }
+
+.page { box-sizing: border-box; max-width: 1240px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 34px; }
+.masthead { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 36px; align-items: end; }
+.eyebrow { grid-column: 1 / -1; margin: 0; font-family: var(--f-mono); font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.masthead h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); }
+.masthead h1 em { font-weight: 400; }
+.lede { margin: 0; max-width: 62ch; color: var(--muted); }
+
+/* ---------- The card table ---------- */
+.game { display: grid; grid-template-columns: minmax(0, 1fr) minmax(270px, 320px); gap: 20px 26px; align-items: start; }
+.felt { padding: 14px; border-radius: 12px; background: radial-gradient(120% 90% at 30% 20%, #376b51, var(--felt) 55%, var(--felt-dark)); box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.35), 0 16px 30px -18px rgba(0, 0, 0, 0.6); overflow-x: auto; }
+.table { min-width: 640px; display: grid; grid-template-columns: 4.4em repeat(8, minmax(0, 1fr)); gap: 5px; }
+.gh { text-align: center; color: #f2ead4; padding-bottom: 4px; }
+.gh b { display: block; font-family: var(--f-display); font-size: 1.3rem; line-height: 1.1; }
+.gh span { display: block; font-family: var(--f-mono); font-size: 0.72rem; line-height: 1.3; color: #cfe2d4; }
+.rl { align-self: center; font-family: var(--f-mono); font-size: 0.72rem; color: #cfe2d4; line-height: 1.2; }
+.cell {
+  box-sizing: border-box;
+  min-height: 62px;
+  padding: 4px 2px;
+  border-radius: 5px;
+  border: 1.5px dashed rgba(242, 234, 212, 0.22);
+  background: rgba(0, 0, 0, 0.12);
+  color: #f2ead4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.cell.none { border-color: transparent; background: none; }
+.cell.target { border-color: rgba(255, 236, 170, 0.75); background: rgba(255, 236, 170, 0.08); }
+.cell.target:hover { background: rgba(255, 236, 170, 0.22); }
+.cell.card {
+  border: 0;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.25);
+}
+.cell .sym { font-family: var(--f-display); font-weight: 700; font-size: 1.35rem; line-height: 1; }
+.cell .w { font-family: var(--f-mono); font-size: 0.75rem; color: var(--ink-soft); }
+.cell.triad .sym { font-size: 0.82rem; line-height: 1.15; }
+.cell.gap { border: 2px dashed var(--red-ink); background: rgba(246, 239, 220, 0.9); color: var(--red-ink); }
+.cell.gap .sym { font-weight: 400; font-size: 1.5rem; }
+.cell.gap .w { color: var(--red-ink); font-size: 0.6rem; letter-spacing: -0.02em; }
+.cell.gap.target { box-shadow: 0 0 0 3px rgba(255, 236, 170, 0.8); }
+.cell.found { background: #fbf3d6; box-shadow: 0 0 0 2px #d9a93b, 0 4px 8px rgba(0, 0, 0, 0.25); }
+.cell.found .yr { font-family: var(--f-mono); font-size: 0.66rem; color: #8a6418; }
+.cell.land { animation: land 0.35s ease-out; }
+@keyframes land { from { transform: translateY(-8px) scale(1.06); } to { transform: none; } }
+.cell.shake { animation: shake 0.35s; }
+@keyframes shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+
+.deck { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 12px; }
+.deck .count { margin: 0; font-family: var(--f-mono); font-size: 0.82rem; color: var(--muted); }
+.big-card {
+  padding: 16px 18px 14px;
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.18), 0 14px 24px -14px rgba(0, 0, 0, 0.5);
+  min-height: 190px;
+}
+.big-card .top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 4px 12px; }
+.big-card .sym { font-family: var(--f-display); font-weight: 700; font-size: 3.6rem; line-height: 1; }
+.big-card.triad .sym { font-size: 2rem; line-height: 1.2; }
+.big-card .w { font-family: var(--f-mono); font-size: 1.4rem; text-align: right; }
+.big-card .w small { display: block; font-size: 0.68rem; color: var(--ink-soft); }
+.big-card .name { font-family: var(--f-display); font-size: 1.3rem; margin-top: 4px; }
+.big-card .about { margin: 6px 0 8px; font-size: 0.95rem; color: #4a4033; }
+.big-card .clue { margin: 0; padding: 6px 10px; border-radius: 6px; background: #ede2c6; font-size: 0.98rem; }
+.big-card.done { display: grid; place-items: center; text-align: center; }
+.big-card.done .sym { font-size: 2.2rem; }
+.msg { margin: 0; min-height: 4.8em; font-size: 0.98rem; }
+.msg b { color: var(--accent); }
+.msg.good b { color: var(--good); }
+.row-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.btn { padding: 7px 13px 8px; border: 1.5px solid var(--line-strong); border-radius: 6px; background: none; font-size: 0.92rem; transition: background-color 0.15s, opacity 0.15s; }
+.btn:hover { background: var(--ground-2); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { background: var(--accent); opacity: 0.9; }
+.btn:disabled { opacity: 0.4; cursor: default; }
+
+/* ---------- Predictions ---------- */
+.sec-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 20px; margin-bottom: 12px; }
+.sec-head h2 { font-size: clamp(1.6rem, 3vw, 2.1rem); }
+.sec-head p { margin: 0; color: var(--muted); max-width: 60ch; }
+.preds { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
+.pred { display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: 10px; background: var(--card-ui); border: 1px solid var(--line); }
+.pred.waiting { border-style: dashed; background: none; }
+.pred h3 { font-size: 1.3rem; }
+.pred .where { margin: 0; font-size: 0.9rem; color: var(--muted); }
+.pred .nbrs { margin: 0; font-family: var(--f-mono); font-size: 0.8rem; line-height: 1.55; }
+.pred label { display: flex; align-items: center; gap: 10px; font-size: 0.92rem; }
+.pred input[type="range"] { flex: 1; min-width: 0; accent-color: var(--accent); }
+.pred output { font-family: var(--f-mono); min-width: 3ch; font-size: 1.05rem; }
+.pred .result { margin: 0; padding: 10px 12px; border-radius: 8px; background: var(--ground-2); font-size: 0.95rem; }
+.pred .result b { font-family: var(--f-display); font-size: 1.15rem; }
+.pred .wait { margin: 0; color: var(--muted); font-style: italic; }
+
+/* ---------- Stories ---------- */
+.stories { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px 32px; }
+.stories h2 { font-size: 1.5rem; margin-bottom: 8px; }
+.stories p { margin: 0 0 10px; max-width: 62ch; }
+.stories .later { margin-top: 18px; }
+.cmp { width: 100%; border-collapse: collapse; font-size: 0.92rem; font-variant-numeric: tabular-nums; }
+.cmp th, .cmp td { padding: 6px 8px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+.cmp th { font-weight: 700; color: var(--muted); font-size: 0.82rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.cmp td:not(:first-child) { font-family: var(--f-mono); }
+.cmp-wrap { overflow-x: auto; }
+.history { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 30px; padding-top: 22px; border-top: 1px solid var(--line-strong); }
+.history h2 { font-size: 1.3rem; margin-bottom: 6px; }
+.history p { margin: 0; font-size: 0.95rem; }
+.history .sources { grid-column: 1 / -1; font-size: 0.85rem; color: var(--muted); }
+.history a { color: inherit; text-underline-offset: 3px; }
+
+@media (max-width: 920px) {
+  .game, .stories { grid-template-columns: minmax(0, 1fr); }
+  .deck { position: static; }
+  .history { grid-template-columns: minmax(0, 1fr); }
+  .masthead { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cell.land, .cell.shake { animation: none; }
+  .btn { transition: none; }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="mendeleev" defer></script>
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Numbers &amp; Elements · Chemistry</p>
+    <h1>Mendeleev’s <em>Table</em></h1>
+    <p class="lede">In 1869 Dmitri Mendeleev sorted the known elements by weight and by how they behave, and the story goes that he laid them out like cards in a game of solitaire. Where no element fit, he left a gap and said one nobody had found yet belonged there. Deal his cards and find the gaps yourself.</p>
+  </header>
+
+  <section class="game" aria-label="Chemical solitaire">
+    <div class="felt"><div class="table" id="table" aria-label="Mendeleev’s 1871 table as it fills in"></div></div>
+    <aside class="deck" aria-label="The deck">
+      <p class="count" id="count"></p>
+      <div class="big-card" id="card"></div>
+      <p class="msg" id="msg" aria-live="polite"></p>
+      <div class="row-btns">
+        <button type="button" class="btn" id="hint">Place it for me</button>
+        <button type="button" class="btn" id="row">Finish this series</button>
+        <button type="button" class="btn" id="restart">Start over</button>
+      </div>
+    </aside>
+  </section>
+
+  <section aria-labelledby="pred-h">
+    <div class="sec-head">
+      <h2 id="pred-h">Predict the missing elements</h2>
+      <p>Mendeleev estimated each missing element from its neighbors, since weights rise steadily along a series. Set your guess for its atomic weight, then see what was found.</p>
+    </div>
+    <div class="preds" id="preds"></div>
+  </section>
+
+  <section class="stories">
+    <div>
+      <h2>The prediction that convinced everyone</h2>
+      <p>Mendeleev named each missing element after a known one in its group, adding the Sanskrit prefix <i>eka-</i>, “one”. In 1871 he described eka-silicon in detail. In 1886 Clemens Winkler found germanium in a silver ore and measured it.</p>
+      <div class="cmp-wrap">
+        <table class="cmp">
+          <thead><tr><th scope="col">Property</th><th scope="col">Mendeleev, 1871</th><th scope="col">Winkler, 1886</th></tr></thead>
+          <tbody>
+            <tr><td>Atomic weight</td><td>72</td><td>72.3</td></tr>
+            <tr><td>Density</td><td>5.5</td><td>5.47</td></tr>
+            <tr><td>Oxide</td><td>EsO<sub>2</sub>, density 4.7</td><td>GeO<sub>2</sub>, density 4.703</td></tr>
+            <tr><td>Chloride</td><td>EsCl<sub>4</sub>, boils below 100 °C</td><td>GeCl<sub>4</sub>, boils at 86 °C</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <h2>Measure it again</h2>
+      <p>When Paul-Émile Lecoq de Boisbaudran found gallium in 1875, he measured its density as 4.7. Mendeleev had predicted 5.9 for eka-aluminium, and he wrote to suggest the measurement be checked. With a purer sample it came out at 5.9.</p>
+      <h2 class="later">Trust the pattern</h2>
+      <p>Tellurium weighs a little more than iodine, yet it behaves like sulfur and selenium while iodine behaves like chlorine and bromine. Mendeleev put them in the order their chemistry asked for. In 1913 Henry Moseley showed why: elements line up by atomic number, the charge on the nucleus, not by weight.</p>
+    </div>
+  </section>
+
+  <section class="history">
+    <div>
+      <h2>A textbook needs an order</h2>
+      <p>Mendeleev was writing a chemistry textbook in St. Petersburg and wanted a sensible order for its chapters. Sorting the 63 elements known at the time, he found that their properties repeat. He published his first table in 1869 and the improved one this page uses in 1871. The game deals its first seven series; the full table went on to series 12, through gold, mercury, lead and uranium.</p>
+    </div>
+    <div>
+      <h2>The gaps fill in</h2>
+      <p>Gallium came in 1875 and scandium in 1879, which Per Teodor Cleve recognized as eka-boron. Germanium followed in 1886. The gap under manganese waited until 1937, when Carlo Perrier and Emilio Segrè made technetium from molybdenum that had been bombarded in a cyclotron. Its name comes from the Greek for “artificial”.</p>
+    </div>
+    <div>
+      <h2>What he didn’t see coming</h2>
+      <p>In 1894 Lord Rayleigh and William Ramsay found argon, a gas that reacts with almost nothing. Ramsay went on to find helium on Earth in 1895, and with Morris Travers, neon, krypton and xenon in 1898. They needed a whole new column, and the table took it in without breaking.</p>
+    </div>
+    <p class="sources">Sources: <a href="https://en.wikipedia.org/wiki/Mendeleev%27s_predicted_elements" target="_blank" rel="noopener">Mendeleev’s predicted elements</a>, <a href="https://en.wikipedia.org/wiki/Germanium" target="_blank" rel="noopener">Germanium</a>, <a href="https://en.wikipedia.org/wiki/Technetium" target="_blank" rel="noopener">Technetium</a>, <a href="https://en.wikipedia.org/wiki/Gallium" target="_blank" rel="noopener">Gallium</a>, <a href="https://en.wikipedia.org/wiki/Noble_gas" target="_blank" rel="noopener">Noble gas</a> and <a href="https://en.wikipedia.org/wiki/Dmitri_Mendeleev" target="_blank" rel="noopener">Dmitri Mendeleev</a> on Wikipedia. Atomic weights on the cards are the ones Mendeleev printed in 1871.</p>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Subscript the digits in a formula: H2O becomes H₂O. A number that doesn't follow a letter stays as it is.
+  const f = (s) => s.replace(/\d+/g, (m, i, str) => (i > 0 && /[A-Za-z)]/.test(str[i - 1]) ? `<sub>${m}</sub>` : m));
+
+  /* ================================================================
+     The 1871 table: eight groups, each headed by its typical formulas
+     ================================================================ */
+  const GROUPS = [
+    ['I', 'R2O', ''], ['II', 'RO', ''], ['III', 'R2O3', ''], ['IV', 'RO2', 'RH4'],
+    ['V', 'R2O5', 'RH3'], ['VI', 'RO3', 'RH2'], ['VII', 'R2O7', 'RH'], ['VIII', 'RO4', ''],
+  ];
+  const ROWS = 7;
+  const lastG = (r) => (r === 1 ? 0 : r === 4 || r === 6 ? 7 : 6);
+  const key = (r, g) => `${r}-${g}`;
+
+  // [symbol, name, weight, series, group (0 to 7), what it is, its clue]
+  const DECK = [
+    ['H', 'Hydrogen', 1, 1, 0, 'The lightest gas.', 'Forms water, H2O.'],
+    ['Li', 'Lithium', 7, 2, 0, 'A soft metal that fizzes in water.', 'Forms Li2O.'],
+    ['Be', 'Beryllium', 9.4, 2, 1, 'A light, hard metal.', 'Forms BeO.'],
+    ['B', 'Boron', 11, 2, 2, 'A hard, dark solid.', 'Forms B2O3.'],
+    ['C', 'Carbon', 12, 2, 3, 'Coal, graphite and diamond.', 'Forms CO2 and CH4.'],
+    ['N', 'Nitrogen', 14, 2, 4, 'Most of the air.', 'Forms N2O5 and NH3.'],
+    ['O', 'Oxygen', 16, 2, 5, 'The gas we breathe.', 'Joins hydrogen as H2O.'],
+    ['F', 'Fluorine', 19, 2, 6, 'A fierce yellow gas.', 'Joins hydrogen as HF.'],
+    ['Na', 'Sodium', 23, 3, 0, 'So soft it cuts like cheese, and it fizzes in water.', 'Forms Na2O.'],
+    ['Mg', 'Magnesium', 24, 3, 1, 'Burns with a white flash.', 'Forms MgO.'],
+    ['Al', 'Aluminium', 27.3, 3, 2, 'A light, silvery metal.', 'Forms Al2O3.'],
+    ['Si', 'Silicon', 28, 3, 3, 'Found in sand and rock.', 'Forms SiO2 and SiH4.'],
+    ['P', 'Phosphorus', 31, 3, 4, 'One kind glows in the dark.', 'Forms P2O5 and PH3.'],
+    ['S', 'Sulfur', 32, 3, 5, 'Yellow, and it stinks when it burns.', 'Forms SO3 and H2S.'],
+    ['Cl', 'Chlorine', 35.5, 3, 6, 'A choking green gas.', 'Forms Cl2O7 and HCl.'],
+    ['K', 'Potassium', 39, 4, 0, 'A soft metal that bursts into flame in water.', 'Forms K2O.'],
+    ['Ca', 'Calcium', 40, 4, 1, 'In chalk, shells and bones.', 'Forms CaO.'],
+    ['Ti', 'Titanium', 48, 4, 3, 'A strong grey metal.', 'Forms TiO2.'],
+    ['V', 'Vanadium', 51, 4, 4, 'Makes steel tough.', 'Forms V2O5.'],
+    ['Cr', 'Chromium', 52, 4, 5, 'Shiny, with brightly colored compounds.', 'Forms CrO3.'],
+    ['Mn', 'Manganese', 55, 4, 6, 'A hard, brittle grey metal.', 'Forms Mn2O7.'],
+    ['Fe Co Ni', 'Iron, cobalt and nickel', '56–59', 4, 7, 'Three magnetic metals so alike that Mendeleev gave them one place together.', 'A family of three, which goes in group VIII.'],
+    ['Cu', 'Copper', 63, 5, 0, 'A reddish metal.', 'Forms Cu2O.'],
+    ['Zn', 'Zinc', 65, 5, 1, 'A bluish-white metal.', 'Forms ZnO.'],
+    ['As', 'Arsenic', 75, 5, 4, 'A grey solid, and a famous poison.', 'Forms As2O5 and AsH3.'],
+    ['Se', 'Selenium', 78, 5, 5, 'Behaves much like sulfur.', 'Forms SeO3 and H2Se.'],
+    ['Br', 'Bromine', 80, 5, 6, 'A red-brown liquid.', 'Joins hydrogen as HBr.'],
+    ['Rb', 'Rubidium', 85, 6, 0, 'A soft metal first spotted in a spectrum in 1861.', 'Forms Rb2O.'],
+    ['Sr', 'Strontium', 87, 6, 1, 'Makes fireworks burn red.', 'Forms SrO.'],
+    ['Yt', 'Yttrium', 88, 6, 2, 'A rare earth named for Ytterby in Sweden. Mendeleev wrote it Yt.', 'Forms Yt2O3.'],
+    ['Zr', 'Zirconium', 90, 6, 3, 'A hard grey metal.', 'Forms ZrO2.'],
+    ['Nb', 'Niobium', 94, 6, 4, 'A soft grey metal.', 'Forms Nb2O5.'],
+    ['Mo', 'Molybdenum', 96, 6, 5, 'A silvery metal that is very hard to melt.', 'Forms MoO3.'],
+    ['Ru Rh Pd', 'Ruthenium, rhodium and palladium', '104–106', 6, 7, 'A second family of three, like iron, cobalt and nickel.', 'A family of three, which goes in group VIII. Ruthenium forms RuO4.'],
+    ['Ag', 'Silver', 108, 7, 0, 'The precious white metal.', 'Forms Ag2O.'],
+    ['Cd', 'Cadmium', 112, 7, 1, 'A soft bluish metal.', 'Forms CdO.'],
+    ['In', 'Indium', 113, 7, 2, 'A soft metal named for the indigo line in its spectrum.', 'Forms In2O3.'],
+    ['Sn', 'Tin', 118, 7, 3, 'The metal in tin cans and bronze.', 'Forms SnO2.'],
+    ['Sb', 'Antimony', 122, 7, 4, 'A brittle silvery solid.', 'Forms Sb2O5.'],
+    ['I', 'Iodine', 127, 7, 6, 'Gives off violet vapor when warmed.', 'Joins hydrogen as HI.'],
+    ['Te', 'Tellurium', 128, 7, 5, 'Behaves much like selenium.', 'Forms TeO3 and H2Te.'],
+  ].map(([sym, name, w, row, g, about, clue]) => ({ sym, name, w, row, g, about, clue }));
+
+  const GAPS = {
+    '4-2': { eka: 'Eka-boron', predicted: 44, el: 'Scandium', sym: 'Sc', w: 45, year: 1879, by: 'Lars Fredrik Nilson in Sweden', note: 'Per Teodor Cleve recognized it as Mendeleev’s eka-boron.' },
+    '5-2': { eka: 'Eka-aluminium', predicted: 68, el: 'Gallium', sym: 'Ga', w: 69.7, year: 1875, by: 'Paul-Émile Lecoq de Boisbaudran in France', note: 'He spotted it first as two violet lines in a spectrum.' },
+    '5-3': { eka: 'Eka-silicon', predicted: 72, el: 'Germanium', sym: 'Ge', w: 72.6, year: 1886, by: 'Clemens Winkler in Germany', note: 'See how the rest of Mendeleev’s description held up, below.' },
+    '6-6': { eka: 'Eka-manganese', predicted: 100, el: 'Technetium', sym: 'Tc', w: 98, year: 1937, by: 'Carlo Perrier and Emilio Segrè in Italy', note: 'It was made in a laboratory before anyone found it in nature.' },
+  };
+  const TE_SPOT = '7-5';
+
+  /* ================================================================
+     State
+     ================================================================ */
+  let placed = {};              // "series-group" -> a card, or { gap: true }
+  let next = 0;                 // index of the next card in the deck
+  let pos = { row: 1, g: 0 };   // the first free space after the last card
+  let revealed = {};            // gap key -> the visitor's guess
+  let guesses = {};
+
+  function advance() {
+    while (pos.row <= ROWS) {
+      if (pos.g > lastG(pos.row)) { pos.row++; pos.g = 0; } else if (placed[key(pos.row, pos.g)]) pos.g++; else break;
+    }
+  }
+  // Put card c in its true place. Spaces passed over in the same series become gaps.
+  function place(c) {
+    if (c.row === pos.row) for (let g = pos.g; g < c.g; g++) placed[key(c.row, g)] = { gap: true };
+    placed[key(c.row, c.g)] = c;
+    next++;
+    if (c.row > pos.row || (c.row === pos.row && c.g >= pos.g)) pos = { row: c.row, g: c.g + 1 };
+    advance();
+  }
+  const gapCount = () => Object.values(placed).filter((p) => p.gap).length;
+
+  /* ================================================================
+     Drawing
+     ================================================================ */
+  const weightOf = (p) => parseFloat(String(p.w));
+  const firstSym = (p) => p.sym.split(' ')[0];
+
+  function render(landed) {
+    const c = DECK[next];
+    const table = $('table');
+    const hadFocus = table.contains(document.activeElement);
+    let h = '<div></div>';
+    for (const [n, ox, hy] of GROUPS) h += `<div class="gh"><b>${n}</b><span>${f(ox)}</span><span>${hy ? f(hy) : '&nbsp;'}</span></div>`;
+    for (let r = 1; r <= ROWS; r++) {
+      h += `<div class="rl">Series ${r}</div>`;
+      for (let g = 0; g < 8; g++) {
+        const k = key(r, g);
+        const p = placed[k];
+        const where = `series ${r}, group ${GROUPS[g][0]}`;
+        if (g > lastG(r)) {
+          h += '<div class="cell none"></div>';
+        } else if (p && !p.gap) {
+          const triad = p.sym.includes(' ');
+          h += `<div class="cell card${triad ? ' triad' : ''}${landed === k && !reduceMotion ? ' land' : ''}"><span class="sym">${p.sym}</span><span class="w">${p.w}</span></div>`;
+        } else if (p && GAPS[k] && revealed[k] != null) {
+          const gp = GAPS[k];
+          h += `<div class="cell card found"><span class="sym">${gp.sym}</span><span class="w">${gp.w}</span><span class="yr">${gp.year}</span></div>`;
+        } else if (p) {
+          if (c && c.sym === 'Te' && k === TE_SPOT) h += `<button type="button" class="cell gap target" data-k="${k}" aria-label="The empty space in ${where}"><span class="sym">?</span></button>`;
+          else h += `<div class="cell gap"><span class="sym">?</span><span class="w">${GAPS[k] ? GAPS[k].eka.toLowerCase() : ''}</span></div>`;
+        } else if (c && r === pos.row) {
+          h += `<button type="button" class="cell target" data-k="${k}" aria-label="Empty space, ${where}"></button>`;
+        } else {
+          h += '<div class="cell"></div>';
+        }
+      }
+    }
+    table.innerHTML = h;
+    if (hadFocus) (table.querySelector('.target') || $('hint')).focus();
+    drawCard();
+    drawPredictions();
+  }
+
+  function drawCard() {
+    const c = DECK[next];
+    const el = $('card');
+    $('hint').disabled = !c;
+    $('row').disabled = !c;
+    if (!c) {
+      $('count').textContent = `All ${DECK.length} cards are on the table`;
+      el.className = 'big-card done';
+      el.innerHTML = '<div><div class="sym">Every card placed</div><p class="about">The red question marks are elements nobody had seen in 1871. Scroll down and predict them.</p></div>';
+      return;
+    }
+    $('count').textContent = `Card ${next + 1} of ${DECK.length} · dealt from lightest to heaviest`;
+    el.className = `big-card${c.sym.includes(' ') ? ' triad' : ''}`;
+    el.innerHTML = `<div class="top"><div class="sym">${c.sym}</div><div class="w">${c.w}<small>atomic weight</small></div></div><div class="name">${c.name}</div><p class="about">${c.about}</p><p class="clue">${f(c.clue)}</p>`;
+  }
+
+  const say = (html, good) => { const m = $('msg'); m.innerHTML = html; m.classList.toggle('good', !!good); };
+  function shake(k) {
+    if (reduceMotion) return;
+    const el = document.querySelector(`[data-k="${k}"]`);
+    if (!el) return;
+    el.classList.remove('shake');
+    void el.offsetWidth;
+    el.classList.add('shake');
+  }
+
+  /* ================================================================
+     Playing
+     ================================================================ */
+  function praise(c, skipped) {
+    if (c.sym === 'Te') return '<b>That’s what Mendeleev did.</b> Tellurium is heavier than iodine, but it behaves like selenium, so it goes under selenium. The weights disagreed with the pattern, and the pattern was right.';
+    if (c.sym === 'I') return '<b>Good.</b> Iodine joins hydrogen as HI, like chlorine and bromine, so it goes in group VII. That left a space in group VI. Now look closely at the next card.';
+    if (skipped) return `<b>You left ${skipped === 1 ? 'a gap' : 'two gaps'}.</b> ${c.name} behaves like group ${GROUPS[c.g][0]}, so the space${skipped === 1 ? '' : 's'} before it stay${skipped === 1 ? 's' : ''} empty. Mendeleev said an undiscovered element belonged in each hole like this.`;
+    const [, ox, hy] = GROUPS[c.g];
+    return `<b>Right.</b> ${f(c.clue)} That matches ${f(ox)}${hy ? ` and ${f(hy)}` : ''} at the top of group ${GROUPS[c.g][0]}.`;
+  }
+
+  function tryPlace(k) {
+    const c = DECK[next];
+    if (!c) return;
+    const [r, g] = k.split('-').map(Number);
+    if (r === c.row && g === c.g) {
+      const skipped = c.row === pos.row ? c.g - pos.g : 0;
+      place(c);
+      render(k);
+      say(praise(c, skipped), true);
+      return;
+    }
+    shake(k);
+    if (r === c.row && g < c.g) {
+      say(`${c.name} is the next heaviest element, but it doesn’t behave like group ${GROUPS[g][0]}. ${f(c.clue)} Mendeleev’s answer was to leave a space empty and put each element where its chemistry fits.`);
+    } else {
+      say(`Not that group. ${f(c.clue)} Which group has that formula at the top?`);
+    }
+  }
+
+  $('table').addEventListener('click', (e) => {
+    const cell = e.target.closest('[data-k]');
+    if (cell) tryPlace(cell.dataset.k);
+  });
+  $('hint').addEventListener('click', () => {
+    const c = DECK[next];
+    if (c) tryPlace(key(c.row, c.g));
+  });
+  $('row').addEventListener('click', () => {
+    const c0 = DECK[next];
+    if (!c0) return;
+    if (c0.sym === 'Te' || c0.sym === 'I') { tryPlace(key(c0.row, c0.g)); return; }
+    const series = c0.row;
+    const before = gapCount();
+    let last = c0;
+    while (DECK[next] && DECK[next].row === series && DECK[next].sym !== 'I') { last = DECK[next]; place(last); }
+    render(key(last.row, last.g));
+    const opened = gapCount() - before;
+    if (DECK[next] && DECK[next].sym === 'I') say(`<b>Series ${series} is dealt up to iodine.</b> ${opened ? 'It left gaps along the way. ' : ''}Place iodine yourself: its clue matters.`, true);
+    else say(`<b>Series ${series} is finished.</b> ${opened ? `It left ${opened === 1 ? 'a gap' : `${opened} gaps`}, marked in red.` : 'Every space in it is filled.'}`, true);
+  });
+  $('restart').addEventListener('click', start);
+
+  /* ================================================================
+     Predictions: a card opens for each gap once it appears
+     ================================================================ */
+  function nearest(r, g, dr, dg) {
+    for (let rr = r + dr, gg = g + dg; rr >= 1 && rr <= ROWS && gg >= 0 && gg <= lastG(rr); rr += dr, gg += dg) {
+      const p = placed[key(rr, gg)];
+      if (!p) return null;
+      if (!p.gap) return p;
+    }
+    return null;
+  }
+  function pair(a, b, words) {
+    const s = (p) => (p ? `${firstSym(p)} ${weightOf(p)}` : '?');
+    const avg = a && b ? ` → ${((weightOf(a) + weightOf(b)) / 2).toFixed(1)}` : '';
+    return `${words}: ${s(a)} and ${s(b)}${avg}`;
+  }
+  let predSig = '';
+  function drawPredictions() {
+    const parts = Object.entries(GAPS).map(([k, gp], i) => {
+      const [r, g] = k.split('-').map(Number);
+      if (!placed[k]) return [`w${i}`, `<div class="pred waiting"><h3>Gap ${i + 1}</h3><p class="wait">Keep dealing. This one hasn’t opened yet.</p></div>`];
+      const nb = `${pair(nearest(r, g, -1, 0), nearest(r, g, 1, 0), 'Above and below')}<br>${pair(nearest(r, g, 0, -1), nearest(r, g, 0, 1), 'Left and right')}`;
+      const done = revealed[k] != null;
+      const guess = done ? revealed[k] : guesses[k] ?? 75;
+      return [`${k}${done ? 'r' : 'o'}${nb}`, `<div class="pred">
+        <h3>${gp.eka}</h3>
+        <p class="where">The gap in series ${r}, group ${GROUPS[g][0]}.</p>
+        <p class="nbrs">Nearest known neighbors<br>${nb}</p>
+        <label for="g-${k}">Your guess <input type="range" id="g-${k}" data-g="${k}" min="40" max="110" step="1" value="${guess}"${done ? ' disabled' : ''}><output id="o-${k}" for="g-${k}">${guess}</output></label>
+        ${done ? `<p class="result" tabindex="-1">${result(k, guess)}</p>` : `<button type="button" class="btn primary" data-reveal="${k}">Reveal</button>`}
+      </div>`];
+    });
+    const sig = parts.map((p) => p[0]).join('|');
+    if (sig === predSig) return;
+    predSig = sig;
+    $('preds').innerHTML = parts.map((p) => p[1]).join('');
+  }
+  function result(k, guess) {
+    const gp = GAPS[k];
+    const off = Math.abs(guess - gp.w);
+    const how = off < 1 ? 'almost exactly right' : `off by ${off.toFixed(1)}`;
+    return `<b>${gp.el} (${gp.sym}), found ${gp.year}</b><br>By ${gp.by}. Its atomic weight is ${gp.w}. Mendeleev predicted ${gp.predicted}; you guessed ${guess}, ${how}. ${gp.note}`;
+  }
+  $('preds').addEventListener('input', (e) => {
+    const k = e.target.dataset.g;
+    if (!k) return;
+    guesses[k] = Number(e.target.value);
+    $(`o-${k}`).textContent = e.target.value;
+  });
+  $('preds').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-reveal]');
+    if (!b) return;
+    const k = b.dataset.reveal;
+    revealed[k] = Number($(`g-${k}`).value);
+    render(null);
+    const res = $(`g-${k}`).closest('.pred').querySelector('.result');
+    if (res) res.focus({ preventScroll: true });
+  });
+
+  /* ================================================================
+     Start with the first two series already dealt
+     ================================================================ */
+  function start() {
+    placed = {};
+    next = 0;
+    pos = { row: 1, g: 0 };
+    revealed = {};
+    guesses = {};
+    predSig = '';
+    while (DECK[next] && DECK[next].row <= 2) place(DECK[next]);
+    render(null);
+    say('The first eight cards are dealt: hydrogen, then the light elements from lithium to fluorine. Now place sodium. Its clue says what it forms; find that formula at the top of a group.');
+  }
+  start();
+})();
+</script>
+</body>
+</html>

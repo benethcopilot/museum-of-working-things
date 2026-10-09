@@ -48,8 +48,16 @@
       "blurb": "Marble paper on water with a brush, an awl and a comb, then pull your one print.",
       "try": "Pull a print"
     },
-    { "slug": "letterpress", "hall": "making", "title": "Letterpress Type Case", "status": "planned", "blurb": "Set a line of metal type by hand and pull a proof you can keep." },
-    { "slug": "mendeleev", "hall": "numbers", "title": "Mendeleev’s Table", "status": "planned", "blurb": "Sort the elements known in 1869 and predict the ones nobody had found yet." },
+    {
+      "slug": "letterpress", "hall": "making", "title": "Letterpress Type Case", "ages": "8 and up",
+      "blurb": "Set metal type by hand from a real 1871 type case, justify it in the stick, then ink it and pull a print you can keep.",
+      "try": "Find the e box without labels"
+    },
+    {
+      "slug": "mendeleev", "hall": "numbers", "title": "Mendeleev’s Table", "ages": "10 and up",
+      "blurb": "Deal the elements onto Mendeleev’s 1871 table, leave gaps where nothing fits, and predict the elements nobody had found yet.",
+      "try": "Decide where tellurium goes"
+    },
     { "slug": "slide-rule", "hall": "numbers", "title": "Slide Rule", "status": "planned", "blurb": "Multiply by sliding two scales, the way engineers did until the 1970s." },
     { "slug": "lock-and-dam", "hall": "machines", "title": "Lock and Dam No. 1", "status": "planned", "blurb": "Raise a barge on the Mississippi between Minneapolis and St. Paul." },
     { "slug": "enigma", "hall": "machines", "title": "Enigma Machine", "status": "planned", "blurb": "Encrypt a message with real rotor wirings and find the flaw codebreakers used." },
