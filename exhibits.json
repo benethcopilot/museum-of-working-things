@@ -89,6 +89,11 @@
       "try": "Multiply 825 by 913"
     },
     {
+      "slug": "galileo", "hall": "numbers", "title": "Galileo’s Ramp", "ages": "9 and up",
+      "blurb": "Set frets along Galileo’s twelve-cubit ramp until a rolling ball clicks in an even rhythm, and find the odd numbers hiding in falling.",
+      "try": "Tilt the ramp and check the pattern holds"
+    },
+    {
       "slug": "lock-and-dam", "hall": "machines", "title": "Lock and Dam No. 1", "ages": "7 and up",
       "blurb": "Work the gates and valves of the Mississippi’s Ford Dam lock and lift a towboat 35.9 feet using nothing but gravity.",
       "try": "Open a gate before the water is level"

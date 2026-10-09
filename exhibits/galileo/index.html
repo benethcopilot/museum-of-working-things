@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Galileo’s Ramp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,600;1,400&family=Alegreya+SC:wght@500;700&family=Alegreya+Sans:wght@400;500&display=swap">
+<style>
+:root {
+  /* Layout: the twelve-cubit ramp runs across the page like a workbench in Padua; under it the rhythm of the clicks against a steady beat; then the measured gaps and the odd numbers they make; then the history. */
+  --ground: #e5e2dc;
+  --ground-2: #d7d3cb;
+  --plaster: #efece6;
+  --text: #241f1b;
+  --muted: #5f5850;
+  --line: rgba(36, 31, 27, 0.14);
+  --line-strong: rgba(36, 31, 27, 0.32);
+  --sanguine: #a4472b;
+  --bronze: #b0803a;
+  --good: #3f7a3a;
+  --wood: #8a5a33;
+  --wood-2: #6b4325;
+  --f-display: "Alegreya SC", "Alegreya", Georgia, serif;
+  --f-body: "Alegreya", Georgia, serif;
+  --f-data: "Alegreya Sans", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #141210;
+    --ground-2: #1f1c19;
+    --plaster: #1a1815;
+    --text: #ece6dd;
+    --muted: #ada498;
+    --line: rgba(236, 230, 221, 0.12);
+    --line-strong: rgba(236, 230, 221, 0.3);
+    --sanguine: #ef8a6a;
+    --bronze: #e0ad5c;
+    --good: #8fd086;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #141210;
+  --ground-2: #1f1c19;
+  --plaster: #1a1815;
+  --text: #ece6dd;
+  --muted: #ada498;
+  --line: rgba(236, 230, 221, 0.12);
+  --line-strong: rgba(236, 230, 221, 0.3);
+  --sanguine: #ef8a6a;
+  --bronze: #e0ad5c;
+  --good: #8fd086;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--text); font-family: var(--f-body); font-size: 18px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--sanguine); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 500; line-height: 1.05; margin: 0; text-wrap: balance; }
+
+.page { box-sizing: border-box; max-width: 1220px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 32px; }
+.masthead { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.eyebrow { margin: 0; font-family: var(--f-data); font-size: 0.8rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--sanguine); }
+.masthead h1 { font-size: clamp(2.8rem, 7vw, 5rem); }
+.lede { margin: 0; max-width: 64ch; color: var(--muted); }
+
+/* ---------- The ramp ---------- */
+.bench { padding: 10px; border: 1px solid var(--line); background: var(--plaster); }
+#ramp { display: block; width: 100%; height: auto; touch-action: none; }
+.rampbody { fill: var(--wood); }
+.rampside { fill: var(--wood-2); }
+.groove { stroke: #e8dcc3; stroke-width: 3; }
+.fret { cursor: ew-resize; }
+.fret .bar { fill: var(--text); }
+.fret .grip { fill: transparent; }
+.fret text { font-family: var(--f-data); font-size: 13px; fill: var(--text); text-anchor: middle; }
+.fret.ok .bar { fill: var(--good); }
+.fret:focus { outline: none; }
+.fret:focus-visible .bar { fill: var(--sanguine); }
+.ball { fill: var(--bronze); stroke: #6b4a1a; stroke-width: 1.5; }
+.support { fill: var(--wood-2); }
+.cubit { font-family: var(--f-data); font-size: 12px; fill: var(--muted); }
+
+.controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin-top: 10px; }
+.btn { padding: 7px 14px; border: 1.5px solid var(--line-strong); border-radius: 3px; background: none; font-family: var(--f-data); font-size: 0.95rem; }
+.btn:hover { background: var(--ground-2); }
+.btn.primary { background: var(--sanguine); border-color: var(--sanguine); color: #fff8f2; }
+.btn.primary:hover { opacity: 0.9; background: var(--sanguine); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.slope { display: flex; align-items: center; gap: 8px; font-family: var(--f-data); font-size: 0.95rem; }
+.slope input { width: 160px; accent-color: var(--sanguine); }
+
+.rhythm { margin-top: 8px; }
+#beat { display: block; width: 100%; height: auto; }
+.tick { stroke: var(--muted); stroke-width: 1.5; }
+.tick-t { font-family: var(--f-data); font-size: 11px; fill: var(--muted); text-anchor: middle; }
+.click { fill: var(--sanguine); }
+.click.ok { fill: var(--good); }
+.miss { stroke: var(--sanguine); stroke-width: 2; }
+.verdict { margin: 4px 0 0; font-size: 1rem; min-height: 1.6em; }
+.verdict b { color: var(--sanguine); }
+.verdict.ok b { color: var(--good); }
+
+/* ---------- The numbers ---------- */
+.grid2 { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.grid2 h2 { font-size: 1.8rem; margin-bottom: 8px; }
+.grid2 p { margin: 0 0 10px; }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-family: var(--f-data); font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+th, td { padding: 5px 8px; border-bottom: 1px solid var(--line); text-align: right; }
+th:first-child, td:first-child { text-align: left; }
+th { font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+td.odd { color: var(--sanguine); font-weight: 500; }
+.odds { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
+.odds span { min-width: 2.2em; padding: 4px 6px; border-radius: 3px; border: 1.5px solid var(--line-strong); text-align: center; font-family: var(--f-data); }
+
+/* ---------- History ---------- */
+.history { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 20px 40px; padding-top: 24px; border-top: 1px solid var(--line-strong); }
+.history h2 { font-size: 2rem; margin-bottom: 12px; }
+.timeline { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.timeline li { display: grid; grid-template-columns: 3.4em minmax(0, 1fr); gap: 12px; }
+.timeline .yr { font-family: var(--f-display); font-size: 1.25rem; line-height: 1.3; color: var(--sanguine); }
+.timeline p { margin: 0; font-size: 1rem; }
+.aside p { margin: 0 0 10px; font-size: 1rem; }
+.aside blockquote { margin: 0 0 10px; padding-left: 12px; border-left: 2px solid var(--bronze); font-style: italic; }
+.sources { grid-column: 1 / -1; margin: 0; font-size: 0.88rem; color: var(--muted); }
+.sources a { color: inherit; text-underline-offset: 3px; }
+
+@media (max-width: 900px) {
+  .grid2, .history { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="galileo" defer></script>
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Numbers &amp; Elements · Padua, about 1604</p>
+    <h1>Galileo’s Ramp</h1>
+    <p class="lede">Things fall too fast to time with a 17th-century clock, so Galileo slowed falling down: he rolled a bronze ball along a grooved ramp. Put seven thin frets across the groove so the ball clicks over them in a perfectly even rhythm, then look at where the frets ended up.</p>
+  </header>
+
+  <section class="bench" aria-label="The ramp">
+    <svg id="ramp" viewBox="0 0 1000 250" role="img" aria-label="A twelve-cubit ramp with seven frets across its groove and a bronze ball at the top. Drag the frets along the ramp."></svg>
+    <div class="controls">
+      <button type="button" class="btn primary" id="go">Release the ball</button>
+      <button type="button" class="btn" id="even">Space the frets evenly</button>
+      <button type="button" class="btn" id="answer">Show where they belong</button>
+      <label class="slope" for="h">Raise the top end <input type="range" id="h" min="0.5" max="2" step="0.1" value="1"><output id="h-o" for="h"></output></label>
+    </div>
+    <div class="rhythm">
+      <svg id="beat" viewBox="0 0 1000 86" role="img" aria-label="Timeline: the steady beat and the clicks of the ball"></svg>
+      <p class="verdict" id="verdict" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div>
+      <h2>Where the frets are</h2>
+      <p>Distances are measured down the ramp from where the ball starts. The last column divides each gap by the first gap.</p>
+      <div class="tablewrap"><table id="table"></table></div>
+    </div>
+    <div>
+      <h2>The odd numbers</h2>
+      <p>When the clicks come evenly, the gaps between frets grow as</p>
+      <div class="odds" id="odds"></div>
+      <p>In each equal stretch of time the ball covers 1, then 3, then 5, then 7 times the first distance. Add them up and the distance from the start runs 1, 4, 9, 16: the squares of the times.</p>
+      <p>Tilt the ramp more or less and everything speeds up or slows down, but the pattern stays the same. Galileo argued that a falling body is the same story told faster.</p>
+    </div>
+  </section>
+
+  <section class="history">
+    <div>
+      <h2>A musician’s son</h2>
+      <ol class="timeline">
+        <li><span class="yr">1591</span><p>Vincenzo Galilei dies. A lutenist and music theorist, he had tested how the pitch of a string changes with its tension. His son grew up with an ear trained to keep time.</p></li>
+        <li><span class="yr">1604</span><p>Working in Padua, Galileo arrives at the rule that a falling body covers distances that grow as the squares of the times.</p></li>
+        <li><span class="yr">1638</span><p>His <i>Two New Sciences</i>, printed in Leiden, describes the ramp: a wooden moulding 12 cubits long, a groove lined with smooth parchment, a hard, smooth bronze ball, and one end raised one or two cubits. He timed each run by weighing the water that ran from a large vessel through a thin pipe.</p></li>
+        <li><span class="yr">1961</span><p>Thomas Settle rebuilds the experiment and shows that a water clock is accurate enough to find the law.</p></li>
+        <li><span class="yr">1970</span><p>Historian Stillman Drake suggests Galileo may first have found it by ear, moving frets until the clicks matched a steady beat, as this exhibit lets you do. It is a reconstruction; Galileo never described doing it.</p></li>
+      </ol>
+    </div>
+    <div class="aside">
+      <h2>Why a ramp?</h2>
+      <p>A ball dropped from a tower falls 5 metres in its first second. Nobody in 1604 could time that. On a gentle ramp the same motion is slowed down many times over, slow enough to count, but it keeps its shape.</p>
+      <p>With the top raised one cubit, the ball here takes about 4.3 seconds to roll all twelve cubits, so the beat comes roughly every half second.</p>
+      <p>A rolling ball goes a little slower than one sliding without friction, because some of its energy goes into spinning. The pattern of odd numbers is unchanged.</p>
+    </div>
+    <p class="sources">Sources: <a href="https://en.wikipedia.org/wiki/Two_New_Sciences" target="_blank" rel="noopener">Two New Sciences</a> and <a href="https://en.wikipedia.org/wiki/Galileo_Galilei" target="_blank" rel="noopener">Galileo Galilei</a> on Wikipedia (the ramp, the water clock, Vincenzo Galilei); <a href="https://www.uni-flensburg.de/en/working-group-physics/histolab/thematical-subsections/mechanics/galileos-inclined-plane-experiment" target="_blank" rel="noopener">University of Flensburg history of physics lab</a> on Drake’s frets; Stillman Drake, “Renaissance Music and Experimental Science”, <i>Journal of the History of Ideas</i> (1970); Thomas Settle, “An Experiment in the History of Science”, <i>Science</i> (1961). The physics on this page is modern: a rolling solid ball.</p>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ================================================================
+     The physics: a solid ball rolling down a 12-cubit ramp
+     ================================================================ */
+  const CUBIT = 5.5 / 12;           // metres, from the 12-cubit, 5.5 m moulding
+  const L = 12 * CUBIT;
+  let hCub = 1;
+  const accel = () => (5 / 7) * 9.81 * ((hCub * CUBIT) / L);
+  const total = () => Math.sqrt((2 * L) / accel());
+  const BEATS = 8;
+
+  let frets = [1, 2, 3, 4, 5, 6, 7].map((k) => k / 8);   // fractions of the ramp, evenly spaced to start
+
+  /* ================================================================
+     Drawing the ramp
+     ================================================================ */
+  const A = [60, 70];
+  const B = () => [940, 70 + 40 + hCub * 50];
+  const at = (f) => { const b = B(); return [A[0] + (b[0] - A[0]) * f, A[1] + (b[1] - A[1]) * f]; };
+  let ballF = 0;
+  function drawRamp() {
+    const b = B();
+    const ang = Math.atan2(b[1] - A[1], b[0] - A[0]);
+    const nx = Math.sin(ang), ny = -Math.cos(ang);       // normal pointing up from the ramp
+    let s = '';
+    s += `<rect class="support" x="${b[0] - 14}" y="${b[1] + 18}" width="18" height="${246 - b[1] - 18}"/>`;
+    s += `<rect class="support" x="${A[0] - 4}" y="${A[1] + 18}" width="18" height="${246 - A[1] - 18}"/>`;
+    s += `<path class="rampbody" d="M${A[0]} ${A[1]}L${b[0]} ${b[1]}L${b[0]} ${b[1] + 18}L${A[0]} ${A[1] + 18}Z"/>`;
+    s += `<path class="rampside" d="M${A[0]} ${A[1] + 12}L${b[0]} ${b[1] + 12}L${b[0]} ${b[1] + 18}L${A[0]} ${A[1] + 18}Z"/>`;
+    s += `<line class="groove" x1="${A[0]}" y1="${A[1] + 2}" x2="${b[0]}" y2="${b[1] + 2}"/>`;
+    for (let c = 0; c <= 12; c++) {
+      const [x, y] = at(c / 12);
+      s += `<line x1="${x}" x2="${x}" y1="${y + 18}" y2="${y + 24}" style="stroke:var(--muted)"/>`;
+      if (c % 3 === 0) s += `<text class="cubit" x="${x}" y="${y + 38}" text-anchor="middle">${c}</text>`;
+    }
+    s += `<text class="cubit" x="${b[0] - 30}" y="${b[1] + 52}" text-anchor="end">cubits from the top</text>`;
+    const T = total(), dt = T / BEATS;
+    frets.forEach((f, i) => {
+      const [x, y] = at(f);
+      const t = T * Math.sqrt(f);
+      const ok = Math.abs(t - Math.round(t / dt) * dt) < 0.03;
+      s += `<g class="fret${ok ? ' ok' : ''}" data-f="${i}" tabindex="0" role="slider" aria-label="Fret ${i + 1}, ${(f * 12).toFixed(2)} cubits down the ramp" aria-valuemin="0" aria-valuemax="12" aria-valuenow="${(f * 12).toFixed(2)}">
+        <rect class="grip" x="${x - 14}" y="${y - 40}" width="28" height="64"/>
+        <rect class="bar" x="${x - 2}" y="${y - 10}" width="4" height="14" rx="1.5"/>
+        <text x="${x}" y="${y - 16}">${i + 1}</text></g>`;
+    });
+    const [bx, by] = at(ballF);
+    s += `<circle class="ball" cx="${(bx + nx * 9).toFixed(1)}" cy="${(by + ny * 9).toFixed(1)}" r="9"/>`;
+    $('ramp').innerHTML = s;
+    $('h-o').textContent = `${hCub.toFixed(1)} cubit${hCub === 1 ? '' : 's'}`;
+  }
+
+  /* ================================================================
+     The rhythm: clicks against the beat
+     ================================================================ */
+  function analyse() {
+    const T = total(), dt = T / BEATS;
+    const rows = frets.map((f, i) => {
+      const t = T * Math.sqrt(f);
+      const k = Math.max(1, Math.min(BEATS - 1, Math.round(t / dt)));
+      return { i, f, t, k, err: t - k * dt };
+    });
+    const used = new Set(rows.map((r) => r.k));
+    const worst = Math.max(...rows.map((r) => Math.abs(r.err)));
+    return { T, dt, rows, even: used.size === rows.length && worst < 0.03, worst };
+  }
+  function drawBeat() {
+    const { T, dt, rows, even, worst } = analyse();
+    const X = (t) => 40 + (t / T) * 920;
+    let s = `<line x1="40" x2="960" y1="44" y2="44" style="stroke:var(--line-strong)"/>`;
+    for (let k = 0; k <= BEATS; k++) s += `<line class="tick" x1="${X(k * dt)}" x2="${X(k * dt)}" y1="28" y2="60"/><text class="tick-t" x="${X(k * dt)}" y="78">${(k * dt).toFixed(2)} s</text>`;
+    s += `<text class="tick-t" x="40" y="18" style="text-anchor:start">beat</text>`;
+    rows.forEach((r) => {
+      const ok = Math.abs(r.err) < 0.03;
+      if (!ok) s += `<line class="miss" x1="${X(r.t)}" x2="${X(r.k * dt)}" y1="44" y2="44"/>`;
+      s += `<circle class="click${ok ? ' ok' : ''}" cx="${X(r.t).toFixed(1)}" cy="44" r="6"/>`;
+    });
+    $('beat').innerHTML = s;
+    const v = $('verdict');
+    v.classList.toggle('ok', even);
+    v.innerHTML = even
+      ? '<b>Even as a metronome.</b> Every click lands on a beat. Now look at the gaps between the frets in the table.'
+      : `<b>Out of step</b> by up to ${Math.round(worst * 1000)} thousandths of a second. Drag the frets so each click (dot) sits on a beat line, or release the ball and listen.`;
+    // the table and the odd numbers
+    const sorted = [...frets].sort((a, b) => a - b);
+    const d = sorted.map((f) => f * 12);
+    const gaps = d.map((x, i) => x - (i ? d[i - 1] : 0));
+    $('table').innerHTML = `<thead><tr><th scope="col">Fret</th><th scope="col">Cubits from the top</th><th scope="col">Gap</th><th scope="col">Gap ÷ first gap</th><th scope="col">Click at</th></tr></thead><tbody>${d.map((x, i) => `<tr><td>${i + 1}</td><td>${x.toFixed(2)}</td><td>${gaps[i].toFixed(2)}</td><td class="${even ? 'odd' : ''}">${(gaps[i] / gaps[0]).toFixed(1)}</td><td>${(T * Math.sqrt(sorted[i])).toFixed(2)} s</td></tr>`).join('')}</tbody>`;
+    $('odds').innerHTML = gaps.map((g) => `<span>${(g / gaps[0]).toFixed(even ? 0 : 1)}</span>`).join('');
+  }
+
+  /* ================================================================
+     Sound
+     ================================================================ */
+  let ac = null;
+  function audio() {
+    if (!ac) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; ac = new AC(); }
+    if (ac.state === 'suspended') ac.resume();
+    return ac;
+  }
+  function tick(when, freq, gain, len) {
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(gain, when);
+    g.gain.exponentialRampToValueAtTime(0.001, when + len);
+    o.connect(g).connect(ac.destination);
+    o.start(when);
+    o.stop(when + len + 0.02);
+  }
+  function click(when) {
+    const n = ac.createBuffer(1, Math.floor(ac.sampleRate * 0.03), ac.sampleRate);
+    const d = n.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 4);
+    const src = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+    src.buffer = n;
+    f.type = 'bandpass';
+    f.frequency.value = 3200;
+    g.gain.value = 1.4;
+    src.connect(f).connect(g).connect(ac.destination);
+    src.start(when);
+  }
+
+  /* ================================================================
+     Rolling
+     ================================================================ */
+  let rolling = false;
+  function release() {
+    if (rolling) return;
+    const T = total(), dt = T / BEATS;
+    const ctx = audio();
+    if (ctx) {
+      const t0 = ctx.currentTime + 0.15;
+      for (let k = 0; k <= BEATS; k++) tick(t0 + k * dt, k === 0 ? 660 : 440, 0.25, 0.08);
+      frets.forEach((f) => click(t0 + T * Math.sqrt(f)));
+      tick(t0 + T, 110, 0.5, 0.3);
+    }
+    rolling = true;
+    $('go').disabled = true;
+    const start = performance.now() + 150;
+    const step = (now) => {
+      const t = Math.max(0, (now - start) / 1000);
+      ballF = Math.min(1, (accel() * t * t) / 2 / L);
+      drawRamp();
+      if (ballF < 1 && !reduceMotion) { requestAnimationFrame(step); return; }
+      setTimeout(() => { ballF = 0; rolling = false; $('go').disabled = false; drawRamp(); }, reduceMotion ? T * 1000 : 900);
+    };
+    requestAnimationFrame(step);
+  }
+
+  /* ================================================================
+     Dragging the frets
+     ================================================================ */
+  const svg = $('ramp');
+  let drag = null;
+  function fracFrom(e) {
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    const p = pt.matrixTransform(svg.getScreenCTM().inverse());
+    const b = B();
+    const vx = b[0] - A[0], vy = b[1] - A[1];
+    return Math.max(0.01, Math.min(0.99, ((p.x - A[0]) * vx + (p.y - A[1]) * vy) / (vx * vx + vy * vy)));
+  }
+  svg.addEventListener('pointerdown', (e) => {
+    const g = e.target.closest('[data-f]');
+    if (!g || rolling) return;
+    drag = Number(g.dataset.f);
+    svg.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+  svg.addEventListener('pointermove', (e) => {
+    if (drag == null) return;
+    frets[drag] = fracFrom(e);
+    drawRamp();
+    drawBeat();
+  });
+  const endDrag = () => {
+    if (drag == null) return;
+    drag = null;
+    frets.sort((a, b) => a - b);
+    drawRamp();
+    drawBeat();
+  };
+  svg.addEventListener('pointerup', endDrag);
+  svg.addEventListener('pointercancel', endDrag);
+  svg.addEventListener('keydown', (e) => {
+    const g = e.target.closest('[data-f]');
+    if (!g || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+    e.preventDefault();
+    const i = Number(g.dataset.f);
+    frets[i] = Math.max(0.01, Math.min(0.99, frets[i] + (e.key === 'ArrowRight' ? 1 : -1) * (e.shiftKey ? 0.01 : 0.002)));
+    drawRamp();
+    drawBeat();
+    svg.querySelector(`[data-f="${i}"]`)?.focus();
+  });
+
+  $('go').addEventListener('click', release);
+  $('even').addEventListener('click', () => { frets = [1, 2, 3, 4, 5, 6, 7].map((k) => k / 8); drawRamp(); drawBeat(); });
+  $('answer').addEventListener('click', () => { frets = [1, 2, 3, 4, 5, 6, 7].map((k) => (k / 8) ** 2); drawRamp(); drawBeat(); });
+  $('h').addEventListener('input', (e) => { hCub = Number(e.target.value); drawRamp(); drawBeat(); });
+
+  drawRamp();
+  drawBeat();
+})();
+</script>
+</body>
+</html>
