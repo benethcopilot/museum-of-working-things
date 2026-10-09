@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Foucault’s Pendulum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Fira+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  /* Layout: looking straight down on the Panthéon floor, the bob swings over a ring of pegs; beside it the place on Earth you choose and why it matters; then the history under the dome. */
+  --ground: #e4e3df;
+  --ground-2: #d6d5cf;
+  --stone: #ecebe6;
+  --text: #1f1f22;
+  --muted: #5b5b62;
+  --line: rgba(31, 31, 34, 0.14);
+  --line-strong: rgba(31, 31, 34, 0.32);
+  --dome: #2c3e66;
+  --brass: #b8892c;
+  --peg: #8b2e2a;
+  --f-display: "Cinzel", "Trajan Pro", Georgia, serif;
+  --f-body: "Lora", Georgia, serif;
+  --f-data: "Fira Mono", "Consolas", "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #111215;
+    --ground-2: #1b1c21;
+    --stone: #17181c;
+    --text: #e7e6e2;
+    --muted: #a3a3aa;
+    --line: rgba(231, 230, 226, 0.12);
+    --line-strong: rgba(231, 230, 226, 0.3);
+    --dome: #9fb6ec;
+    --brass: #e4b856;
+    --peg: #ef8a7d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #111215;
+  --ground-2: #1b1c21;
+  --stone: #17181c;
+  --text: #e7e6e2;
+  --muted: #a3a3aa;
+  --line: rgba(231, 230, 226, 0.12);
+  --line-strong: rgba(231, 230, 226, 0.3);
+  --dome: #9fb6ec;
+  --brass: #e4b856;
+  --peg: #ef8a7d;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--text); font-family: var(--f-body); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--brass); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 500; line-height: 1.1; margin: 0; letter-spacing: 0.02em; text-wrap: balance; }
+
+.page { box-sizing: border-box; max-width: 1200px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 34px; }
+.masthead { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.eyebrow { margin: 0; font-family: var(--f-data); font-size: 0.76rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dome); }
+.masthead h1 { font-size: clamp(2.4rem, 6.4vw, 4.6rem); }
+.lede { margin: 0; max-width: 64ch; color: var(--muted); }
+
+/* ---------- The floor ---------- */
+.hall { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(280px, 1fr); gap: 26px; align-items: start; }
+.floor { padding: 10px; border: 1px solid var(--line); background: var(--stone); }
+#floor { display: block; width: 100%; max-width: 600px; height: auto; margin-inline: auto; }
+.disc { fill: var(--ground-2); stroke: var(--line-strong); stroke-width: 1.5; }
+.deg { stroke: var(--line-strong); stroke-width: 1; }
+.deg-t { font-family: var(--f-data); font-size: 11px; fill: var(--muted); text-anchor: middle; }
+.peg { fill: var(--peg); }
+.peg.down { fill: none; stroke: var(--peg); stroke-width: 1.5; opacity: 0.55; }
+.trace { stroke: var(--dome); stroke-width: 1; opacity: 0.18; }
+.plane { stroke: var(--dome); stroke-width: 1.5; stroke-dasharray: 4 5; }
+.bob { fill: var(--brass); stroke: #6d4f16; stroke-width: 1.5; }
+.bob-shadow { fill: rgba(0, 0, 0, 0.18); }
+.wire { fill: var(--text); }
+.panel { display: flex; flex-direction: column; gap: 14px; }
+.panel h2 { font-size: 1.4rem; }
+.places { display: flex; flex-wrap: wrap; gap: 6px; }
+.btn { padding: 6px 12px; border: 1.5px solid var(--line-strong); border-radius: 3px; background: none; font-size: 0.9rem; }
+.btn:hover { background: var(--ground-2); }
+.btn[aria-pressed="true"] { background: var(--dome); color: var(--ground); border-color: var(--dome); }
+.btn.primary { background: var(--brass); border-color: var(--brass); color: #1f1606; font-weight: 600; }
+.btn.primary:hover { opacity: 0.9; background: var(--brass); }
+.lat { display: flex; flex-direction: column; gap: 2px; font-size: 0.92rem; }
+.lat input { width: 100%; accent-color: var(--dome); }
+.lat output { font-family: var(--f-data); }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.readouts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ro { padding: 8px 10px; border-radius: 3px; background: var(--ground-2); }
+.ro span { display: block; font-size: 0.75rem; color: var(--muted); }
+.ro b { font-family: var(--f-data); font-weight: 500; font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.say { margin: 0; padding: 10px 12px; border-left: 3px solid var(--brass); background: var(--ground-2); font-size: 0.95rem; }
+
+/* ---------- Why ---------- */
+.why { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 26px; align-items: start; }
+.why h2 { font-size: 1.8rem; margin-bottom: 8px; }
+.why p { margin: 0 0 10px; }
+#globe { display: block; width: 100%; max-width: 340px; height: auto; }
+.earth { fill: var(--ground-2); stroke: var(--line-strong); stroke-width: 1.5; }
+.axis { stroke: var(--dome); stroke-width: 2.5; }
+.vert { stroke: var(--brass); stroke-width: 3; }
+.proj { stroke: var(--brass); stroke-width: 1.2; stroke-dasharray: 3 3; }
+.gl { font-family: var(--f-data); font-size: 12px; fill: var(--text); }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; font-variant-numeric: tabular-nums; }
+th, td { padding: 5px 8px; border-bottom: 1px solid var(--line); text-align: right; }
+th:first-child, td:first-child { text-align: left; }
+th { font-family: var(--f-data); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 400; }
+td { font-family: var(--f-data); }
+td:first-child { font-family: var(--f-body); }
+
+/* ---------- History ---------- */
+.history { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 20px 40px; padding-top: 24px; border-top: 1px solid var(--line-strong); }
+.history h2 { font-size: 1.8rem; margin-bottom: 12px; }
+.timeline { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.timeline li { display: grid; grid-template-columns: 5.6em minmax(0, 1fr); gap: 12px; }
+.timeline .yr { font-family: var(--f-data); font-size: 0.85rem; line-height: 2; color: var(--dome); }
+.timeline p { margin: 0; font-size: 0.96rem; }
+.aside p { margin: 0 0 10px; font-size: 0.96rem; }
+.aside blockquote { margin: 0 0 10px; padding-left: 12px; border-left: 2px solid var(--brass); font-style: italic; font-size: 0.96rem; }
+.sources { grid-column: 1 / -1; margin: 0; font-size: 0.85rem; color: var(--muted); }
+.sources a { color: inherit; text-underline-offset: 3px; }
+
+@media (max-width: 920px) {
+  .hall, .why, .history { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bob { transition: none; }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="foucault" defer></script>
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Sky &amp; Time · The Panthéon, Paris, 1851</p>
+    <h1>Foucault’s Pendulum</h1>
+    <p class="lede">Léon Foucault hung a 28-kilogram ball from the dome of the Panthéon on a 67-metre wire and set it swinging. Over the hours, its swing seemed to turn slowly around the floor. The pendulum wasn’t turning. The building, and the whole Earth, was turning underneath it.</p>
+  </header>
+
+  <section class="hall" aria-label="The pendulum, seen from above">
+    <div class="floor">
+      <svg id="floor" viewBox="0 0 600 600" role="img" aria-label="Looking down on the pendulum floor: a ring of pegs, the swinging bob, and the line of its swing"></svg>
+    </div>
+    <div class="panel">
+      <h2>Where is the pendulum?</h2>
+      <div class="places" id="places" role="group" aria-label="Choose a place"></div>
+      <label class="lat" for="lat">Latitude <output id="lat-o" for="lat"></output><input type="range" id="lat" min="-90" max="90" step="0.5" value="48.85"></label>
+      <div class="row">
+        <button type="button" class="btn primary" id="run">Start the pendulum</button>
+        <button type="button" class="btn" id="speed" aria-pressed="false">Faster: 1 hour a second</button>
+        <button type="button" class="btn" id="reset">Stand the pegs back up</button>
+      </div>
+      <div class="readouts">
+        <div class="ro"><span>The swing turns</span><b id="r-rate"></b></div>
+        <div class="ro"><span>Full circle takes</span><b id="r-full"></b></div>
+        <div class="ro"><span>Time on the floor</span><b id="r-time">0 h 00 min</b></div>
+        <div class="ro"><span>Pegs knocked over</span><b id="r-pegs">0 of 36</b></div>
+      </div>
+      <p class="say" id="say"></p>
+    </div>
+  </section>
+
+  <section class="why">
+    <div>
+      <svg id="globe" viewBox="0 0 340 320" role="img" aria-label="The Earth with its spin axis and the straight-up direction at the chosen latitude"></svg>
+    </div>
+    <div>
+      <h2>Why it depends on where you are</h2>
+      <p>At the North Pole the floor turns right round underneath the pendulum once a day, in 23 hours 56 minutes. At the equator the floor isn’t turning around the straight-up direction at all, so the swing never changes. In between, the floor turns by the Earth’s spin times the sine of the latitude.</p>
+      <p>North of the equator the swing turns clockwise seen from above; south of it, anticlockwise.</p>
+      <table>
+        <thead><tr><th scope="col">Place</th><th scope="col">Latitude</th><th scope="col">Per hour</th><th scope="col">Full circle</th></tr></thead>
+        <tbody id="tbl"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="history">
+    <div>
+      <h2>Proof you could watch</h2>
+      <ol class="timeline">
+        <li><span class="yr">Feb 1851</span><p>Foucault shows his pendulum to the public for the first time, in the meridian room of the Paris Observatory.</p></li>
+        <li><span class="yr">Mar 1851</span><p>A few weeks later he hangs the famous one in the Panthéon: a brass-coated lead bob of 28 kg on a 67 m wire. Each swing takes about 16.5 seconds, and the edge of the swing creeps about 5 mm further round every time.</p></li>
+        <li><span class="yr">1851</span><p>He explains it in a paper to the French Academy of Sciences: the pendulum keeps its plane in space while the Earth turns beneath it.</p></li>
+        <li><span class="yr">1852</span><p>He shows the same thing with a spinning gyroscope, a word he coined.</p></li>
+        <li><span class="yr">1855</span><p>The original bob moves to the Conservatoire des Arts et Métiers in Paris.</p></li>
+        <li><span class="yr">1995</span><p>An exact copy goes back under the Panthéon’s dome, where it still swings.</p></li>
+      </ol>
+    </div>
+    <div class="aside">
+      <h2>What the pendulum shows</h2>
+      <p>People had accepted for two centuries that the Earth spins, from astronomy and arithmetic. Foucault’s pendulum was the first simple experiment that let anyone stand in a room and watch the rotation happen.</p>
+      <p>In Paris the swing turns about 11.3 degrees an hour and takes about 31.8 hours to come full circle. Museums put a ring of pegs around the floor so visitors can see the turning as the bob knocks them over one by one.</p>
+      <p>The bob here swings much faster than a real one, and the turning is sped up too, so you can watch a day go by in minutes.</p>
+    </div>
+    <p class="sources">Sources: <a href="https://en.wikipedia.org/wiki/Foucault_pendulum" target="_blank" rel="noopener">Foucault pendulum</a> (the 1851 demonstrations, the Panthéon bob and wire, the turning rate of 360° × sin(latitude) per sidereal day, and the later history) and <a href="https://en.wikipedia.org/wiki/L%C3%A9on_Foucault" target="_blank" rel="noopener">Léon Foucault</a> on Wikipedia.</p>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const rad = (d) => (d * Math.PI) / 180;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const SIDEREAL = 23 + 56 / 60;             // hours
+  const SPIN = 360 / SIDEREAL;               // degrees an hour, about 15.04
+
+  const PLACES = [
+    ['North Pole', 90], ['Paris, the Panthéon', 48.85], ['Minneapolis', 44.98], ['Equator', 0], ['Sydney', -33.87],
+  ];
+  let lat = 48.85;
+  let plane = 0;                // degrees, the swing direction on the floor
+  let simHours = 0;
+  let running = false, fast = false;
+  let phase = 0;                // swing phase for drawing
+  let knocked = new Set();
+  let traces = [];
+
+  const rate = () => SPIN * Math.sin(rad(lat));          // degrees an hour, + is clockwise from above
+  const fullCircle = () => (Math.abs(rate()) < 1e-6 ? Infinity : 360 / Math.abs(rate()));
+
+  /* ================================================================
+     The floor
+     ================================================================ */
+  const C = 300, R = 250, PEGR = 232, AMP = 214;
+  function drawFloor() {
+    let s = `<circle class="disc" cx="${C}" cy="${C}" r="${R + 30}"/>`;
+    for (let a = 0; a < 360; a += 10) {
+      const x1 = C + (R + 2) * Math.cos(rad(a - 90)), y1 = C + (R + 2) * Math.sin(rad(a - 90));
+      const x2 = C + (R + 10) * Math.cos(rad(a - 90)), y2 = C + (R + 10) * Math.sin(rad(a - 90));
+      s += `<line class="deg" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"/>`;
+      if (a % 30 === 0) s += `<text class="deg-t" x="${(C + (R + 21) * Math.cos(rad(a - 90))).toFixed(1)}" y="${(C + (R + 21) * Math.sin(rad(a - 90)) + 4).toFixed(1)}">${a}°</text>`;
+    }
+    for (const t of traces) {
+      const dx = AMP * Math.cos(rad(t - 90)), dy = AMP * Math.sin(rad(t - 90));
+      s += `<line class="trace" x1="${(C - dx).toFixed(1)}" y1="${(C - dy).toFixed(1)}" x2="${(C + dx).toFixed(1)}" y2="${(C + dy).toFixed(1)}"/>`;
+    }
+    for (let j = 0; j < 36; j++) {
+      const a = j * 10;
+      const x = C + PEGR * Math.cos(rad(a - 90)), y = C + PEGR * Math.sin(rad(a - 90));
+      if (knocked.has(j)) {
+        const fx = x + 9 * Math.cos(rad(a)), fy = y + 9 * Math.sin(rad(a));
+        s += `<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${fx.toFixed(1)}" y2="${fy.toFixed(1)}" style="stroke:var(--peg);stroke-width:4;stroke-linecap:round;opacity:0.5"/>`;
+      } else {
+        s += `<circle class="peg" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5"/>`;
+      }
+    }
+    const dx = AMP * Math.cos(rad(plane - 90)), dy = AMP * Math.sin(rad(plane - 90));
+    s += `<line class="plane" x1="${(C - dx).toFixed(1)}" y1="${(C - dy).toFixed(1)}" x2="${(C + dx).toFixed(1)}" y2="${(C + dy).toFixed(1)}"/>`;
+    const k = Math.sin(phase);
+    const bx = C + k * dx, by = C + k * dy;
+    s += `<circle class="bob-shadow" cx="${(bx + 6).toFixed(1)}" cy="${(by + 6).toFixed(1)}" r="16"/>`;
+    s += `<circle class="wire" cx="${C}" cy="${C}" r="2"/>`;
+    s += `<circle class="bob" cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="16"/>`;
+    $('floor').innerHTML = s;
+  }
+
+  /* ================================================================
+     The globe
+     ================================================================ */
+  function drawGlobe() {
+    const gx = 150, gy = 170, gr = 110;
+    const px = gx + gr * Math.cos(rad(lat)), py = gy - gr * Math.sin(rad(lat));
+    const ux = Math.cos(rad(lat)), uy = -Math.sin(rad(lat));
+    const sinL = Math.sin(rad(lat));
+    let s = `<circle class="earth" cx="${gx}" cy="${gy}" r="${gr}"/>`;
+    s += `<line x1="${gx - gr}" x2="${gx + gr}" y1="${gy}" y2="${gy}" style="stroke:var(--line-strong);stroke-dasharray:4 4"/>`;
+    s += `<line class="axis" x1="${gx}" y1="${gy + gr + 18}" x2="${gx}" y2="${gy - gr - 30}"/><path d="M${gx} ${gy - gr - 38}l-6 12h12Z" style="fill:var(--dome)"/>`;
+    s += `<text class="gl" x="${gx + 8}" y="${gy - gr - 26}">Earth’s spin</text>`;
+    s += `<line class="vert" x1="${px.toFixed(1)}" y1="${py.toFixed(1)}" x2="${(px + 60 * ux).toFixed(1)}" y2="${(py + 60 * uy).toFixed(1)}"/>`;
+    s += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="5" style="fill:var(--brass)"/>`;
+    s += `<text class="gl" x="${(px + 66 * ux + 4).toFixed(1)}" y="${(py + 66 * uy).toFixed(1)}">straight up</text>`;
+    s += `<line class="proj" x1="${gx}" y1="${gy}" x2="${px.toFixed(1)}" y2="${py.toFixed(1)}"/>`;
+    s += `<text class="gl" x="${gx - gr}" y="${gy + gr + 40}">latitude ${Math.abs(lat).toFixed(1)}° ${lat >= 0 ? 'N' : 'S'}: the floor turns at</text>`;
+    s += `<text class="gl" x="${gx - gr}" y="${gy + gr + 58}">${Math.abs(sinL).toFixed(2)} × the Earth’s spin</text>`;
+    $('globe').innerHTML = s;
+  }
+
+  /* ================================================================
+     Readouts
+     ================================================================ */
+  function fmtHours(h) {
+    if (!Number.isFinite(h)) return 'never';
+    const H = Math.floor(h), M = Math.round((h - H) * 60);
+    return `${H} h ${String(M).padStart(2, '0')} min`;
+  }
+  function readouts() {
+    const r = rate();
+    $('r-rate').textContent = Math.abs(r) < 0.005 ? 'not at all' : `${Math.abs(r).toFixed(1)}° an hour ${r > 0 ? '↻' : '↺'}`;
+    $('r-full').textContent = fmtHours(fullCircle());
+    $('r-time').textContent = fmtHours(simHours);
+    $('r-pegs').textContent = `${knocked.size} of 36`;
+    $('lat-o').textContent = `${Math.abs(lat).toFixed(1)}° ${lat >= 0 ? 'north' : 'south'}`;
+    const r2 = Math.abs(r);
+    $('say').textContent = r2 < 0.005
+      ? 'On the equator the swing stays put: the floor carries the pendulum round the Earth, but doesn’t twist underneath it.'
+      : Math.abs(lat) >= 89.5
+        ? `At the pole the Earth turns right round beneath the pendulum once every ${fmtHours(fullCircle())}. The pendulum keeps swinging the same way in space.`
+        : `Here the swing turns ${r2.toFixed(1)}° each hour, ${r > 0 ? 'clockwise' : 'anticlockwise'} from above. It comes full circle in ${fmtHours(fullCircle())}, longer than a day.`;
+    document.querySelectorAll('[data-place]').forEach((b) => b.setAttribute('aria-pressed', String(Math.abs(Number(b.dataset.place) - lat) < 0.01)));
+  }
+
+  /* ================================================================
+     Running
+     ================================================================ */
+  let last = 0, lastTrace = 0;
+  function frame(t) {
+    if (!running) return;
+    const dt = Math.min(0.1, (t - last) / 1000);
+    last = t;
+    const hoursPerSec = fast ? 1 : 1 / 6;   // 10 minutes a second, or an hour a second
+    const dh = dt * hoursPerSec;
+    const before = plane;
+    simHours += dh;
+    plane += rate() * dh;
+    phase += dt * (2 * Math.PI / 2.2);
+    // knock pegs the swing has swept past, at both ends of the swing
+    const a0 = Math.min(before, plane), a1 = Math.max(before, plane);
+    for (let j = 0; j < 36; j++) {
+      for (const base of [j * 10, j * 10 + 180]) {
+        for (let n = -2; n <= 2; n++) {
+          const target = base + n * 360;
+          if (target > a0 && target <= a1) knocked.add(j);
+        }
+      }
+    }
+    if (Math.abs(plane - lastTrace) > 4) { traces.push(plane); lastTrace = plane; if (traces.length > 120) traces.shift(); }
+    drawFloor();
+    readouts();
+    if (knocked.size === 36 || simHours > 72) { stop(); $('say').textContent = knocked.size === 36 ? `Every peg is down after ${fmtHours(simHours)}: half a full circle, because each swing knocks pegs at both ends.` : 'Three days have gone by on the floor. Choose another place, or start again.'; return; }
+    requestAnimationFrame(frame);
+  }
+  function startRun() {
+    if (reduceMotion) {
+      // jump ahead three hours at a time instead of animating
+      const dh = 3;
+      const before = plane;
+      simHours += dh;
+      plane += rate() * dh;
+      const a0 = Math.min(before, plane), a1 = Math.max(before, plane);
+      for (let j = 0; j < 36; j++) for (const base of [j * 10, j * 10 + 180]) for (let n = -2; n <= 2; n++) { const target = base + n * 360; if (target > a0 && target <= a1) knocked.add(j); }
+      traces.push(plane);
+      drawFloor();
+      readouts();
+      return;
+    }
+    running = true;
+    $('run').textContent = 'Pause';
+    last = performance.now();
+    requestAnimationFrame(frame);
+  }
+  function stop() { running = false; $('run').textContent = reduceMotion ? 'Advance three hours' : 'Start the pendulum'; }
+  function reset() { stop(); plane = 0; simHours = 0; phase = 0; knocked = new Set(); traces = []; lastTrace = 0; drawFloor(); readouts(); }
+
+  $('run').addEventListener('click', () => { if (running) stop(); else startRun(); });
+  $('speed').addEventListener('click', () => {
+    fast = !fast;
+    $('speed').setAttribute('aria-pressed', String(fast));
+    $('speed').textContent = fast ? 'Slower: 10 minutes a second' : 'Faster: 1 hour a second';
+  });
+  $('reset').addEventListener('click', reset);
+  $('places').innerHTML = PLACES.map(([n, l]) => `<button type="button" class="btn" data-place="${l}">${n}</button>`).join('');
+  $('places').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-place]');
+    if (!b) return;
+    lat = Number(b.dataset.place);
+    $('lat').value = lat;
+    reset();
+    drawGlobe();
+  });
+  $('lat').addEventListener('input', (e) => { lat = Number(e.target.value); drawGlobe(); readouts(); });
+  $('tbl').innerHTML = PLACES.map(([n, l]) => {
+    const r = SPIN * Math.sin(rad(l));
+    return `<tr><td>${n}</td><td>${Math.abs(l).toFixed(1)}° ${l >= 0 ? 'N' : 'S'}</td><td>${Math.abs(r) < 0.005 ? '0°' : `${Math.abs(r).toFixed(1)}° ${r > 0 ? '↻' : '↺'}`}</td><td>${Math.abs(r) < 0.005 ? 'never' : fmtHours(360 / Math.abs(r))}</td></tr>`;
+  }).join('');
+
+  // Open with a few hours already on the floor, so the turning shows.
+  stop();
+  for (let i = 0; i < 4; i++) { const b = plane; simHours += 1; plane += rate(); for (let j = 0; j < 36; j++) for (const base of [j * 10, j * 10 + 180]) if (base > b && base <= plane) knocked.add(j); traces.push(b, plane); }
+  phase = 1.1;
+  drawFloor();
+  drawGlobe();
+  readouts();
+})();
+</script>
+</body>
+</html>

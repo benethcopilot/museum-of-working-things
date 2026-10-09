@@ -29,6 +29,11 @@
       "try": "Sail with a watch that loses a minute a day"
     },
     {
+      "slug": "foucault", "hall": "sky", "title": "Foucault’s Pendulum", "ages": "8 and up",
+      "blurb": "Watch the Earth turn under Foucault’s 1851 pendulum as it knocks over a ring of pegs, at the pole, in Paris, in Minneapolis and on the equator.",
+      "try": "Take it to the equator"
+    },
+    {
       "slug": "band-organ", "hall": "sound", "title": "Carousel Band Organ", "ages": "All ages",
       "blurb": "A paper roll plays carousel tunes from before 1914, after the Wurlitzer organ at Como Park.",
       "try": "Watch the roll switch on the bells"
