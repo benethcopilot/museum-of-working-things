@@ -54,6 +54,11 @@
       "try": "Take the handle off and check the dates"
     },
     {
+      "slug": "finches", "hall": "life", "title": "Darwin’s Finches", "ages": "10 and up",
+      "blurb": "Run a drought on Daphne Major and watch natural selection reshape 1,200 finches’ beaks, matched to the Grants’ 1977 measurements.",
+      "try": "Follow a drought with a very wet year"
+    },
+    {
       "slug": "kintsugi", "hall": "making", "title": "Kintsugi Bowl", "ages": "All ages",
       "blurb": "Break a tea bowl, then mend it with lacquer and gold, one real step at a time.",
       "try": "Break a mended bowl again"
