@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Harrison’s Sea Watch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baskervville:ital@0;1&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  /* Layout: a sea chart strip across the top where you sail a ship west and the two clocks beside it tell you how far; then the 1761 voyage to Jamaica with your choice of watch; then the history of the prize. */
+  --ground: #e4e9ea;
+  --ground-2: #d4dcde;
+  --chart: #eef3f1;
+  --sea: #cfe0e2;
+  --text: #15212b;
+  --muted: #52616b;
+  --line: rgba(21, 33, 43, 0.14);
+  --line-strong: rgba(21, 33, 43, 0.32);
+  --navy: #1d3557;
+  --brass: #a77d2c;
+  --red: #a8322a;
+  --land: #d8ccad;
+  --f-display: "Baskervville", "Libre Baskerville", Baskerville, Georgia, serif;
+  --f-body: "Libre Baskerville", Baskerville, Georgia, serif;
+  --f-data: "IBM Plex Mono", "Consolas", "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0e1418;
+    --ground-2: #182128;
+    --chart: #141d24;
+    --sea: #1b2c38;
+    --text: #e4ebef;
+    --muted: #9eb0ba;
+    --line: rgba(228, 235, 239, 0.12);
+    --line-strong: rgba(228, 235, 239, 0.3);
+    --navy: #9dbbe6;
+    --brass: #e1b65c;
+    --red: #ff8676;
+    --land: #4c4433;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #0e1418;
+  --ground-2: #182128;
+  --chart: #141d24;
+  --sea: #1b2c38;
+  --text: #e4ebef;
+  --muted: #9eb0ba;
+  --line: rgba(228, 235, 239, 0.12);
+  --line-strong: rgba(228, 235, 239, 0.3);
+  --navy: #9dbbe6;
+  --brass: #e1b65c;
+  --red: #ff8676;
+  --land: #4c4433;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--text); font-family: var(--f-body); font-size: 16px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--brass); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 400; line-height: 1.05; margin: 0; text-wrap: balance; }
+
+.page { box-sizing: border-box; max-width: 1220px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 34px; }
+.masthead { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.eyebrow { grid-column: 1 / -1; margin: 0; font-family: var(--f-data); font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); }
+.masthead h1 { font-size: clamp(2.8rem, 7vw, 5.2rem); font-style: italic; }
+.lede { margin: 0; max-width: 60ch; color: var(--muted); }
+
+/* ---------- The chart and the clocks ---------- */
+.bridge { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(260px, 1fr); gap: 22px; align-items: start; }
+.chartbox { border: 1px solid var(--line-strong); background: var(--chart); }
+#strip { display: block; width: 100%; height: auto; touch-action: none; }
+.sea { fill: var(--sea); }
+.merid { stroke: var(--line-strong); stroke-width: 1; stroke-dasharray: 2 4; }
+.merid-t { font-family: var(--f-data); font-size: 11px; fill: var(--muted); text-anchor: middle; }
+.place { fill: var(--navy); }
+.place-t { font-family: var(--f-body); font-size: 13px; fill: var(--text); text-anchor: middle; }
+.ship { cursor: grab; }
+.ship .hull { fill: var(--navy); }
+.ship .sail { fill: var(--chart); stroke: var(--navy); stroke-width: 1.5; }
+.sun { fill: var(--brass); }
+.sunray { stroke: var(--brass); stroke-width: 1.5; stroke-dasharray: 3 3; }
+.chartnote { margin: 0; padding: 8px 12px; font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--line); }
+.clocks { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.clock { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+.clock svg { width: 100%; max-width: 150px; height: auto; }
+.clock h3 { font-size: 1rem; font-family: var(--f-body); font-weight: 700; }
+.clock .dig { font-family: var(--f-data); font-size: 1.05rem; }
+.face { fill: #f6f1e2; stroke: var(--brass); stroke-width: 5; }
+.tick { stroke: #3a3022; stroke-width: 1.4; }
+.num { font-family: var(--f-display); font-size: 15px; fill: #2a2117; text-anchor: middle; }
+.hand { stroke: #1a1510; stroke-linecap: round; }
+.hand.sec { stroke: var(--red); }
+.reckon { margin: 0; padding: 12px 14px; border-left: 3px solid var(--brass); background: var(--ground-2); font-size: 0.95rem; }
+.reckon b { font-family: var(--f-data); font-weight: 500; }
+
+/* ---------- The voyage ---------- */
+.sec-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 24px; margin-bottom: 12px; }
+.sec-head h2 { font-size: clamp(1.8rem, 3.4vw, 2.4rem); }
+.sec-head p { margin: 0; max-width: 62ch; color: var(--muted); }
+.voyage { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 22px; align-items: start; }
+.panel { display: flex; flex-direction: column; gap: 12px; }
+.presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.btn { padding: 6px 12px; border: 1.5px solid var(--line-strong); border-radius: 3px; background: none; font-size: 0.88rem; }
+.btn:hover { background: var(--ground-2); }
+.btn[aria-pressed="true"] { background: var(--navy); color: var(--ground); border-color: var(--navy); }
+.slider { display: flex; flex-direction: column; gap: 2px; font-size: 0.92rem; }
+.slider input { width: 100%; accent-color: var(--navy); }
+.slider output { font-family: var(--f-data); }
+.verdict { padding: 14px 16px; border: 1.5px solid var(--line-strong); border-radius: 4px; display: flex; flex-direction: column; gap: 6px; }
+.verdict .big { font-family: var(--f-display); font-size: 2.2rem; line-height: 1; color: var(--navy); }
+.verdict p { margin: 0; font-size: 0.95rem; }
+.prize { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.prize div { padding: 6px 8px; border-radius: 3px; border: 1px solid var(--line); font-size: 0.82rem; text-align: center; }
+.prize div b { display: block; font-family: var(--f-display); font-size: 1.15rem; font-weight: 400; }
+.prize div.won { border-color: var(--brass); background: rgba(167, 125, 44, 0.16); }
+#seachart { display: block; width: 100%; height: auto; border: 1px solid var(--line-strong); background: var(--chart); }
+.landf { fill: var(--land); stroke: #8c7c58; stroke-width: 1; }
+.true { fill: var(--navy); }
+.belief { fill: var(--red); }
+.lab { font-family: var(--f-body); font-size: 13px; fill: var(--text); }
+.lab.red { fill: var(--red); }
+.scale { stroke: var(--text); stroke-width: 2; }
+.scalet { font-family: var(--f-data); font-size: 11px; fill: var(--text); }
+
+/* ---------- History ---------- */
+.watches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.watches div { padding: 14px; border-top: 3px solid var(--brass); background: var(--ground-2); }
+.watches h3 { font-size: 1.3rem; }
+.watches p { margin: 4px 0 0; font-size: 0.9rem; }
+.history { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 20px 40px; padding-top: 24px; border-top: 1px solid var(--line-strong); }
+.history h2 { font-size: 2rem; margin-bottom: 12px; }
+.timeline { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.timeline li { display: grid; grid-template-columns: 5.4em minmax(0, 1fr); gap: 12px; }
+.timeline .yr { font-family: var(--f-data); font-size: 0.85rem; line-height: 2; color: var(--red); }
+.timeline p { margin: 0; font-size: 0.95rem; }
+.aside p { margin: 0 0 10px; font-size: 0.95rem; }
+.sources { grid-column: 1 / -1; margin: 0; font-size: 0.82rem; color: var(--muted); }
+.sources a { color: inherit; text-underline-offset: 3px; }
+
+@media (max-width: 960px) {
+  .bridge, .voyage, .history { grid-template-columns: minmax(0, 1fr); }
+  .watches { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .masthead { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 480px) {
+  .watches { grid-template-columns: minmax(0, 1fr); }
+  .prize { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="harrison" defer></script>
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Sky &amp; Time · London, 1714–1773</p>
+    <h1>Harrison’s Sea Watch</h1>
+    <p class="lede">A sailor could find latitude from the Sun. Longitude, how far east or west, was a guess, and ships ran aground because of it. The answer turned out to be a clock good enough to keep home time across an ocean. A Yorkshire carpenter named John Harrison built it.</p>
+  </header>
+
+  <section class="bridge" aria-label="Finding longitude">
+    <div class="chartbox">
+      <svg id="strip" viewBox="0 0 920 260" role="img" aria-label="A strip of the Atlantic from Portsmouth to Jamaica. Drag the ship west or east."></svg>
+      <p class="chartnote">Drag the ship. It is noon on board: the Sun is at its highest over the ship. Every place has its own noon, and the Earth turns 15° every hour.</p>
+    </div>
+    <div class="panel">
+      <div class="clocks">
+        <div class="clock"><h3>Sea watch</h3><svg id="home" viewBox="0 0 160 160" aria-hidden="true"></svg><span class="dig" id="home-d"></span><span class="sub">still set to Portsmouth</span></div>
+        <div class="clock"><h3>Sun time on board</h3><svg id="local" viewBox="0 0 160 160" aria-hidden="true"></svg><span class="dig">12:00:00</span><span class="sub">the Sun is highest</span></div>
+      </div>
+      <p class="reckon" id="reckon" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section aria-labelledby="voy-h">
+    <div class="sec-head">
+      <h2 id="voy-h">The voyage to Jamaica</h2>
+      <p>In 1761 Harrison’s son William sailed to Jamaica on HMS <i>Deptford</i> with H4. The voyage took 81 days and 5 hours. Every second the watch gains or loses becomes a quarter of a minute of longitude. Choose a watch and see where you would think you were.</p>
+    </div>
+    <div class="voyage">
+      <div class="panel">
+        <div class="presets" id="presets" role="group" aria-label="Choose a watch"></div>
+        <label class="slider" for="rate">Your watch’s error each day <output id="rate-o" for="rate"></output><input type="range" id="rate" min="0" max="60" step="0.5" value="0"></label>
+        <label class="slider" for="days">Days at sea <output id="days-o" for="days"></output><input type="range" id="days" min="1" max="120" step="1" value="81"></label>
+        <div class="verdict">
+          <span class="big" id="err-big"></span>
+          <p id="err-say"></p>
+          <div class="prize" id="prize"></div>
+        </div>
+      </div>
+      <svg id="seachart" viewBox="0 0 560 320" role="img" aria-label="Chart near Jamaica comparing the true position with where the watch says you are"></svg>
+    </div>
+  </section>
+
+  <section aria-labelledby="w-h">
+    <div class="sec-head"><h2 id="w-h">Four timekeepers and thirty years</h2><p>Harrison spent three decades on large clocks for the sea before he realised a watch could do better.</p></div>
+    <div class="watches">
+      <div><h3>H1</h3><p>Finished in 1735: a big brass sea clock with two linked balances instead of a pendulum, so a ship’s rolling would not upset it.</p></div>
+      <div><h3>H2 and H3</h3><p>Larger and more refined, built over the next twenty years. H3 introduced the bimetallic strip to correct for temperature, still used in thermostats.</p></div>
+      <div><h3>H4</h3><p>A silver watch only about 5.2 inches across, beating five times a second, with pallets cut from diamond. It is the one that went to sea in 1761.</p></div>
+      <div><h3>Longitude by the Moon</h3><p>The rival method. Measure the Moon against the stars, then spend hours with printed tables. On the 1764 trial it was within about 30 miles; H4 was within 10.</p></div>
+    </div>
+  </section>
+
+  <section class="history">
+    <div>
+      <h2>The longitude prize</h2>
+      <ol class="timeline">
+        <li><span class="yr">1707</span><p>A British fleet, unsure of its position, wrecks on the Isles of Scilly. The disaster makes longitude a national priority.</p></li>
+        <li><span class="yr">1714</span><p>Parliament’s Longitude Act offers £10,000 for a method good to one degree, £15,000 for two-thirds of a degree and £20,000 for half a degree.</p></li>
+        <li><span class="yr">1730</span><p>Harrison, a self-taught clockmaker who began with wooden clocks of oak and lignum vitae, brings his first plans for a sea clock to London.</p></li>
+        <li><span class="yr">1761–62</span><p>H4 sails to Jamaica on HMS <i>Deptford</i>. Allowing for its known daily rate, it ends 5 seconds slow after 81 days: about one nautical mile of longitude.</p></li>
+        <li><span class="yr">1764</span><p>A second trial to Barbados on HMS <i>Tartar</i>. H4 is within 39 seconds. The Board of Longitude still suspects luck.</p></li>
+        <li><span class="yr">1773</span><p>After years of dispute, and help from King George III, Parliament pays Harrison £8,750. In all he receives £23,065, though never the prize itself.</p></li>
+      </ol>
+    </div>
+    <div class="aside">
+      <h2>The arithmetic of a second</h2>
+      <p>The Earth turns 360° in 24 hours: 15° an hour, 1° every 4 minutes, 1 minute of arc every 4 seconds.</p>
+      <p>At the equator a minute of arc of longitude is one nautical mile. Nearer the poles the lines of longitude draw together, so near Jamaica, at 18° north, it is about 0.95 of a mile.</p>
+      <p>A watch that loses a single minute a day would put you hundreds of miles out after a crossing. H4 had to stay within a couple of seconds a day, and its rate had to be steady enough to correct for.</p>
+    </div>
+    <p class="sources">Sources: <a href="https://en.wikipedia.org/wiki/John_Harrison" target="_blank" rel="noopener">John Harrison</a> (the trials on HMS <i>Deptford</i> and HMS <i>Tartar</i>, the payments, and H4’s size, beat and diamond pallets), <a href="https://en.wikipedia.org/wiki/Longitude_Act" target="_blank" rel="noopener">Longitude Act</a> and <a href="https://en.wikipedia.org/wiki/Longitude_rewards" target="_blank" rel="noopener">Longitude rewards</a> on Wikipedia, citing Rupert Gould, <i>The Marine Chronometer</i> (1923). Places on the chart are drawn by longitude only and not to scale north to south.</p>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const rad = (d) => (d * Math.PI) / 180;
+  const pad = (n) => String(n).padStart(2, '0');
+
+  /* ================================================================
+     Clocks
+     ================================================================ */
+  function dial(svg, secs) {
+    const h = (secs / 3600) % 12, m = (secs / 60) % 60, s = secs % 60;
+    const hand = (angle, len, w, cls) => {
+      const a = rad(angle - 90);
+      return `<line class="hand ${cls}" x1="80" y1="80" x2="${(80 + len * Math.cos(a)).toFixed(1)}" y2="${(80 + len * Math.sin(a)).toFixed(1)}" stroke-width="${w}"/>`;
+    };
+    let t = '<circle class="face" cx="80" cy="80" r="72"/>';
+    for (let i = 0; i < 60; i++) {
+      const a = rad(i * 6 - 90), r1 = i % 5 ? 64 : 58;
+      t += `<line class="tick" x1="${(80 + r1 * Math.cos(a)).toFixed(1)}" y1="${(80 + r1 * Math.sin(a)).toFixed(1)}" x2="${(80 + 68 * Math.cos(a)).toFixed(1)}" y2="${(80 + 68 * Math.sin(a)).toFixed(1)}"/>`;
+    }
+    ['XII', 'I', 'II', 'III', 'IIII', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'].forEach((n, i) => {
+      const a = rad(i * 30 - 90);
+      t += `<text class="num" x="${(80 + 46 * Math.cos(a)).toFixed(1)}" y="${(85 + 46 * Math.sin(a)).toFixed(1)}">${n}</text>`;
+    });
+    t += hand(h * 30, 32, 5, '') + hand(m * 6, 50, 3, '') + hand(s * 6, 56, 1.5, 'sec');
+    t += '<circle cx="80" cy="80" r="4" fill="#1a1510"/>';
+    svg.innerHTML = t;
+  }
+
+  /* ================================================================
+     The strip chart: west to the left, 10 px per degree
+     ================================================================ */
+  const LX = (lonW) => 860 - lonW * 10;
+  const PLACES = [['Portsmouth', 1.1], ['Bridgetown, Barbados', 59.6], ['Kingston, Jamaica', 76.8]];
+  let lon = 76.8;
+  function drawStrip() {
+    let s = '<rect class="sea" x="0" y="0" width="920" height="260"/>';
+    for (let d = 0; d <= 80; d += 10) s += `<line class="merid" x1="${LX(d)}" x2="${LX(d)}" y1="20" y2="236"/><text class="merid-t" x="${LX(d)}" y="252">${d === 0 ? '0° Greenwich' : `${d}° W`}</text>`;
+    PLACES.forEach(([n, l], i) => {
+      const y = i === 0 ? 120 : 196;
+      s += `<circle class="place" cx="${LX(l)}" cy="${y}" r="5"/><text class="place-t" x="${LX(l)}" y="${y + 20}">${n}</text>`;
+    });
+    const x = LX(lon);
+    s += `<circle class="sun" cx="${x}" cy="34" r="14"/><line class="sunray" x1="${x}" x2="${x}" y1="50" y2="132"/>`;
+    s += `<g class="ship" id="ship" transform="translate(${x} 150)" tabindex="0" role="slider" aria-label="The ship, ${lon.toFixed(1)} degrees west" aria-valuemin="0" aria-valuemax="80" aria-valuenow="${lon.toFixed(1)}">
+      <path class="hull" d="M-26 0H26L18 12H-18Z"/><path class="sail" d="M-2 -34V-2H-20Z"/><path class="sail" d="M2 -40V-2H24Z"/><line x1="0" x2="0" y1="-44" y2="0" style="stroke:var(--navy);stroke-width:2"/>
+      <rect x="-40" y="-50" width="80" height="70" fill="transparent"/></g>`;
+    $('strip').innerHTML = s;
+  }
+  function update() {
+    drawStrip();
+    const secs = Math.round(12 * 3600 + lon * 240);
+    dial($('home'), secs);
+    dial($('local'), 12 * 3600);
+    const hh = Math.floor(secs / 3600), mm = Math.floor((secs % 3600) / 60), ss = secs % 60;
+    $('home-d').textContent = `${pad(hh)}:${pad(mm)}:${pad(ss)}`;
+    const diff = secs - 12 * 3600;
+    const dh = Math.floor(diff / 3600), dm = Math.floor((diff % 3600) / 60), ds = diff % 60;
+    $('reckon').innerHTML = lon < 0.05
+      ? 'At Portsmouth both clocks agree: it is noon at home and noon here.'
+      : `The Sun is highest here when the sea watch says <b>${pad(hh)}:${pad(mm)}:${pad(ss)}</b>. Noon came <b>${dh} h ${dm} min ${ds} s</b> later here than at home, so you are <b>${dh} × 15° + ${dm} ÷ 4 + ${ds} ÷ 240 = ${lon.toFixed(1)}° west</b> of Greenwich.`;
+  }
+  const strip = $('strip');
+  let dragging = false;
+  function lonFrom(e) {
+    const pt = strip.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    const p = pt.matrixTransform(strip.getScreenCTM().inverse());
+    return Math.max(0, Math.min(80, (860 - p.x) / 10));
+  }
+  strip.addEventListener('pointerdown', (e) => { dragging = true; strip.setPointerCapture(e.pointerId); lon = Math.round(lonFrom(e) * 10) / 10; update(); });
+  strip.addEventListener('pointermove', (e) => { if (dragging) { lon = Math.round(lonFrom(e) * 10) / 10; update(); } });
+  strip.addEventListener('pointerup', () => { dragging = false; });
+  strip.addEventListener('pointercancel', () => { dragging = false; });
+  strip.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault();
+    lon = Math.max(0, Math.min(80, lon + (e.key === 'ArrowLeft' ? 1 : -1) * (e.shiftKey ? 5 : 0.5)));
+    update();
+    $('ship').focus();
+  });
+
+  /* ================================================================
+     The voyage: a watch's error becomes an error in longitude
+     ================================================================ */
+  const PRESETS = [
+    { name: 'H4 on HMS Deptford', total: 5, days: 81, note: 'H4 ended 5 seconds slow once its known daily loss was allowed for.' },
+    { name: 'H4 on HMS Tartar', total: 39, note: 'On the 1764 trial to Barbados, H4 was within 39 seconds.' },
+    { name: '10 seconds a day', rate: 10 },
+    { name: 'A minute a day', rate: 60 },
+  ];
+  let mode = 0;
+  const LAT = 18;
+  function voyage() {
+    const days = Number($('days').value);
+    const p = PRESETS[mode];
+    const total = p && p.total != null ? p.total : Number($('rate').value) * days;
+    $('rate-o').textContent = p && p.total != null ? `(fixed by the record: ${p.total} s in all)` : `${Number($('rate').value)} s`;
+    $('days-o').textContent = `${days} days`;
+    const arcmin = total / 4;
+    const nm = arcmin * Math.cos(rad(LAT));
+    $('err-big').textContent = nm < 10 ? `${nm.toFixed(1)} miles out` : `${Math.round(nm).toLocaleString('en-US')} miles out`;
+    $('err-say').innerHTML = `${total.toLocaleString('en-US')} seconds of error in all is ${arcmin < 10 ? arcmin.toFixed(2) : arcmin.toFixed(0)} minutes of longitude, which off Jamaica is about ${nm < 10 ? nm.toFixed(1) : Math.round(nm)} nautical miles. ${p && p.note ? p.note : ''}`;
+    const tiers = [[60, '£10,000', 'within 1°'], [40, '£15,000', 'within 40′'], [30, '£20,000', 'within 30′']];
+    $('prize').innerHTML = tiers.map(([lim, money, words]) => `<div class="${arcmin <= lim ? 'won' : ''}"><b>${money}</b>${words}${arcmin <= lim ? ' ✓' : ''}</div>`).join('');
+    drawSea(nm);
+  }
+  function drawSea(nm) {
+    // 1 px = 0.5 nautical mile around Kingston
+    const K = [380, 200];
+    const px = nm * 2;
+    let s = '<rect width="560" height="320" style="fill:var(--sea)"/>';
+    s += `<path class="landf" d="M250 196 C270 170 330 166 372 176 C410 168 456 178 480 196 C462 214 420 222 380 216 C330 224 284 222 250 196Z"/>`;
+    s += `<text class="lab" x="364" y="240" text-anchor="middle">Jamaica (outline not to scale)</text>`;
+    s += `<circle class="true" cx="${K[0]}" cy="${K[1]}" r="6"/><text class="lab" x="${K[0] + 10}" y="${K[1] - 10}">Kingston: where you are</text>`;
+    // the watch reads slow, so you think you are less far west: east of the truth
+    const bx = K[0] + px;
+    if (bx <= 540) {
+      s += `<circle class="belief" cx="${bx}" cy="${K[1] - 70}" r="6"/><text class="lab red" x="${Math.min(bx, 470)}" y="${K[1] - 84}" text-anchor="middle">where the watch says</text>`;
+      s += `<line x1="${K[0]}" x2="${bx}" y1="${K[1] - 70}" y2="${K[1] - 70}" style="stroke:var(--red);stroke-width:1.5;stroke-dasharray:4 3"/>`;
+    } else {
+      s += `<path d="M500 ${K[1] - 70}h40l-8 -6M540 ${K[1] - 70}l-8 6" style="fill:none;stroke:var(--red);stroke-width:2"/><text class="lab red" x="536" y="${K[1] - 84}" text-anchor="end">the watch puts you ${Math.round(nm)} miles east, off the chart</text>`;
+    }
+    s += `<g transform="translate(24 296)"><line class="scale" x1="0" x2="100" y1="0" y2="0"/><line class="scale" x1="0" x2="0" y1="-5" y2="5"/><line class="scale" x1="100" x2="100" y1="-5" y2="5"/><text class="scalet" x="50" y="-8" text-anchor="middle">50 nautical miles</text></g>`;
+    $('seachart').innerHTML = s;
+  }
+  $('presets').innerHTML = PRESETS.map((p, i) => `<button type="button" class="btn" data-p="${i}" aria-pressed="${i === mode}">${p.name}</button>`).join('');
+  $('presets').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-p]');
+    if (!b) return;
+    mode = Number(b.dataset.p);
+    const p = PRESETS[mode];
+    if (p.rate != null) $('rate').value = p.rate;
+    if (p.days) $('days').value = p.days;
+    document.querySelectorAll('[data-p]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    voyage();
+  });
+  $('rate').addEventListener('input', () => { mode = -1; document.querySelectorAll('[data-p]').forEach((x) => x.setAttribute('aria-pressed', 'false')); voyage(); });
+  $('days').addEventListener('input', () => { if (mode >= 0 && PRESETS[mode].total != null) { mode = -1; document.querySelectorAll('[data-p]').forEach((x) => x.setAttribute('aria-pressed', 'false')); $('rate').value = 0; } voyage(); });
+
+  update();
+  voyage();
+})();
+</script>
+</body>
+</html>

@@ -24,6 +24,11 @@
       "try": "Flatten the Earth and watch the shadows"
     },
     {
+      "slug": "harrison", "hall": "sky", "title": "Harrison’s Sea Watch", "ages": "10 and up",
+      "blurb": "Find a ship’s longitude from the gap between local noon and a watch set to home, and see how John Harrison’s H4 won the race to Jamaica.",
+      "try": "Sail with a watch that loses a minute a day"
+    },
+    {
       "slug": "band-organ", "hall": "sound", "title": "Carousel Band Organ", "ages": "All ages",
       "blurb": "A paper roll plays carousel tunes from before 1914, after the Wurlitzer organ at Como Park.",
       "try": "Watch the roll switch on the bells"

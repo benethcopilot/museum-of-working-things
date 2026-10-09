@@ -24,7 +24,7 @@ tools/check.mjs         checks the list, the folders and the links agree
 
 | Hall | Exhibits |
 | --- | --- |
-| Sky & Time | Brass Astrolabe, Eratosthenes' Shadow |
+| Sky & Time | Brass Astrolabe, Eratosthenes' Shadow, Harrison's Sea Watch |
 | Music & Sound | Carousel Band Organ, Thirty-Note Music Box, Autoharp Chords |
 | Life Science | Litter Lab, Broad Street Pump |
 | Making & Mending | Kintsugi Bowl, Ebru Tray, Letterpress Type Case |
