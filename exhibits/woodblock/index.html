@@ -1,0 +1,750 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Edo Woodblock Print</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Antique&family=Alegreya+Sans:ital,wght@0,400;0,700;1,400&family=Azeret+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@800&text=%E6%9B%99%E3%81%AE%E5%AF%8C%E5%A3%AB%E7%89%88&display=swap">
+<style>
+:root {
+  /* Layout: the printer's bench. The carved block on the left with the sheet laid over it, the impression pinned up on the right, and the step you are on beneath; then the seven blocks laid out, bokashi, the blue revolution, and the four trades. */
+  --ground: #e8ebf0;
+  --ground-2: #dadfe7;
+  --card: #f5f7fa;
+  --ink: #1c1b19;
+  --muted: #565b64;
+  --line: rgba(28, 27, 25, 0.13);
+  --line-strong: rgba(28, 27, 25, 0.3);
+  --indigo: #1f4a8a;
+  --shu: #b9432c;
+  --good: #2c7449;
+  /* the bench and the paper look the same in both themes */
+  --bench: #3b2c20;
+  --bench-2: #2e2219;
+  --bench-ink: #efe3cf;
+  --bench-dim: #c2ad8d;
+  --f-display: "Zen Antique", "Hoefler Text", Georgia, serif;
+  --f-body: "Alegreya Sans", "Segoe UI", system-ui, sans-serif;
+  --f-data: "Azeret Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0f1217;
+    --ground-2: #19202a;
+    --card: #141a22;
+    --ink: #e6e9ee;
+    --muted: #9ea6b3;
+    --line: rgba(230, 233, 238, 0.12);
+    --line-strong: rgba(230, 233, 238, 0.3);
+    --indigo: #8fb2ec;
+    --shu: #f08a6f;
+    --good: #80cf98;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #0f1217;
+  --ground-2: #19202a;
+  --card: #141a22;
+  --ink: #e6e9ee;
+  --muted: #9ea6b3;
+  --line: rgba(230, 233, 238, 0.12);
+  --line-strong: rgba(230, 233, 238, 0.3);
+  --indigo: #8fb2ec;
+  --shu: #f08a6f;
+  --good: #80cf98;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--f-body); font-size: 18px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: default; opacity: 0.45; }
+:focus-visible { outline: 3px solid var(--shu); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 400; line-height: 1.08; margin: 0; text-wrap: balance; }
+a { color: var(--indigo); }
+
+.page { box-sizing: border-box; max-width: 1240px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 50px; }
+.masthead { display: grid; gap: 10px; }
+.eyebrow { margin: 0; font-family: var(--f-data); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.masthead h1 { font-size: clamp(2.6rem, 7vw, 5rem); }
+.lede { margin: 0; max-width: 66ch; color: var(--muted); }
+section > h2, .text h2 { font-size: clamp(1.8rem, 3.6vw, 2.5rem); }
+.text { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.text p { margin: 0; max-width: 64ch; }
+
+/* ---------- Bench ---------- */
+.bench { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); gap: 16px 22px; padding: 16px; border-radius: 6px; background: linear-gradient(180deg, var(--bench), var(--bench-2)); color: var(--bench-ink); }
+.bench h2 { font-size: 1.25rem; color: var(--bench-ink); }
+.pane { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.pane-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.pane-head span { font-family: var(--f-data); font-size: 0.74rem; color: var(--bench-dim); }
+canvas { display: block; width: 100%; height: auto; }
+#block { border-radius: 3px; touch-action: none; cursor: default; }
+#block.drag { cursor: grab; }
+#block.rub { cursor: none; }
+#print { border-radius: 2px; box-shadow: 0 8px 18px -10px rgba(0, 0, 0, 0.7); }
+.controls { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); gap: 14px 22px; align-items: start; }
+.stepbox { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; border-radius: 4px; background: rgba(0, 0, 0, 0.22); border: 1px solid rgba(255, 255, 255, 0.08); }
+.stepline { display: flex; gap: 6px; flex-wrap: wrap; }
+.stepline span { font-family: var(--f-data); font-size: 0.7rem; padding: 2px 8px; border-radius: 99px; border: 1px solid rgba(239, 227, 207, 0.3); color: var(--bench-dim); }
+.stepline span.now { background: var(--bench-ink); color: var(--bench-2); border-color: var(--bench-ink); }
+.stepline span.done { color: var(--bench-ink); border-color: rgba(239, 227, 207, 0.6); }
+.instr { margin: 0; font-size: 1rem; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.bbtn { padding: 6px 13px; border-radius: 3px; border: 1.5px solid rgba(239, 227, 207, 0.5); background: none; color: var(--bench-ink); font-size: 0.95rem; }
+.bbtn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.08); }
+.bbtn.go { background: var(--bench-ink); color: var(--bench-2); border-color: var(--bench-ink); font-weight: 700; }
+.bbtn[aria-pressed="true"] { background: rgba(239, 227, 207, 0.22); }
+.slider { display: flex; flex-direction: column; gap: 2px; font-size: 0.95rem; }
+.slider input { width: 100%; accent-color: #c9a46a; }
+.slider output { font-family: var(--f-data); font-size: 0.85rem; }
+.meters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.meter { padding: 7px 10px; border-radius: 3px; background: rgba(0, 0, 0, 0.22); min-width: 0; }
+.meter span { display: block; font-size: 0.74rem; color: var(--bench-dim); }
+.meter b { font-family: var(--f-data); font-weight: 500; font-size: 0.95rem; }
+.note { margin: 0; padding: 10px 12px; border-left: 3px solid #c9a46a; background: rgba(0, 0, 0, 0.22); font-size: 0.98rem; }
+.note.good { border-left-color: #8fd3a5; }
+.note.bad { border-left-color: #f0977f; }
+
+/* ---------- Below ---------- */
+.blocks { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.blk { display: flex; flex-direction: column; gap: 6px; padding: 8px; border-radius: 3px; background: var(--card); border: 1px solid var(--line); }
+.blk canvas { border-radius: 2px; }
+.blk b { font-family: var(--f-data); font-weight: 500; font-size: 0.78rem; }
+.blk span { font-size: 0.88rem; color: var(--muted); }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.fact { padding: 10px 12px; border-radius: 3px; background: var(--card); border: 1px solid var(--line); }
+.fact b { display: block; font-family: var(--f-display); font-size: 1.7rem; line-height: 1.1; color: var(--indigo); }
+.fact span { font-size: 0.9rem; color: var(--muted); }
+.trades { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.trades li { padding: 10px 12px; border-radius: 3px; background: var(--card); border: 1px solid var(--line); }
+.trades b { font-family: var(--f-display); font-size: 1.15rem; display: block; }
+.trades span { font-size: 0.92rem; color: var(--muted); }
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-left: 2px solid var(--line-strong); }
+.timeline li { display: grid; grid-template-columns: 4.2em minmax(0, 1fr); gap: 12px; padding: 7px 0 7px 14px; position: relative; }
+.timeline li::before { content: ""; position: absolute; left: -6px; top: 15px; width: 10px; height: 10px; border-radius: 50%; background: var(--ground); border: 2px solid var(--shu); }
+.timeline b { font-family: var(--f-display); font-size: 1.2rem; font-weight: 400; }
+.timeline p { margin: 0; font-size: 0.97rem; }
+.sources { margin: 0; font-size: 0.88rem; color: var(--muted); max-width: 100ch; }
+
+@media (max-width: 920px) {
+  .bench, .controls, .two { grid-template-columns: minmax(0, 1fr); }
+  .facts { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 520px) {
+  .meters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .trades { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="woodblock" defer></script>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <p class="eyebrow">Making &amp; Mending · Edo, Japan · 1831</p>
+    <h1>Edo Woodblock Print</h1>
+    <p class="lede">A Japanese colour print was made by four trades. The artist drew it, a carver cut a separate cherry-wood block for every colour, and the printer laid one damp sheet on each block in turn, rubbing it with a flat pad called a baren. Two small notches cut into every block, the kentō, put the paper in exactly the same place each time. You are the printer. Seven blocks are carved and waiting.</p>
+  </header>
+
+  <section class="bench" aria-label="The printer's bench">
+    <div class="pane">
+      <div class="pane-head"><h2 id="blockTitle">Block 1 of 7: the key block</h2><span id="blockColor">sumi ink</span></div>
+      <canvas id="block" width="640" height="448" tabindex="0" aria-label="The carved block. Lay the sheet in the kento notches at the lower edge, then rub it with the baren."></canvas>
+    </div>
+    <div class="pane">
+      <div class="pane-head"><h2 id="printTitle">The finished design</h2><span id="printSub">the proof you are aiming for</span></div>
+      <canvas id="print" width="592" height="400" aria-label="The print so far"></canvas>
+    </div>
+    <div class="controls">
+      <div class="stepbox">
+        <div class="stepline" id="stepline"><span>1 Ink the block</span><span>2 Lay the sheet</span><span>3 Rub with the baren</span><span>4 Lift</span></div>
+        <p class="instr" id="instr"></p>
+        <label class="slider" id="fadeBox" for="fade" hidden><span>How far the colour fades: <output id="fadeOut" for="fade">medium</output></span><input id="fade" type="range" min="0.15" max="1" step="0.05" value="0.5"></label>
+        <div class="row" id="actions"></div>
+      </div>
+      <div class="pane">
+        <div class="meters">
+          <div class="meter"><span>Registration</span><b id="mReg">—</b></div>
+          <div class="meter"><span>Rubbed</span><b id="mRub">—</b></div>
+          <div class="meter"><span>Impression</span><b id="mEd">No. 1</b></div>
+        </div>
+        <div class="row"><button class="bbtn" id="kento" type="button" aria-pressed="true">Kentō notches: on</button><button class="bbtn" id="auto" type="button">Print the rest for me</button><button class="bbtn" id="again" type="button">Start a new impression</button></div>
+        <p class="note" id="note" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="text" aria-label="The seven blocks">
+    <h2>One block for every colour</h2>
+    <p>The carver pasted the artist’s drawing face down on a cherry block and cut away everything but the black lines: the key block. Proofs from it went back to the artist, who marked one colour on each, and each became another block. Here are this print’s seven, with the colour each one carries. Every block is carved in reverse, like a seal, so the print comes out the right way round: look at the title. Where two colours overlap, the thin water-based inks mix on the paper: the pine trunk is printed in both yellow and pink.</p>
+    <div class="blocks" id="blocks"></div>
+  </section>
+
+  <section class="two" aria-label="Bokashi and the blue revolution">
+    <div class="text">
+      <h2>Bokashi: a fade by hand</h2>
+      <p>The sky and the sea in this print are bokashi. The printer wiped the block with a damp cloth, loaded colour along one edge of a wide brush and drew it across, so the ink bled into the wet wood and faded out. This straight-line fade, ichimonji bokashi, is the one Hokusai and Hiroshige used for skies, seas and horizons. It had to be brushed again for every single sheet, so no two impressions match exactly. Set the fade on blocks 6 and 7 to make yours.</p>
+      <p>The edge of a fade is never perfectly even. Printers called a straight fade with a ragged edge ichimonji-mura-bokashi, and you will see that unevenness in your print too.</p>
+    </div>
+    <div class="text">
+      <h2>The blue revolution</h2>
+      <p>Earlier printers had only plant blues that faded in the light. Prussian blue, a synthetic pigment the Japanese called bero-ai, “Berlin indigo”, was strong and lasting. In January 1831 Hokusai’s publisher Nishimuraya Yohachi advertised the new blue in his series <i>Thirty-six Views of Mount Fuji</i>, and its first ten prints, including <i>The Great Wave off Kanagawa</i>, are among the first Japanese prints to use it.</p>
+      <div class="facts">
+        <div class="fact"><b>1,000</b><span>copies of the Great Wave in the first printing</span></div>
+        <div class="fact"><b>8,000</b><span>estimated copies printed in all, as the blocks wore</span></div>
+        <div class="fact"><b>25 × 37</b><span>centimetres: the ōban sheet it was printed on</span></div>
+      </div>
+      <p>As the blocks wore, the pink and yellow of the sky faded first in later copies, and collectors still use that wear to tell early impressions from late ones.</p>
+    </div>
+  </section>
+
+  <section class="two" aria-label="The four trades">
+    <div class="text">
+      <h2>Four trades, one print</h2>
+      <ul class="trades">
+        <li><b>Publisher</b><span>Commissioned the design, paid for the blocks, sold the prints. Owning the blocks was the nearest thing to copyright.</span></li>
+        <li><b>Artist</b><span>Drew the design in ink on thin paper and chose the colours.</span></li>
+        <li><b>Carver</b><span>Pasted the drawing to cherry wood and cut it, destroying the original drawing as the block took shape.</span></li>
+        <li><b>Printer</b><span>Brushed water-based colour onto each block, laid the paper in the kentō and rubbed it with the baren.</span></li>
+      </ul>
+      <p>Usually only the artist and the publisher were named on the finished print. The baren itself is a coil of twisted bamboo-leaf rope in a disc of laminated paper, wrapped in a bamboo leaf.</p>
+    </div>
+    <ol class="timeline">
+      <li><b>770</b><p>The Hyakumantō Darani: Buddhist charms printed from blocks, the start of woodblock printing in Japan.</p></li>
+      <li><b>1670s</b><p>Hishikawa Moronobu’s black-ink prints launch ukiyo-e, pictures of the “floating world”.</p></li>
+      <li><b>1740s</b><p>Okumura Masanobu and others print areas of colour from several blocks.</p></li>
+      <li><b>1760s</b><p>Suzuki Harunobu’s “brocade pictures”, nishiki-e, use up to a dozen blocks.</p></li>
+      <li><b>1831</b><p>Hokusai’s <i>The Great Wave off Kanagawa</i>, printed in Prussian blue.</p></li>
+      <li><b>1856</b><p>Hiroshige begins <i>One Hundred Famous Views of Edo</i>, full of bokashi sunrises; he dies in 1858.</p></li>
+      <li><b>1915</b><p>Publisher Watanabe Shōzaburō names the shin-hanga, “new prints”, reviving the old craft.</p></li>
+    </ol>
+  </section>
+
+  <p class="sources">Sources: Wikipedia, <a href="https://en.wikipedia.org/wiki/Woodblock_printing_in_Japan" target="_blank" rel="noopener">Woodblock printing in Japan</a> (cherry blocks, the baren and how it is made, the kentō, nishiki-e and their separate colour blocks, 770 and the Buddhist origins, the publisher’s blocks as copyright), <a href="https://en.wikipedia.org/wiki/Ukiyo-e" target="_blank" rel="noopener">Ukiyo-e</a> (the four trades, the drawing destroyed in carving, water-based ink, Moronobu, Masanobu, Harunobu’s dozen blocks, shin-hanga), <a href="https://en.wikipedia.org/wiki/Bokashi_(printing)" target="_blank" rel="noopener">Bokashi</a> (ichimonji and mura bokashi, the damp cloth and the one-edge brush) and <a href="https://en.wikipedia.org/wiki/The_Great_Wave_off_Kanagawa" target="_blank" rel="noopener">The Great Wave off Kanagawa</a> (1831, bero-ai, Nishimuraya’s January 1831 advertisement, about 1,000 and 8,000 copies, ōban size, wear in the pink and yellow sky). The design here, “Fuji at Dawn” (曙の富士), is drawn by the page in the style of the period and does not copy a real print. Ink on paper is modelled as thin transparent layers.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s) => document.querySelector(s);
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const PW = 592, PH = 400, N = PW * PH;
+  const BW = 640, BH = 448, BX = 24, BY = 24;           // block canvas and where the carved image sits
+  const MARGIN = 10;                                     // paper margin beyond the image
+  const HOME = { x: BX - MARGIN, y: BY - MARGIN };        // the sheet's place when it sits in the kentō
+  const SHEET_W = PW + 2 * MARGIN, SHEET_H = PH + 2 * MARGIN;
+  const PAPER = [243, 237, 222];
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  function rng(seed) { let s = seed >>> 0; return () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  const R = rng(1831);
+  const fiber = new Float32Array(N), speck = new Float32Array(N), grainY = new Float32Array(PH);
+  for (let i = 0; i < N; i++) { fiber[i] = 0.975 + 0.025 * R(); speck[i] = R(); }
+  for (let y = 0; y < PH; y++) grainY[y] = Math.sin(y * 0.55 + Math.sin(y * 0.07) * 3) * 0.5 + 0.5;
+
+  // ---------- The design ----------
+  const HZ = 262;                                        // horizon
+  function fujiPath(g) {
+    g.beginPath(); g.moveTo(196, HZ); g.quadraticCurveTo(300, 230, 338, 64);
+    g.quadraticCurveTo(355, 58, 372, 64); g.quadraticCurveTo(410, 230, 520, HZ); g.closePath();
+  }
+  function snowPath(g) {
+    g.beginPath(); g.moveTo(0, 0); g.lineTo(PW, 0); g.lineTo(PW, 118);
+    for (let x = PW; x >= 0; x -= 9) g.lineTo(x, 116 + 13 * Math.abs(Math.sin((x - 330) * 0.11)) + (x % 27 === 0 ? 6 : 0));
+    g.closePath();
+  }
+  function hillsPath(g) { g.beginPath(); g.moveTo(0, HZ + 2); g.lineTo(0, 236); g.quadraticCurveTo(40, 224, 80, 236); g.quadraticCurveTo(130, 220, 172, 240); g.quadraticCurveTo(205, 248, 236, HZ + 2); g.closePath(); }
+  function rockPath(g) { g.beginPath(); g.moveTo(PW, PH); g.lineTo(PW, 292); g.quadraticCurveTo(566, 288, 548, 318); g.quadraticCurveTo(520, 360, 452, PH); g.closePath(); }
+  function trunkPath(g) {
+    g.beginPath(); g.moveTo(566, 312); g.bezierCurveTo(548, 260, 528, 236, 520, 200); g.bezierCurveTo(514, 172, 500, 158, 478, 150);
+    g.lineTo(482, 143); g.bezierCurveTo(510, 150, 526, 168, 532, 196); g.bezierCurveTo(540, 232, 560, 258, 578, 306); g.closePath();
+  }
+  const CLUMPS = [[476, 142, 44, 13], [520, 176, 40, 12], [552, 214, 34, 11], [458, 182, 30, 10], [540, 132, 30, 10]];
+  function clumpsPath(g) { g.beginPath(); CLUMPS.forEach(([x, y, a, b]) => { g.moveTo(x + a, y); g.ellipse(x, y, a, b, -0.08, 0, Math.PI * 2); }); }
+  const CLOUDS = [[150, 70, 120, 7], [250, 104, 90, 5], [470, 60, 110, 6], [430, 92, 70, 4]];
+  const SUN = [112, 196, 22];
+  const CART = { x: 26, y: 24, w: 44, h: 160 };
+  const SEAL = { x: 28, y: 344, s: 30 };
+  function boat(g, fill) {
+    g.beginPath(); g.moveTo(132, 302); g.lineTo(186, 302); g.quadraticCurveTo(180, 312, 170, 314); g.lineTo(144, 314); g.quadraticCurveTo(136, 310, 132, 302); g.closePath();
+    if (fill) g.fill(); else g.stroke();
+  }
+  const JP = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "MS Mincho", serif';
+
+  function mask(draw) {
+    const c = document.createElement('canvas'); c.width = PW; c.height = PH;
+    const g = c.getContext('2d', { willReadFrequently: true });
+    g.fillStyle = '#000'; g.strokeStyle = '#000'; g.lineCap = 'round'; g.lineJoin = 'round';
+    draw(g);
+    const d = g.getImageData(0, 0, PW, PH).data, m = new Float32Array(N);
+    for (let i = 0; i < N; i++) m[i] = d[i * 4 + 3] / 255;
+    return m;
+  }
+  const BLOCKS = [
+    { name: 'the key block', color: 'sumi ink', rgb: [38, 34, 32], a: 0.96, draw(g) {
+      g.lineWidth = 2.2; fujiPath(g); g.stroke();
+      g.lineWidth = 1.6; hillsPath(g); g.stroke(); rockPath(g); g.stroke(); trunkPath(g); g.stroke();
+      g.lineWidth = 1.4; clumpsPath(g); g.stroke();
+      // needles along the tops of the clumps
+      g.lineWidth = 1;
+      CLUMPS.forEach(([x, y, a, b]) => { for (let t = -0.9; t <= 0.9; t += 0.12) { const px = x + a * t, py = y - b * Math.sqrt(1 - t * t); g.beginPath(); g.moveTo(px, py); g.lineTo(px + t * 4, py - 5); g.stroke(); } });
+      // waves: rows of scalloped crests
+      g.lineWidth = 1.3;
+      [[282, 26, 3], [306, 32, 4], [334, 40, 5], [366, 48, 6]].forEach(([y, w, h], row) => {
+        for (let x = -w + (row % 2) * w / 2; x < PW; x += w) {
+          if (x > 440 && y > 300) continue;
+          g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + w / 2, y - h * 2, x + w, y); g.stroke();
+          g.beginPath(); g.moveTo(x + w * 0.62, y - h * 0.8); g.quadraticCurveTo(x + w * 0.75, y - h * 1.5, x + w * 0.9, y - h * 0.4); g.stroke();
+        }
+      });
+      boat(g, true);
+      g.lineWidth = 1.4; g.beginPath(); g.moveTo(158, 302); g.lineTo(158, 258); g.stroke();
+      g.strokeRect(146, 262, 24, 34);
+      g.lineWidth = 2; g.strokeRect(CART.x, CART.y, CART.w, CART.h);
+      g.font = `800 30px ${JP}`; g.textAlign = 'center'; g.textBaseline = 'middle';
+      '曙の富士'.split('').forEach((ch, i) => g.fillText(ch, CART.x + CART.w / 2, CART.y + 22 + i * 38));
+    } },
+    { name: 'the yellow block', color: 'yellow', rgb: [233, 196, 88], a: 0.85, draw(g) {
+      const gr = g.createLinearGradient(0, HZ, 0, 110); gr.addColorStop(0, 'rgba(0,0,0,0.9)'); gr.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = gr; g.fillRect(0, 100, PW, HZ - 100);
+      g.globalCompositeOperation = 'destination-out'; fujiPath(g); g.fill(); g.globalCompositeOperation = 'source-over';
+      g.fillStyle = '#000'; g.fillRect(CART.x + 2, CART.y + 2, CART.w - 4, CART.h - 4); trunkPath(g); g.fill();
+    } },
+    { name: 'the pink block', color: 'beni pink', rgb: [214, 96, 112], a: 0.8, draw(g) {
+      const gr = g.createLinearGradient(0, HZ, 0, 170); gr.addColorStop(0, 'rgba(0,0,0,0.75)'); gr.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = gr; g.fillRect(0, 160, PW, HZ - 160);
+      g.globalCompositeOperation = 'destination-out'; fujiPath(g); g.fill(); hillsPath(g); g.fill(); g.globalCompositeOperation = 'source-over';
+      g.fillStyle = '#000'; g.beginPath(); g.arc(SUN[0], SUN[1], SUN[2], 0, Math.PI * 2); g.fill();
+      trunkPath(g); g.fill();
+      g.fillRect(SEAL.x, SEAL.y, SEAL.s, SEAL.s);
+      g.globalCompositeOperation = 'destination-out';
+      g.font = `800 22px ${JP}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('版', SEAL.x + SEAL.s / 2, SEAL.y + SEAL.s / 2 + 1);
+      g.globalCompositeOperation = 'source-over';
+    } },
+    { name: 'the mountain block', color: 'pale indigo', rgb: [104, 132, 176], a: 0.85, draw(g) {
+      fujiPath(g); g.fill();
+      g.globalCompositeOperation = 'destination-out'; snowPath(g); g.fill(); g.globalCompositeOperation = 'source-over';
+    } },
+    { name: 'the green block', color: 'green', rgb: [96, 140, 84], a: 0.85, draw(g) {
+      hillsPath(g); g.fill(); clumpsPath(g); g.fill(); rockPath(g); g.fill();
+    } },
+    { name: 'the sky block', color: 'Prussian blue', rgb: [28, 72, 140], a: 0.92, fade: 'top', draw(g) {
+      g.fillRect(0, 0, PW, HZ);
+      g.globalCompositeOperation = 'destination-out';
+      fujiPath(g); g.fill(); hillsPath(g); g.fill();
+      g.fillRect(CART.x - 3, CART.y - 3, CART.w + 6, CART.h + 6);
+      CLOUDS.forEach(([x, y, a, b]) => { g.beginPath(); g.ellipse(x, y, a, b, 0, 0, Math.PI * 2); g.fill(); });
+      clumpsPath(g); g.fill(); trunkPath(g); g.fill();
+      g.beginPath(); g.arc(SUN[0], SUN[1], SUN[2] + 2, 0, Math.PI * 2); g.fill();
+      g.fillRect(144, 258, 28, 40);
+      g.globalCompositeOperation = 'source-over';
+    } },
+    { name: 'the sea block', color: 'Prussian blue', rgb: [24, 56, 116], a: 0.93, fade: 'horizon', draw(g) {
+      g.fillRect(0, HZ, PW, PH - HZ);
+      g.globalCompositeOperation = 'destination-out'; rockPath(g); g.fill(); hillsPath(g); g.fill(); boat(g, true); g.fillRect(144, 258, 28, 42); g.fillRect(SEAL.x - 3, SEAL.y - 3, SEAL.s + 6, SEAL.s + 6);
+      g.globalCompositeOperation = 'source-over';
+    } }
+  ];
+
+  // a fade brushed on by hand: full colour at one edge, thinning out, with a ragged edge
+  function fadeOf(b, width) {
+    const f = new Float32Array(N), r = rng(Math.floor(width * 1000) + (b.fade === 'top' ? 7 : 9));
+    const wob = new Float32Array(PW);
+    // a gently uneven edge: slow waves plus a little brush texture, never sharp stripes
+    const p1 = r() * 6, p2 = r() * 6;
+    let w = 0;
+    for (let x = 0; x < PW; x++) { w = w * 0.9 + (r() - 0.5) * 0.012; wob[x] = 0.05 * Math.sin(x * 0.011 + p1) + 0.025 * Math.sin(x * 0.037 + p2) + w; }
+    for (let y = 0; y < PH; y++) for (let x = 0; x < PW; x++) {
+      let t;
+      if (b.fade === 'top') t = y / (HZ * width);
+      else t = (y - HZ) / ((PH - HZ) * width);
+      t += wob[x];
+      const v = 1 - clamp(t, 0, 1);
+      f[y * PW + x] = b.fade === 'top' ? v * v * (3 - 2 * v) : 0.32 + 0.68 * v * v * (3 - 2 * v);
+    }
+    return f;
+  }
+
+  // ---------- Block view rendering ----------
+  const bc = $('#block'), bg = bc.getContext('2d');
+  const pc = $('#print'), pg = pc.getContext('2d');
+  const woodCache = new Map();
+  function woodImage(bi) {
+    if (woodCache.has(bi)) return woodCache.get(bi);
+    const b = BLOCKS[bi], c = document.createElement('canvas'); c.width = BW; c.height = BH;
+    const g = c.getContext('2d'), im = g.createImageData(BW, BH), d = im.data, r = rng(50 + bi);
+    for (let y = 0; y < BH; y++) {
+      const gy = Math.sin(y * 0.42 + Math.sin(y * 0.05 + bi) * 4) * 0.5 + 0.5;
+      for (let x = 0; x < BW; x++) {
+        const k = (y * BW + x) * 4;
+        const px = x - BX, py = y - BY;
+        const inImg = px >= 0 && py >= 0 && px < PW && py < PH;
+        // carved in reverse, so the print comes out the right way round
+        const raised = inImg ? b.mask[py * PW + (PW - 1 - px)] > 0.35 : true;
+        const base = raised ? [206, 160, 116] : [150, 104, 70];
+        const shade = (raised ? 1 : 0.86) * (0.92 + 0.08 * gy) * (0.97 + 0.03 * r());
+        d[k] = base[0] * shade; d[k + 1] = base[1] * shade; d[k + 2] = base[2] * shade; d[k + 3] = 255;
+      }
+    }
+    g.putImageData(im, 0, 0);
+    // the kentō: an L-shaped notch at the bottom right corner and a straight one along the bottom at the left
+    g.fillStyle = '#5a3a22';
+    g.fillRect(HOME.x + SHEET_W, HOME.y + SHEET_H - 26, 6, 32);
+    g.fillRect(HOME.x + SHEET_W - 26, HOME.y + SHEET_H, 32, 6);
+    g.fillRect(HOME.x + 60, HOME.y + SHEET_H, 70, 6);
+    woodCache.set(bi, c);
+    return c;
+  }
+  function inkedImage(bi, load) {
+    const b = BLOCKS[bi], c = document.createElement('canvas'); c.width = PW; c.height = PH;
+    const g = c.getContext('2d'), im = g.createImageData(PW, PH), d = im.data;
+    for (let i = 0; i < N; i++) {
+      const y = (i / PW) | 0, s = y * PW + (PW - 1 - (i - y * PW));   // mirrored, as on the wood
+      const a = b.mask[s] * (load ? load[s] : 1);
+      d[i * 4] = b.rgb[0]; d[i * 4 + 1] = b.rgb[1]; d[i * 4 + 2] = b.rgb[2]; d[i * 4 + 3] = Math.round(255 * a * 0.92);
+    }
+    g.putImageData(im, 0, 0);
+    return c;
+  }
+
+  // ---------- State ----------
+  const GRID = 8, GW = Math.ceil(PW / GRID), GH = Math.ceil(PH / GRID);
+  let bi = 0, step = 'ink', inked = null, load = null, fadeW = 0.5;
+  let sheet = { x: HOME.x - 46, y: HOME.y - 38 }, cover = new Float32Array(GW * GH);
+  let layers = [];      // printed: { bi, load, dx, dy, cover }
+  let useKento = true, edition = 1, baren = null, proofShown = true;
+  const coverCanvas = document.createElement('canvas'); coverCanvas.width = GW; coverCanvas.height = GH;
+  const coverCtx = coverCanvas.getContext('2d');
+  const showCanvas = document.createElement('canvas'); showCanvas.width = SHEET_W; showCanvas.height = SHEET_H;
+  const showCtx = showCanvas.getContext('2d');
+
+  function drawBlock() {
+    bg.drawImage(woodImage(bi), 0, 0);
+    if (inked) bg.drawImage(inked, BX, BY);
+    if (step === 'lay' || step === 'rub' || step === 'lift') {
+      // the damp sheet, face down, with the colour showing through where it has been rubbed
+      bg.save();
+      bg.fillStyle = 'rgba(244, 239, 226, 0.9)';
+      bg.shadowColor = 'rgba(0,0,0,0.35)'; bg.shadowBlur = step === 'lay' ? 10 : 2;
+      bg.fillRect(sheet.x, sheet.y, SHEET_W, SHEET_H);
+      bg.restore();
+      if (step !== 'lay') {
+        showCtx.clearRect(0, 0, SHEET_W, SHEET_H);
+        showCtx.globalCompositeOperation = 'source-over';
+        showCtx.globalAlpha = 0.5;
+        showCtx.drawImage(inked, BX - sheet.x, BY - sheet.y);
+        showCtx.globalAlpha = 1;
+        const cd = coverCtx.createImageData(GW, GH);
+        for (let i = 0; i < GW * GH; i++) cd.data[i * 4 + 3] = Math.round(255 * Math.min(1, cover[i]));
+        coverCtx.putImageData(cd, 0, 0);
+        showCtx.globalCompositeOperation = 'destination-in';
+        showCtx.imageSmoothingEnabled = true;
+        showCtx.drawImage(coverCanvas, MARGIN, MARGIN, PW, PH);
+        showCtx.globalCompositeOperation = 'source-over';
+        bg.drawImage(showCanvas, sheet.x, sheet.y);
+      }
+      if (baren && step === 'rub') {
+        bg.save();
+        bg.beginPath(); bg.arc(baren.x, baren.y, 40, 0, Math.PI * 2);
+        bg.fillStyle = 'rgba(70, 52, 34, 0.35)'; bg.fill();
+        bg.lineWidth = 2; bg.strokeStyle = 'rgba(40, 28, 18, 0.8)'; bg.stroke();
+        bg.beginPath(); for (let a = 0; a < 6.3; a += 0.4) { bg.moveTo(baren.x, baren.y); bg.lineTo(baren.x + Math.cos(a) * 34, baren.y + Math.sin(a) * 34); }
+        bg.strokeStyle = 'rgba(40, 28, 18, 0.25)'; bg.lineWidth = 1; bg.stroke();
+        bg.restore();
+      }
+    }
+  }
+
+  // ---------- The impression ----------
+  function transfer(cov, n) { return cov >= 1 ? 1 : clamp((cov - 0.55 * n) / 0.45, 0, 1); }
+  function sampleCover(cv, u, v) {
+    const gx = clamp(u / GRID - 0.5, 0, GW - 1), gy = clamp(v / GRID - 0.5, 0, GH - 1);
+    const x0 = gx | 0, y0 = gy | 0, x1 = Math.min(GW - 1, x0 + 1), y1 = Math.min(GH - 1, y0 + 1), fx = gx - x0, fy = gy - y0;
+    return (cv[y0 * GW + x0] * (1 - fx) + cv[y0 * GW + x1] * fx) * (1 - fy) + (cv[y1 * GW + x0] * (1 - fx) + cv[y1 * GW + x1] * fx) * fy;
+  }
+  function renderPrint(list, full) {
+    const im = pg.createImageData(PW, PH), d = im.data;
+    const r = new Float32Array(N).fill(1), gch = new Float32Array(N).fill(1), b = new Float32Array(N).fill(1);
+    list.forEach((L) => {
+      const B = BLOCKS[L.bi], cr = 1 - B.rgb[0] / 255, cg = 1 - B.rgb[1] / 255, cb = 1 - B.rgb[2] / 255;
+      const dx = Math.round(L.dx), dy = Math.round(L.dy);
+      for (let v = 0; v < PH; v++) {
+        const sy = v + dy; if (sy < 0 || sy >= PH) continue;
+        const grain = 0.93 + 0.07 * grainY[sy];
+        for (let u = 0; u < PW; u++) {
+          const sx = u + dx; if (sx < 0 || sx >= PW) continue;
+          const si = sy * PW + sx, m = B.mask[si];
+          if (m <= 0.002) continue;
+          const i = v * PW + u;
+          const t = full ? 1 : transfer(sampleCover(L.cover, u, v), speck[i]);
+          const a = B.a * m * (L.load ? L.load[si] : 1) * t * (B.a > 0.95 ? 1 : grain);
+          r[i] *= 1 - a * cr; gch[i] *= 1 - a * cg; b[i] *= 1 - a * cb;
+        }
+      }
+    });
+    for (let i = 0; i < N; i++) {
+      const f = fiber[i];
+      d[i * 4] = PAPER[0] * r[i] * f; d[i * 4 + 1] = PAPER[1] * gch[i] * f; d[i * 4 + 2] = PAPER[2] * b[i] * f; d[i * 4 + 3] = 255;
+    }
+    pg.putImageData(im, 0, 0);
+  }
+
+  // ---------- Steps ----------
+  const instr = $('#instr'), actions = $('#actions'), note = $('#note');
+  const say = (t, cls) => { note.textContent = t; note.className = 'note' + (cls ? ' ' + cls : ''); };
+  function button(label, fn, go) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'bbtn' + (go ? ' go' : ''); b.textContent = label;
+    b.addEventListener('click', fn); actions.appendChild(b); return b;
+  }
+  function regText() {
+    const dx = sheet.x - HOME.x, dy = sheet.y - HOME.y, e = Math.hypot(dx, dy);
+    return e < 0.5 ? 'in the kentō' : `off by ${(e * 0.625).toFixed(1)} mm`;
+  }
+  function rubbedFraction() {
+    let s = 0, n = 0;
+    const B = BLOCKS[bi];
+    for (let gy = 0; gy < GH; gy++) for (let gx = 0; gx < GW; gx++) {
+      const m = B.mask[Math.min(PH - 1, gy * GRID + 4) * PW + Math.max(0, PW - 1 - (gx * GRID + 4))];
+      if (m < 0.2) continue;
+      s += Math.min(1, cover[gy * GW + gx]); n++;
+    }
+    return n ? s / n : 1;
+  }
+  function meters() {
+    $('#mReg').textContent = step === 'ink' ? '—' : regText();
+    $('#mRub').textContent = step === 'rub' || step === 'lift' ? Math.round(rubbedFraction() * 100) + '%' : '—';
+    $('#mEd').textContent = 'No. ' + edition;
+  }
+  function setStep(s) {
+    step = s;
+    const order = ['ink', 'lay', 'rub', 'lift'];
+    Array.from($('#stepline').children).forEach((el, i) => {
+      el.className = i < order.indexOf(s) ? 'done' : i === order.indexOf(s) ? 'now' : '';
+    });
+    const B = BLOCKS[bi];
+    $('#blockTitle').textContent = `Block ${bi + 1} of 7: ${B.name}`;
+    $('#blockColor').textContent = B.color + (B.fade ? ', with bokashi' : '');
+    actions.textContent = '';
+    $('#fadeBox').hidden = !(s === 'ink' && B.fade);
+    bc.className = s === 'lay' ? 'drag' : s === 'rub' ? 'rub' : '';
+    if (s === 'ink') {
+      instr.textContent = B.fade
+        ? `This block prints the ${B.fade === 'top' ? 'sky' : 'sea'} as a bokashi. Choose how far the colour should fade, then wipe the block with a damp cloth and brush the ${B.color} along the ${B.fade === 'top' ? 'top' : 'horizon'} edge.`
+        : `The raised wood carries the ${B.color}; everything cut away stays clean. Brush the colour onto the block.`;
+      button(B.fade ? 'Wet the block and brush the fade' : 'Brush on the ' + B.color, inkBlock, true);
+    } else if (s === 'lay') {
+      instr.textContent = useKento ? 'Lay the damp sheet face down: drag it until its corner drops into the L-shaped notch at the lower right and its edge rests on the notch at the left.' : 'The kentō notches are off. Lay the sheet by eye: drag it to where you think it belongs and let go.';
+      button(useKento ? 'Drop it into the kentō' : 'Lay it as best I can', () => placeSheet(true), true);
+    } else if (s === 'rub') {
+      instr.textContent = 'Rub the back of the sheet with the baren in small circles. You can see the colour come through the damp paper. Light rubbing leaves a speckled texture.';
+      button('Rub it evenly for me', rubAll, false);
+      button('Lift the sheet', lift, true);
+    }
+    meters(); drawBlock();
+  }
+  function inkBlock() {
+    const B = BLOCKS[bi];
+    load = B.fade ? fadeOf(B, fadeW) : null;
+    const full = inkedImage(bi, load);
+    if (proofShown) { proofShown = false; renderPrint(layers, false); $('#printTitle').textContent = 'Your impression'; $('#printSub').textContent = 'pinned up to dry'; }
+    if (reduceMotion) { inked = full; afterInk(); return; }
+    // sweep the brush across the block
+    const t0 = performance.now();
+    (function f(now) {
+      const k = Math.min(1, (now - t0) / 650);
+      const c = document.createElement('canvas'); c.width = PW; c.height = PH;
+      const g = c.getContext('2d'); g.drawImage(full, 0, 0);
+      g.globalCompositeOperation = 'destination-in'; g.fillRect(0, 0, PW * k + 1, PH);
+      inked = c; drawBlock();
+      if (k < 1) requestAnimationFrame(f); else { inked = full; afterInk(); }
+    })(t0);
+  }
+  function afterInk() {
+    cover = new Float32Array(GW * GH);
+    sheet = { x: HOME.x - 40 - Math.random() * 20, y: HOME.y - 30 - Math.random() * 16 };
+    say(BLOCKS[bi].fade ? 'The colour bleeds into the damp wood and thins out. Every sheet gets its own fade.' : 'Inked. Now lay the paper on before the colour dries.');
+    setStep('lay');
+  }
+  function placeSheet(auto) {
+    if (auto) {
+      if (useKento) { sheet.x = HOME.x; sheet.y = HOME.y; }
+      else { sheet.x = HOME.x + (Math.random() - 0.5) * 16; sheet.y = HOME.y + (Math.random() - 0.5) * 12; }
+    }
+    say(useKento ? (Math.hypot(sheet.x - HOME.x, sheet.y - HOME.y) < 0.5 ? 'The corner sits in the notch: this colour will land exactly over the last.' : 'Close, but not in the notch.') : `Laid by eye, ${regText()}. Without the kentō each colour lands a little off the one before.`, useKento ? 'good' : 'bad');
+    setStep('rub');
+  }
+  function rubAt(px, py) {
+    // px, py in block-canvas pixels
+    const u = px - sheet.x - MARGIN, v = py - sheet.y - MARGIN;
+    const rad = 40 / GRID;
+    const cx = u / GRID, cy = v / GRID;
+    for (let gy = Math.max(0, Math.floor(cy - rad)); gy <= Math.min(GH - 1, Math.ceil(cy + rad)); gy++) {
+      for (let gx = Math.max(0, Math.floor(cx - rad)); gx <= Math.min(GW - 1, Math.ceil(cx + rad)); gx++) {
+        const d = Math.hypot(gx + 0.5 - cx, gy + 0.5 - cy) / rad;
+        if (d < 1) cover[gy * GW + gx] = Math.min(1.4, cover[gy * GW + gx] + 0.09 * (1 - d * d));
+      }
+    }
+  }
+  function rubAll() { for (let i = 0; i < cover.length; i++) cover[i] = Math.max(cover[i], 1.1); drawBlock(); meters(); say('Rubbed evenly, edge to edge.'); }
+  function lift() {
+    const frac = rubbedFraction();
+    // the sheet lay face down on a reversed block: flip the rubbing and the offset into the print's own view
+    const flipped = new Float32Array(GW * GH);
+    for (let gy = 0; gy < GH; gy++) for (let gx = 0; gx < GW; gx++) flipped[gy * GW + gx] = cover[gy * GW + (GW - 1 - gx)];
+    layers.push({ bi, load, dx: -(sheet.x - HOME.x), dy: sheet.y - HOME.y, cover: flipped });
+    renderPrint(layers, false);
+    const reg = Math.hypot(sheet.x - HOME.x, sheet.y - HOME.y) * 0.625;
+    let msg = frac < 0.6 ? `Lifted. Only ${Math.round(frac * 100)}% of the block was rubbed, so the colour came through speckled and patchy.` : frac < 0.95 ? 'Lifted. A little speckling where the baren pressed lightly: printers call that sesame-seed printing, goma-zuri, and sometimes did it on purpose.' : 'Lifted. A clean, even impression.';
+    if (reg > 0.5) msg += ` This colour sits ${reg.toFixed(1)} mm off the key lines.`;
+    inked = null; load = null;
+    if (bi < BLOCKS.length - 1) {
+      bi++; say(msg + ' On to the next block.', frac < 0.6 ? 'bad' : ''); setStep('ink');
+    } else finish(msg);
+  }
+  function finish(msg) {
+    step = 'done';
+    Array.from($('#stepline').children).forEach((el) => { el.className = 'done'; });
+    actions.textContent = '';
+    $('#fadeBox').hidden = true;
+    bc.className = '';
+    instr.textContent = 'All seven blocks are printed. Compare your impression with the proof, or start another: no two come out quite the same.';
+    button('Start a new impression', newImpression, true);
+    const maxReg = Math.max(...layers.map((L) => Math.hypot(L.dx, L.dy))) * 0.625;
+    const minRub = Math.min(...layers.map((L) => { let s = 0; for (const c of L.cover) s += Math.min(1, c); return s / L.cover.length; }));
+    const good = maxReg < 0.5 && minRub > 0.85;
+    say(msg + (good ? ' Every colour sits in register and the colour is even: a publisher would sell this impression.' : maxReg >= 0.5 ? ` Your worst colour is ${maxReg.toFixed(1)} mm out of register. A publisher would sell it cheaply, if at all.` : ' Some colours are patchy. Try rubbing every part of each block.'), good ? 'good' : 'bad');
+    meters();
+    bi = 0; drawBlockDone();
+  }
+  function drawBlockDone() {
+    bg.drawImage(woodImage(0), 0, 0);
+    $('#blockTitle').textContent = 'All seven blocks printed';
+    $('#blockColor').textContent = 'the key block, washed and set aside';
+  }
+  function newImpression() {
+    layers = []; bi = 0; edition++; inked = null; load = null; cover = new Float32Array(GW * GH);
+    renderPrint(layers, false);
+    $('#printTitle').textContent = 'Your impression'; $('#printSub').textContent = 'a fresh damp sheet';
+    proofShown = false;
+    say('A fresh sheet. The key block is first again.');
+    setStep('ink');
+  }
+
+  // ---------- Pointer on the block ----------
+  function toBlock(e) { const r = bc.getBoundingClientRect(); return [(e.clientX - r.left) * BW / r.width, (e.clientY - r.top) * BH / r.height]; }
+  let grab = null, rubbing = false, pending = false;
+  const redraw = () => { if (!pending) { pending = true; requestAnimationFrame(() => { pending = false; drawBlock(); meters(); }); } };
+  bc.addEventListener('pointerdown', (e) => {
+    const [x, y] = toBlock(e);
+    if (step === 'lay') {
+      if (x >= sheet.x && y >= sheet.y && x <= sheet.x + SHEET_W && y <= sheet.y + SHEET_H) { grab = { dx: x - sheet.x, dy: y - sheet.y }; bc.setPointerCapture(e.pointerId); }
+    } else if (step === 'rub') {
+      rubbing = true; bc.setPointerCapture(e.pointerId); baren = { x, y }; rubAt(x, y); redraw();
+    }
+  });
+  bc.addEventListener('pointermove', (e) => {
+    const [x, y] = toBlock(e);
+    if (step === 'lay' && grab) {
+      sheet.x = x - grab.dx; sheet.y = y - grab.dy;
+      if (useKento && Math.hypot(sheet.x - HOME.x, sheet.y - HOME.y) < 14) { sheet.x = HOME.x; sheet.y = HOME.y; }
+      redraw();
+    } else if (step === 'rub') {
+      baren = { x, y };
+      if (rubbing) rubAt(x, y);
+      redraw();
+    }
+  });
+  ['pointerup', 'pointercancel'].forEach((t) => bc.addEventListener(t, () => {
+    if (step === 'lay' && grab) { grab = null; placeSheet(false); }
+    rubbing = false;
+  }));
+  bc.addEventListener('pointerleave', () => { if (step === 'rub') { baren = null; redraw(); } });
+  bc.addEventListener('keydown', (e) => {
+    if (step !== 'lay') return;
+    const d = { ArrowLeft: [-2, 0], ArrowRight: [2, 0], ArrowUp: [0, -2], ArrowDown: [0, 2] }[e.key];
+    if (d) { e.preventDefault(); sheet.x += d[0]; sheet.y += d[1]; if (useKento && Math.hypot(sheet.x - HOME.x, sheet.y - HOME.y) < 3) { sheet.x = HOME.x; sheet.y = HOME.y; } drawBlock(); meters(); }
+    if (e.key === 'Enter') { e.preventDefault(); placeSheet(false); }
+  });
+
+  // ---------- Other controls ----------
+  const fade = $('#fade');
+  fade.addEventListener('input', () => {
+    fadeW = +fade.value;
+    $('#fadeOut').textContent = fadeW < 0.35 ? 'a narrow band' : fadeW < 0.7 ? 'medium' : 'a long, slow fade';
+  });
+  $('#kento').addEventListener('click', (e) => {
+    useKento = !useKento;
+    e.currentTarget.setAttribute('aria-pressed', String(useKento));
+    e.currentTarget.textContent = 'Kentō notches: ' + (useKento ? 'on' : 'off');
+    if (step === 'lay') setStep('lay');
+    say(useKento ? 'Kentō on: the sheet drops into the same notches on every block.' : 'Kentō off: you will have to line each sheet up by eye, as printers did before the notches.');
+  });
+  $('#again').addEventListener('click', newImpression);
+  $('#auto').addEventListener('click', () => {
+    if (step === 'done') newImpression();
+    if (proofShown) { proofShown = false; $('#printTitle').textContent = 'Your impression'; $('#printSub').textContent = 'pinned up to dry'; }
+    if (step !== 'ink') { // finish the block in hand
+      if (step === 'lay') placeSheet(true);
+      rubAll(); lift();
+    }
+    while (step === 'ink') {
+      const B = BLOCKS[bi];
+      load = B.fade ? fadeOf(B, fadeW) : null;
+      inked = inkedImage(bi, load);
+      cover = new Float32Array(GW * GH).fill(1.1);
+      sheet = useKento ? { x: HOME.x, y: HOME.y } : { x: HOME.x + (Math.random() - 0.5) * 16, y: HOME.y + (Math.random() - 0.5) * 12 };
+      step = 'rub';
+      lift();
+    }
+  });
+
+  // ---------- The seven blocks laid out ----------
+  function buildGallery() {
+    const box = $('#blocks');
+    BLOCKS.forEach((B, i) => {
+      const card = document.createElement('div'); card.className = 'blk';
+      const c = document.createElement('canvas'); c.width = 148; c.height = 100;
+      const g = c.getContext('2d');
+      const t = document.createElement('canvas'); t.width = PW; t.height = PH;
+      const tg = t.getContext('2d'), im = tg.createImageData(PW, PH);
+      for (let k = 0; k < N; k++) {
+        const y = (k / PW) | 0, s = y * PW + (PW - 1 - (k - y * PW));   // shown as carved, in reverse
+        const raised = B.mask[s] > 0.35;
+        const a = B.fade ? B.mask[s] * fadeOf.cache[i][s] : B.mask[s];
+        const wood = raised ? [206, 160, 116] : [150, 104, 70];
+        const col = raised ? [wood[0] + (B.rgb[0] - wood[0]) * a * 0.85, wood[1] + (B.rgb[1] - wood[1]) * a * 0.85, wood[2] + (B.rgb[2] - wood[2]) * a * 0.85] : wood;
+        im.data[k * 4] = col[0]; im.data[k * 4 + 1] = col[1]; im.data[k * 4 + 2] = col[2]; im.data[k * 4 + 3] = 255;
+      }
+      tg.putImageData(im, 0, 0);
+      g.drawImage(t, 0, 0, 148, 100);
+      card.appendChild(c);
+      const lab = document.createElement('b'); lab.textContent = `${i + 1}. ${B.name.replace('the ', '')}`;
+      const sp = document.createElement('span'); sp.textContent = B.color + (B.fade ? ', bokashi' : '');
+      card.appendChild(lab); card.appendChild(sp);
+      box.appendChild(card);
+    });
+  }
+
+  // ---------- Start ----------
+  function start() {
+    BLOCKS.forEach((B) => { B.mask = mask((g) => B.draw(g)); });
+    fadeOf.cache = BLOCKS.map((B) => (B.fade ? fadeOf(B, 0.5) : null));
+    // the artist's proof: every block in register, evenly rubbed, medium fades
+    renderPrint(BLOCKS.map((B, i) => ({ bi: i, load: fadeOf.cache[i], dx: 0, dy: 0 })), true);
+    setStep('ink');
+    say('The proof on the right is the finished design. Brush ink onto the key block to begin your own impression.');
+    buildGallery();
+  }
+  const fontReady = document.fonts && document.fonts.load ? document.fonts.load(`800 30px "Shippori Mincho"`, '曙の富士版') : Promise.resolve();
+  Promise.race([fontReady, new Promise((r) => setTimeout(r, 1500))]).then(start, start);
+})();
+</script>
+</body>
+</html>

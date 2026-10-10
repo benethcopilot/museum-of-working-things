@@ -94,6 +94,11 @@
       "try": "Leave it in the sun far too long"
     },
     {
+      "slug": "woodblock", "hall": "making", "title": "Edo Woodblock Print", "ages": "8 and up",
+      "blurb": "Be the printer of a Japanese colour print: ink seven reversed cherry blocks, drop each sheet into the kentō notches, rub with the baren and brush your own bokashi skies.",
+      "try": "Turn the kentō off and print by eye"
+    },
+    {
       "slug": "mendeleev", "hall": "numbers", "title": "Mendeleev’s Table", "ages": "10 and up",
       "blurb": "Deal the elements onto Mendeleev’s 1871 table, leave gaps where nothing fits, and predict the elements nobody had found yet.",
       "try": "Decide where tellurium goes"
