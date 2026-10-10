@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Ikebana Moribana</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Infant:ital,wght@0,500;0,700;1,500&family=Nunito+Sans:ital,wght@0,400;0,700;1,400&family=Spline+Sans+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  /* Layout: an alcove. The arrangement seen from the front on the left, the same arrangement seen from above on the right, and the three stems' controls with the teacher's notes beneath; then the rules, the schools and the history. */
+  --ground: #eceee9;
+  --ground-2: #dfe3dc;
+  --card: #f7f8f5;
+  --ink: #1e231d;
+  --muted: #5b6358;
+  --line: rgba(30, 35, 29, 0.13);
+  --line-strong: rgba(30, 35, 29, 0.3);
+  --moss: #4d6b3a;
+  --bloom: #b0476a;
+  --good: #2c7449;
+  --warn: #a65a1f;
+  /* the alcove looks the same in both themes */
+  --wall: #e7e0d2;
+  --wall-2: #d9d0be;
+  --floor: #8a6f4f;
+  --f-display: "Cormorant Infant", "Garamond", Georgia, serif;
+  --f-body: "Nunito Sans", "Segoe UI", system-ui, sans-serif;
+  --f-data: "Spline Sans Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #111410;
+    --ground-2: #1b1f19;
+    --card: #161a15;
+    --ink: #e4e8e1;
+    --muted: #a0a99c;
+    --line: rgba(228, 232, 225, 0.12);
+    --line-strong: rgba(228, 232, 225, 0.3);
+    --moss: #a2c48a;
+    --bloom: #ef8fb0;
+    --good: #82cf9a;
+    --warn: #f0ae6e;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #111410;
+  --ground-2: #1b1f19;
+  --card: #161a15;
+  --ink: #e4e8e1;
+  --muted: #a0a99c;
+  --line: rgba(228, 232, 225, 0.12);
+  --line-strong: rgba(228, 232, 225, 0.3);
+  --moss: #a2c48a;
+  --bloom: #ef8fb0;
+  --good: #82cf9a;
+  --warn: #f0ae6e;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--bloom); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 700; line-height: 1.05; margin: 0; text-wrap: balance; }
+a { color: var(--moss); }
+
+.page { box-sizing: border-box; max-width: 1220px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 48px; }
+.masthead { display: grid; gap: 10px; }
+.eyebrow { margin: 0; font-family: var(--f-data); font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.masthead h1 { font-size: clamp(3rem, 8vw, 5.6rem); font-weight: 500; }
+.masthead h1 b { font-weight: 700; color: var(--moss); }
+.lede { margin: 0; max-width: 66ch; color: var(--muted); }
+section > h2, .text h2 { font-size: clamp(2rem, 4vw, 2.8rem); }
+.text { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.text p { margin: 0; max-width: 64ch; }
+
+/* ---------- Alcove ---------- */
+.alcove { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 18px; }
+.view { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.view canvas { display: block; width: 100%; height: auto; border-radius: 4px; border: 1px solid var(--line-strong); }
+#front { background: var(--wall); }
+#top { background: var(--wall-2); touch-action: none; cursor: grab; }
+.view .cap { margin: 0; font-size: 0.84rem; color: var(--muted); }
+.bench { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.panel { display: flex; flex-direction: column; gap: 12px; padding: 14px 16px; border-radius: 4px; background: var(--card); border: 1px solid var(--line); min-width: 0; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.row > span { font-size: 0.9rem; color: var(--muted); }
+.btn { padding: 6px 13px; border: 1.5px solid var(--line-strong); border-radius: 3px; background: none; font-size: 0.92rem; }
+.btn:hover { background: var(--ground-2); }
+.btn[aria-pressed="true"] { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+.btn.go { background: var(--moss); border-color: var(--moss); color: var(--ground); font-weight: 700; }
+.sliders { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.slider { display: flex; flex-direction: column; gap: 2px; font-size: 0.9rem; min-width: 0; }
+.slider input { width: 100%; accent-color: var(--moss); }
+.slider output { font-family: var(--f-data); font-size: 0.85rem; }
+.measure { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.notes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.notes li { display: grid; grid-template-columns: 1.4em minmax(0, 1fr); gap: 6px; font-size: 0.93rem; }
+.notes li b { font-family: var(--f-data); font-weight: 500; }
+.notes li.ok b { color: var(--good); }
+.notes li.no b { color: var(--warn); }
+.say { margin: 0; padding: 10px 12px; border-left: 3px solid var(--bloom); background: var(--ground-2); font-size: 0.95rem; }
+.say.good { border-left-color: var(--good); }
+.targets { font-family: var(--f-data); font-size: 0.85rem; color: var(--muted); margin: 0; }
+
+/* ---------- Below ---------- */
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.styles { display: grid; gap: 10px; }
+.styles div { padding: 10px 12px; border-radius: 3px; background: var(--card); border: 1px solid var(--line); }
+.styles b { font-family: var(--f-display); font-size: 1.25rem; }
+.styles p { margin: 2px 0 0; font-size: 0.93rem; color: var(--muted); }
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-left: 2px solid var(--line-strong); }
+.timeline li { display: grid; grid-template-columns: 4.6em minmax(0, 1fr); gap: 12px; padding: 7px 0 7px 14px; position: relative; }
+.timeline li::before { content: ""; position: absolute; left: -6px; top: 15px; width: 10px; height: 10px; border-radius: 50%; background: var(--ground); border: 2px solid var(--bloom); }
+.timeline b { font-family: var(--f-display); font-size: 1.3rem; }
+.timeline p { margin: 0; font-size: 0.95rem; }
+.sources { margin: 0; font-size: 0.86rem; color: var(--muted); max-width: 100ch; }
+
+@media (max-width: 920px) {
+  .alcove, .bench, .two { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .sliders, .measure { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="ikebana" defer></script>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <p class="eyebrow">Art Studio · Japan · from the 15th century</p>
+    <h1>Ikebana <b>Moribana</b></h1>
+    <p class="lede">Ikebana is more than flowers in a vase. It is built from a few stems set at measured lengths and angles, with the empty space between them as carefully placed as the flowers. In moribana, “piled-up flowers”, the stems stand on a kenzan, a heavy bed of needles, in a shallow dish of water. Set the three main stems in the upright form, then fill it in.</p>
+  </header>
+
+  <section aria-label="The arrangement">
+    <div class="alcove">
+      <div class="view">
+        <canvas id="front" width="640" height="520" aria-label="The arrangement seen from the front"></canvas>
+        <p class="cap">From the front, as it would stand in the alcove.</p>
+      </div>
+      <div class="view">
+        <canvas id="top" width="400" height="400" tabindex="0" aria-label="The arrangement seen from above. Drag the tip of the chosen stem to lean it; arrow keys work too."></canvas>
+        <p class="cap">From above. Drag the tip of the chosen stem to lean it and turn it. Front is at the bottom.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bench" aria-label="Setting the stems">
+    <div class="panel">
+      <div class="row" role="group" aria-label="Which stem">
+        <span>Stem</span>
+        <button class="btn stem" type="button" data-i="0" aria-pressed="true">Primary</button>
+        <button class="btn stem" type="button" data-i="1" aria-pressed="false">Secondary</button>
+        <button class="btn stem" type="button" data-i="2" aria-pressed="false">Ornamental</button>
+      </div>
+      <div class="sliders">
+        <label class="slider" for="len"><span>Length <output id="lenOut" for="len"></output></span><input id="len" type="range" min="8" max="70" step="1"></label>
+        <label class="slider" for="tilt"><span>Lean from upright <output id="tiltOut" for="tilt"></output></span><input id="tilt" type="range" min="0" max="85" step="1"></label>
+        <label class="slider" for="dir"><span>Turned toward <output id="dirOut" for="dir"></output></span><input id="dir" type="range" min="-180" max="180" step="1"></label>
+      </div>
+      <div class="row" role="group" aria-label="Season">
+        <span>Season</span>
+        <button class="btn season" type="button" data-s="spring" aria-pressed="true">Spring</button>
+        <button class="btn season" type="button" data-s="autumn" aria-pressed="false">Autumn</button>
+        <button class="btn season" type="button" data-s="winter" aria-pressed="false">Winter</button>
+      </div>
+      <div class="row">
+        <button class="btn" id="loosen" type="button">Start from loose stems</button>
+        <button class="btn" id="fill" type="button">Add filler stems</button>
+        <button class="btn go" id="teacher" type="button">Set it as the teacher would</button>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Measure the dish first</h3>
+      <div class="measure">
+        <label class="slider" for="dia"><span>Diameter <output id="diaOut" for="dia"></output></span><input id="dia" type="range" min="20" max="42" step="1" value="30"></label>
+        <label class="slider" for="dep"><span>Depth <output id="depOut" for="dep"></output></span><input id="dep" type="range" min="4" max="10" step="1" value="6"></label>
+      </div>
+      <p class="targets" id="targets"></p>
+      <ul class="notes" id="notes"></ul>
+      <p class="say" id="say" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="two" aria-label="The forms">
+    <div class="text">
+      <h2>Three stems and a triangle</h2>
+      <p>Many arrangements are built on a triangle with three unequal sides, marked by three main stems. Some schools call them shin, soe and hikae, and give them meanings: heaven, human and earth, an idea credited to the painter Sōami in the 15th century. The rest of the material fills in inside that triangle, and the space left empty matters as much as what is there.</p>
+      <p>In the upright form of moribana, the primary stem stands straight up and is about as long as the dish is wide and deep together. The secondary stem is about two-thirds as long, leaning 45° toward the front left. The ornamental stem is about half as long, leaning 60° toward the front right. Seen from above, the three tips make a right triangle.</p>
+      <p>The water shows the season. In spring and summer more water is left open at the front, which is why the kenzan moves back in the spring setting here.</p>
+    </div>
+    <div class="text">
+      <h2>Ways of arranging</h2>
+      <div class="styles">
+        <div><b>Rikka, “standing flowers”</b><p>The oldest formal style: a Buddhist picture of a whole landscape, built from nine main branches.</p></div>
+        <div><b>Nageire, “thrown-in”</b><p>A freer style in a tall vase, growing out of the simple flowers of the tea room.</p></div>
+        <div><b>Seika or shōka, “pure flowers”</b><p>Only three main parts, to show the beauty of one kind of plant.</p></div>
+        <div><b>Moribana, “piled-up flowers”</b><p>A shallow dish and a kenzan, introduced by Ohara Unshin around 1890, so arrangements could stand in Western-style rooms as well as the alcove.</p></div>
+        <div><b>Jiyūka, “free flowers”</b><p>Any material at all, the 20th century’s modern style.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="two" aria-label="History">
+    <div class="text">
+      <h2>From altar offerings to an art</h2>
+      <p>Flowers were first placed on Buddhist altars as offerings. The Ikenobō school, the oldest, traces itself to priests at a temple beside a pond, ike, in Kyoto, and its formal styles began in the mid-15th century, when the shōgun Ashikaga Yoshimasa championed tea, painting and flower arranging. Each school is still led by an iemoto, often handed down within a family.</p>
+    </div>
+    <ol class="timeline">
+      <li><b>600s</b><p>The envoy Ono no Imoko brings the custom of Buddhist altar flowers from China.</p></li>
+      <li><b>1400s</b><p>The first systematised styles, including rikka, take shape among Ikenobō priests; Sōami imagines the three elements.</p></li>
+      <li><b>1500s</b><p>Nageire gains favour alongside the tea ceremony.</p></li>
+      <li><b>1890s</b><p>Ohara Unshin introduces moribana; the Ohara school is founded in 1895.</p></li>
+      <li><b>1927</b><p>Teshigahara Sōfu founds the Sōgetsu school, the best known modern school.</p></li>
+    </ol>
+  </section>
+
+  <p class="sources">Sources: Wikipedia, <a href="https://en.wikipedia.org/wiki/Moribana" target="_blank" rel="noopener">Moribana</a> (Ohara Unshin around 1890, the kenzan and shallow dish, the upright form’s lengths and angles and the right triangle seen from above, water shown at the front in spring and summer) and <a href="https://en.wikipedia.org/wiki/Ikebana" target="_blank" rel="noopener">Ikebana</a> (the scalene triangle, heaven, human and earth, Sōami, Ono no Imoko, Ikenobō, Ashikaga Yoshimasa, rikka, nageire, seika, jiyūka, the Ohara and Sōgetsu schools, the iemoto); Make, <a href="https://makezine.com/article/craft/101_ikebana/" target="_blank" rel="noopener">101: Ikebana</a> (the names shin, soe and hikae). Schools differ: the Sōgetsu school, for example, tilts its main stem 10 to 15°. This exhibit follows the upright form as Wikipedia describes it, and the plants are drawn by the page.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const rad = (d) => d * Math.PI / 180, deg = (r) => r * 180 / Math.PI;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  function rng(seed) { let s = seed >>> 0; return () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+
+  // ---------- State ----------
+  // stems: length in cm, lean from upright in degrees, direction in degrees (0 = toward the front, + = to the left)
+  const NAMES = ['primary', 'secondary', 'ornamental'];
+  const dish = { dia: 30, dep: 6 };
+  let stems = [], fillers = [], sel = 0, season = 'spring';
+  const SEASONS = {
+    spring: { kenzan: [-5, -6], water: 'more water open at the front', main: 'cherry', flower: 'iris', label: 'flowering cherry and iris' },
+    autumn: { kenzan: [-5, 2], water: 'the kenzan nearer the middle', main: 'maple', flower: 'chrysanthemum', label: 'maple and chrysanthemum' },
+    winter: { kenzan: [-4, 4], water: 'little water showing at the front', main: 'pine', flower: 'camellia', label: 'pine and camellia' }
+  };
+  const target = () => { const p = dish.dia + dish.dep; return [p, p * 2 / 3, p / 2]; };
+  function teacher() {
+    const [a, b, c] = target();
+    stems = [{ len: Math.round(a), tilt: 0, dir: 0 }, { len: Math.round(b), tilt: 45, dir: 45 }, { len: Math.round(c), tilt: 60, dir: -45 }];
+  }
+  function loose() { stems = [{ len: 60, tilt: 25, dir: 120 }, { len: 60, tilt: 8, dir: -90 }, { len: 60, tilt: 15, dir: 170 }]; fillers = []; }
+
+  // ---------- Geometry ----------
+  // world: x right, y up, z toward the viewer, in cm; the kenzan sits on the dish floor
+  const offsets = [[-1.5, -1.5], [-2, 1.5], [2, 1.5]];
+  function base(i) { const k = SEASONS[season].kenzan; return [k[0] + offsets[i][0], 0, k[1] + offsets[i][1]]; }
+  function dirVec(tilt, dir) { const t = rad(tilt), f = rad(dir); return [-Math.sin(t) * Math.sin(f), Math.cos(t), Math.sin(t) * Math.cos(f)]; }
+  function tip(i, s) { const b = base(i), d = dirVec(s.tilt, s.dir); return [b[0] + d[0] * s.len, b[1] + d[1] * s.len, b[2] + d[2] * s.len]; }
+
+  // ---------- Front view ----------
+  const front = $('#front'), fg = front.getContext('2d');
+  let FS = 8;
+  const FCX = 320, FBY = 452, EL = rad(16);
+  const fproj = ([x, y, z]) => [FCX + x * FS, FBY - (y * Math.cos(EL) - z * Math.sin(EL)) * FS];
+  function drawFront() {
+    const g = fg;
+    // frame the arrangement: zoom so the tallest and widest stems fit the alcove
+    let hMax = 20, wMax = dish.dia / 2 + 4;
+    stems.forEach((s, i) => { const t = tip(i, s); hMax = Math.max(hMax, t[1] * Math.cos(EL) - t[2] * Math.sin(EL) + 6); wMax = Math.max(wMax, Math.abs(t[0]) + 6); });
+    FS = Math.min(9, 400 / hMax, 300 / wMax);
+    // alcove wall and the board it stands on
+    const wall = g.createLinearGradient(0, 0, 0, 520); wall.addColorStop(0, '#ece6d9'); wall.addColorStop(1, '#ddd4c2');
+    g.fillStyle = wall; g.fillRect(0, 0, 640, 520);
+    g.fillStyle = 'rgba(120, 100, 70, 0.08)'; g.fillRect(560, 0, 80, 520);
+    // the dish: rim ellipse, wall, water; it stands on a board at the height of its foot
+    const R = dish.dia / 2, D = dish.dep;
+    const boardY = Math.round(fproj([0, -D, 0])[1]);
+    g.fillStyle = '#7c6347'; g.fillRect(0, boardY, 640, 520 - boardY);
+    g.fillStyle = '#6a5339'; g.fillRect(0, boardY, 640, 5);
+    const rim = [], bottom = [];
+    for (let a = 0; a <= 360; a += 6) { rim.push(fproj([R * Math.cos(rad(a)), 0, R * Math.sin(rad(a))])); bottom.push(fproj([R * 0.92 * Math.cos(rad(a)), -D, R * 0.92 * Math.sin(rad(a))])); }
+    g.fillStyle = '#2f3b44';
+    g.beginPath(); rim.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y)));
+    for (let i = bottom.length - 1; i >= 0; i--) g.lineTo(bottom[i][0], bottom[i][1]);
+    g.closePath(); g.fill();
+    const wl = rim.map(([x, y]) => [x, y + 3]);
+    g.fillStyle = '#6f8ea0'; g.beginPath(); wl.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(255,255,255,0.35)'; g.lineWidth = 1.2; g.beginPath(); wl.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.stroke();
+    g.strokeStyle = '#1f282e'; g.lineWidth = 2; g.beginPath(); rim.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.stroke();
+    // the kenzan, just under the water
+    const k = SEASONS[season].kenzan, kp = fproj([k[0], 0.2, k[1]]);
+    g.fillStyle = 'rgba(40, 46, 50, 0.65)'; g.fillRect(kp[0] - 22, kp[1] - 4, 44, 8);
+    // draw back to front so nearer stems overlap farther ones
+    const order = [...stems.keys()].concat(fillers.map((f, j) => 'f' + j));
+    const items = order.map((key) => {
+      if (typeof key === 'number') return { z: (base(key)[2] + tip(key, stems[key])[2]) / 2, draw: () => drawStem(key) };
+      const f = fillers[+key.slice(1)];
+      return { z: f.z, draw: () => drawFiller(f) };
+    }).sort((a, b) => a.z - b.z);
+    items.forEach((it) => it.draw());
+  }
+  function stemPath(b, t, bend) {
+    const p0 = fproj(b), p2 = fproj(t);
+    const mx = (p0[0] + p2[0]) / 2, my = (p0[1] + p2[1]) / 2;
+    const dx = p2[0] - p0[0], dy = p2[1] - p0[1], L = Math.hypot(dx, dy) || 1;
+    return { p0, p1: [mx - dy / L * bend, my + dx / L * bend], p2 };
+  }
+  function along(P, t) { const u = 1 - t; return [u * u * P.p0[0] + 2 * u * t * P.p1[0] + t * t * P.p2[0], u * u * P.p0[1] + 2 * u * t * P.p1[1] + t * t * P.p2[1]]; }
+  function drawStem(i) {
+    const s = stems[i], b = base(i), t = tip(i, s), g = fg;
+    const kind = i === 2 ? SEASONS[season].flower : SEASONS[season].main;
+    const r = rng(17 + i * 31 + season.length);
+    const P = stemPath(b, t, (i === 1 ? -1 : 1) * Math.min(18, s.len * 0.3));
+    const isBranch = kind === 'cherry' || kind === 'maple' || kind === 'pine';
+    g.strokeStyle = isBranch ? '#4a3626' : '#3f6b2e'; g.lineCap = 'round';
+    g.lineWidth = isBranch ? 4 : 3;
+    g.beginPath(); g.moveTo(P.p0[0], P.p0[1]); g.quadraticCurveTo(P.p1[0], P.p1[1], P.p2[0], P.p2[1]); g.stroke();
+    if (isBranch) {
+      // side twigs with their blossoms, leaves or needles
+      const ang = Math.atan2(P.p2[1] - P.p0[1], P.p2[0] - P.p0[0]);
+      const lenPx = Math.hypot(P.p2[0] - P.p0[0], P.p2[1] - P.p0[1]);
+      [0.38, 0.55, 0.7, 0.84].forEach((f, n) => {
+        const [x, y] = along(P, f), side = n % 2 ? 1 : -1, a = ang + side * (0.55 + r() * 0.3), l = lenPx * (0.16 + r() * 0.08);
+        const ex = x + Math.cos(a) * l, ey = y + Math.sin(a) * l;
+        g.lineWidth = 2; g.strokeStyle = '#4a3626'; g.beginPath(); g.moveTo(x, y); g.lineTo(ex, ey); g.stroke();
+        ornament(kind, ex, ey, r, 1);
+        ornament(kind, (x + ex) / 2, (y + ey) / 2, r, 0.7);
+      });
+      ornament(kind, P.p2[0], P.p2[1], r, 1.1);
+      ornament(kind, along(P, 0.92)[0], along(P, 0.92)[1], r, 0.8);
+    } else {
+      // a flower on its stem, with leaves near the base
+      leaves(kind, P, r);
+      bloom(kind, P.p2[0], P.p2[1], 1.25);
+    }
+  }
+  function ornament(kind, x, y, r, s) {
+    const g = fg;
+    if (kind === 'cherry') {
+      for (let k = 0; k < 3; k++) {
+        const cx = x + (r() - 0.5) * 14 * s, cy = y + (r() - 0.5) * 12 * s;
+        g.fillStyle = r() < 0.25 ? '#e9a3b8' : '#f6cdd8';
+        for (let p = 0; p < 5; p++) { const a = p * 1.2566 + r(); g.beginPath(); g.ellipse(cx + Math.cos(a) * 3.2 * s, cy + Math.sin(a) * 3.2 * s, 2.8 * s, 2.2 * s, a, 0, 7); g.fill(); }
+        g.fillStyle = '#c0546f'; g.beginPath(); g.arc(cx, cy, 1.1 * s, 0, 7); g.fill();
+      }
+    } else if (kind === 'maple') {
+      for (let k = 0; k < 2; k++) {
+        const cx = x + (r() - 0.5) * 12 * s, cy = y + (r() - 0.5) * 10 * s, rot = r() * 6;
+        g.fillStyle = r() < 0.5 ? '#c4401f' : '#d9692a';
+        g.beginPath();
+        for (let p = 0; p < 10; p++) { const a = rot + p * Math.PI / 5, rr = (p % 2 ? 2.6 : 7.5) * s; g.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr); }
+        g.closePath(); g.fill();
+      }
+    } else if (kind === 'pine') {
+      g.strokeStyle = '#2f5a35'; g.lineWidth = 1.1;
+      for (let p = 0; p < 16; p++) { const a = -Math.PI / 2 + (p / 15 - 0.5) * 2.6, l = (8 + r() * 5) * s; g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l * 0.8); g.stroke(); }
+    }
+  }
+  function leaves(kind, P, r) {
+    const g = fg, [bx, by] = P.p0;
+    if (kind === 'iris') {
+      g.fillStyle = '#4f7f3c';
+      [[-0.32, 0.55], [0.16, 0.7], [0.4, 0.45]].forEach(([a, f]) => {
+        const len = Math.hypot(P.p2[0] - bx, P.p2[1] - by) * f, ang = Math.atan2(P.p2[1] - by, P.p2[0] - bx) + a;
+        const ex = bx + Math.cos(ang) * len, ey = by + Math.sin(ang) * len, nx = -Math.sin(ang) * 4, ny = Math.cos(ang) * 4;
+        g.beginPath(); g.moveTo(bx + nx, by + ny); g.quadraticCurveTo((bx + ex) / 2 + nx * 1.4, (by + ey) / 2 + ny * 1.4, ex, ey); g.quadraticCurveTo((bx + ex) / 2 - nx * 1.4, (by + ey) / 2 - ny * 1.4, bx - nx, by - ny); g.fill();
+      });
+    } else {
+      g.fillStyle = kind === 'camellia' ? '#2e4f2a' : '#557a3b';
+      [0.3, 0.5, 0.68].forEach((f, n) => {
+        const [x, y] = along(P, f), a = Math.atan2(P.p2[1] - P.p0[1], P.p2[0] - P.p0[0]) + (n % 2 ? 0.9 : -0.9);
+        g.beginPath(); g.ellipse(x + Math.cos(a) * 9, y + Math.sin(a) * 9, kind === 'camellia' ? 10 : 9, kind === 'camellia' ? 5 : 4, a, 0, 7); g.fill();
+      });
+    }
+  }
+  function bloom(kind, x, y, s) {
+    const g = fg;
+    if (kind === 'iris') {
+      g.fillStyle = '#5b3d9a';
+      [-0.9, 0, 0.9].forEach((a) => { g.beginPath(); g.ellipse(x + Math.sin(a) * 9 * s, y + 6 * s, 5 * s, 10 * s, a * 0.8, 0, 7); g.fill(); });
+      g.fillStyle = '#7d5cc4';
+      [-0.45, 0.45].forEach((a) => { g.beginPath(); g.ellipse(x + Math.sin(a) * 6 * s, y - 8 * s, 4 * s, 9 * s, a * 0.6, 0, 7); g.fill(); });
+      g.fillStyle = '#e5c34a'; g.beginPath(); g.ellipse(x, y + 4 * s, 1.6 * s, 5 * s, 0, 0, 7); g.fill();
+    } else if (kind === 'chrysanthemum') {
+      g.strokeStyle = '#e8c23d'; g.lineWidth = 2.2 * s; g.lineCap = 'round';
+      for (let p = 0; p < 26; p++) { const a = p * 0.2417; g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a) * 12 * s, y + Math.sin(a) * 10 * s); g.stroke(); }
+      g.fillStyle = '#c9951f'; g.beginPath(); g.arc(x, y, 4 * s, 0, 7); g.fill();
+    } else if (kind === 'camellia') {
+      g.fillStyle = '#b8233a';
+      for (let p = 0; p < 6; p++) { const a = p * 1.047; g.beginPath(); g.ellipse(x + Math.cos(a) * 6 * s, y + Math.sin(a) * 5 * s, 7 * s, 5.5 * s, a, 0, 7); g.fill(); }
+      g.fillStyle = '#e8c547'; g.beginPath(); g.arc(x, y, 3.6 * s, 0, 7); g.fill();
+    }
+  }
+  function drawFiller(f) {
+    const g = fg, P = stemPath(f.b, f.t, 4), kind = SEASONS[season].flower;
+    g.strokeStyle = '#3f6b2e'; g.lineWidth = 2; g.beginPath(); g.moveTo(P.p0[0], P.p0[1]); g.quadraticCurveTo(P.p1[0], P.p1[1], P.p2[0], P.p2[1]); g.stroke();
+    if (f.leaf) {
+      g.fillStyle = kind === 'camellia' ? '#2e4f2a' : '#557a3b';
+      const a = Math.atan2(P.p2[1] - P.p0[1], P.p2[0] - P.p0[0]);
+      g.beginPath(); g.ellipse(P.p2[0], P.p2[1], 11, 4.5, a, 0, 7); g.fill();
+    } else bloom(kind, P.p2[0], P.p2[1], 0.85);
+  }
+
+  // ---------- Top view ----------
+  const top = $('#top'), tg = top.getContext('2d');
+  const TS = 5.6, TC = 200;
+  const tproj = ([x, , z]) => [TC + x * TS, TC + z * TS];
+  function drawTop() {
+    const g = tg;
+    g.fillStyle = '#d6cdb9'; g.fillRect(0, 0, 400, 400);
+    const R = dish.dia / 2;
+    g.fillStyle = '#2f3b44'; g.beginPath(); g.arc(TC, TC, R * TS, 0, 7); g.fill();
+    g.fillStyle = '#6f8ea0'; g.beginPath(); g.arc(TC, TC, R * TS - 4, 0, 7); g.fill();
+    const k = SEASONS[season].kenzan, [kx, kz] = tproj([k[0], 0, k[1]]);
+    g.fillStyle = '#39424a'; g.fillRect(kx - 22, kz - 16, 44, 32);
+    g.fillStyle = '#5d6872'; for (let a = 0; a < 6; a++) for (let b2 = 0; b2 < 4; b2++) g.fillRect(kx - 19 + a * 7, kz - 13 + b2 * 7, 2, 2);
+    // the zones the secondary and ornamental should fall in
+    const zone = (from, to, len, tilt, col) => {
+      const reach = len * Math.sin(rad(tilt)) * TS, b = tproj(base(0));
+      g.fillStyle = col; g.beginPath(); g.moveTo(b[0], b[1]);
+      for (let d = from; d <= to; d += 3) { const v = dirVec(90, d); g.lineTo(b[0] + v[0] * reach * 1.25, b[1] + v[2] * reach * 1.25); }
+      g.closePath(); g.fill();
+    };
+    const [, l2, l3] = target();
+    zone(30, 60, l2, 45, 'rgba(176, 71, 106, 0.16)');
+    zone(-67.5, -22.5, l3, 60, 'rgba(77, 107, 58, 0.18)');
+    // front marker
+    g.fillStyle = '#5b5444'; g.font = '12px "Spline Sans Mono", monospace'; g.textAlign = 'center'; g.fillText('front', TC, 392); g.fillText('back', TC, 14);
+    g.textAlign = 'left'; g.fillText('left', 6, TC + 4); g.textAlign = 'right'; g.fillText('right', 394, TC + 4);
+    // the triangle of the three tips
+    const tips = stems.map((s, i) => tproj(tip(i, s)));
+    g.strokeStyle = 'rgba(40, 40, 30, 0.6)'; g.setLineDash([5, 4]); g.lineWidth = 1.4;
+    g.beginPath(); tips.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.closePath(); g.stroke(); g.setLineDash([]);
+    // stems and tips
+    stems.forEach((s, i) => {
+      const b = tproj(base(i)), t = tips[i];
+      g.strokeStyle = ['#4a3626', '#4a3626', '#3f6b2e'][i]; g.lineWidth = i === sel ? 3.5 : 2.2;
+      g.beginPath(); g.moveTo(b[0], b[1]); g.lineTo(t[0], t[1]); g.stroke();
+      g.fillStyle = ['#ead7b0', '#e9a3b8', '#9fc58a'][i];
+      g.strokeStyle = i === sel ? '#1e231d' : 'rgba(30,35,29,0.5)'; g.lineWidth = i === sel ? 2.5 : 1.2;
+      g.beginPath(); g.arc(t[0], t[1], i === sel ? 9 : 7, 0, 7); g.fill(); g.stroke();
+      g.fillStyle = '#1e231d'; g.font = '700 10px "Spline Sans Mono", monospace'; g.textAlign = 'center'; g.fillText('PSO'[i], t[0], t[1] + 3.5);
+    });
+    fillers.forEach((f) => { const t = tproj(f.t); g.fillStyle = 'rgba(176, 71, 106, 0.7)'; g.beginPath(); g.arc(t[0], t[1], 3, 0, 7); g.fill(); });
+  }
+
+  // ---------- Notes ----------
+  function angleAtPrimary() {
+    const [p, s, o] = stems.map((st, i) => tip(i, st));
+    const a = [s[0] - p[0], s[2] - p[2]], b = [o[0] - p[0], o[2] - p[2]];
+    const la = Math.hypot(...a), lb = Math.hypot(...b);
+    if (la < 1 || lb < 1) return null;
+    return deg(Math.acos(clamp((a[0] * b[0] + a[1] * b[1]) / (la * lb), -1, 1)));
+  }
+  function notes() {
+    const [l1, l2, l3] = target();
+    const s = stems, list = [];
+    const near = (v, t, tol) => Math.abs(v - t) <= tol;
+    const inArc = (d, a, b) => d >= a && d <= b;
+    list.push([near(s[0].len, l1, l1 * 0.1), `Primary about ${Math.round(l1)} cm long (dish width plus depth)`, `${s[0].len} cm`]);
+    list.push([s[0].tilt <= 10, 'Primary standing upright', `leans ${s[0].tilt}°`]);
+    list.push([near(s[1].len, l2, l2 * 0.12), `Secondary about two-thirds: ${Math.round(l2)} cm`, `${s[1].len} cm`]);
+    list.push([near(s[1].tilt, 45, 8) && inArc(s[1].dir, 30, 60), 'Secondary leaning 45° to the front left', `${s[1].tilt}°, ${dirName(s[1].dir)}`]);
+    list.push([near(s[2].len, l3, l3 * 0.12), `Ornamental about half: ${Math.round(l3)} cm`, `${s[2].len} cm`]);
+    list.push([near(s[2].tilt, 60, 8) && inArc(s[2].dir, -67.5, -22.5), 'Ornamental leaning 60° to the front right', `${s[2].tilt}°, ${dirName(s[2].dir)}`]);
+    const ang = angleAtPrimary();
+    const allOk = list.every((x) => x[0]);
+    $('#notes').innerHTML = list.map(([ok, t, v]) => `<li class="${ok ? 'ok' : 'no'}"><b>${ok ? '✓' : '·'}</b><span>${t} <i>(${v})</i></span></li>`).join('');
+    $('#targets').textContent = `Dish ${dish.dia} + ${dish.dep} cm = ${dish.dia + dish.dep} cm. Primary ${Math.round(l1)} cm, secondary ${Math.round(l2)} cm, ornamental ${Math.round(l3)} cm.`;
+    const say = $('#say');
+    if (allOk) {
+      say.className = 'say good';
+      say.textContent = `This is the upright form. From above, the tips meet at ${ang === null ? '—' : Math.round(ang) + '°'} beside the primary stem: a right triangle. ${fillers.length ? 'The fillers sit inside it.' : 'Now add filler stems inside the triangle.'} Season: ${SEASONS[season].label}, with ${SEASONS[season].water}.`;
+    } else {
+      const done = list.filter((x) => x[0]).length;
+      say.className = 'say';
+      say.textContent = `${done} of 6 rules met.${ang !== null ? ` From above, the angle at the primary stem is ${Math.round(ang)}°; the upright form makes it about 90°.` : ''} Choose a stem and set it with the sliders, or drag its tip in the view from above.`;
+    }
+  }
+  const dirName = (d) => {
+    const a = ((d % 360) + 540) % 360 - 180;
+    if (Math.abs(a) <= 15) return 'front';
+    if (Math.abs(a) >= 165) return 'back';
+    const side = a > 0 ? 'left' : 'right';
+    if (Math.abs(a) < 75) return 'front ' + side;
+    if (Math.abs(a) <= 105) return side;
+    return 'back ' + side;
+  };
+
+  // ---------- Controls ----------
+  const len = $('#len'), tilt = $('#tilt'), dir = $('#dir');
+  function syncControls() {
+    const s = stems[sel];
+    len.value = s.len; tilt.value = s.tilt; dir.value = s.dir;
+    $('#lenOut').textContent = s.len + ' cm';
+    $('#tiltOut').textContent = s.tilt + '°';
+    $('#dirOut').textContent = s.tilt < 3 ? 'straight up' : dirName(s.dir) + ` (${s.dir}°)`;
+    $$('.stem').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.i === sel)));
+  }
+  function redraw() { drawFront(); drawTop(); notes(); syncControls(); }
+  $$('.stem').forEach((b) => b.addEventListener('click', () => { sel = +b.dataset.i; redraw(); }));
+  len.addEventListener('input', () => { stems[sel].len = +len.value; redraw(); });
+  tilt.addEventListener('input', () => { stems[sel].tilt = +tilt.value; redraw(); });
+  dir.addEventListener('input', () => { stems[sel].dir = +dir.value; redraw(); });
+  $$('.season').forEach((b) => b.addEventListener('click', () => {
+    season = b.dataset.s;
+    $$('.season').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    if (fillers.length) makeFillers();
+    redraw();
+  }));
+  $('#dia').addEventListener('input', (e) => { dish.dia = +e.target.value; $('#diaOut').textContent = dish.dia + ' cm'; redraw(); });
+  $('#dep').addEventListener('input', (e) => { dish.dep = +e.target.value; $('#depOut').textContent = dish.dep + ' cm'; redraw(); });
+  $('#teacher').addEventListener('click', () => { teacher(); redraw(); });
+  $('#loosen').addEventListener('click', () => { loose(); redraw(); $('#say').textContent = 'Three fresh stems, all too long and leaning anywhere. Measure, cut and set them one at a time, starting with the primary.'; });
+  function makeFillers() {
+    // short stems inside the triangle, leaning between the secondary and ornamental
+    const r = rng(season.length * 7 + 3);
+    fillers = [];
+    const [l1] = target();
+    for (let n = 0; n < 6; n++) {
+      const d = -40 + r() * 80, t = 20 + r() * 35, L = l1 * (0.22 + r() * 0.18), b = [SEASONS[season].kenzan[0] + (r() - 0.5) * 5, 0, SEASONS[season].kenzan[1] + (r() - 0.5) * 4];
+      const v = dirVec(t, d);
+      fillers.push({ b, t: [b[0] + v[0] * L, b[1] + v[1] * L, b[2] + v[2] * L], z: b[2] + v[2] * L / 2, leaf: n % 3 === 2 });
+    }
+  }
+  $('#fill').addEventListener('click', () => { makeFillers(); redraw(); });
+
+  // drag the tip of the chosen stem in the view from above
+  function topPt(e) { const r = top.getBoundingClientRect(); return [(e.clientX - r.left) * 400 / r.width, (e.clientY - r.top) * 400 / r.height]; }
+  let dragging = false;
+  function setFromTop(px, py) {
+    const s = stems[sel], b = tproj(base(sel));
+    const dx = (px - b[0]) / TS, dz = (py - b[1]) / TS, reach = Math.hypot(dx, dz);
+    s.tilt = Math.round(deg(Math.asin(clamp(reach / s.len, 0, 0.996))));
+    if (reach > 0.5) s.dir = Math.round(deg(Math.atan2(-dx, dz)));
+    redraw();
+  }
+  top.addEventListener('pointerdown', (e) => {
+    const [x, y] = topPt(e);
+    // pick the nearest tip if the pointer lands on one
+    const tips = stems.map((s, i) => tproj(tip(i, s)));
+    let best = -1, bd = 22;
+    tips.forEach(([tx, ty], i) => { const d = Math.hypot(tx - x, ty - y); if (d < bd) { bd = d; best = i; } });
+    if (best >= 0) sel = best;
+    dragging = true; top.setPointerCapture(e.pointerId); setFromTop(x, y);
+  });
+  top.addEventListener('pointermove', (e) => { if (dragging) { const [x, y] = topPt(e); setFromTop(x, y); } });
+  ['pointerup', 'pointercancel'].forEach((t) => top.addEventListener(t, () => { dragging = false; }));
+  top.addEventListener('keydown', (e) => {
+    const s = stems[sel];
+    if (e.key === 'ArrowLeft') s.dir = Math.min(180, s.dir + 5);
+    else if (e.key === 'ArrowRight') s.dir = Math.max(-180, s.dir - 5);
+    else if (e.key === 'ArrowUp') s.tilt = Math.max(0, s.tilt - 5);
+    else if (e.key === 'ArrowDown') s.tilt = Math.min(85, s.tilt + 5);
+    else return;
+    e.preventDefault(); redraw();
+  });
+
+  // ---------- Start: the teacher's arrangement, filled in ----------
+  $('#diaOut').textContent = dish.dia + ' cm'; $('#depOut').textContent = dish.dep + ' cm';
+  teacher(); makeFillers(); redraw();
+})();
+</script>
+</body>
+</html>

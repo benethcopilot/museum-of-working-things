@@ -105,6 +105,11 @@
       "try": "Paint an ensō in one breath"
     },
     {
+      "slug": "ikebana", "hall": "studio", "title": "Ikebana Moribana", "ages": "9 and up",
+      "blurb": "Measure the dish, then set three stems on a kenzan at the lengths and angles of the moribana upright form, and watch their tips make a right triangle seen from above.",
+      "try": "Change the season and watch the water move"
+    },
+    {
       "slug": "mendeleev", "hall": "numbers", "title": "Mendeleev’s Table", "ages": "10 and up",
       "blurb": "Deal the elements onto Mendeleev’s 1871 table, leave gaps where nothing fits, and predict the elements nobody had found yet.",
       "try": "Decide where tellurium goes"
