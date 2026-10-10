@@ -135,6 +135,11 @@
       "try": "Look at it on the bench, then in evening light"
     },
     {
+      "slug": "pysanka", "hall": "studio", "title": "Pysanka Written Eggs", "ages": "All ages",
+      "blurb": "Write a Ukrainian egg in hot beeswax, dip it from yellow to black, add wax between baths, then wipe the wax away and see the colours you kept.",
+      "try": "Pull a drop of wax into a tear"
+    },
+    {
       "slug": "mendeleev", "hall": "numbers", "title": "Mendeleev’s Table", "ages": "10 and up",
       "blurb": "Deal the elements onto Mendeleev’s 1871 table, leave gaps where nothing fits, and predict the elements nobody had found yet.",
       "try": "Decide where tellurium goes"

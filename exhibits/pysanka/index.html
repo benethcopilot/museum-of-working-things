@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Pysanka Written Eggs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Philosopher:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=Ubuntu+Mono&display=swap">
+<style>
+:root {
+  /* Layout: a dark worktable. The egg in a cup in the middle, the dye jars along the side in order from light to dark, the stylus and its tips; then how it is done, the old eggs, and the legend. */
+  --ground: #eeece6;
+  --ground-2: #e2dfd7;
+  --card: #f9f8f4;
+  --ink: #221d17;
+  --muted: #5f5850;
+  --line: rgba(34, 29, 23, 0.13);
+  --line-strong: rgba(34, 29, 23, 0.3);
+  --red: #b3261e;
+  --gold: #c88d12;
+  --good: #2c7449;
+  /* the table looks the same in both themes */
+  --table: #2b2420;
+  --table-2: #221c18;
+  --table-ink: #f2e7d6;
+  --table-dim: #c3b29c;
+  --f-display: "Philosopher", "Optima", Georgia, serif;
+  --f-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-data: "Ubuntu Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #13110f;
+    --ground-2: #1d1a17;
+    --card: #181513;
+    --ink: #eeeae4;
+    --muted: #aca49a;
+    --line: rgba(238, 234, 228, 0.12);
+    --line-strong: rgba(238, 234, 228, 0.3);
+    --red: #f07c72;
+    --gold: #ecc05a;
+    --good: #82cf9a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #13110f;
+  --ground-2: #1d1a17;
+  --card: #181513;
+  --ink: #eeeae4;
+  --muted: #aca49a;
+  --line: rgba(238, 234, 228, 0.12);
+  --line-strong: rgba(238, 234, 228, 0.3);
+  --red: #f07c72;
+  --gold: #ecc05a;
+  --good: #82cf9a;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--f-body); font-size: 18px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: default; opacity: 0.45; }
+:focus-visible { outline: 3px solid #e7b33c; outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 700; line-height: 1.05; margin: 0; text-wrap: balance; }
+a { color: var(--red); }
+
+.page { box-sizing: border-box; max-width: 1200px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 48px; }
+.masthead { display: grid; gap: 10px; }
+.eyebrow { margin: 0; font-family: var(--f-data); font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.masthead h1 { font-size: clamp(2.8rem, 8vw, 5.4rem); color: var(--red); }
+.masthead h1 i { font-weight: 400; color: var(--ink); }
+.lede { margin: 0; max-width: 64ch; color: var(--muted); }
+section > h2, .text h2 { font-size: clamp(1.9rem, 3.8vw, 2.6rem); }
+.text { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.text p { margin: 0; max-width: 62ch; }
+
+/* ---------- Table ---------- */
+.table { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; padding: 18px; border-radius: 6px; background: radial-gradient(ellipse at 30% 30%, #3b3029, var(--table-2) 70%); color: var(--table-ink); }
+.eggbox { display: flex; flex-direction: column; gap: 8px; align-items: center; min-width: 0; }
+#egg { display: block; width: 100%; max-width: 440px; height: auto; touch-action: none; cursor: crosshair; }
+#egg.turning { cursor: grab; }
+.eggnote { margin: 0; font-size: 0.86rem; color: var(--table-dim); text-align: center; }
+.side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.side h2 { font-size: 1.5rem; color: var(--table-ink); }
+.tool { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 4px; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.07); }
+.tool > span { font-family: var(--f-data); font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--table-dim); }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.tbtn { padding: 5px 11px; border-radius: 3px; border: 1.5px solid rgba(242, 231, 214, 0.45); background: none; color: var(--table-ink); font-size: 0.92rem; }
+.tbtn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.08); }
+.tbtn[aria-pressed="true"] { background: rgba(242, 231, 214, 0.2); border-color: var(--table-ink); }
+.tbtn.go { background: var(--table-ink); color: var(--table-2); border-color: var(--table-ink); font-weight: 600; }
+.jars { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.jar { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 2px 4px; border-radius: 4px 4px 8px 8px; border: 1.5px solid rgba(242, 231, 214, 0.35); background: rgba(255, 255, 255, 0.04); color: var(--table-ink); font-size: 0.78rem; }
+.jar i { display: block; width: 70%; height: 26px; border-radius: 3px 3px 10px 10px; }
+.jar:hover:not(:disabled) { background: rgba(255, 255, 255, 0.1); }
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px; font-family: var(--f-data); font-size: 0.82rem; }
+.steps li { padding: 2px 8px; border-radius: 99px; border: 1px solid rgba(242, 231, 214, 0.3); color: var(--table-dim); }
+.note { margin: 0; padding: 10px 12px; border-left: 3px solid #e7b33c; background: rgba(0, 0, 0, 0.25); font-size: 0.98rem; }
+.note.good { border-left-color: #8fd3a5; }
+
+/* ---------- Below ---------- */
+.how { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; counter-reset: s; }
+.how li { padding: 12px 14px; border-radius: 4px; background: var(--card); border: 1px solid var(--line); counter-increment: s; }
+.how li::before { content: counter(s); display: block; font-family: var(--f-display); font-size: 1.8rem; line-height: 1; color: var(--red); }
+.how b { display: block; }
+.how p { margin: 2px 0 0; font-size: 0.95rem; color: var(--muted); }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.kinds { display: grid; gap: 8px; }
+.kinds div { padding: 9px 12px; border-radius: 3px; background: var(--card); border: 1px solid var(--line); }
+.kinds b { font-family: var(--f-display); font-size: 1.15rem; }
+.kinds p { margin: 2px 0 0; font-size: 0.94rem; color: var(--muted); }
+.legend { margin: 0; padding: 14px 16px; border-left: 3px solid var(--red); background: var(--card); font-style: italic; }
+.sources { margin: 0; font-size: 0.88rem; color: var(--muted); max-width: 100ch; }
+
+@media (max-width: 920px) {
+  .table, .two { grid-template-columns: minmax(0, 1fr); }
+  .how { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 480px) { .how { grid-template-columns: minmax(0, 1fr); } .jars { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="pysanka" defer></script>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <p class="eyebrow">Art Studio · Ukraine · a spring craft older than Easter</p>
+    <h1>Pysanka <i>Written Eggs</i></h1>
+    <p class="lede">A pysanka is not painted. Its name comes from pysaty, “to write”, because the design is written onto the shell in hot beeswax. Wherever the wax goes, the colour underneath is kept. Dip the egg in a dye, write again, dip again, and only at the very end warm the egg and wipe the wax away to find out what you made.</p>
+  </header>
+
+  <section class="table" aria-label="The egg table">
+    <div class="eggbox">
+      <canvas id="egg" width="440" height="520" tabindex="0" aria-label="A hen's egg. Write on it with wax, or turn it to reach the other side."></canvas>
+      <p class="eggnote" id="eggnote">Drag on the egg to write with wax. Switch to Turn to roll it round.</p>
+    </div>
+    <div class="side">
+      <h2 id="title">Write in wax</h2>
+      <div class="tool">
+        <span>The stylus</span>
+        <div class="row" role="group" aria-label="Hand">
+          <button class="tbtn mode" type="button" data-m="write" aria-pressed="true">Write with wax</button>
+          <button class="tbtn mode" type="button" data-m="dot" aria-pressed="false">Drop and pull</button>
+          <button class="tbtn mode" type="button" data-m="turn" aria-pressed="false">Turn the egg</button>
+        </div>
+        <div class="row" role="group" aria-label="Tip">
+          <span style="font-size:.9rem;color:var(--table-dim)">Tip</span>
+          <button class="tbtn tip" type="button" data-t="0.9" aria-pressed="false">fine</button>
+          <button class="tbtn tip" type="button" data-t="1.6" aria-pressed="true">medium</button>
+          <button class="tbtn tip" type="button" data-t="3.4" aria-pressed="false">wide</button>
+          <button class="tbtn" id="guides" type="button" aria-pressed="true">Pencil guides</button>
+        </div>
+      </div>
+      <div class="tool">
+        <span>Dye jars, light to dark</span>
+        <div class="jars" id="jars"></div>
+        <ul class="steps" id="baths"></ul>
+      </div>
+      <div class="row">
+        <button class="tbtn go" id="melt" type="button">Warm it and wipe off the wax</button>
+        <button class="tbtn" id="fresh" type="button">A fresh white egg</button>
+        <button class="tbtn" id="example" type="button">Show an example egg</button>
+      </div>
+      <p class="note" id="note" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="text" aria-label="How a pysanka is written">
+    <h2>Light to dark, layer by layer</h2>
+    <ol class="how">
+      <li><b>Write on white</b><p>Beeswax was warmed in a little bowl on the family stove. The stylus, a scrap of thin brass rolled into a cone round a needle and tied to a willow stick, writes it onto a raw white egg.</p></li>
+      <li><b>Dye and write again</b><p>The egg goes into the lightest dye. Now wax covers what should stay that colour, and so on, jar after jar. Plant dyes could take hours, so eggs were written in batches.</p></li>
+      <li><b>Darkest last</b><p>The order was always light to dark: yellow, orange, red, purple, black. A yellow bath barely shows on an egg that is already red.</p></li>
+      <li><b>Wipe it off</b><p>The egg was warmed in the stove, or dipped for a moment in boiling water, and the melted wax wiped gently away. Every hidden colour appears at once.</p></li>
+    </ol>
+  </section>
+
+  <section class="two" aria-label="Kinds of eggs and history">
+    <div class="text">
+      <h2>Written, dotted, scratched</h2>
+      <div class="kinds">
+        <div><b>Pysanky</b><p>Raw eggs written in wax with a stylus, the full wax-resist method, using traditional folk motifs.</p></div>
+        <div><b>Krapanky</b><p>“Dotted”: wax dripped from a beeswax candle or daubed on with a stick, leaving spots.</p></div>
+        <div><b>Drop-pull eggs</b><p>In the Lemko and Boiko lands, a pinhead dipped in wax: a drop, then a pull, makes tears and commas.</p></div>
+        <div><b>Krashanky</b><p>Boiled eggs dyed one colour, often red from onion skins, to be blessed and eaten at Easter.</p></div>
+        <div><b>Driapanky</b><p>“Scratched”: a dyed egg with the pattern scratched through to the white shell.</p></div>
+      </div>
+    </div>
+    <div class="text">
+      <h2>Fragile and very old</h2>
+      <p>Eggshells rarely survive in the ground, so the oldest pysanky are recent finds: a goose egg with a wave pattern, found in 2013 in a rainwater system in Lviv dating to the 15th or 16th century, and a crushed egg from the end of the 17th century, excavated at Baturyn in 2008. The idea is far older. Before Christianity, many Slavs worshipped a sun god, Dazhboh, and eggs written with signs of nature were spring talismans: the earth reborn after winter, as life bursts from an egg. In Kievan Rus’, potters made glazed clay eggs, and more than seventy have been dug up.</p>
+      <p class="legend">The Hutsuls of the Carpathian mountains say the fate of the world depends on the pysanka. A horrible serpent lies chained to a cliff, and every year he sends his servants out to count the eggs. If few were written, his chains loosen and he roams the earth; if there are more, the chains are pulled tighter for another year.</p>
+      <p class="eggnote" id="count" style="color:var(--muted);text-align:left"></p>
+    </div>
+  </section>
+
+  <p class="sources">Sources: Wikipedia, <a href="https://en.wikipedia.org/wiki/Egg_decorating_in_Slavic_culture" target="_blank" rel="noopener">Egg decorating in Slavic culture</a> (pysaty, “to write”; the brass-and-willow stylus and the wax warmed on the stove; raw eggs, slow plant dyes and the light-to-dark order; wiping the wax off in the stove or in boiling water; krapanky, drop-pull, krashanky and driapanky; the Lviv egg of 2013 and the Baturyn egg of 2008; Dazhboh and the spring rites; Kievan Rus’ ceramic eggs; the Hutsul legend). The page draws the egg and mixes the dyes with a simple model in which each bath darkens what is already there.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  // ---------- Dyes: each bath multiplies the colour already on the shell ----------
+  const DYES = [
+    { name: 'yellow', rgb: [250, 214, 70] },
+    { name: 'orange', rgb: [244, 150, 50] },
+    { name: 'green', rgb: [60, 140, 70] },
+    { name: 'red', rgb: [196, 36, 34] },
+    { name: 'purple', rgb: [120, 50, 120] },
+    { name: 'black', rgb: [28, 22, 22] }
+  ];
+  const SHELL = [246, 240, 226];
+  let baths = [];               // dye indices in order
+  let colours = [SHELL];        // colour of the shell after 0, 1, 2... baths
+  const mixIn = (c, d) => c.map((v, i) => Math.round(v * d[i] / 255));
+
+  // ---------- The shell, as a map: longitude across, from top to bottom down ----------
+  const TW = 1024, TH = 512, TN = TW * TH;
+  const waxAt = new Int16Array(TN).fill(-1);   // -1 no wax, else the bath count when it was waxed
+  let melted = false;
+
+  // ---------- Egg geometry: an ellipsoid, tapered toward the top ----------
+  const EA = 1.0, EB = 1.32, TAPER = 0.1;          // half-width, half-height, how much narrower the top is
+  let yaw = 0.4, pitch = -0.18;
+  const cv = $('#egg'), cx = cv.getContext('2d');
+  const CW = 440, CH = 520, SC = 172, CX = 220, CY = 262;
+  const img = cx.createImageData(CW, CH);
+  const off = document.createElement('canvas'); off.width = CW; off.height = CH;
+  // cast a ray from the screen into the egg; returns surface map coords and the shading normal
+  function hit(px, py) {
+    let X = (px - CX) / SC, Y = -(py - CY) / SC;
+    X = X / (1 - TAPER * Y / EB);                   // undo the taper
+    const cyw = Math.cos(yaw), syw = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+    // ray origin and direction in view space, turned into the egg's own space
+    const o = [X, Y, 5], d = [0, 0, -1];
+    const rot = (v) => {
+      // inverse of yaw-then-pitch: undo pitch (about x), then yaw (about y)
+      const y1 = v[1] * cp + v[2] * sp, z1 = -v[1] * sp + v[2] * cp, x1 = v[0];
+      return [x1 * cyw - z1 * syw, y1, x1 * syw + z1 * cyw];
+    };
+    const O = rot(o), Dd = rot(d);
+    const a2 = EA * EA, b2 = EB * EB;
+    const A = Dd[0] * Dd[0] / a2 + Dd[1] * Dd[1] / b2 + Dd[2] * Dd[2] / a2;
+    const B = 2 * (O[0] * Dd[0] / a2 + O[1] * Dd[1] / b2 + O[2] * Dd[2] / a2);
+    const C = O[0] * O[0] / a2 + O[1] * O[1] / b2 + O[2] * O[2] / a2 - 1;
+    const disc = B * B - 4 * A * C;
+    if (disc < 0) return null;
+    const t = (-B - Math.sqrt(disc)) / (2 * A);
+    const p = [O[0] + Dd[0] * t, O[1] + Dd[1] * t, O[2] + Dd[2] * t];
+    const u = (Math.atan2(p[2], p[0]) / (2 * Math.PI) + 1) % 1;
+    const v = Math.acos(clamp(p[1] / EB, -1, 1)) / Math.PI;
+    // normal in egg space, then back to view space for lighting
+    let n = [p[0] / a2, p[1] / b2, p[2] / a2];
+    const nl = Math.hypot(n[0], n[1], n[2]); n = [n[0] / nl, n[1] / nl, n[2] / nl];
+    const x2 = n[0] * cyw + n[2] * syw, z2 = -n[0] * syw + n[2] * cyw;
+    const nv = [x2, n[1] * cp - z2 * sp, n[1] * sp + z2 * cp];
+    return { u, v, n: nv, p };
+  }
+  let showGuides = true;
+  function texel(i) {
+    const w = waxAt[i];
+    if (w < 0) return colours[colours.length - 1];
+    if (melted) return colours[w];
+    return waxLook[w];
+  }
+  function colourAt(u, v) {
+    // blend the four nearest texels so the wax lines have smooth edges
+    const fx = u * TW - 0.5, fy = clamp(v * TH - 0.5, 0, TH - 1.001);
+    const x0 = Math.floor(fx), y0 = Math.floor(fy), ax = fx - x0, ay = fy - y0;
+    const xa = (x0 + TW) % TW, xb = (x0 + 1) % TW, r0 = y0 * TW, r1 = Math.min(TH - 1, y0 + 1) * TW;
+    const c00 = texel(r0 + xa), c10 = texel(r0 + xb), c01 = texel(r1 + xa), c11 = texel(r1 + xb);
+    const w00 = (1 - ax) * (1 - ay), w10 = ax * (1 - ay), w01 = (1 - ax) * ay, w11 = ax * ay;
+    let c = [0, 1, 2].map((k) => c00[k] * w00 + c10[k] * w10 + c01[k] * w01 + c11[k] * w11);
+    // faint pencil guides: around the middle, two bands, and four lines end to end
+    if (showGuides && !melted) {
+      const gv = Math.min(Math.abs(v - 0.5), Math.abs(v - 0.33), Math.abs(v - 0.67));
+      const gu = Math.min(...[0, 0.25, 0.5, 0.75, 1].map((q) => Math.abs(u - q))) * Math.sin(v * Math.PI);
+      if (gv < 0.0025 || gu < 0.0016) c = [c[0] * 0.78, c[1] * 0.78, c[2] * 0.8];
+    }
+    return c;
+  }
+  let waxLook = [];
+  function render() {
+    // wax on the shell is dark beeswax with a hint of the colour beneath it
+    waxLook = colours.map((c) => [c[0] * 0.38 + 52 * 0.62, c[1] * 0.38 + 38 * 0.62, c[2] * 0.38 + 26 * 0.62]);
+    const d = img.data;
+    const L = [-0.45, 0.55, 0.7], ll = Math.hypot(...L); L[0] /= ll; L[1] /= ll; L[2] /= ll;
+    for (let py = 0; py < CH; py++) for (let px = 0; px < CW; px++) {
+      const k = (py * CW + px) * 4;
+      // quick reject outside the egg's bounding box
+      if (Math.abs(px - CX) > SC * 1.12 || Math.abs(py - CY) > SC * EB * 1.06) { d[k + 3] = 0; continue; }
+      const h = hit(px, py);
+      if (!h) { d[k + 3] = 0; continue; }
+      const c = colourAt(h.u, h.v);
+      const diff = Math.max(0, h.n[0] * L[0] + h.n[1] * L[1] + h.n[2] * L[2]);
+      // a soft eggshell sheen
+      const hx = L[0], hy = L[1], hz = L[2] + 1, hl = Math.hypot(hx, hy, hz);
+      const spec = Math.pow(Math.max(0, (h.n[0] * hx + h.n[1] * hy + h.n[2] * hz) / hl), 40) * (melted ? 0.35 : 0.2);
+      const shade = 0.32 + 0.72 * diff;
+      d[k] = Math.min(255, c[0] * shade + 255 * spec); d[k + 1] = Math.min(255, c[1] * shade + 255 * spec); d[k + 2] = Math.min(255, c[2] * shade + 255 * spec); d[k + 3] = 255;
+    }
+    cx.clearRect(0, 0, CW, CH);
+    // the egg cup and the egg's shadow
+    cx.fillStyle = 'rgba(0,0,0,0.35)'; cx.beginPath(); cx.ellipse(CX + 10, CY + SC * EB + 6, SC * 0.8, 16, 0, 0, 7); cx.fill();
+    off.getContext('2d').putImageData(img, 0, 0);
+    cx.drawImage(off, 0, 0);
+  }
+  let pending = false;
+  const redraw = () => { if (!pending) { pending = true; requestAnimationFrame(() => { pending = false; render(); }); } };
+
+  // ---------- Writing with wax ----------
+  let mode = 'write', tip = 1.6;
+  const DROP = 2.6;   // a drop of wax from a pin head is wider than a line from the stylus
+  function stamp(h, r) {
+    // a disc of wax on the shell; r is in hundredths of the egg's width
+    const rad = r / 100;
+    const rho = Math.max(0.04, Math.hypot(h.p[0], h.p[2]));
+    const du = rad / (2 * Math.PI * rho), dv = rad / (Math.PI * EB * 0.95);
+    const u0 = h.u * TW, v0 = h.v * TH, ru = Math.max(0.6, Math.min(TW / 2, du * TW)), rv = Math.max(0.6, dv * TH);
+    for (let y = Math.max(0, Math.floor(v0 - rv)); y <= Math.min(TH - 1, Math.ceil(v0 + rv)); y++) {
+      const ey = (y + 0.5 - v0) / rv;
+      for (let x = Math.floor(u0 - ru); x <= Math.ceil(u0 + ru); x++) {
+        const ex = (x + 0.5 - u0) / ru;
+        if (ex * ex + ey * ey > 1) continue;
+        const i = y * TW + ((x % TW) + TW) % TW;
+        if (waxAt[i] < 0) waxAt[i] = baths.length;
+      }
+    }
+  }
+  function canvasPt(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * CW / r.width, (e.clientY - r.top) * CH / r.height]; }
+  let drag = null;
+  cv.addEventListener('pointerdown', (e) => {
+    const p = canvasPt(e);
+    if (melted && mode !== 'turn') { say('The wax has been melted off. Start a fresh egg to write another, or turn this one to admire it.'); setMode('turn'); }
+    cv.setPointerCapture(e.pointerId);
+    drag = { last: p, yaw, pitch, start: p };
+    if (mode === 'write' || mode === 'dot') { const h = hit(p[0], p[1]); if (h) { stamp(h, mode === 'dot' ? DROP * tip : tip); redraw(); } }
+  });
+  cv.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const p = canvasPt(e);
+    if (mode === 'turn') {
+      yaw = drag.yaw - (p[0] - drag.start[0]) * 0.012;
+      pitch = clamp(drag.pitch + (p[1] - drag.start[1]) * 0.008, -1.2, 1.2);
+      redraw(); return;
+    }
+    if (mode === 'dot') {
+      // drop and pull: the wax drop is dragged into a tear that thins to a tail
+      const dist = Math.hypot(p[0] - drag.start[0], p[1] - drag.start[1]);
+      const k = clamp(1 - dist / 44, 0.12, 1);
+      const [x0, y0] = drag.last, n = Math.max(1, Math.ceil(Math.hypot(p[0] - x0, p[1] - y0) / 1.5));
+      for (let j = 1; j <= n; j++) { const h = hit(x0 + (p[0] - x0) * j / n, y0 + (p[1] - y0) * j / n); if (h) stamp(h, DROP * tip * k); }
+      drag.last = p;
+      if (dist > 48) drag = null;
+      redraw(); return;
+    }
+    const [x0, y0] = drag.last, n = Math.max(1, Math.ceil(Math.hypot(p[0] - x0, p[1] - y0) / 1.5));
+    for (let k = 1; k <= n; k++) { const h = hit(x0 + (p[0] - x0) * k / n, y0 + (p[1] - y0) * k / n); if (h) stamp(h, tip); }
+    drag.last = p; redraw();
+  });
+  ['pointerup', 'pointercancel'].forEach((t) => cv.addEventListener(t, () => { drag = null; }));
+  cv.addEventListener('keydown', (e) => {
+    const d = { ArrowLeft: [-0.2, 0], ArrowRight: [0.2, 0], ArrowUp: [0, -0.15], ArrowDown: [0, 0.15] }[e.key];
+    if (!d) return;
+    e.preventDefault(); yaw += d[0]; pitch = clamp(pitch + d[1], -1.2, 1.2); redraw();
+  });
+
+  // ---------- Controls ----------
+  const say = (t, cls) => { const s = $('#note'); s.textContent = t; s.className = 'note' + (cls ? ' ' + cls : ''); };
+  function setMode(m) {
+    mode = m; $$('.mode').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.m === m)));
+    cv.classList.toggle('turning', m === 'turn');
+    $('#eggnote').textContent = m === 'turn' ? 'Drag to roll the egg round, or tip it to see the ends. Arrow keys work too.' : m === 'dot' ? 'Press for a drop of wax, then pull it into a tear or a comma.' : 'Drag on the egg to write with wax. Switch to Turn to roll it round.';
+  }
+  $$('.mode').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.m)));
+  $$('.tip').forEach((b) => b.addEventListener('click', () => { tip = +b.dataset.t; $$('.tip').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); }));
+  $('#guides').addEventListener('click', (e) => { showGuides = !showGuides; e.currentTarget.setAttribute('aria-pressed', String(showGuides)); redraw(); });
+  const jars = $('#jars');
+  DYES.forEach((dy, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'jar';
+    b.innerHTML = `<i style="background: rgb(${dy.rgb.join(',')})"></i>${dy.name}`;
+    b.setAttribute('aria-label', `Dip the egg in ${dy.name} dye`);
+    b.addEventListener('click', () => dip(i));
+    jars.appendChild(b);
+  });
+  function updateBaths() {
+    $('#baths').innerHTML = ['white shell'].concat(baths.map((i) => DYES[i].name)).map((n, i) => `<li>${i ? '→ ' : ''}${n}</li>`).join('');
+    const last = baths[baths.length - 1];
+    $('#title').textContent = melted ? 'The finished pysanka' : last === 5 ? 'Ready to wipe off the wax' : baths.length ? `Write in wax over the ${DYES[last].name}` : 'Write in wax on the white shell';
+    $('#melt').disabled = melted || !baths.length;
+  }
+  function dip(i) {
+    if (melted) { say('This egg is finished. Start a fresh one.'); return; }
+    const before = colours[colours.length - 1], after = mixIn(before, DYES[i].rgb);
+    const lum = (c) => 0.3 * c[0] + 0.59 * c[1] + 0.11 * c[2];
+    baths.push(i); colours.push(after);
+    updateBaths(); redraw();
+    if (lum(after) > lum(before) * 0.9 && baths.length > 1) say(`The ${DYES[i].name} hardly shows over what is already there. That is why pysanky go from light to dark.`);
+    else if (i === 5) say('Black, the darkest bath. Everything not under wax is now black. Warm the egg and wipe off the wax to see the colours you kept.', 'good');
+    else say(`Dipped in ${DYES[i].name}. Now write wax over everything that should stay ${DYES[i].name}, then choose a darker jar.`);
+  }
+  // the eggs this visitor has finished, kept only in this browser, for the serpent's servants to count
+  const COUNT_KEY = 'pysanka-written-v1';
+  function written(add) {
+    let n = 0;
+    try { n = +(localStorage.getItem(COUNT_KEY) || 0) + add; if (add) localStorage.setItem(COUNT_KEY, String(n)); } catch (e) { n = add; }
+    $('#count').textContent = n ? `Pysanky you have written here: ${n}. The serpent’s chains are a little tighter.` : '';
+    return n;
+  }
+  written(0);
+  function melt() {
+    if (melted || !baths.length) return;
+    melted = true; setMode('turn'); updateBaths(); written(1);
+    if (reduceMotion) { redraw(); say('The wax is wiped away and every hidden colour appears at once.', 'good'); return; }
+    // turn the egg once round as the wax is wiped away
+    const y0 = yaw, t0 = performance.now();
+    (function f(now) {
+      const k = Math.min(1, (now - t0) / 1600);
+      yaw = y0 + k * Math.PI * 2; render();
+      if (k < 1) requestAnimationFrame(f); else say('The wax is wiped away and every hidden colour appears at once. Drag to turn your pysanka.', 'good');
+    })(t0);
+  }
+  $('#melt').addEventListener('click', melt);
+  function fresh() { waxAt.fill(-1); baths = []; colours = [SHELL]; melted = false; setMode('write'); updateBaths(); redraw(); say('A clean white egg. Write in wax everything that should stay white, then dip it in yellow.'); }
+  $('#fresh').addEventListener('click', fresh);
+
+  // ---------- An example, written in the traditional order ----------
+  function surf(u, v) {
+    // the shell point for given map coords, for writing the example
+    const th = u * 2 * Math.PI, ph = v * Math.PI, y = EB * Math.cos(ph), r = EA * Math.sin(ph);
+    return { u, v, p: [r * Math.cos(th), y, r * Math.sin(th)] };
+  }
+  function line(u0, v0, u1, v1, r) {
+    const n = Math.ceil(Math.hypot((u1 - u0) * TW, (v1 - v0) * TH) / 1.5);
+    for (let k = 0; k <= n; k++) stamp(surf(((u0 + (u1 - u0) * k / n) % 1 + 1) % 1, v0 + (v1 - v0) * k / n), r);
+  }
+  function star(uc, vc, R, r) {
+    // an eight-pointed star in a panel, drawn as two squares
+    const s = Math.sin(vc * Math.PI), ku = R / (2 * Math.PI * Math.max(s, 0.3)), kv = R / Math.PI;
+    for (let q = 0; q < 2; q++) {
+      const pts = [];
+      for (let k = 0; k < 4; k++) { const a = q * Math.PI / 4 + k * Math.PI / 2; pts.push([uc + Math.cos(a) * ku, vc + Math.sin(a) * kv]); }
+      for (let k = 0; k < 4; k++) line(pts[k][0], pts[k][1], pts[(k + 1) % 4][0], pts[(k + 1) % 4][1], r);
+    }
+  }
+  function example() {
+    waxAt.fill(-1); baths = []; colours = [SHELL]; melted = false;
+    // white: the band lines round the middle and the four lines from end to end
+    [0.33, 0.67].forEach((v) => line(0, v, 0.999, v, 1.4));
+    [0, 0.25, 0.5, 0.75].forEach((u) => { line(u, 0.02, u, 0.33, 1.2); line(u, 0.67, u, 0.98, 1.2); });
+    for (let k = 0; k < 4; k++) star(k * 0.25 + 0.125, 0.5, 0.36, 1.1);
+    // a running wave around the band, the oldest known pattern
+    for (let s = 0; s < 120; s++) { const u = s / 120, u2 = (s + 1) / 120; line(u, 0.37 + 0.02 * Math.sin(u * 2 * Math.PI * 12), u2, 0.37 + 0.02 * Math.sin(u2 * 2 * Math.PI * 12), 0.9); }
+    dipQuiet(0);
+    // yellow: fill the stars' centres and dots in the end panels
+    for (let k = 0; k < 4; k++) { stamp(surf(k * 0.25 + 0.125, 0.5), 6); for (let a = 0; a < 4; a++) stamp(surf(k * 0.25 + 0.125 + [0.026, 0, -0.026, 0][a], 0.5 + [0, 0.05, 0, -0.05][a]), 2.4); }
+    for (let k = 0; k < 8; k++) { stamp(surf(k / 8 + 0.0625, 0.2), 4.2); stamp(surf(k / 8 + 0.0625, 0.8), 4.2); }
+    dipQuiet(1);
+    // orange: a second wave below the first
+    for (let s = 0; s < 120; s++) { const u = s / 120, u2 = (s + 1) / 120; line(u, 0.63 + 0.02 * Math.cos(u * 2 * Math.PI * 12), u2, 0.63 + 0.02 * Math.cos(u2 * 2 * Math.PI * 12), 1.2); }
+    dipQuiet(3);
+    // red: fill the end panels with the wide tip, leaving a black edge inside the white lines
+    for (let k = 0; k < 4; k++) { fillPanel(k * 0.25 + 0.022, k * 0.25 + 0.228, 0.07, 0.305); fillPanel(k * 0.25 + 0.022, k * 0.25 + 0.228, 0.695, 0.93); }
+    dipQuiet(5);
+    melted = true; updateBaths(); setMode('turn'); redraw();
+    say('An example written in the traditional order: white lines and stars, then yellow, orange, red and black, with the wax melted off. Turn it, or start a fresh egg.', 'good');
+  }
+  function fillPanel(u0, u1, v0, v1) {
+    for (let y = Math.round(v0 * TH); y < Math.round(v1 * TH); y++) for (let x = Math.round(u0 * TW); x < Math.round(u1 * TW); x++) {
+      const i = y * TW + x;
+      if (waxAt[i] < 0) waxAt[i] = baths.length;
+    }
+  }
+  function dipQuiet(i) { baths.push(i); colours.push(mixIn(colours[colours.length - 1], DYES[i].rgb)); }
+  $('#example').addEventListener('click', example);
+
+  example();
+})();
+</script>
+</body>
+</html>
