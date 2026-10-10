@@ -9,7 +9,8 @@ serves it, and any web server can.
 ## What's inside
 
 ```
-index.html              the lobby: halls and exhibit cards, drawn from exhibits.json
+index.html              the lobby: a finder (words, age, not stamped yet) and the
+                        halls of exhibit cards, drawn from exhibits.json
 exhibits.json           the only list you edit: the museum's name, its halls, its exhibits
 shared/museum.css       the top bar every exhibit shows (Lobby · Hall · Next exhibit)
 shared/museum.js        draws that bar and stamps the visitor's passport

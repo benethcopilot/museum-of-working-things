@@ -89,6 +89,17 @@ a.card:hover { transform: translateY(-3px); border-color: var(--hall); }
 .card.soon { border-style: dashed; border-top-style: solid; opacity: 0.72; }
 .card.soon .meta span { font-style: italic; }
 .note { margin: 0; color: var(--muted); }
+.finder { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; padding: 14px 16px; border-radius: 16px; background: var(--card); border: 2px solid var(--line); }
+.finder label, .finder .group > span { font-size: 0.9rem; color: var(--muted); }
+.search { display: flex; align-items: center; gap: 8px; flex: 1 1 220px; min-width: 0; }
+.search input { flex: 1; min-width: 0; padding: 8px 12px; border: 2px solid var(--line-strong); border-radius: 999px; background: var(--ground); color: var(--text); font: inherit; }
+.group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.chip { padding: 5px 12px; border: 2px solid var(--line-strong); border-radius: 999px; background: none; color: var(--text); font: inherit; font-size: 0.88rem; cursor: pointer; }
+.chip:hover { border-color: var(--accent); }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--ground); }
+.chip.surprise { border-style: dashed; }
+.count { margin: 0; font-size: 0.9rem; color: var(--muted); flex-basis: 100%; }
+.finder[hidden], .hall[hidden], .card[hidden] { display: none; }
 footer { padding-top: 22px; border-top: 1px solid var(--line); font-size: 0.9rem; color: var(--muted); }
 footer a { color: inherit; text-underline-offset: 3px; }
 @media (max-width: 640px) {
@@ -108,6 +119,20 @@ footer a { color: inherit; text-underline-offset: 3px; }
     </div>
     <div class="passport" aria-live="polite"><b id="pass-count">0</b><span id="pass-text">exhibits stamped</span></div>
   </header>
+  <div class="finder" id="finder" role="search" aria-label="Find an exhibit" hidden>
+    <div class="search"><label for="q">Find</label><input id="q" type="search" placeholder="lighthouse, music, codes…" autocomplete="off"></div>
+    <div class="group" role="group" aria-label="Your age"><span>Your age</span>
+      <button class="chip age" type="button" data-age="99" aria-pressed="true">Any</button>
+      <button class="chip age" type="button" data-age="7" aria-pressed="false">6–7</button>
+      <button class="chip age" type="button" data-age="9" aria-pressed="false">8–9</button>
+      <button class="chip age" type="button" data-age="10" aria-pressed="false">10</button>
+    </div>
+    <div class="group">
+      <button class="chip" id="unseen" type="button" aria-pressed="false">Not stamped yet</button>
+      <button class="chip surprise" id="surprise" type="button">Surprise me</button>
+    </div>
+    <p class="count" id="count" aria-live="polite"></p>
+  </div>
   <main id="halls"><p class="note">Opening the doors…</p></main>
   <footer id="footer">Every exhibit runs in your browser. Nothing you do here is sent anywhere; your passport stamps are kept in this browser only.</footer>
 </div>
@@ -117,6 +142,52 @@ footer a { color: inherit; text-underline-offset: 3px; }
   const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   let seen = new Set();
   try { seen = new Set(JSON.parse(localStorage.getItem('museum-passport-v1') || '[]')); } catch (err) { /* stamps are optional */ }
+
+  // Find an exhibit: words, the visitor's age, and what is not stamped yet
+  function setUpFinder(total) {
+    const finder = document.getElementById('finder');
+    const q = document.getElementById('q');
+    const unseen = document.getElementById('unseen');
+    const count = document.getElementById('count');
+    const ages = Array.from(document.querySelectorAll('.chip.age'));
+    let maxAge = 99;
+    try { const a = +localStorage.getItem('museum-age-v1'); if ([7, 9, 10, 99].includes(a)) maxAge = a; } catch (err) { /* optional */ }
+    function visibleCards() {
+      return Array.from(document.querySelectorAll('a.card')).filter((c) => !c.hidden);
+    }
+    function apply() {
+      const words = q.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+      const onlyNew = unseen.getAttribute('aria-pressed') === 'true';
+      ages.forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.age === maxAge)));
+      let shown = 0;
+      document.querySelectorAll('a.card').forEach((c) => {
+        const ok = +c.dataset.min <= maxAge
+          && words.every((w) => c.dataset.words.includes(w))
+          && !(onlyNew && seen.has(c.dataset.slug));
+        c.hidden = !ok;
+        if (ok) shown++;
+      });
+      const filtering = words.length || onlyNew || maxAge !== 99;
+      document.querySelectorAll('.card.soon').forEach((c) => { c.hidden = !!filtering; });
+      document.querySelectorAll('.hall').forEach((h) => { h.hidden = !h.querySelector('.card:not([hidden])'); });
+      count.textContent = !filtering ? '' : shown ? `Showing ${shown} of ${total} exhibits.` : 'Nothing matches. Try fewer words or another age.';
+    }
+    q.addEventListener('input', apply);
+    unseen.addEventListener('click', () => { unseen.setAttribute('aria-pressed', String(unseen.getAttribute('aria-pressed') !== 'true')); apply(); });
+    ages.forEach((b) => b.addEventListener('click', () => {
+      maxAge = +b.dataset.age;
+      try { localStorage.setItem('museum-age-v1', String(maxAge)); } catch (err) { /* optional */ }
+      apply();
+    }));
+    document.getElementById('surprise').addEventListener('click', () => {
+      const pool = visibleCards();
+      const fresh = pool.filter((c) => !seen.has(c.dataset.slug));
+      const pick = (fresh.length ? fresh : pool)[Math.floor(Math.random() * (fresh.length || pool.length))];
+      if (pick) location.href = pick.getAttribute('href');
+    });
+    finder.hidden = false;
+    apply();
+  }
 
   fetch('exhibits.json')
     .then((r) => r.json())
@@ -135,7 +206,9 @@ footer a { color: inherit; text-underline-offset: 3px; }
           if (e.status === 'planned') {
             return `<div class="card soon" style="--hall:${esc(h.color)}"><h3>${esc(e.title)}</h3><p>${esc(e.blurb)}</p><p class="meta"><span>Opening soon</span></p></div>`;
           }
-          return `<a class="card${seen.has(e.slug) ? ' stamped' : ''}" href="exhibits/${esc(e.slug)}/" style="--hall:${esc(h.color)}">
+          const minAge = /^(\d+)/.test(e.ages || '') ? parseInt(e.ages, 10) : 0;
+          const words = [e.title, e.blurb, e.try, h.name].join(' ').toLowerCase();
+          return `<a class="card${seen.has(e.slug) ? ' stamped' : ''}" href="exhibits/${esc(e.slug)}/" style="--hall:${esc(h.color)}" data-slug="${esc(e.slug)}" data-min="${minAge}" data-words="${esc(words)}">
             ${seen.has(e.slug) ? '<span class="stamp">Stamped</span>' : ''}
             <h3>${esc(e.title)}</h3><p>${esc(e.blurb)}</p>
             <p class="meta">${e.ages ? `<span>${esc(e.ages)}</span>` : ''}${e.try ? `<span>Try: ${esc(e.try)}</span>` : ''}</p></a>`;
@@ -147,6 +220,7 @@ footer a { color: inherit; text-underline-offset: 3px; }
       if (data.museum.repo) {
         document.getElementById('footer').insertAdjacentHTML('beforeend', ` The museum is open source: <a href="${esc(data.museum.repo)}">see how it is built</a>.`);
       }
+      setUpFinder(open.length);
     })
     .catch(() => {
       document.getElementById('halls').innerHTML = '<p class="note">The exhibit list could not be loaded. If you opened this file straight from your computer, run a small web server instead: see the README.</p>';
