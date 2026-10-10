@@ -64,6 +64,11 @@
       "try": "Follow a drought with a very wet year"
     },
     {
+      "slug": "semmelweis", "hall": "life", "title": "Semmelweis’s Two Clinics", "ages": "11 and up",
+      "blurb": "Turn the pages of Vienna’s 1840s maternity register, test six theories of childbed fever against the hospital’s own numbers, and find the month the doctors began washing their hands.",
+      "try": "Find the month without peeking"
+    },
+    {
       "slug": "kintsugi", "hall": "making", "title": "Kintsugi Bowl", "ages": "All ages",
       "blurb": "Break a tea bowl, then mend it with lacquer and gold, one real step at a time.",
       "try": "Break a mended bowl again"

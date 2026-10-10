@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Semmelweis’s Two Clinics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,700;1,6..96,500&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=DM+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  /* Layout: the hospital's own register opened on two facing pages, one per clinic, turned year by year; then a casebook of six theories tested against it, the month the deaths stopped, and Vienna against Dublin since 1784. Red marks doctors who did autopsies, blue marks those who did not. */
+  --paper: #edf0ec;
+  --paper-2: #e0e5e0;
+  --card: #f8faf7;
+  --ink: #1b2420;
+  --muted: #56625c;
+  --line: rgba(27, 36, 32, 0.13);
+  --line-strong: rgba(27, 36, 32, 0.3);
+  --first: #a8382e;
+  --second: #1f68b0;
+  --chlorine: #5f7410;
+  --chlorine-wash: rgba(95, 116, 16, 0.12);
+  --winter: rgba(31, 104, 176, 0.08);
+  --dot-empty: rgba(27, 36, 32, 0.16);
+  --f-display: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+  --f-body: "Literata", Georgia, "Times New Roman", serif;
+  --f-data: "DM Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121715;
+    --paper-2: #1b221f;
+    --card: #171e1b;
+    --ink: #e3e9e5;
+    --muted: #9ea9a3;
+    --line: rgba(227, 233, 229, 0.12);
+    --line-strong: rgba(227, 233, 229, 0.3);
+    --first: #e0655a;
+    --second: #4a97de;
+    --chlorine: #b9cc5a;
+    --chlorine-wash: rgba(185, 204, 90, 0.12);
+    --winter: rgba(74, 151, 222, 0.1);
+    --dot-empty: rgba(227, 233, 229, 0.16);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121715;
+  --paper-2: #1b221f;
+  --card: #171e1b;
+  --ink: #e3e9e5;
+  --muted: #9ea9a3;
+  --line: rgba(227, 233, 229, 0.12);
+  --line-strong: rgba(227, 233, 229, 0.3);
+  --first: #e0655a;
+  --second: #4a97de;
+  --chlorine: #b9cc5a;
+  --chlorine-wash: rgba(185, 204, 90, 0.12);
+  --winter: rgba(74, 151, 222, 0.1);
+  --dot-empty: rgba(227, 233, 229, 0.16);
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--chlorine); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 500; line-height: 1.08; margin: 0; text-wrap: balance; }
+a { color: var(--second); }
+i { font-style: italic; }
+
+.page { box-sizing: border-box; max-width: 1180px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 52px; }
+.masthead { display: grid; gap: 12px; }
+.eyebrow { margin: 0; font-family: var(--f-data); font-size: 0.76rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.masthead h1 { font-size: clamp(2.6rem, 7vw, 5rem); font-weight: 700; letter-spacing: -0.01em; }
+.masthead h1 i { font-weight: 500; }
+.lede { margin: 0; max-width: 66ch; color: var(--muted); font-size: 1.05rem; }
+section > h2 { font-size: clamp(1.7rem, 3.4vw, 2.4rem); }
+.intro { margin: 0; max-width: 66ch; }
+.stack { display: flex; flex-direction: column; gap: 16px; }
+
+/* ---------- The register ---------- */
+.register { display: flex; flex-direction: column; gap: 16px; }
+.yearbar { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; }
+.yearbar input { width: 100%; accent-color: var(--ink); }
+.yearbar output { font-family: var(--f-display); font-size: 2.2rem; font-weight: 700; font-variant-numeric: lining-nums tabular-nums; min-width: 3ch; }
+.step { width: 2.4rem; height: 2.4rem; border-radius: 50%; border: 1.5px solid var(--line-strong); background: var(--card); font-size: 1rem; }
+.step:hover { background: var(--paper-2); }
+.yearbar .arrows { display: flex; gap: 6px; }
+.book { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border: 1px solid var(--line-strong); border-radius: 3px; background: var(--card); box-shadow: 0 1px 0 var(--line-strong), 0 10px 24px -18px rgba(0, 0, 0, 0.4); }
+.leaf { padding: 18px 22px 20px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 18px; align-items: start; min-width: 0; }
+.leaf + .leaf { border-left: 1px solid var(--line-strong); }
+.leaf h3 { font-size: 1.45rem; grid-column: 1 / -1; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.leaf h3 small { font-family: var(--f-data); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 400; }
+.leaf.first h3 small { color: var(--first); }
+.leaf.second h3 small { color: var(--second); }
+.tally { display: grid; grid-template-columns: auto auto; gap: 2px 14px; margin: 0; font-variant-numeric: tabular-nums; align-content: start; }
+.tally dt { color: var(--muted); font-size: 0.88rem; }
+.tally dd { margin: 0; font-family: var(--f-data); text-align: right; }
+.tally .rate { font-family: var(--f-display); font-size: 2.4rem; font-weight: 700; line-height: 1; grid-column: 1 / -1; text-align: left; margin-top: 6px; font-variant-numeric: lining-nums tabular-nums; }
+.leaf.first .rate { color: var(--first); }
+.leaf.second .rate { color: var(--second); }
+.dots { width: 150px; height: auto; display: block; }
+.dotcap { grid-column: 1 / -1; margin: 0; font-size: 0.9rem; color: var(--muted); }
+.d-on-1 { fill: var(--first); }
+.d-on-2 { fill: var(--second); }
+.d-off { fill: var(--dot-empty); }
+.era { margin: 0; padding: 12px 14px; border-left: 3px solid var(--ink); background: var(--card); max-width: 80ch; }
+.era b { font-family: var(--f-data); font-weight: 500; font-size: 0.82rem; letter-spacing: 0.06em; text-transform: uppercase; display: block; color: var(--muted); }
+
+/* ---------- Charts ---------- */
+.fig { position: relative; padding: 12px 12px 6px; border: 1px solid var(--line); border-radius: 3px; background: var(--card); }
+.fig svg { display: block; width: 100%; height: auto; overflow: visible; }
+.fig svg:focus { outline: none; }
+.fig svg:focus-visible { outline: 3px solid var(--chlorine); outline-offset: 4px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 0 6px; padding: 0; list-style: none; font-size: 0.86rem; color: var(--muted); }
+.legend li { display: flex; align-items: center; gap: 7px; }
+.legend i { display: inline-block; width: 16px; height: 3px; border-radius: 2px; }
+.legend i.box { width: 12px; height: 12px; border-radius: 2px; }
+.c-grid { stroke: var(--line); stroke-width: 1; }
+.c-axis { stroke: var(--line-strong); stroke-width: 1; }
+.c-t { font-family: var(--f-data); font-size: 10.5px; fill: var(--muted); }
+.c-lab { font-family: var(--f-body); font-size: 12px; fill: var(--ink); }
+.c-l1 { fill: none; stroke: var(--first); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.c-l2 { fill: none; stroke: var(--second); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.c-p1 { fill: var(--first); stroke: var(--card); stroke-width: 2; }
+.c-p2 { fill: var(--second); stroke: var(--card); stroke-width: 2; }
+.c-band { fill: var(--chlorine-wash); }
+.c-winter { fill: var(--winter); }
+.c-mark { stroke: var(--chlorine); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.c-markt { font-family: var(--f-data); font-size: 10.5px; fill: var(--chlorine); }
+.c-sel { stroke: var(--ink); stroke-width: 1; stroke-opacity: 0.45; }
+.c-bar { fill: var(--first); }
+.c-bar.after { fill: var(--first); fill-opacity: 0.55; }
+.c-bar.hot { fill: var(--ink); fill-opacity: 1; }
+.c-handle { fill: var(--chlorine); }
+.c-split { stroke: var(--chlorine); stroke-width: 2; }
+.c-na { font-family: var(--f-data); font-size: 9px; fill: var(--muted); }
+.tip { position: absolute; pointer-events: none; padding: 7px 10px; background: var(--ink); color: var(--paper); border-radius: 3px; font-size: 0.82rem; line-height: 1.4; white-space: nowrap; transform: translate(-50%, calc(-100% - 10px)); z-index: 2; }
+.tip b { font-family: var(--f-data); font-weight: 500; }
+.tip .sw { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; }
+.readouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.ro { padding: 8px 11px; border-radius: 3px; background: var(--paper-2); min-width: 0; }
+.ro span { display: block; font-size: 0.76rem; color: var(--muted); }
+.ro b { font-family: var(--f-data); font-weight: 500; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.say { margin: 0; padding: 10px 13px; border-left: 3px solid var(--chlorine); background: var(--card); font-size: 0.97rem; max-width: 80ch; }
+.btn { padding: 6px 13px; border: 1.5px solid var(--line-strong); border-radius: 3px; background: none; font-size: 0.92rem; }
+.btn:hover { background: var(--paper-2); }
+.btn[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.btn.go { background: var(--chlorine); border-color: var(--chlorine); color: var(--paper); font-weight: 600; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.slider { display: flex; flex-direction: column; gap: 2px; font-size: 0.92rem; }
+.slider input { width: 100%; accent-color: var(--chlorine); }
+.slider output { font-family: var(--f-data); }
+
+/* ---------- Casebook ---------- */
+.cases { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.case { display: flex; flex-direction: column; gap: 10px; padding: 16px 18px 18px; border: 1px solid var(--line-strong); border-radius: 3px; background: var(--card); min-width: 0; }
+.case .k { margin: 0; font-family: var(--f-data); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.case h3 { font-size: 1.35rem; }
+.case p { margin: 0; font-size: 0.95rem; }
+.case .q { font-weight: 600; }
+.case .opts { display: flex; flex-direction: column; gap: 6px; }
+.case .opts button { text-align: left; padding: 7px 11px; border: 1.5px solid var(--line-strong); border-radius: 3px; background: none; font-size: 0.92rem; }
+.case .opts button:hover:not(:disabled) { background: var(--paper-2); }
+.case .opts button:disabled { cursor: default; }
+.case .opts button.picked { border-color: var(--ink); background: var(--paper-2); }
+.case .result { display: flex; flex-direction: column; gap: 10px; }
+.case .judge { color: var(--muted); }
+.case .rec { padding-top: 8px; border-top: 1px solid var(--line); }
+.stamp { align-self: flex-start; padding: 3px 10px; border: 2px solid currentColor; border-radius: 3px; font-family: var(--f-data); font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; transform: rotate(-2deg); }
+.stamp.no { color: var(--first); }
+.stamp.yes { color: var(--chlorine); }
+.spark { width: 100%; max-width: 260px; height: auto; display: block; }
+.progress { margin: 0; font-family: var(--f-data); font-size: 0.85rem; color: var(--muted); }
+
+/* ---------- Find the month, Dublin ---------- */
+.two { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.two .stack { min-width: 0; }
+
+/* ---------- Afterward ---------- */
+.after { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.after p { margin: 0; max-width: 62ch; }
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-left: 2px solid var(--line-strong); }
+.timeline li { display: grid; grid-template-columns: 4.2em minmax(0, 1fr); gap: 12px; padding: 7px 0 7px 14px; position: relative; }
+.timeline li::before { content: ""; position: absolute; left: -6px; top: 15px; width: 10px; height: 10px; border-radius: 50%; background: var(--paper); border: 2px solid var(--ink); }
+.timeline li.key::before { background: var(--chlorine); border-color: var(--chlorine); }
+.timeline b { font-family: var(--f-display); font-size: 1.2rem; font-weight: 700; font-variant-numeric: lining-nums tabular-nums; }
+.timeline p { margin: 0; font-size: 0.95rem; }
+.sources { margin: 0; font-size: 0.86rem; color: var(--muted); max-width: 100ch; }
+
+@media (max-width: 920px) {
+  .cases { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .two, .after { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .book { grid-template-columns: minmax(0, 1fr); }
+  .leaf + .leaf { border-left: 0; border-top: 1px solid var(--line-strong); }
+  .cases { grid-template-columns: minmax(0, 1fr); }
+  .dots { width: 120px; }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="semmelweis" defer></script>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <p class="eyebrow">Life Science · Vienna General Hospital · 1847</p>
+    <h1>Semmelweis’s <i>Two Clinics</i></h1>
+    <p class="lede">Vienna’s great hospital had two maternity clinics under one roof. In the early 1840s about one mother in ten died of childbed fever in the first, and about one in twenty-five in the second. Ignaz Semmelweis, a young doctor in the first clinic, set out to learn why using the hospital’s own records. Open them and work through the problem as he did.</p>
+  </header>
+
+  <section class="register" aria-label="The hospital register">
+    <h2>The register</h2>
+    <p class="intro">Each year the hospital counted every birth and every mother who died. Turn the pages. The First Clinic trained doctors, and the Second Clinic trained midwives.</p>
+    <div class="yearbar">
+      <output id="yearOut" for="year">1846</output>
+      <input id="year" type="range" min="1833" max="1858" step="1" value="1846" aria-label="Year">
+      <div class="arrows"><button class="step" id="prevYear" type="button" aria-label="Previous year">◀</button><button class="step" id="nextYear" type="button" aria-label="Next year">▶</button></div>
+    </div>
+    <div class="book">
+      <div class="leaf first">
+        <h3>First Clinic <small>taught doctors</small></h3>
+        <dl class="tally">
+          <dt>Births</dt><dd id="b1">4,010</dd>
+          <dt>Mothers who died</dt><dd id="d1">459</dd>
+          <dd class="rate" id="r1">11.4%</dd>
+        </dl>
+        <svg class="dots" id="dots1" viewBox="0 0 150 150" role="img" aria-label="Of every 100 mothers in the First Clinic, how many died"></svg>
+        <p class="dotcap" id="cap1"></p>
+      </div>
+      <div class="leaf second">
+        <h3>Second Clinic <small>taught midwives</small></h3>
+        <dl class="tally">
+          <dt>Births</dt><dd id="b2">3,754</dd>
+          <dt>Mothers who died</dt><dd id="d2">105</dd>
+          <dd class="rate" id="r2">2.8%</dd>
+        </dl>
+        <svg class="dots" id="dots2" viewBox="0 0 150 150" role="img" aria-label="Of every 100 mothers in the Second Clinic, how many died"></svg>
+        <p class="dotcap" id="cap2"></p>
+      </div>
+    </div>
+    <p class="era" id="era" aria-live="polite"></p>
+    <div class="fig">
+      <ul class="legend"><li><i style="background: var(--first)"></i>First Clinic (doctors)</li><li><i style="background: var(--second)"></i>Second Clinic (midwives)</li><li><i class="box" style="background: var(--chlorine-wash); border: 1px solid var(--chlorine)"></i>Semmelweis’s chlorine washing</li></ul>
+      <svg id="yearsChart" viewBox="0 0 680 250" tabindex="0" role="img" aria-label="Share of mothers who died each year in both clinics, 1833 to 1858. Use the arrow keys to move through the years."></svg>
+      <div class="tip" id="tipYears" hidden></div>
+    </div>
+  </section>
+
+  <section class="stack" aria-label="Test the theories">
+    <h2>Test the theories</h2>
+    <p class="intro">Doctors of the day had plenty of explanations. Semmelweis checked each against the records, or changed something in the clinic and watched what happened. For each theory, decide what it predicts before you look.</p>
+    <p class="progress" id="progress">Theories tested: 0 of 6</p>
+    <div class="cases" id="cases"></div>
+    <p class="say" id="caseSum" hidden></p>
+  </section>
+
+  <section class="two" aria-label="Find the month">
+    <div class="stack">
+      <h2>Find the month</h2>
+      <div class="fig">
+        <ul class="legend"><li><i class="box" style="background: var(--first)"></i>Share of mothers who died, First Clinic, month by month</li><li><i class="box" style="background: var(--winter); border: 1px solid var(--line-strong)"></i>November to March</li></ul>
+        <svg id="monthChart" viewBox="0 0 680 270" tabindex="0" role="img" aria-label="Monthly share of mothers who died in the First Clinic, January 1841 to March 1849. Drag the green line, or use the slider below."></svg>
+        <div class="tip" id="tipMonths" hidden></div>
+      </div>
+    </div>
+    <div class="stack">
+      <p>Semmelweis’s own monthly figures for the First Clinic. Somewhere in here the doctors started washing their hands. Drag the green line to the month you think things changed, and compare the deaths before and after it.</p>
+      <label class="slider" for="split"><span>Washing starts: <output id="splitOut" for="split">January 1844</output></span><input id="split" type="range" min="1" max="98" step="1" value="36"></label>
+      <div class="readouts">
+        <div class="ro"><span>Before the line</span><b id="before">—</b></div>
+        <div class="ro"><span>After the line</span><b id="after">—</b></div>
+      </div>
+      <div class="row"><button class="btn" id="winterBtn" type="button" aria-pressed="false">Shade the winters</button><button class="btn go" id="revealBtn" type="button">Show when it began</button></div>
+      <p class="say" id="saySplit" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="two" aria-label="Before the autopsies">
+    <div class="stack">
+      <h2>Before the autopsies</h2>
+      <div class="fig">
+        <ul class="legend"><li><i style="background: var(--first)"></i>Vienna maternity hospital</li><li><i style="background: var(--second)"></i>Rotunda Hospital, Dublin</li></ul>
+        <svg id="longChart" viewBox="0 0 680 260" tabindex="0" role="img" aria-label="Share of mothers who died each year in Vienna and in Dublin, 1784 to 1849"></svg>
+        <div class="tip" id="tipLong" hidden></div>
+      </div>
+    </div>
+    <div class="stack">
+      <p>To make his case, Semmelweis went back to 1784. Until 1822 Vienna’s maternity wards were run by Johann Lucas Boër. In 1823 Johann Klein took over and taught obstetrics through anatomy, so students learned from autopsies. Dublin’s Rotunda Hospital, which Semmelweis used for comparison, stood apart from any general hospital, and its students did no autopsies.</p>
+      <div class="readouts">
+        <div class="ro"><span>Vienna 1784–1822</span><b id="v1">—</b></div>
+        <div class="ro"><span>Vienna 1823–1846</span><b id="v2">—</b></div>
+        <div class="ro"><span>Dublin 1784–1822</span><b id="u1">—</b></div>
+        <div class="ro"><span>Dublin 1823–1846</span><b id="u2">—</b></div>
+      </div>
+      <p class="say">Vienna’s rate jumped the year the autopsies began, while Dublin’s barely moved. Semmelweis saw the same pattern as in his two clinics: where doctors handled the dead, mothers died.</p>
+    </div>
+  </section>
+
+  <section class="after" aria-label="What happened next">
+    <div class="stack">
+      <h2>Right, and ignored</h2>
+      <p>Semmelweis could show that washing worked, but not why. Germs had not been discovered, and many doctors were offended at being told their hands carried death. He chose chlorinated lime because it worked best at getting the smell of the autopsy room off the hands. He did not know it was killing bacteria.</p>
+      <p>His post in Vienna was not renewed in 1849. In Pest he brought childbed fever almost to an end at the small Szent Rókus Hospital: 8 deaths in 933 births from 1851 to 1855. When he finally published his book in 1861, most leading doctors rejected it. His successor in Vienna, Carl Braun, wrote a textbook listing thirty causes of childbed fever; infection from corpses came twenty-eighth.</p>
+      <p>Within twenty years of his death, Louis Pasteur, Joseph Lister and Robert Koch had shown that germs cause disease. Semmelweis is now called the saviour of mothers, and the university of medicine in Budapest bears his name.</p>
+    </div>
+    <ol class="timeline">
+      <li><b>1818</b><p>Ignaz Semmelweis is born in Buda, Hungary, on 1 July.</p></li>
+      <li><b>1846</b><p>He becomes assistant in the First Clinic in July. A government commission blames rough examinations by students.</p></li>
+      <li class="key"><b>1847</b><p>Jakob Kolletschka dies in March after an autopsy wound. In mid-May Semmelweis has everyone wash in chlorinated lime before examining.</p></li>
+      <li class="key"><b>1848</b><p>The First Clinic’s rate for the year is 1.3%, no higher than the midwives’.</p></li>
+      <li><b>1849</b><p>His appointment ends in March. He moves to Pest the next year.</p></li>
+      <li><b>1851</b><p>Head of obstetrics at Szent Rókus Hospital in Pest, where childbed fever almost disappears.</p></li>
+      <li><b>1861</b><p>He publishes <i>The Etiology, Concept and Prophylaxis of Childbed Fever</i>.</p></li>
+      <li><b>1865</b><p>He dies on 13 August in an asylum in Vienna, of blood poisoning, aged 47.</p></li>
+    </ol>
+  </section>
+
+  <p class="sources">Sources: Wikipedia, <a href="https://en.wikipedia.org/wiki/Historical_mortality_rates_of_puerperal_fever" target="_blank" rel="noopener">Historical mortality rates of puerperal fever</a> (every figure here: the yearly tables for both clinics 1833–1858, the monthly First Clinic table 1841–1849, and Vienna and Dublin 1784–1849, all transcribed from Semmelweis’s 1861 book; the source has no figures for December 1841, and its monthly and yearly tables differ slightly in places) and <a href="https://en.wikipedia.org/wiki/Ignaz_Semmelweis" target="_blank" rel="noopener">Ignaz Semmelweis</a> (his career, overcrowding and climate ruled out, street births, Kolletschka, chlorinated lime and the smell, Szent Rókus, Braun’s thirty causes, his death). Carl G. Hempel, <a href="https://www.stephenhicks.org/wp-content/uploads/2010/03/semmelweis-by-hempelcarl.pdf" target="_blank" rel="noopener">“Scientific Inquiry: Invention and Test”</a>, from <i>Philosophy of Natural Science</i> (1966) (the 1846 commission, the priest and his bell, the change of birthing position). The cut from 42 students to 20 is Semmelweis’s own figure, as quoted in later accounts. Rates are deaths divided by births.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const NS = 'http://www.w3.org/2000/svg';
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  function el(tag, attrs, parent) {
+    const n = document.createElementNS(NS, tag);
+    if (attrs) for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+  const fmt = (n) => n.toLocaleString('en-US');
+  const pct = (d, b, p = 1) => (100 * d / b).toFixed(p) + '%';
+  const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+  // ---------- The records (Semmelweis 1861, as tabulated on Wikipedia) ----------
+  // year, First Clinic births, deaths, Second Clinic births, deaths
+  const TWO = [[1833, 3737, 197, 353, 8], [1834, 2657, 205, 1744, 150], [1835, 2573, 143, 1682, 84], [1836, 2677, 200, 1670, 131], [1837, 2765, 251, 1784, 124], [1838, 2987, 91, 1779, 88], [1839, 2781, 151, 2010, 91], [1840, 2889, 267, 2073, 55], [1841, 3036, 237, 2442, 86], [1842, 3287, 518, 2659, 202], [1843, 3060, 274, 2739, 164], [1844, 3157, 260, 2956, 68], [1845, 3492, 241, 3241, 66], [1846, 4010, 459, 3754, 105], [1847, 3490, 176, 3306, 32], [1848, 3556, 45, 3319, 43], [1849, 3858, 103, 3371, 87], [1850, 3745, 74, 3261, 54], [1851, 4194, 75, 3395, 121], [1852, 4471, 181, 3360, 192], [1853, 4221, 94, 3480, 67], [1854, 4393, 400, 3396, 210], [1855, 3659, 198, 2938, 174], [1856, 3925, 156, 3070, 125], [1857, 4220, 124, 3795, 83], [1858, 4203, 86, 4179, 60]];
+  // First Clinic month by month, January 1841 to March 1849: births, deaths (null: no figures)
+  const MONTHLY = [[254, 37], [239, 18], [277, 12], [255, 4], [255, 2], [200, 10], [190, 16], [222, 3], [213, 4], [236, 26], [235, 53], null,
+    [307, 64], [311, 38], [264, 27], [242, 26], [310, 10], [273, 18], [231, 48], [216, 55], [223, 41], [242, 71], [209, 48], [239, 75],
+    [272, 52], [263, 42], [266, 33], [285, 34], [246, 15], [196, 8], [191, 1], [193, 3], [221, 5], [250, 44], [252, 18], [236, 19],
+    [244, 37], [257, 29], [276, 47], [208, 36], [240, 14], [224, 6], [206, 9], [269, 17], [245, 3], [248, 8], [245, 27], [256, 27],
+    [303, 23], [274, 13], [292, 13], [260, 11], [296, 13], [280, 20], [245, 15], [251, 9], [237, 25], [283, 42], [265, 29], [267, 28],
+    [336, 45], [293, 53], [311, 48], [253, 48], [305, 41], [266, 27], [252, 33], [216, 39], [271, 39], [254, 38], [297, 32], [298, 16],
+    [311, 10], [312, 6], [305, 11], [312, 57], [294, 36], [268, 6], [250, 3], [264, 5], [262, 12], [278, 11], [246, 11], [273, 8],
+    [283, 10], [291, 2], [276, 0], [305, 2], [313, 3], [264, 3], [269, 1], [261, 0], [312, 3], [299, 7], [310, 9], [373, 5],
+    [403, 9], [389, 12], [406, 20]];
+  const monthName = (i) => MONTHS[i % 12] + ' ' + (1841 + Math.floor(i / 12));
+  const WASH = 77;   // June 1847, the first full month of chlorine washing
+  // year, births, deaths: Vienna (whole maternity hospital to 1840, First Clinic from 1841) and Dublin's Rotunda
+  const VIENNA = [[1784, 284, 6], [1785, 899, 13], [1786, 1151, 5], [1787, 1407, 5], [1788, 1425, 5], [1789, 1246, 7], [1790, 1326, 10], [1791, 1395, 8], [1792, 1579, 14], [1793, 1684, 44], [1794, 1768, 7], [1795, 1798, 38], [1796, 1904, 22], [1797, 2012, 5], [1798, 2046, 5], [1799, 2067, 20], [1800, 2070, 41], [1801, 2106, 17], [1802, 2346, 9], [1803, 2215, 16], [1804, 2022, 8], [1805, 2112, 9], [1806, 1875, 13], [1807, 925, 6], [1808, 855, 7], [1809, 912, 13], [1810, 744, 6], [1811, 1050, 20], [1812, 1419, 9], [1813, 1945, 21], [1814, 2062, 66], [1815, 2591, 19], [1816, 2410, 12], [1817, 2735, 25], [1818, 2568, 56], [1819, 3089, 154], [1820, 2998, 75], [1821, 3294, 55], [1822, 3066, 26], [1823, 2872, 214], [1824, 2911, 144], [1825, 2594, 229], [1826, 2359, 192], [1827, 2367, 51], [1828, 2833, 101], [1829, 3012, 140], [1830, 2797, 111], [1831, 3353, 222], [1832, 3331, 105], [1833, 3737, 197], [1834, 2657, 205], [1835, 2573, 143], [1836, 2677, 200], [1837, 2765, 251], [1838, 2987, 91], [1839, 2781, 151], [1840, 2889, 267], [1841, 3036, 237], [1842, 3287, 518], [1843, 3060, 274], [1844, 3157, 260], [1845, 3492, 241], [1846, 4010, 459], [1847, 3490, 176], [1848, 3556, 45], [1849, 3858, 103]];
+  const DUBLIN = [[1784, 1261, 11], [1785, 1292, 8], [1786, 1351, 8], [1787, 1347, 10], [1788, 1469, 23], [1789, 1435, 25], [1790, 1546, 12], [1791, 1602, 25], [1792, 1631, 10], [1793, 1747, 19], [1794, 1543, 20], [1795, 1503, 7], [1796, 1621, 10], [1797, 1712, 13], [1798, 1604, 8], [1799, 1537, 10], [1800, 1837, 18], [1801, 1725, 30], [1802, 1985, 26], [1803, 2028, 44], [1804, 1915, 16], [1805, 2220, 12], [1806, 2406, 23], [1807, 2511, 12], [1808, 2665, 13], [1809, 2889, 21], [1810, 2854, 29], [1811, 2561, 24], [1812, 2676, 43], [1813, 2484, 62], [1814, 2508, 25], [1815, 3075, 17], [1816, 3314, 18], [1817, 3473, 32], [1818, 3539, 56], [1819, 3197, 94], [1820, 2458, 70], [1821, 2849, 22], [1822, 2675, 12], [1823, 2584, 59], [1824, 2446, 20], [1825, 2740, 26], [1826, 2440, 81], [1827, 2550, 33], [1828, 2856, 43], [1829, 2141, 34], [1830, 2288, 12], [1831, 2176, 12], [1832, 2242, 12], [1833, 2138, 12], [1834, 2024, 34], [1835, 1902, 34], [1836, 1810, 36], [1837, 1833, 24], [1838, 2126, 45], [1839, 1951, 25], [1840, 1521, 26], [1841, 2003, 23], [1842, 2171, 21], [1843, 2210, 22], [1844, 2288, 14], [1845, 1411, 35], [1846, 2025, 17], [1847, 1703, 47], [1848, 1816, 35], [1849, 2063, 38]];
+
+  // ---------- Tooltip helper ----------
+  function showTip(tip, svg, x, y, html) {
+    const r = svg.getBoundingClientRect(), fr = svg.parentNode.getBoundingClientRect();
+    const vb = svg.viewBox.baseVal;
+    let px = r.left - fr.left + x * r.width / vb.width;
+    const py = r.top - fr.top + y * r.height / vb.height;
+    tip.innerHTML = html;
+    tip.hidden = false;
+    const w = tip.offsetWidth;
+    px = Math.max(w / 2 + 4, Math.min(fr.width - w / 2 - 4, px));
+    tip.style.left = px + 'px';
+    tip.style.top = Math.max(tip.offsetHeight + 14, py) + 'px';
+  }
+  const sw = (v) => `<span class="sw" style="background: var(${v})"></span>`;
+
+  // ---------- The register ----------
+  function buildDots(svg, cls) {
+    const dots = [];
+    for (let i = 0; i < 100; i++) {
+      const r = Math.floor(i / 10), c = i % 10;
+      dots.push(el('circle', { cx: 7.5 + c * 15, cy: 7.5 + r * 15, r: 5.6, class: 'd-off' }, svg));
+    }
+    return dots;
+  }
+  const dots1 = buildDots($('#dots1')), dots2 = buildDots($('#dots2'));
+  function paintDots(dots, rate, on) {
+    const n = Math.round(rate);
+    dots.forEach((d, i) => d.setAttribute('class', i < n ? on : 'd-off'));
+  }
+  function eraText(y) {
+    if (y === 1833) return ['1833', 'A second maternity clinic opens because the first is overflowing. Medical students and student midwives train in both clinics.'];
+    if (y <= 1839) return ['1833 to 1840', 'Medical students and student midwives train in both clinics, and the two clinics’ death rates rise and fall roughly together.'];
+    if (y === 1840) return ['1840', 'The two clinics split apart: 9.2% of mothers die in the first, 2.7% in the second. From 1841 the records cover medical students in the First Clinic only and student midwives in the Second.'];
+    if (y <= 1845) return ['1841 to 1846', 'Medical students now train only in the First Clinic, midwives only in the Second. The First Clinic’s death rate runs between one and a half and four times the Second’s. Women beg on their knees to be sent to the Second, and some give birth in the street rather than be admitted to the First.'];
+    if (y === 1846) return ['1846', 'Semmelweis becomes assistant in the First Clinic in July. 459 mothers die there this year, against 105 in the Second Clinic.'];
+    if (y === 1847) return ['1847', 'In mid-May Semmelweis orders everyone to wash their hands in chlorinated lime before examining a patient. Of the First Clinic’s 176 deaths this year, 120 came before the end of May.'];
+    if (y === 1848) return ['1848', 'The first full year of washing. 1.3% of mothers die in the First Clinic and 1.3% in the Second: the doctors’ clinic is as safe as the midwives’.'];
+    if (y === 1849) return ['1849', 'Semmelweis’s appointment ends in March. The year closes at 2.7% in the First Clinic.'];
+    return ['1850 to 1858', 'After Semmelweis left, the First Clinic’s rate wandered between 1.8% and 9.1%. Doctors kept up some of the washing without accepting his explanation, and the clinic never again matched 1848.'];
+  }
+  const yearIn = $('#year'), yearOut = $('#yearOut');
+  let selYear = 1846;
+  function setYear(y) {
+    selYear = Math.max(1833, Math.min(1858, y));
+    yearIn.value = selYear;
+    yearOut.textContent = selYear;
+    const r = TWO[selYear - 1833];
+    const r1 = 100 * r[2] / r[1], r2 = 100 * r[4] / r[3];
+    $('#b1').textContent = fmt(r[1]); $('#d1').textContent = fmt(r[2]); $('#r1').textContent = r1.toFixed(1) + '%';
+    $('#b2').textContent = fmt(r[3]); $('#d2').textContent = fmt(r[4]); $('#r2').textContent = r2.toFixed(1) + '%';
+    paintDots(dots1, r1, 'd-on-1'); paintDots(dots2, r2, 'd-on-2');
+    $('#cap1').textContent = `About ${Math.round(r1)} of every 100 mothers died.`;
+    $('#cap2').textContent = `About ${Math.round(r2)} of every 100 mothers died.`;
+    const [k, t] = eraText(selYear);
+    $('#era').innerHTML = `<b>${k}</b>${t}`;
+    drawYearSel();
+  }
+  yearIn.addEventListener('input', () => setYear(+yearIn.value));
+  $('#prevYear').addEventListener('click', () => setYear(selYear - 1));
+  $('#nextYear').addEventListener('click', () => setYear(selYear + 1));
+
+  // years chart
+  const yc = $('#yearsChart'), tipY = $('#tipYears');
+  const YX = (y) => 46 + (y - 1833) * (612 / 25), YY = (v) => 210 - v * 11;
+  {
+    el('rect', { x: YX(1846.875), y: 14, width: YX(1848.75) - YX(1846.875), height: 196, class: 'c-band' }, yc);
+    el('text', { x: YX(1847.8), y: 26, 'text-anchor': 'middle', class: 'c-markt' }, yc).textContent = 'washing';
+    [0, 5, 10, 15].forEach((v) => {
+      el('line', { x1: 40, y1: YY(v), x2: 668, y2: YY(v), class: v ? 'c-grid' : 'c-axis' }, yc);
+      el('text', { x: 34, y: YY(v) + 4, 'text-anchor': 'end', class: 'c-t' }, yc).textContent = v + '%';
+    });
+    for (let y = 1835; y <= 1855; y += 5) el('text', { x: YX(y), y: 228, 'text-anchor': 'middle', class: 'c-t' }, yc).textContent = y;
+    el('line', { x1: YX(1840.5), y1: 14, x2: YX(1840.5), y2: 210, class: 'c-grid', 'stroke-dasharray': '3 3' }, yc);
+    el('text', { x: YX(1840.5) - 4, y: 40, 'text-anchor': 'end', class: 'c-t' }, yc).textContent = 'students and';
+    el('text', { x: YX(1840.5) - 4, y: 53, 'text-anchor': 'end', class: 'c-t' }, yc).textContent = 'midwives split';
+    const p1 = TWO.map((r) => [YX(r[0]), YY(100 * r[2] / r[1])]), p2 = TWO.map((r) => [YX(r[0]), YY(100 * r[4] / r[3])]);
+    el('path', { d: 'M' + p2.map((p) => p.join(' ')).join(' L'), class: 'c-l2' }, yc);
+    el('path', { d: 'M' + p1.map((p) => p.join(' ')).join(' L'), class: 'c-l1' }, yc);
+    el('text', { x: YX(1842) + 8, y: YY(15.8) + 4, class: 'c-lab' }, yc).textContent = 'First Clinic';
+    el('text', { x: YX(1843.7), y: YY(2.3) + 16, 'text-anchor': 'middle', class: 'c-lab' }, yc).textContent = 'Second Clinic';
+  }
+  const selLine = el('line', { x1: 0, y1: 14, x2: 0, y2: 210, class: 'c-sel' }, yc);
+  const selP1 = el('circle', { r: 5, class: 'c-p1' }, yc), selP2 = el('circle', { r: 5, class: 'c-p2' }, yc);
+  function drawYearSel() {
+    const r = TWO[selYear - 1833], x = YX(selYear);
+    selLine.setAttribute('x1', x); selLine.setAttribute('x2', x);
+    selP1.setAttribute('cx', x); selP1.setAttribute('cy', YY(100 * r[2] / r[1]));
+    selP2.setAttribute('cx', x); selP2.setAttribute('cy', YY(100 * r[4] / r[3]));
+  }
+  function yearAt(e) {
+    const r = yc.getBoundingClientRect();
+    const x = (e.clientX - r.left) * 680 / r.width;
+    return Math.max(1833, Math.min(1858, Math.round(1833 + (x - 46) * 25 / 612)));
+  }
+  function tipYear(y) {
+    const r = TWO[y - 1833];
+    showTip(tipY, yc, YX(y), Math.min(YY(100 * r[2] / r[1]), YY(100 * r[4] / r[3])),
+      `<b>${y}</b><br>${sw('--first')}First Clinic <b>${pct(r[2], r[1])}</b><br>${sw('--second')}Second Clinic <b>${pct(r[4], r[3])}</b>`);
+  }
+  yc.addEventListener('pointermove', (e) => tipYear(yearAt(e)));
+  yc.addEventListener('pointerleave', () => { tipY.hidden = true; });
+  yc.addEventListener('click', (e) => setYear(yearAt(e)));
+  yc.addEventListener('keydown', (e) => {
+    const d = { ArrowLeft: -1, ArrowRight: 1 }[e.key];
+    if (!d) return;
+    e.preventDefault(); setYear(selYear + d); tipYear(selYear);
+  });
+  yc.addEventListener('focus', () => tipYear(selYear));
+  yc.addEventListener('blur', () => { tipY.hidden = true; });
+  setYear(1846);
+
+  // ---------- Casebook ----------
+  const CASES = [
+    { t: 'Bad air over Vienna', d: 'Most doctors blamed “epidemic influences”: something in the air, the weather or the season that settled over the whole city.',
+      q: 'If that were the cause, the Second Clinic, under the same roof, should have had', opts: ['about as many deaths as the First', 'far fewer deaths than the First'], expect: 0,
+      why: 'Both clinics breathed the same Vienna air, so both should have suffered alike.',
+      rec: 'They did not. In 1846 the First Clinic lost 11.4% of its mothers and the Second lost 2.8%. Women who gave birth in the street on the way to the hospital seldom caught the fever at all.' },
+    { t: 'Overcrowding', d: 'Perhaps too many women packed into too few beds spread the sickness.',
+      q: 'If crowding were the cause, the more crowded clinic should have had', opts: ['fewer deaths', 'more deaths'], expect: 1,
+      why: 'Crowding would make the fuller clinic the deadlier one.',
+      rec: 'The Second Clinic was always the more crowded, because women begged to be sent there instead of the First. It had fewer deaths.' },
+    { t: 'Rough examinations', d: 'In 1846 a government commission blamed the medical students, foreign ones above all, for examining the women roughly.',
+      q: 'If rough examination were the cause, cutting the number of students should have', opts: ['brought deaths down and kept them down', 'made no lasting difference'], expect: 0,
+      why: 'Fewer students and fewer examinations should mean fewer injuries, month after month.',
+      rec: 'The students were cut from 42 to 20, foreigners were almost all turned away, and examinations were kept to a minimum. Deaths fell from December 1846 to March 1847, then climbed: 57 deaths in April, 18.3% of all births. Midwives examined their patients the same way without the deaths.',
+      spark: [69, 76] },
+    { t: 'The priest’s bell', d: 'To reach a dying patient in the First Clinic, the priest bringing the last rites walked through five wards behind an attendant ringing a bell. Perhaps terror made the women ill.',
+      q: 'If fear of the bell were the cause, a silent, roundabout route for the priest should have', opts: ['changed nothing', 'brought deaths down'], expect: 1,
+      why: 'Take away the fright and the fever should fall.',
+      rec: 'Semmelweis persuaded the priest to come by a roundabout way, without the bell. Deaths in the First Clinic did not fall.' },
+    { t: 'Lying on the back', d: 'In the First Clinic mothers gave birth lying on their backs. In the Second Clinic they lay on their sides.',
+      q: 'If the position mattered, switching the First Clinic to the side position should have', opts: ['brought deaths down', 'changed nothing'], expect: 0,
+      why: 'Make the First Clinic do what the Second did, and its deaths should fall toward the Second’s.',
+      rec: 'Semmelweis made the switch for no other reason than that the Second Clinic did it. The First Clinic’s deaths stayed where they were.' },
+    { t: 'Something on the doctors’ hands', d: 'In March 1847 Semmelweis’s friend Jakob Kolletschka, a professor of forensic medicine, was cut by a student’s scalpel during an autopsy and died. His body showed the same disease as the mothers’. Doctors and students went from the autopsy room straight to the labor ward. Midwives did no autopsies.',
+      q: 'If “cadaverous particles” on the hands were the cause, washing in chlorinated lime before every examination should have', opts: ['changed nothing', 'brought deaths down sharply'], expect: 1,
+      why: 'Clean the hands, and whatever they carried never reaches the mothers.',
+      rec: 'Washing began in mid-May 1847. April: 18.3% of mothers died. June: 2.2%. July: 1.2%. August: 1.9%. In 1848 the First Clinic’s rate for the whole year was 1.3%, the same as the midwives’ clinic.',
+      spark: [72, 83], ok: true }
+  ];
+  const casesBox = $('#cases');
+  let tested = 0;
+  function sparkline(svg, from, to) {
+    const n = to - from + 1, w = 260 / n;
+    let max = 0;
+    for (let i = from; i <= to; i++) if (MONTHLY[i]) max = Math.max(max, MONTHLY[i][1] / MONTHLY[i][0]);
+    for (let i = from; i <= to; i++) {
+      const m = MONTHLY[i]; if (!m) continue;
+      const v = m[1] / m[0], h = Math.max(1, 52 * v / max);
+      const bar = el('rect', { x: (i - from) * w + 1, y: 56 - h, width: w - 2, height: h, rx: 1.5, class: 'c-bar' + (i >= WASH ? ' after' : '') }, svg);
+      el('title', null, bar).textContent = `${monthName(i)}: ${pct(m[1], m[0])}`;
+      el('text', { x: (i - from) * w + w / 2, y: 68, 'text-anchor': 'middle', class: 'c-t' }, svg).textContent = MONTHS[i % 12][0];
+    }
+    if (WASH > from && WASH <= to) {
+      const x = (WASH - from) * w - w / 2;
+      el('line', { x1: x, y1: 2, x2: x, y2: 58, class: 'c-mark' }, svg);
+    }
+    el('text', { x: 0, y: 82, class: 'c-t' }, svg).textContent = `${monthName(from)} to ${monthName(to)}`;
+  }
+  CASES.forEach((c, i) => {
+    const art = document.createElement('article');
+    art.className = 'case';
+    art.innerHTML = `<p class="k">Theory ${i + 1}</p><h3>${c.t}</h3><p>${c.d}</p><p class="q">${c.q}…</p><div class="opts">${c.opts.map((o, j) => `<button type="button" data-j="${j}">${o}</button>`).join('')}</div><div class="result" hidden><p class="judge"></p><p class="rec">${c.rec}</p></div>`;
+    casesBox.appendChild(art);
+    const res = art.querySelector('.result');
+    art.querySelectorAll('.opts button').forEach((b) => b.addEventListener('click', () => {
+      const j = +b.dataset.j;
+      art.querySelectorAll('.opts button').forEach((x) => { x.disabled = true; });
+      b.classList.add('picked');
+      res.querySelector('.judge').textContent = (j === c.expect ? 'Yes. ' : 'Think again. ') + c.why + ' What the record shows:';
+      if (c.spark) {
+        const s = el('svg', { viewBox: '0 0 260 86', class: 'spark', role: 'img', 'aria-label': 'Monthly share of mothers who died, ' + monthName(c.spark[0]) + ' to ' + monthName(c.spark[1]) });
+        sparkline(s, c.spark[0], c.spark[1]);
+        res.appendChild(s);
+      }
+      const st = document.createElement('span');
+      st.className = 'stamp ' + (c.ok ? 'yes' : 'no');
+      st.textContent = c.ok ? 'Fits the record' : 'Ruled out';
+      res.appendChild(st);
+      res.hidden = false;
+      tested++;
+      $('#progress').textContent = `Theories tested: ${tested} of 6`;
+      if (tested === CASES.length) {
+        const s = $('#caseSum');
+        s.hidden = false;
+        s.textContent = 'Five theories failed against the hospital’s own numbers and one passed. Semmelweis still could not say what the “particles” were. Nobody could yet: it would be another twenty years before germs were shown to cause disease.';
+      }
+    }));
+  });
+
+  // ---------- Find the month ----------
+  const mc = $('#monthChart'), tipM = $('#tipMonths');
+  const MX0 = 44, MSTEP = 626 / 99, MY = (v) => 236 - v * 6.6;   // v in percent
+  const winterG = el('g', { hidden: '' }, mc);
+  for (let i = 0; i < 99; i++) {
+    const m = i % 12;
+    if (m === 10) el('rect', { x: MX0 + i * MSTEP, y: 12, width: MSTEP * Math.min(5, 99 - i), height: 224, class: 'c-winter' }, winterG);
+    if (i === 0) el('rect', { x: MX0, y: 12, width: MSTEP * 3, height: 224, class: 'c-winter' }, winterG);
+  }
+  const afterBand = el('rect', { x: 0, y: 12, width: 0, height: 224, class: 'c-band' }, mc);
+  [0, 10, 20, 30].forEach((v) => {
+    el('line', { x1: 38, y1: MY(v), x2: 672, y2: MY(v), class: v ? 'c-grid' : 'c-axis' }, mc);
+    el('text', { x: 32, y: MY(v) + 4, 'text-anchor': 'end', class: 'c-t' }, mc).textContent = v + '%';
+  });
+  for (let y = 0; y < 9; y++) {
+    const x = MX0 + y * 12 * MSTEP;
+    el('line', { x1: x, y1: 236, x2: x, y2: 242, class: 'c-axis' }, mc);
+    el('text', { x: x + 2, y: 254, class: 'c-t' }, mc).textContent = 1841 + y;
+  }
+  const bars = [];
+  MONTHLY.forEach((m, i) => {
+    const x = MX0 + i * MSTEP + 1;
+    if (!m) { el('text', { x: x + MSTEP / 2 - 1, y: 232, 'text-anchor': 'middle', class: 'c-na' }, mc).textContent = '·'; bars.push(null); return; }
+    const v = 100 * m[1] / m[0], h = Math.max(1, 236 - MY(v));
+    bars.push(el('rect', { x, y: 236 - h, width: MSTEP - 2, height: h, rx: 1.5, class: 'c-bar' }, mc));
+  });
+  const splitLine = el('line', { x1: 0, y1: 8, x2: 0, y2: 240, class: 'c-split' }, mc);
+  const handle = el('circle', { cx: 0, cy: 8, r: 6, class: 'c-handle' }, mc);
+  const splitIn = $('#split');
+  let split = 36, hot = -1;
+  function sums(a, b) {
+    let births = 0, deaths = 0;
+    for (let i = a; i < b; i++) if (MONTHLY[i]) { births += MONTHLY[i][0]; deaths += MONTHLY[i][1]; }
+    return { births, deaths };
+  }
+  function paintBars() {
+    bars.forEach((b, i) => { if (b) b.setAttribute('class', 'c-bar' + (i >= split ? ' after' : '') + (i === hot ? ' hot' : '')); });
+  }
+  function drawSplit() {
+    const x = MX0 + split * MSTEP;
+    splitLine.setAttribute('x1', x); splitLine.setAttribute('x2', x); handle.setAttribute('cx', x);
+    afterBand.setAttribute('x', x); afterBand.setAttribute('width', MX0 + 99 * MSTEP - x);
+    paintBars();
+    $('#splitOut').textContent = monthName(split);
+    splitIn.value = split;
+    const a = sums(0, split), b = sums(split, 99);
+    $('#before').textContent = `${pct(a.deaths, a.births)} died`;
+    $('#after').textContent = `${pct(b.deaths, b.births)} died`;
+    const ratio = (a.deaths / a.births) / (b.deaths / b.births);
+    const say = $('#saySplit');
+    if (split === WASH) {
+      say.textContent = `This is it. Semmelweis began the chlorine washings in mid-May 1847, so June is the first full month. Before: ${fmt(a.deaths)} deaths in ${fmt(a.births)} births. After: ${fmt(b.deaths)} in ${fmt(b.births)}. Once the doctors washed, a mother’s risk of dying fell to about one ${['', '', 'half', 'third', 'quarter', 'fifth', 'sixth'][Math.round(ratio)] || Math.round(ratio) + 'th'} of what it had been.`;
+    } else if (split < WASH) {
+      say.textContent = `Before the line, ${pct(a.deaths, a.births)} of mothers died; after it, ${pct(b.deaths, b.births)}. The months after your line still include plenty of bad ones. Try later.`;
+    } else {
+      say.textContent = `Before the line, ${pct(a.deaths, a.births)} of mothers died; after it, ${pct(b.deaths, b.births)}. Your “before” already includes good months. Try earlier.`;
+    }
+  }
+  splitIn.addEventListener('input', () => { split = +splitIn.value; drawSplit(); });
+  function monthAt(e) {
+    const r = mc.getBoundingClientRect();
+    const x = (e.clientX - r.left) * 680 / r.width;
+    return Math.max(0, Math.min(98, Math.floor((x - MX0) / MSTEP)));
+  }
+  let draggingSplit = false;
+  mc.addEventListener('pointerdown', (e) => {
+    draggingSplit = true; mc.setPointerCapture(e.pointerId);
+    split = Math.max(1, Math.min(98, Math.round((monthAt(e) * MSTEP + MSTEP / 2) / MSTEP)));
+    drawSplit();
+  });
+  mc.addEventListener('pointermove', (e) => {
+    const i = monthAt(e);
+    hot = i;
+    if (draggingSplit) {
+      const r = mc.getBoundingClientRect();
+      const x = (e.clientX - r.left) * 680 / r.width;
+      split = Math.max(1, Math.min(98, Math.round((x - MX0) / MSTEP)));
+      drawSplit();
+    } else paintBars();
+    const m = MONTHLY[i];
+    showTip(tipM, mc, MX0 + (i + 0.5) * MSTEP, m ? MY(100 * m[1] / m[0]) : 230,
+      m ? `<b>${monthName(i)}</b><br>${fmt(m[1])} deaths in ${fmt(m[0])} births<br><b>${pct(m[1], m[0])}</b>` : `<b>${monthName(i)}</b><br>no figures`);
+  });
+  ['pointerup', 'pointercancel'].forEach((t) => mc.addEventListener(t, () => { draggingSplit = false; }));
+  mc.addEventListener('pointerleave', () => { tipM.hidden = true; hot = -1; paintBars(); });
+  mc.addEventListener('keydown', (e) => {
+    const d = { ArrowLeft: -1, ArrowRight: 1 }[e.key];
+    if (!d) return;
+    e.preventDefault();
+    split = Math.max(1, Math.min(98, split + d));
+    drawSplit();
+  });
+  $('#revealBtn').addEventListener('click', () => { split = WASH; drawSplit(); });
+  $('#winterBtn').addEventListener('click', (e) => {
+    const on = e.currentTarget.getAttribute('aria-pressed') !== 'true';
+    e.currentTarget.setAttribute('aria-pressed', String(on));
+    if (on) winterG.removeAttribute('hidden'); else winterG.setAttribute('hidden', '');
+    if (on) {
+      let wb = 0, wd = 0, sb = 0, sd = 0;
+      for (let i = 0; i < WASH - 1; i++) {
+        const m = MONTHLY[i]; if (!m) continue;
+        const mo = i % 12;
+        if (mo >= 10 || mo <= 2) { wb += m[0]; wd += m[1]; }
+        else if (mo >= 5 && mo <= 8) { sb += m[0]; sd += m[1]; }
+      }
+      $('#saySplit').textContent = `Before the washing, ${pct(wd, wb)} of mothers died in the months from November to March and ${pct(sd, sb)} from June to September. Semmelweis explained the difference: in summer the students were on holiday and the autopsy rooms were quiet, while in winter they crowded the dissecting rooms before the four o’clock rounds.`;
+    } else drawSplit();
+  });
+  drawSplit();
+
+  // ---------- Vienna and Dublin ----------
+  const lc = $('#longChart'), tipL = $('#tipLong');
+  const LX = (y) => 40 + (y - 1784) * (626 / 65), LY = (v) => 222 - v * 12.4;
+  {
+    el('rect', { x: LX(1847.375), y: 12, width: LX(1849.25) - LX(1847.375), height: 210, class: 'c-band' }, lc);
+    [0, 5, 10, 15].forEach((v) => {
+      el('line', { x1: 34, y1: LY(v), x2: 672, y2: LY(v), class: v ? 'c-grid' : 'c-axis' }, lc);
+      el('text', { x: 28, y: LY(v) + 4, 'text-anchor': 'end', class: 'c-t' }, lc).textContent = v + '%';
+    });
+    for (let y = 1790; y <= 1845; y += 10) el('text', { x: LX(y), y: 240, 'text-anchor': 'middle', class: 'c-t' }, lc).textContent = y;
+    el('line', { x1: LX(1822.5), y1: 12, x2: LX(1822.5), y2: 222, class: 'c-mark', style: 'stroke: var(--ink)' }, lc);
+    el('text', { x: LX(1822.5) - 6, y: 30, 'text-anchor': 'end', class: 'c-t' }, lc).textContent = '1823: teaching';
+    el('text', { x: LX(1822.5) - 6, y: 43, 'text-anchor': 'end', class: 'c-t' }, lc).textContent = 'by autopsy begins';
+    const pv = VIENNA.map((r) => [LX(r[0]), LY(100 * r[2] / r[1])]), pd = DUBLIN.map((r) => [LX(r[0]), LY(100 * r[2] / r[1])]);
+    el('path', { d: 'M' + pd.map((p) => p.map((n) => n.toFixed(1)).join(' ')).join(' L'), class: 'c-l2' }, lc);
+    el('path', { d: 'M' + pv.map((p) => p.map((n) => n.toFixed(1)).join(' ')).join(' L'), class: 'c-l1' }, lc);
+    el('text', { x: LX(1825) + 6, y: LY(8.8) - 6, class: 'c-lab' }, lc).textContent = 'Vienna';
+    el('text', { x: LX(1795), y: LY(2.6) - 10, class: 'c-lab' }, lc).textContent = 'Dublin';
+  }
+  const lSel = el('line', { x1: 0, y1: 12, x2: 0, y2: 222, class: 'c-sel' }, lc);
+  lSel.setAttribute('opacity', 0);
+  const lP1 = el('circle', { r: 4.5, class: 'c-p1', opacity: 0 }, lc), lP2 = el('circle', { r: 4.5, class: 'c-p2', opacity: 0 }, lc);
+  let lYear = 1823;
+  function tipLong(y) {
+    lYear = Math.max(1784, Math.min(1849, y));
+    const v = VIENNA[lYear - 1784], d = DUBLIN[lYear - 1784], x = LX(lYear);
+    lSel.setAttribute('x1', x); lSel.setAttribute('x2', x); lSel.setAttribute('opacity', 1);
+    lP1.setAttribute('cx', x); lP1.setAttribute('cy', LY(100 * v[2] / v[1])); lP1.setAttribute('opacity', 1);
+    lP2.setAttribute('cx', x); lP2.setAttribute('cy', LY(100 * d[2] / d[1])); lP2.setAttribute('opacity', 1);
+    showTip(tipL, lc, x, Math.min(LY(100 * v[2] / v[1]), LY(100 * d[2] / d[1])),
+      `<b>${lYear}</b><br>${sw('--first')}Vienna <b>${pct(v[2], v[1])}</b><br>${sw('--second')}Dublin <b>${pct(d[2], d[1])}</b>`);
+  }
+  function hideLong() { tipL.hidden = true; [lSel, lP1, lP2].forEach((n) => n.setAttribute('opacity', 0)); }
+  lc.addEventListener('pointermove', (e) => {
+    const r = lc.getBoundingClientRect();
+    tipLong(Math.round(1784 + ((e.clientX - r.left) * 680 / r.width - 40) * 65 / 626));
+  });
+  lc.addEventListener('pointerleave', hideLong);
+  lc.addEventListener('focus', () => tipLong(lYear));
+  lc.addEventListener('blur', hideLong);
+  lc.addEventListener('keydown', (e) => {
+    const d = { ArrowLeft: -1, ArrowRight: 1 }[e.key];
+    if (!d) return;
+    e.preventDefault(); tipLong(lYear + d);
+  });
+  function period(rows, a, b) {
+    let births = 0, deaths = 0;
+    rows.forEach((r) => { if (r[0] >= a && r[0] <= b) { births += r[1]; deaths += r[2]; } });
+    return pct(deaths, births);
+  }
+  $('#v1').textContent = period(VIENNA, 1784, 1822);
+  $('#v2').textContent = period(VIENNA, 1823, 1846);
+  $('#u1').textContent = period(DUBLIN, 1784, 1822);
+  $('#u2').textContent = period(DUBLIN, 1823, 1846);
+})();
+</script>
+</body>
+</html>
