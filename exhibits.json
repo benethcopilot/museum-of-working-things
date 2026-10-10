@@ -122,6 +122,11 @@
       "slug": "difference-engine", "hall": "machines", "title": "Difference Engine", "ages": "10 and up",
       "blurb": "Turn the handle of Charles Babbage’s calculating engine and watch it print tables of squares, cubes and primes using nothing but addition.",
       "try": "Catch the typesetter’s misprint"
+    },
+    {
+      "slug": "split-rock", "hall": "machines", "title": "Split Rock Lighthouse", "ages": "8 and up",
+      "blurb": "Wind the weights and set the governor so Split Rock’s 1910 lens flashes every ten seconds across Lake Superior, then open the lens and find out why the light reached 22 miles.",
+      "try": "Keep the light through a November night"
     }
   ]
 }

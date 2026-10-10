@@ -1,0 +1,1204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Split Rock Lighthouse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rokkitt:wght@500;700;800&family=Libre+Franklin:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=Caveat:wght@500&display=swap">
+<style>
+:root {
+  /* Layout: a night chart of the western end of Lake Superior with the light's two beams sweeping, beside the view from a ship's deck and the watch room under the lens; then the lens cut open, the curve of the lake, and the 1905 storm that put the light there. */
+  --paper: #e6ebec;
+  --paper-2: #d8e0e2;
+  --card: #f3f6f6;
+  --ink: #14202b;
+  --muted: #50606c;
+  --line: rgba(20, 32, 43, 0.14);
+  --line-strong: rgba(20, 32, 43, 0.32);
+  --lake: #1d4f7a;
+  --lamp: #c98a12;
+  --lamp-ink: #1d1404;
+  --alarm: #b03a2e;
+  --ok: #2c7548;
+  /* the night scene looks the same in both themes */
+  --night: #0a1622;
+  --night-2: #12263b;
+  --night-land: #182029;
+  --night-shore: rgba(196, 214, 228, 0.34);
+  --night-grid: rgba(170, 200, 225, 0.12);
+  --night-ink: #c9d6e0;
+  --night-dim: #7f93a4;
+  --beam: #ffd56a;
+  --glass: rgba(170, 215, 235, 0.22);
+  --glass-edge: rgba(190, 225, 240, 0.75);
+  --log-ink: #22324a;
+  --log-paper: #f6f1e2;
+  --log-rule: rgba(60, 90, 140, 0.18);
+  --f-display: "Rokkitt", "Rockwell", Georgia, serif;
+  --f-body: "Libre Franklin", "Franklin Gothic Book", Arial, sans-serif;
+  --f-data: "IBM Plex Mono", Consolas, "Courier New", monospace;
+  --f-hand: "Caveat", "Segoe Print", "Bradley Hand", cursive;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0c131a;
+    --paper-2: #16212c;
+    --card: #111b25;
+    --ink: #e2e8eb;
+    --muted: #9cabb6;
+    --line: rgba(226, 232, 235, 0.12);
+    --line-strong: rgba(226, 232, 235, 0.3);
+    --lake: #8dbbe6;
+    --lamp: #f2c14e;
+    --lamp-ink: #1d1404;
+    --alarm: #f08b7e;
+    --ok: #82d09c;
+    --log-ink: #22324a;
+    --log-paper: #e9e2cf;
+    --log-rule: rgba(60, 90, 140, 0.2);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0c131a;
+  --paper-2: #16212c;
+  --card: #111b25;
+  --ink: #e2e8eb;
+  --muted: #9cabb6;
+  --line: rgba(226, 232, 235, 0.12);
+  --line-strong: rgba(226, 232, 235, 0.3);
+  --lake: #8dbbe6;
+  --lamp: #f2c14e;
+  --lamp-ink: #1d1404;
+  --alarm: #f08b7e;
+  --ok: #82d09c;
+  --log-ink: #22324a;
+  --log-paper: #e9e2cf;
+  --log-rule: rgba(60, 90, 140, 0.2);
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: default; opacity: 0.45; }
+:focus-visible { outline: 3px solid var(--lamp); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 700; line-height: 1.08; margin: 0; text-wrap: balance; }
+a { color: var(--lake); }
+
+.page { box-sizing: border-box; max-width: 1220px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 44px; }
+.masthead { display: grid; gap: 10px; }
+.eyebrow { margin: 0; font-family: var(--f-data); font-size: 0.76rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--lake); }
+.masthead h1 { font-size: clamp(2.6rem, 7.2vw, 5.2rem); font-weight: 800; letter-spacing: -0.01em; }
+.lede { margin: 0; max-width: 68ch; color: var(--muted); }
+
+/* ---------- The station ---------- */
+.station { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); grid-template-areas: "chart deck" "chart watch"; gap: 22px 28px; align-items: start; }
+.chart { grid-area: chart; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.chart-frame { position: relative; border-radius: 4px; overflow: hidden; background: var(--night); border: 1px solid var(--line-strong); }
+#map { display: block; width: 100%; height: auto; }
+.hud { position: absolute; left: 8px; top: 8px; right: 8px; display: flex; flex-wrap: wrap; gap: 5px 6px; font-family: var(--f-data); font-size: 0.74rem; color: var(--night-ink); pointer-events: none; }
+.hud span { background: rgba(6, 14, 22, 0.78); padding: 2px 8px; border-radius: 3px; }
+.hud .fog { color: var(--beam); }
+.chart-note { margin: 0; font-size: 0.86rem; color: var(--muted); }
+.m-lake { fill: var(--night); }
+.m-grid { stroke: var(--night-grid); stroke-width: 1; fill: none; }
+.m-gridt { font-family: var(--f-data); font-size: 9px; fill: var(--night-dim); }
+.m-land { fill: var(--night-land); stroke: var(--night-shore); stroke-width: 1.1; stroke-linejoin: round; }
+.m-ring { fill: none; stroke: var(--beam); stroke-opacity: 0.32; stroke-width: 1; stroke-dasharray: 3 5; }
+.m-ringt { font-family: var(--f-data); font-size: 10px; fill: var(--beam); fill-opacity: 0.75; }
+.m-label { font-family: var(--f-body); font-style: italic; font-size: 11px; fill: var(--night-ink); }
+.m-big { font-family: var(--f-display); font-size: 15px; letter-spacing: 0.32em; fill: var(--night-dim); }
+.m-town { fill: var(--night-ink); }
+.m-light { fill: #fff3c8; stroke: var(--night); stroke-width: 1.5; }
+.m-ship { fill: #d8e4ec; stroke: var(--night); stroke-width: 1; }
+.m-shiphit { fill: transparent; cursor: grab; }
+.ship { touch-action: none; }
+.ship:focus { outline: none; }
+.ship:focus-visible .m-shipring { stroke: var(--beam); stroke-width: 2; }
+.m-shipring { fill: none; stroke: transparent; }
+.m-fog { fill: #a9b5bf; }
+.m-horn { fill: none; stroke: var(--night-ink); stroke-width: 1.5; }
+
+.deck { grid-area: deck; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.watch { grid-area: watch; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.deck h2, .watch h2 { font-size: 1.5rem; }
+.view { display: block; width: 100%; height: auto; border-radius: 4px; background: var(--night); }
+.strip-cap { display: flex; justify-content: space-between; font-family: var(--f-data); font-size: 0.72rem; color: var(--muted); margin-top: -4px; }
+.readouts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.ro { padding: 7px 10px; border-radius: 3px; background: var(--paper-2); min-width: 0; }
+.ro span { display: block; font-size: 0.74rem; color: var(--muted); }
+.ro b { font-family: var(--f-data); font-weight: 500; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.say { margin: 0; padding: 10px 12px; border-left: 3px solid var(--lamp); background: var(--card); font-size: 0.95rem; }
+.say.warn { border-left-color: var(--alarm); }
+.say.good { border-left-color: var(--ok); }
+
+.watch-grid { display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 16px; align-items: start; }
+#tower { display: block; width: 104px; height: auto; }
+.t-wall { fill: var(--card); stroke: var(--ink); stroke-width: 1.4; stroke-linejoin: round; }
+.t-glass { fill: var(--night); stroke: var(--ink); stroke-width: 1.2; }
+.t-roof { fill: var(--ink); }
+.t-mast { fill: var(--paper-2); stroke: var(--line-strong); stroke-width: 1; }
+.t-weight { fill: var(--muted); stroke: var(--ink); stroke-width: 1; }
+.t-cable { stroke: var(--ink); stroke-width: 1; }
+.t-box { fill: var(--lamp); stroke: var(--ink); stroke-width: 1.2; }
+.t-crank { stroke: var(--ink); stroke-width: 2; stroke-linecap: round; fill: none; }
+.t-merc { fill: #b9c2c8; }
+.t-lens { fill: var(--glass); stroke: var(--glass-edge); stroke-width: 1; }
+.t-eye { fill: var(--beam); }
+.t-cap { font-family: var(--f-data); font-size: 8px; fill: var(--muted); }
+.controls { display: flex; flex-direction: column; gap: 11px; min-width: 0; }
+.gauge { display: grid; grid-template-columns: 6.2em minmax(0, 1fr); gap: 2px 10px; align-items: center; font-size: 0.9rem; }
+.bar { height: 10px; border-radius: 5px; background: var(--paper-2); overflow: hidden; border: 1px solid var(--line); }
+.bar i { display: block; height: 100%; width: 100%; background: var(--lake); }
+.bar.low i { background: var(--alarm); }
+.gauge small { grid-column: 2; font-family: var(--f-data); font-size: 0.74rem; color: var(--muted); }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.row > span { font-size: 0.9rem; margin-right: 4px; }
+.btn { padding: 6px 12px; border: 1.5px solid var(--line-strong); border-radius: 3px; background: none; font-size: 0.9rem; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+.btn:hover:not(:disabled) { background: var(--paper-2); }
+.btn[aria-pressed="true"] { background: var(--lake); color: var(--paper); border-color: var(--lake); }
+.btn.primary { background: var(--lamp); border-color: var(--lamp); color: var(--lamp-ink); font-weight: 600; }
+.btn.primary:hover:not(:disabled) { background: var(--lamp); filter: brightness(1.06); }
+.slider { display: flex; flex-direction: column; gap: 2px; font-size: 0.9rem; }
+.slider input { width: 100%; accent-color: var(--lake); }
+.slider output { font-family: var(--f-data); font-variant-numeric: tabular-nums; }
+.nightbox { display: flex; flex-direction: column; gap: 9px; padding: 10px 12px; border: 1px dashed var(--line-strong); border-radius: 4px; }
+.nightbox p { margin: 0; font-size: 0.88rem; color: var(--muted); }
+
+/* ---------- Log ---------- */
+.log { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 26px; align-items: start; }
+.logpage { padding: 18px 22px 22px; border-radius: 3px; background-color: var(--log-paper); color: var(--log-ink); background-image: repeating-linear-gradient(to bottom, transparent 0 33px, var(--log-rule) 33px 34px); box-shadow: 0 1px 0 var(--line-strong); }
+.logpage p { margin: 0; font-family: var(--f-hand); font-size: 1.42rem; line-height: 34px; }
+.logpage .stamp { font-family: var(--f-data); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; line-height: 34px; opacity: 0.7; }
+.verdict { display: flex; flex-direction: column; gap: 12px; }
+.verdict h2 { font-size: 1.5rem; }
+.scores { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+
+/* ---------- Lens ---------- */
+.lens, .range { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+.range { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); }
+.range .figure { order: 2; }
+.figure { border-radius: 4px; background: var(--night); overflow: hidden; border: 1px solid var(--line-strong); }
+.figure svg { display: block; width: 100%; height: auto; }
+.text { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.text h2 { font-size: clamp(1.6rem, 3.2vw, 2.2rem); }
+.text p { margin: 0; max-width: 62ch; }
+.l-glass { fill: var(--glass); stroke: var(--glass-edge); stroke-width: 1; }
+.l-glass.dim { opacity: 0.25; }
+.l-frame { fill: none; stroke: #8a7440; stroke-width: 1.5; }
+.l-ray { stroke: var(--beam); stroke-width: 1; stroke-opacity: 0.55; }
+.l-fan { fill: var(--beam); fill-opacity: 0.08; }
+.l-out { stroke: var(--beam); stroke-width: 1.2; stroke-opacity: 0.85; }
+.l-lost { stroke: var(--night-dim); stroke-width: 1; stroke-opacity: 0.45; stroke-dasharray: 2 4; }
+.l-level { stroke: var(--night-ink); stroke-width: 1; stroke-opacity: 0.35; stroke-dasharray: 6 6; }
+.l-t { font-family: var(--f-data); font-size: 11px; fill: var(--night-ink); }
+.l-burner { fill: #6c5a35; }
+.l-mantle { fill: #fff6d6; }
+
+.r-sky { fill: var(--night); }
+.r-water { fill: #10314f; stroke: var(--night-shore); stroke-width: 1; }
+.r-land { fill: var(--night-land); stroke: var(--night-shore); stroke-width: 1; }
+.r-tower { fill: #e9e2cf; }
+.r-see { stroke: var(--beam); stroke-width: 1.6; }
+.r-blocked { stroke: #ef7f6f; stroke-width: 1.6; stroke-dasharray: 5 4; }
+.r-tan { stroke: var(--night-ink); stroke-opacity: 0.45; stroke-width: 1; stroke-dasharray: 2 3; }
+.r-tick { stroke: var(--night-dim); stroke-width: 1; }
+.r-t { font-family: var(--f-data); font-size: 10px; fill: var(--night-dim); }
+.r-tl { font-family: var(--f-data); font-size: 10.5px; fill: var(--night-ink); }
+.r-ship { fill: #d8e4ec; }
+.r-lamp { fill: var(--beam); }
+
+/* ---------- Storm and history ---------- */
+.storm { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.storm h2 { font-size: clamp(1.6rem, 3.2vw, 2.2rem); }
+.storm p { margin: 0; max-width: 62ch; }
+.story { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-left: 2px solid var(--line-strong); }
+.timeline li { display: grid; grid-template-columns: 4.2em minmax(0, 1fr); gap: 12px; padding: 7px 0 7px 14px; position: relative; }
+.timeline li::before { content: ""; position: absolute; left: -6px; top: 15px; width: 10px; height: 10px; border-radius: 50%; background: var(--paper); border: 2px solid var(--lake); }
+.timeline li.lit::before { background: var(--lamp); border-color: var(--lamp); }
+.timeline b { font-family: var(--f-display); font-size: 1.15rem; font-weight: 700; color: var(--lake); font-variant-numeric: tabular-nums; }
+.timeline p { margin: 0; font-size: 0.95rem; }
+.sources { margin: 0; font-size: 0.86rem; color: var(--muted); max-width: 100ch; }
+
+@media (max-width: 900px) {
+  .station { grid-template-columns: minmax(0, 1fr); grid-template-areas: "chart" "deck" "watch"; }
+  .lens, .range, .storm, .log { grid-template-columns: minmax(0, 1fr); }
+  .range .figure { order: 0; }
+}
+@media (max-width: 460px) {
+  .readouts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .watch-grid { grid-template-columns: 78px minmax(0, 1fr); gap: 12px; }
+  #tower { width: 78px; }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="split-rock" defer></script>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <p class="eyebrow">Machines &amp; Messages · North Shore of Lake Superior · 1910</p>
+    <h1>Split Rock Lighthouse</h1>
+    <p class="lede">After the storm of November 1905 wrecked or damaged 29 ships on Lake Superior, the Lighthouse Service put a light on a 130-foot cliff north of Two Harbors, Minnesota. Its lens floated on a bath of mercury, turned by falling weights, and sent one white flash across the lake every ten seconds. Keep it turning.</p>
+  </header>
+
+  <section class="station" id="station" aria-label="The light at work">
+    <div class="chart">
+      <div class="chart-frame">
+        <svg id="map" viewBox="0 0 640 480" role="img" aria-label="Night chart of the western end of Lake Superior. Split Rock Light stands on the North Shore and two beams sweep around it. Your ship is out on the lake."></svg>
+        <div class="hud" id="hud" hidden></div>
+      </div>
+      <p class="chart-note">Drag your ship anywhere on the lake, or select it and use the arrow keys. Chart simplified from real positions; grid lines are every quarter degree of latitude and half degree of longitude.</p>
+    </div>
+
+    <div class="deck">
+      <h2>From your deck</h2>
+      <svg class="view" id="deckview" viewBox="0 0 320 140" role="img" aria-label="What a sailor on your ship sees toward the light"></svg>
+      <svg class="view" id="strip" viewBox="0 0 320 52" role="img" aria-label="The light's brightness at your ship over the last 30 seconds"></svg>
+      <div class="strip-cap"><span>30 seconds ago</span><span>brightness at your ship</span><span>now</span></div>
+      <div class="readouts">
+        <div class="ro"><span>Flash every</span><b id="roEvery">10.0 s</b></div>
+        <div class="ro"><span>Each flash lasts</span><b id="roLasts">0.5 s</b></div>
+        <div class="ro"><span>Light is</span><b id="roDist">11.0 mi</b></div>
+      </div>
+      <p class="say" id="sayChar" aria-live="polite"></p>
+    </div>
+
+    <div class="watch">
+      <h2>In the watch room</h2>
+      <div class="watch-grid">
+        <svg id="tower" viewBox="0 0 120 262" role="img" aria-label="Cutaway of the tower: the lens on its mercury float, the clockwork below it, and the weights hanging in the hollow mast"></svg>
+        <div class="controls">
+          <div class="gauge">
+            <span>Weights</span><div class="bar" id="wBarBox"><i id="wBar"></i></div>
+            <small id="wText"></small>
+          </div>
+          <div class="row"><button class="btn primary" id="wind" type="button">Wind the weights</button></div>
+          <label class="slider" for="gov">
+            <span>Governor: one turn of the lens every <output id="govOut" for="gov">20.0 s</output></span>
+            <input id="gov" type="range" min="10" max="40" step="0.5" value="20">
+          </label>
+          <div class="row" role="group" aria-label="Lens panels">
+            <span>Lens panels</span>
+            <button class="btn chip" type="button" data-n="2" aria-pressed="true">2</button>
+            <button class="btn chip" type="button" data-n="4" aria-pressed="false">4</button>
+            <button class="btn chip" type="button" data-n="8" aria-pressed="false">8</button>
+          </div>
+          <div class="row">
+            <button class="btn" id="fogBtn" type="button" aria-pressed="false">Sound the fog signal</button>
+            <button class="btn" id="soundBtn" type="button" aria-pressed="true">Sound on</button>
+          </div>
+          <div class="nightbox">
+            <div class="night-only gauge" hidden>
+              <span>Lamp tank</span><div class="bar" id="pBarBox"><i id="pBar"></i></div>
+              <small id="pText"></small>
+            </div>
+            <div class="row night-only" hidden><button class="btn primary" id="pump" type="button">Pump the tank</button></div>
+            <p id="nightHelp">Keep the light through a November night in 1910. The weights last two hours, the kerosene tank needs pumping, and fog can roll in at any hour.</p>
+            <div class="row"><button class="btn" id="nightBtn" type="button">Keep a November night</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="log" id="logCard" hidden aria-label="Your night in the station log">
+    <div class="logpage" id="logPage"></div>
+    <div class="verdict">
+      <h2>The inspector reads your log</h2>
+      <div class="scores">
+        <div class="ro"><span>Light shown correctly</span><b id="scLight">—</b></div>
+        <div class="ro"><span>Fog signal when needed</span><b id="scFog">—</b></div>
+      </div>
+      <p class="say" id="sayVerdict"></p>
+      <div class="row"><button class="btn" id="againBtn" type="button">Keep another night</button></div>
+    </div>
+  </section>
+
+  <section class="lens" aria-label="Inside the lens">
+    <div class="figure">
+      <svg id="lensSvg" viewBox="0 0 680 380" role="img" aria-label="Cross-section of the two-panel lens with the lamp at its centre and the light rays drawn"></svg>
+    </div>
+    <div class="text">
+      <h2>Inside the lens</h2>
+      <p>The lens is two great glass panels closed around the lamp like the halves of a clam shell, which is why it is called a bivalve. Rings of glass in the middle of each panel bend the light; prisms above and below catch the light going up or down and bounce it out level. Everything leaves flat, toward the horizon, where the ships are.</p>
+      <label class="slider" for="flame">
+        <span>Raise or lower the flame: <output id="flameOut" for="flame">at the focus</output></span>
+        <input id="flame" type="range" min="-40" max="40" step="1" value="0">
+      </label>
+      <div class="row"><button class="btn" id="bareBtn" type="button" aria-pressed="false">Take the lens away</button></div>
+      <div class="readouts">
+        <div class="ro"><span>Rays the lens catches</span><b id="roCaught">40 of 60</b></div>
+        <div class="ro"><span>Aimed at the horizon</span><b id="roAim">100%</b></div>
+        <div class="ro"><span>Beam tilt</span><b id="roTilt">0.0°</b></div>
+      </div>
+      <p class="say" id="sayLens" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="range" aria-label="How far the light reaches">
+    <div class="figure">
+      <svg id="rangeSvg" viewBox="0 0 680 300" role="img" aria-label="Side view of the lake's curve between the light and a ship"></svg>
+    </div>
+    <div class="text">
+      <h2>Why 22 miles?</h2>
+      <p>The lake is curved. From high on the cliff the light can see farther over the bulge of water, and a sailor high on a deck can see farther back. Where the two horizons meet is as far as the lamp can reach, however bright it is.</p>
+      <label class="slider" for="dist">
+        <span>Ship’s distance from the light: <output id="distOut" for="dist">20 miles</output></span>
+        <input id="dist" type="range" min="1" max="45" step="0.5" value="20">
+      </label>
+      <div class="row" role="group" aria-label="Where the sailor stands">
+        <span>Sailor</span>
+        <button class="btn eye" type="button" data-h="4" aria-pressed="false">Rowboat · 4 ft</button>
+        <button class="btn eye" type="button" data-h="15" aria-pressed="true">Deck · 15 ft</button>
+        <button class="btn eye" type="button" data-h="40" aria-pressed="false">Pilothouse · 40 ft</button>
+      </div>
+      <div class="row" role="group" aria-label="Where the light stands">
+        <span>Light</span>
+        <button class="btn lamp" type="button" data-h="168" aria-pressed="true">On the cliff · 168 ft</button>
+        <button class="btn lamp" type="button" data-h="50" aria-pressed="false">At the water’s edge · 50 ft</button>
+      </div>
+      <p class="say" id="sayRange" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="storm" aria-label="The storm and the light's history">
+    <div class="story">
+      <h2>The storm that built a lighthouse</h2>
+      <p>On 27 November 1905 a storm swept east across the Great Lakes. On Lake Superior it brought easterly gales and heavy snow, with winds at Duluth reaching 68 miles an hour early on the 28th.</p>
+      <p>The steamer <i>Mataafa</i>, towing the barge <i>James Nasmyth</i>, turned back for Duluth. Trying to run between the piers of the ship canal she was thrown against them and grounded outside, where she broke in two. Nine men trapped in the stern died of cold in the night while people watched from shore.</p>
+      <p>Up the North Shore the steamer <i>William Edenborn</i> was driven aground near the Split Rock River, and her barge <i>Madeira</i> broke loose and was smashed against Gold Rock, close to where the lighthouse now stands. Seaman Fred Benson’s courage saved all but one of her crew.</p>
+      <p>By the count of the Minnesota Historical Society, the storm disabled or destroyed 29 ships and took 36 lives. The shore here had another danger: iron in its rocks pulled compass needles off true. Shipowners asked for a light, and in March 1907 Congress set aside $75,000 to build one.</p>
+    </div>
+    <ol class="timeline">
+      <li><b>1905</b><p>The November gale damages or destroys 29 ships on Lake Superior.</p></li>
+      <li><b>1907</b><p>Congress appropriates $75,000 for a light station between Two Harbors and Beaver Bay.</p></li>
+      <li><b>1909</b><p>Work begins in June. There is no road, so every brick and beam arrives by boat and is hoisted up the cliff by a derrick.</p></li>
+      <li class="lit"><b>1910</b><p>The light shines for the first time that summer. Orren “Pete” Young is head keeper until 1928.</p></li>
+      <li><b>1924</b><p>The North Shore highway reaches the station and tourists start arriving by car.</p></li>
+      <li><b>1940</b><p>The station is electrified. A 1,000-watt bulb replaces the kerosene lamp and an electric motor turns the lens, so nobody has to wind the weights again.</p></li>
+      <li><b>1969</b><p>Radar and radio navigation have made the light unnecessary, and it is retired.</p></li>
+      <li class="lit"><b>1975</b><p>The <i>Edmund Fitzgerald</i> sinks on 10 November with all 29 of her crew. Since 1985 the beacon has been lit every 10 November in their memory.</p></li>
+      <li><b>2011</b><p>Split Rock Light Station is named a National Historic Landmark.</p></li>
+    </ol>
+  </section>
+
+  <p class="sources">Sources: Minnesota Historical Society, <a href="https://www.mnhs.org/splitrock/learn/technology" target="_blank" rel="noopener">Lighthouse Technology</a> (the clockwork wound every two hours, 250 pounds of mercury under a 1,500-pound lens, two panels catching 60 percent of the light, one flash every 10 seconds lasting half a second, the kerosene tank pumped up by hand, the 22-mile range, the fog signal’s 2-second blast every 20 seconds below about five miles’ visibility), <a href="https://www.mnhs.org/splitrock/learn/timeline" target="_blank" rel="noopener">Timeline</a> and <a href="https://www.mnhs.org/splitrock/learn/shipwrecks" target="_blank" rel="noopener">Shipwrecks</a>; Terry Pepper, <a href="http://www.terrypepper.com/lights/superior/splitrock/splitrock.htm" target="_blank" rel="noopener">Seeing the Light: Split Rock</a> (one turn every 20 seconds, the 168-foot focal plane, the 55 mm oil vapor lamp, the iron in the shore rocks, construction); Wikipedia, <a href="https://en.wikipedia.org/wiki/Split_Rock_Lighthouse" target="_blank" rel="noopener">Split Rock Lighthouse</a> and <a href="https://en.wikipedia.org/wiki/Mataafa_Storm" target="_blank" rel="noopener">Mataafa Storm</a> (the wreck of the <i>Mataafa</i> and the Weather Bureau’s wind record). Range uses the Bowditch rule that the horizon lies 1.17 × √(height in feet) nautical miles away, with the Light List’s standard 15-foot observer. A third-order lens has a 500 mm focal distance. The ray drawing is simplified: each glass ring is treated as a thin element.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const NS = 'http://www.w3.org/2000/svg';
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const rad = (d) => d * Math.PI / 180;
+  const deg = (r) => r * 180 / Math.PI;
+  function el(tag, attrs, parent) {
+    const n = document.createElementNS(NS, tag);
+    if (attrs) for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+  function setText(node, s) { if (node.textContent !== s) node.textContent = s; }
+
+  // ---------- Facts ----------
+  const FOCAL_FT = 168;            // focal plane above the lake (Pepper)
+  const K = 1.17 * 1.15078;        // horizon in statute miles per √feet (Bowditch, converted)
+  const horizon = (ft) => K * Math.sqrt(Math.max(0, ft));
+  const EYE_FT = 15;               // the Light List's standard observer
+  const GEO_RANGE = horizon(FOCAL_FT) + horizon(EYE_FT);   // ≈ 22.7 miles
+  const NIGHT_SPEED = 240;         // night seconds per real second in the challenge
+
+  // ---------- Chart ----------
+  const LIGHT = [47.2, -91.3672];
+  const PX = 9;                    // pixels per mile
+  const MI_LAT = 69.05, MI_LON = 69.17 * Math.cos(rad(LIGHT[0]));
+  const C = { x: 250, y: 190 };
+  const proj = ([lat, lon]) => [C.x + (lon - LIGHT[1]) * MI_LON * PX, C.y - (lat - LIGHT[0]) * MI_LAT * PX];
+
+  const NORTH = [[46.70, -92.25], [46.779, -92.093], [46.84, -92.0], [46.9, -91.88], [46.947, -91.78], [46.99, -91.72], [47.017, -91.67], [47.05, -91.62], [47.09, -91.54], [47.14, -91.46], [47.183, -91.4], [47.194, -91.378], [47.2, -91.3665], [47.214, -91.347], [47.238, -91.318], [47.257, -91.297], [47.29, -91.25], [47.35, -91.18], [47.41, -91.11], [47.47, -91.0], [47.52, -90.92], [47.57, -90.83], [47.64, -90.68], [47.71, -90.52], [47.746, -90.334], [47.8, -90.1]];
+  const SOUTH = [[46.65, -92.3], [46.71, -92.01], [46.73, -91.8], [46.76, -91.6], [46.79, -91.39], [46.833, -91.26], [46.86, -91.1], [46.9, -90.96], [46.93, -90.9], [46.9, -90.84], [46.86, -90.79], [46.81, -90.82], [46.65, -90.85]];
+  const ISLANDS = [ // lat, lon, half-width and half-height in miles, tilt
+    [46.985, -90.94, 1.4, 1.6, 0], [46.99, -90.86, 1.0, 0.4, -10], [46.97, -90.8, 0.5, 0.6, 0],
+    [46.93, -90.73, 1.5, 1.8, 0], [47.07, -90.73, 0.6, 0.9, 0], [46.92, -90.57, 3.0, 1.0, -15],
+    [46.87, -90.48, 1.7, 0.6, -20], [47.03, -90.43, 1.2, 3.4, 15], [46.79, -90.7, 6.5, 2.2, -35]
+  ];
+  const northPoly = NORTH.map(proj).concat([[900, -300], [-300, -300], [-300, 600]]);
+  const southPoly = SOUTH.map(proj).concat([[-300, 600]]);
+  const islands = ISLANDS.map(([la, lo, a, b, t]) => { const [x, y] = proj([la, lo]); return { x, y, a: a * PX, b: b * PX, t }; });
+
+  function inPoly(pts, x, y) {
+    let inside = false;
+    for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+      const [xi, yi] = pts[i], [xj, yj] = pts[j];
+      if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+  }
+  function onLand(x, y) {
+    if (inPoly(northPoly, x, y) || inPoly(southPoly, x, y)) return true;
+    return islands.some((s) => {
+      const c = Math.cos(rad(-s.t)), sn = Math.sin(rad(-s.t));
+      const dx = x - s.x, dy = y - s.y;
+      const u = dx * c - dy * sn, v = dx * sn + dy * c;
+      return (u * u) / (s.a * s.a) + (v * v) / (s.b * s.b) <= 1.15;
+    });
+  }
+  const pathOf = (pts, close) => 'M' + pts.map((p) => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L') + (close ? ' Z' : '');
+
+  const map = $('#map');
+  const defs = el('defs', null, map);
+  const grad = el('radialGradient', { id: 'beamGrad', gradientUnits: 'userSpaceOnUse', cx: 0, cy: 0, r: 1 }, defs);
+  el('stop', { offset: 0, 'stop-color': '#fff3c8', 'stop-opacity': 0.95 }, grad);
+  el('stop', { offset: 0.3, 'stop-color': '#ffd56a', 'stop-opacity': 0.5 }, grad);
+  el('stop', { offset: 1, 'stop-color': '#ffd56a', 'stop-opacity': 0 }, grad);
+  const glowG = el('radialGradient', { id: 'lampGlow' }, defs);
+  el('stop', { offset: 0, 'stop-color': '#fff6d6', 'stop-opacity': 1 }, glowG);
+  el('stop', { offset: 0.35, 'stop-color': '#ffd56a', 'stop-opacity': 0.55 }, glowG);
+  el('stop', { offset: 1, 'stop-color': '#ffd56a', 'stop-opacity': 0 }, glowG);
+
+  el('rect', { x: 0, y: 0, width: 640, height: 480, class: 'm-lake' }, map);
+  // graticule
+  [[46.75, '46°45′'], [47.0, '47°N'], [47.25, '47°15′']].forEach(([lat, t]) => {
+    const y = proj([lat, LIGHT[1]])[1];
+    el('line', { x1: 0, y1: y, x2: 640, y2: y, class: 'm-grid' }, map);
+    el('text', { x: 4, y: y - 3, class: 'm-gridt' }, map).textContent = t;
+  });
+  [[-91.5, '91°30′W'], [-91.0, '91°W'], [-90.5, '90°30′']].forEach(([lon, t]) => {
+    const x = proj([LIGHT[0], lon])[0];
+    el('line', { x1: x, y1: 0, x2: x, y2: 480, class: 'm-grid' }, map);
+    el('text', { x: x + 3, y: 476, class: 'm-gridt' }, map).textContent = t;
+  });
+  const ring = el('circle', { cx: C.x, cy: C.y, r: (GEO_RANGE * PX).toFixed(1), class: 'm-ring' }, map);
+  const ringLabel = el('text', { x: C.x + GEO_RANGE * PX * Math.sin(rad(152)) + 6, y: C.y - GEO_RANGE * PX * Math.cos(rad(152)) + 2, class: 'm-ringt' }, map);
+  ringLabel.textContent = '22 miles';
+
+  const beams = el('g', { class: 'beams' }, map);
+  const lampHalo = el('circle', { cx: C.x, cy: C.y, r: 26, fill: 'url(#lampGlow)' }, map);
+  el('path', { d: pathOf(northPoly, true), class: 'm-land' }, map);
+  el('path', { d: pathOf(southPoly, true), class: 'm-land' }, map);
+  islands.forEach((s) => el('ellipse', { cx: s.x.toFixed(1), cy: s.y.toFixed(1), rx: s.a.toFixed(1), ry: s.b.toFixed(1), transform: `rotate(${s.t} ${s.x.toFixed(1)} ${s.y.toFixed(1)})`, class: 'm-land' }, map));
+
+  function label(x, y, text, cls, anchor) {
+    const t = el('text', { x, y, class: cls || 'm-label', 'text-anchor': anchor || 'start' }, map);
+    t.textContent = text;
+    return t;
+  }
+  label(452, 236, 'LAKE SUPERIOR', 'm-big', 'middle');
+  label(118, 140, 'MINNESOTA', 'm-big', 'middle');
+  label(255, 468, 'WISCONSIN', 'm-big', 'middle');
+  [[[47.017, -91.67], 'Two Harbors', -6, -4, 'end'], [[47.257, -91.297], 'Beaver Bay', -6, -4, 'end']].forEach(([p, t, dx, dy, a]) => {
+    const [x, y] = proj(p);
+    el('circle', { cx: x, cy: y, r: 2.4, class: 'm-town' }, map);
+    label(x + dx, y + dy, t, 'm-label', a);
+  });
+  label(240, 186, 'Split Rock Light', 'm-label', 'end');
+  label(552, 302, 'Apostle Islands', 'm-label', 'middle');
+  label(8, 438, '← Duluth, 45 mi', 'm-label', 'start');
+  label(634, 18, 'Grand Marais, 61 mi ↗', 'm-label', 'end');
+  // scale bar and north arrow
+  el('line', { x1: 520, y1: 48, x2: 520 + 10 * PX, y2: 48, stroke: '#c9d6e0', 'stroke-width': 2 }, map);
+  [520, 520 + 5 * PX, 520 + 10 * PX].forEach((x) => el('line', { x1: x, y1: 44, x2: x, y2: 52, stroke: '#c9d6e0', 'stroke-width': 1.5 }, map));
+  label(520 + 5 * PX, 64, '10 miles', 'm-gridt', 'middle');
+  el('path', { d: 'M628 40 L622 58 L628 54 L634 58 Z', fill: '#c9d6e0' }, map);
+  label(628, 72, 'N', 'm-gridt', 'middle');
+
+  el('circle', { cx: C.x, cy: C.y, r: 4.2, class: 'm-light' }, map);
+  const hornRing = el('circle', { cx: C.x, cy: C.y, r: 0, class: 'm-horn', opacity: 0 }, map);
+  const fogRect = el('rect', { x: 0, y: 0, width: 640, height: 480, class: 'm-fog', opacity: 0, 'pointer-events': 'none' }, map);
+
+  const shipG = el('g', { class: 'ship', tabindex: 0, role: 'button' }, map);
+  el('circle', { r: 18, class: 'm-shiphit' }, shipG);
+  el('circle', { r: 13, class: 'm-shipring' }, shipG);
+  el('path', { d: 'M0 -10 C4 -5 4 5 3 9 L-3 9 C-4 5 -4 -5 0 -10 Z', class: 'm-ship', transform: 'rotate(50)' }, shipG);
+
+  let beamPaths = [];
+  function buildBeams() {
+    beams.textContent = '';
+    beamPaths = [];
+    const h = rad(4.5);
+    for (let k = 0; k < S.n; k++) {
+      const a = rad(k * 360 / S.n);
+      const x1 = Math.sin(a - h), y1 = -Math.cos(a - h), x2 = Math.sin(a + h), y2 = -Math.cos(a + h);
+      beamPaths.push(el('path', { d: `M0 0 L${x1.toFixed(4)} ${y1.toFixed(4)} A1 1 0 0 1 ${x2.toFixed(4)} ${y2.toFixed(4)} Z`, fill: 'url(#beamGrad)' }, beams));
+    }
+  }
+
+  // ---------- Deck view ----------
+  const deck = $('#deckview');
+  const ddefs = el('defs', null, deck);
+  const sky = el('linearGradient', { id: 'deckSky', x1: 0, y1: 0, x2: 0, y2: 1 }, ddefs);
+  el('stop', { offset: 0, 'stop-color': '#060f19' }, sky);
+  el('stop', { offset: 1, 'stop-color': '#173049' }, sky);
+  const dglow = el('radialGradient', { id: 'deckGlow' }, ddefs);
+  el('stop', { offset: 0, 'stop-color': '#fffaf0', 'stop-opacity': 1 }, dglow);
+  el('stop', { offset: 0.25, 'stop-color': '#ffe08a', 'stop-opacity': 0.75 }, dglow);
+  el('stop', { offset: 1, 'stop-color': '#ffd56a', 'stop-opacity': 0 }, dglow);
+  el('rect', { x: 0, y: 0, width: 320, height: 102, fill: 'url(#deckSky)' }, deck);
+  el('rect', { x: 0, y: 102, width: 320, height: 38, fill: '#06101a' }, deck);
+  [[18, 14], [44, 38], [71, 9], [96, 52], [122, 22], [149, 41], [177, 12], [205, 30], [231, 58], [258, 18], [283, 44], [305, 8], [62, 66], [214, 70], [292, 75]].forEach(([x, y], i) =>
+    el('circle', { cx: x, cy: y, r: i % 3 ? 0.7 : 1.1, fill: '#dfe8f0', opacity: i % 2 ? 0.55 : 0.85 }, deck));
+  const ridge = el('path', { d: 'M0 102 L0 97 C40 95 80 96 120 94 C140 93 150 91 156 88 L164 88 C172 91 190 93 230 95 C270 96 300 96 320 97 L320 102 Z', fill: '#03080d' }, deck);
+  const dRefl = el('ellipse', { cx: 160, cy: 120, rx: 4, ry: 16, fill: 'url(#deckGlow)', opacity: 0 }, deck);
+  const dGlow = el('circle', { cx: 160, cy: 87, r: 4, fill: 'url(#deckGlow)', opacity: 0 }, deck);
+  const dCore = el('circle', { cx: 160, cy: 87, r: 1.6, fill: '#fff8e0', opacity: 0.1 }, deck);
+  const dFog = el('rect', { x: 0, y: 0, width: 320, height: 140, fill: '#9aa7b2', opacity: 0 }, deck);
+  const dMsg = el('text', { x: 160, y: 60, 'text-anchor': 'middle', fill: '#c9d6e0', 'font-family': 'IBM Plex Mono, monospace', 'font-size': 11 }, deck);
+  const dCap = el('text', { x: 8, y: 134, fill: '#7f93a4', 'font-family': 'IBM Plex Mono, monospace', 'font-size': 9.5 }, deck);
+
+  // ---------- Strip chart ----------
+  const strip = $('#strip');
+  el('rect', { x: 0, y: 0, width: 320, height: 52, fill: '#0a1622' }, strip);
+  for (let i = 0; i <= 6; i++) el('line', { x1: 10 + i * 50, y1: 6, x2: 10 + i * 50, y2: 46, stroke: 'rgba(170,200,225,0.12)' }, strip);
+  el('line', { x1: 10, y1: 46, x2: 310, y2: 46, stroke: 'rgba(170,200,225,0.35)' }, strip);
+  const stripLine = el('polyline', { points: '', fill: 'none', stroke: '#ffd56a', 'stroke-width': 1.5, 'stroke-linejoin': 'round' }, strip);
+
+  // ---------- Tower cutaway ----------
+  const tower = $('#tower');
+  el('path', { d: 'M60 4 L88 22 L32 22 Z', class: 't-roof' }, tower);
+  el('rect', { x: 34, y: 22, width: 52, height: 36, class: 't-glass' }, tower);
+  const tLens = el('rect', { x: 44, y: 26, width: 32, height: 28, rx: 8, class: 't-lens' }, tower);
+  const tEye = el('circle', { cx: 60, cy: 40, r: 5, class: 't-eye' }, tower);
+  el('rect', { x: 42, y: 55, width: 36, height: 4, class: 't-merc' }, tower);
+  el('path', { d: 'M30 58 L90 58 L90 84 L30 84 Z', class: 't-wall' }, tower);
+  el('rect', { x: 48, y: 64, width: 24, height: 14, class: 't-box' }, tower);
+  const tCrank = el('g', { transform: 'translate(78 71)' }, tower);
+  el('path', { d: 'M0 0 L8 0 L8 5', class: 't-crank' }, tCrank);
+  el('path', { d: 'M32 84 L88 84 L100 256 L20 256 Z', class: 't-wall' }, tower);
+  el('rect', { x: 55, y: 84, width: 10, height: 168, class: 't-mast' }, tower);
+  const tCable = el('line', { x1: 60, y1: 78, x2: 60, y2: 92, class: 't-cable' }, tower);
+  const tWeight = el('rect', { x: 53, y: 92, width: 14, height: 18, rx: 1.5, class: 't-weight' }, tower);
+  const TOP = 86, BOTTOM = 250 - 18;
+
+  // ---------- State ----------
+  const S = {
+    theta: 125, omega: 18, period: 20, n: 2, w: 1, p: 1, L: 1, b: 0,
+    ship: { x: 0, y: 0 },
+    samples: new Float32Array(600), sIdx: 0, sAcc: 0, frameNo: 0,
+    raf: 0, last: 0, visible: true, quiet: 0,
+    fogOn: false, fogClock: 0, blastT: -1, crankA: 0, crankUntil: 0,
+    sound: true, night: null, lastWindAt: -99, lastPumpAt: -99, clock: 0
+  };
+  {
+    const b = rad(140), r = 11 * PX;
+    S.ship.x = C.x + r * Math.sin(b);
+    S.ship.y = C.y - r * Math.cos(b);
+  }
+  buildBeams();
+
+  // ---------- Sound ----------
+  let ac = null;
+  function audio() {
+    if (!S.sound) return null;
+    if (!ac) {
+      try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
+    }
+    if (ac.state === 'suspended') ac.resume();
+    return ac;
+  }
+  function tick(freq, vol) {
+    const a = audio(); if (!a) return;
+    const t = a.currentTime;
+    const len = Math.floor(a.sampleRate * 0.03);
+    const buf = a.createBuffer(1, len, a.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+    const src = a.createBufferSource(); src.buffer = buf;
+    const bp = a.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = freq; bp.Q.value = 3;
+    const g = a.createGain(); g.gain.value = vol;
+    src.connect(bp); bp.connect(g); g.connect(a.destination);
+    src.start(t);
+  }
+  function blast() {
+    S.blastT = 0;
+    const a = audio(); if (!a) return;
+    // 1910-1935: a siren, 2 seconds on, 18 seconds silent (MNHS)
+    const t = a.currentTime;
+    const o = a.createOscillator(); o.type = 'sawtooth';
+    o.frequency.setValueAtTime(120, t);
+    o.frequency.exponentialRampToValueAtTime(310, t + 0.7);
+    o.frequency.setValueAtTime(310, t + 1.55);
+    o.frequency.exponentialRampToValueAtTime(170, t + 2.1);
+    const lp = a.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 850;
+    const g = a.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.16, t + 0.3);
+    g.gain.setValueAtTime(0.16, t + 1.7);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 2.15);
+    o.connect(lp); lp.connect(g); g.connect(a.destination);
+    o.start(t); o.stop(t + 2.25);
+  }
+
+  // ---------- Model ----------
+  function shipView() {
+    const dx = S.ship.x - C.x, dy = S.ship.y - C.y;
+    return { dist: Math.hypot(dx, dy) / PX, bearing: (deg(Math.atan2(dx, -dy)) + 360) % 360 };
+  }
+  const beamProfile = (d) => clamp((5.1 - d) / 1.2, 0, 1);   // half brightness at 4.5°: a 9° beam
+  function visibility() {
+    const n = S.night; if (!n) return Infinity;
+    let v = Infinity;
+    for (const f of n.banks) {
+      const ramp = 0.4 * 3600;
+      if (n.t < f.start || n.t > f.end) continue;
+      let k = 1;
+      if (n.t < f.start + ramp) k = (n.t - f.start) / ramp;
+      else if (n.t > f.end - ramp) k = (f.end - n.t) / ramp;
+      v = Math.min(v, 20 + (f.min - 20) * k);
+    }
+    return v;
+  }
+  function brightness(dist, bearing, vis) {
+    if (dist > GEO_RANGE || S.L <= 0) return 0;
+    const f = dist <= 0.6 * vis ? 1 : clamp((vis - dist) / (0.4 * vis), 0, 1);
+    if (f <= 0) return 0;
+    let best = 0;
+    for (let k = 0; k < S.n; k++) {
+      let d = Math.abs((S.theta + k * 360 / S.n) - bearing) % 360;
+      if (d > 180) d = 360 - d;
+      best = Math.max(best, beamProfile(d));
+    }
+    return best * S.L * (2 / S.n) * f;
+  }
+  function lampLevel() {
+    if (!S.night) return 1;
+    if (S.p > 0.25) return 1;
+    if (S.p <= 0.06) return 0;
+    const k = (S.p - 0.06) / 0.19;
+    return k * (0.8 + 0.2 * Math.sin(S.clock * 23) * Math.sin(S.clock * 7.1));
+  }
+  function fault() {
+    if (S.L < 0.9) return S.L <= 0 ? 'lamp out' : 'lamp pressure low';
+    if (S.w <= 0 || S.omega < 0.97 * 360 / S.period) return 'weights ran down';
+    if (Math.abs(S.period - 20) > 0.6) return 'lens turning at the wrong speed';
+    return null;
+  }
+
+  function step(dt) {
+    S.clock += dt;
+    const target = S.w > 0 ? 360 / S.period : 0;
+    const rate = target > S.omega ? 2.5 : 1.1;
+    S.omega += (target - S.omega) * Math.min(1, dt * rate);
+    if (target === 0 && S.omega < 0.05) S.omega = 0;
+    S.theta = (S.theta + S.omega * dt) % 360;
+    const life = S.night ? 2 * 3600 / NIGHT_SPEED : 120;
+    if (S.omega > 0) S.w = Math.max(0, S.w - dt * (S.omega / 18) / life);
+    if (S.night) S.p = Math.max(0, S.p - dt / 75);
+    S.L = lampLevel();
+    const v = shipView();
+    const vis = visibility();
+    S.vis = vis;
+    S.b = brightness(v.dist, v.bearing, vis);
+    S.sAcc += dt;
+    while (S.sAcc >= 0.05) { S.sAcc -= 0.05; S.samples[S.sIdx] = S.b; S.sIdx = (S.sIdx + 1) % 600; }
+    S.quiet = S.b > 0.01 || S.omega > 0 ? 0 : S.quiet + dt;
+    if (S.fogOn) {
+      S.fogClock -= dt;
+      if (S.fogClock <= 0) { blast(); S.fogClock += 20; }
+    }
+    if (S.blastT >= 0) { S.blastT += dt; if (S.blastT > 2.4) S.blastT = -1; }
+    if (S.night) nightStep(dt, vis);
+  }
+
+  // ---------- Night challenge ----------
+  const WINDS = ['NE, fresh gale; snow squalls', 'E, strong; heavy sea running', 'NW, light; clear and cold', 'SW, moderate; cloudy', 'NE, moderate; overcast', 'N, fresh; flurries'];
+  const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  function clockText(sec, short) {
+    let h = Math.floor(sec / 3600) % 24, m = Math.floor(sec / 60) % 60;
+    const pm = h >= 12; h = h % 12 || 12;
+    return h + '.' + String(m).padStart(2, '0') + (short ? '' : pm ? ' p.m.' : ' a.m.');
+  }
+  function durText(sec) {
+    const m = Math.round(sec / 60), h = Math.floor(m / 60);
+    return h ? `${h} h ${m % 60} m` : `${m} minutes`;
+  }
+  function startNight() {
+    const day = 14 + Math.floor(Math.random() * 17);   // 14 to 30 November
+    const date = new Date(1910, 10, day);
+    const banks = [];
+    let earliest = 18.5;
+    const count = Math.random() < 0.5 ? 1 : 2;
+    for (let i = 0; i < count; i++) {
+      const start = earliest + Math.random() * 3, dur = 1.5 + Math.random() * 1.5;
+      banks.push({ start: start * 3600, end: (start + dur) * 3600, min: 0.6 + Math.random() * 2.2 });
+      earliest = start + dur + 1.5;
+    }
+    S.night = {
+      t: 16.5 * 3600, end: 31.5 * 3600, date, wind: WINDS[Math.floor(Math.random() * WINDS.length)], banks,
+      total: 0, good: 0, fog: 0, fogSig: 0, sigClear: 0, winds: 0, pumps: 0,
+      faults: [], fault: null, fogs: [], inFog: false
+    };
+    S.w = 1; S.p = 1; S.period = 20; S.omega = 18;
+    gov.value = 20; setN(2);
+    S.fogOn = false; fogBtn.setAttribute('aria-pressed', 'false');
+    $$('.chip').forEach((b) => { b.disabled = true; });
+    $$('.night-only').forEach((n) => { n.hidden = false; });
+    nightBtn.textContent = 'Stop the night';
+    setText(nightHelp, 'The night runs 240 times faster than real time, but the lens still turns at its true speed. Wind before the weights reach the bottom, pump before the lamp starves, and sound the fog signal whenever visibility drops under five miles.');
+    $('#hud').hidden = false;
+    $('#hud').dataset.key = '';
+    $('#logCard').hidden = true;
+    audio();
+    wake();
+  }
+  function stopNight() {
+    S.night = null;
+    $$('.chip').forEach((b) => { b.disabled = false; });
+    $$('.night-only').forEach((n) => { n.hidden = true; });
+    nightBtn.textContent = 'Keep a November night';
+    setText(nightHelp, 'Keep the light through a November night in 1910. The weights last two hours, the kerosene tank needs pumping, and fog can roll in at any hour.');
+    $('#hud').hidden = true;
+    S.p = 1;
+    if (S.fogOn) toggleFog();
+  }
+  function nightStep(dt, vis) {
+    const n = S.night;
+    const ds = dt * NIGHT_SPEED;
+    n.t += ds;
+    const f = fault();
+    n.total += ds;
+    if (!f) n.good += ds;
+    if (f && !n.fault) n.fault = { start: n.t, cause: f };
+    if (!f && n.fault) { n.faults.push(Object.assign(n.fault, { end: n.t })); n.fault = null; }
+    const foggy = vis < 5;
+    if (foggy) { n.fog += ds; if (S.fogOn) n.fogSig += ds; }
+    else if (S.fogOn) n.sigClear += ds;
+    if (foggy && !n.inFog) { n.inFog = true; n.fogs.push({ start: n.t, end: null }); }
+    if (!foggy && n.inFog) { n.inFog = false; n.fogs[n.fogs.length - 1].end = n.t; }
+    if (n.t >= n.end) endNight();
+  }
+  function endNight() {
+    const n = S.night;
+    if (n.fault) { n.faults.push(Object.assign(n.fault, { end: n.t })); n.fault = null; }
+    if (n.inFog) n.fogs[n.fogs.length - 1].end = null;
+    const d = n.date;
+    const lines = [];
+    lines.push(`<p class="stamp">Split Rock Light Station · Station Log</p>`);
+    lines.push(`<p>${DAYS[d.getDay()]}, ${d.getDate()} November 1910.</p>`);
+    lines.push(`<p>Wind ${n.wind}.</p>`);
+    lines.push(`<p>Light exhibited from 4.30 p.m. until 7.30 a.m.</p>`);
+    lines.push(`<p>Weights wound ${n.winds} times. Lamp tank pumped ${n.pumps} times.</p>`);
+    if (n.fogs.length) {
+      n.fogs.forEach((f) => lines.push(`<p>Thick fog from ${clockText(f.start)} ${f.end ? 'to ' + clockText(f.end) : 'until daylight.'}</p>`));
+      lines.push(`<p>Fog signal sounded ${durText(n.fogSig + n.sigClear)}.</p>`);
+    } else lines.push('<p>No fog.</p>');
+    const real = n.faults.filter((f) => f.end - f.start >= 240);
+    if (!real.length) lines.push('<p>Light kept all night without fault.</p>');
+    else real.slice(0, 3).forEach((f) => lines.push(`<p>Light irregular at ${clockText(f.start)}: ${f.cause}, ${durText(f.end - f.start)}.</p>`));
+    lines.push('<p>Keeper on watch.</p>');
+    $('#logPage').innerHTML = lines.join('');
+    const lightPct = Math.round(100 * n.good / n.total);
+    const fogPct = n.fog > 0 ? Math.round(100 * n.fogSig / n.fog) : null;
+    setText($('#scLight'), lightPct + '%');
+    setText($('#scFog'), fogPct === null ? 'no fog' : fogPct + '%');
+    const worst = Math.min(lightPct, fogPct === null ? 100 : fogPct);
+    const sv = $('#sayVerdict');
+    sv.className = 'say ' + (worst >= 90 ? 'good' : worst < 75 ? 'warn' : '');
+    sv.textContent = worst >= 98 ? 'Station in excellent order. Keeper commended.'
+      : worst >= 90 ? 'Station in good order. Keep a closer watch on the weights and the tank.'
+      : worst >= 75 ? 'Light irregular. Keeper reminded that ships set their course by it.'
+      : 'Light did not show its proper character. Report forwarded to the District office.';
+    stopNight();
+    $('#logCard').hidden = false;
+    $('#logCard').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
+  }
+
+  // ---------- Render ----------
+  const roEvery = $('#roEvery'), roLasts = $('#roLasts'), roDist = $('#roDist'), sayChar = $('#sayChar');
+  const wBar = $('#wBar'), wText = $('#wText'), pBar = $('#pBar'), pText = $('#pText'), hud = $('#hud');
+  const compass = (b) => ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.round(b / 45) % 8];
+  let lastSay = '';
+  function render() {
+    S.frameNo++;
+    const vis = S.vis === undefined ? Infinity : S.vis;
+    const v = shipView();
+    // beams
+    const reach = Math.min(GEO_RANGE, vis) * PX;
+    beams.setAttribute('transform', `translate(${C.x} ${C.y}) rotate(${S.theta.toFixed(2)}) scale(${reach.toFixed(1)})`);
+    beams.setAttribute('opacity', (S.L * Math.sqrt(2 / S.n)).toFixed(3));
+    lampHalo.setAttribute('opacity', (0.25 + 0.75 * S.L).toFixed(3));
+    shipG.setAttribute('transform', `translate(${S.ship.x.toFixed(1)} ${S.ship.y.toFixed(1)})`);
+    const fogK = vis === Infinity ? 0 : clamp((20 - vis) / 19.4, 0, 1);
+    fogRect.setAttribute('opacity', (fogK * 0.5).toFixed(3));
+    if (S.blastT >= 0 && !reduceMotion) {
+      const k = S.blastT / 2.4;
+      hornRing.setAttribute('r', (5 * PX * k).toFixed(1));
+      hornRing.setAttribute('opacity', (1 - k).toFixed(2));
+    } else hornRing.setAttribute('opacity', 0);
+    // deck view
+    const inRange = v.dist <= GEO_RANGE;
+    const b = S.b;
+    dGlow.setAttribute('r', (3 + 26 * b).toFixed(1));
+    dGlow.setAttribute('opacity', b.toFixed(3));
+    dRefl.setAttribute('opacity', (b * 0.55).toFixed(3));
+    dCore.setAttribute('opacity', inRange && S.L > 0 ? (0.08 + 0.92 * b).toFixed(3) : 0);
+    ridge.setAttribute('opacity', v.dist < horizon(130) + horizon(EYE_FT) ? (vis < v.dist ? 0 : 1) : 0);
+    dFog.setAttribute('opacity', (fogK * (v.dist > vis ? 0.55 : 0.3)).toFixed(3));
+    setText(dMsg, !inRange ? 'The light is below your horizon' : v.dist > vis ? 'Fog hides the light' : S.L <= 0 ? 'The lamp is out' : '');
+    setText(dCap, `Looking ${compass((v.bearing + 180) % 360)} toward Split Rock`);
+    if (S.frameNo % 2 === 0) {
+      let pts = '';
+      for (let i = 0; i < 600; i++) {
+        const s = S.samples[(S.sIdx + i) % 600];
+        pts += (10 + i * 0.5).toFixed(1) + ',' + (46 - s * 38).toFixed(1) + ' ';
+      }
+      stripLine.setAttribute('points', pts);
+    }
+    // readouts
+    const turning = S.omega > 0.3;
+    const per = turning ? (Math.abs(S.omega - 360 / S.period) < 0.02 * 360 / S.period ? S.period : 360 / S.omega) : Infinity;
+    const every = per / S.n, lasts = per * 9 / 360;
+    setText(roEvery, turning ? every.toFixed(1) + ' s' : 'stopped');
+    setText(roLasts, turning ? lasts.toFixed(1) + ' s' : '—');
+    setText(roDist, `${v.dist.toFixed(1)} mi ${compass((v.bearing + 180) % 360)}`);
+    let say, cls = '';
+    if (S.L <= 0) { say = 'The lamp has gone out for want of air pressure in the kerosene tank. Pump the tank to light it again.'; cls = 'warn'; }
+    else if (S.w <= 0 && !turning) { say = 'The weights have reached the bottom and the lens has stopped. Now the light shines two fixed ways and every other ship sees darkness. Wind the weights.'; cls = 'warn'; }
+    else if (!turning) say = 'The lens is starting to turn.';
+    else if (S.L < 0.9) { say = 'The lamp is starving for air and burning low. Pump the tank.'; cls = 'warn'; }
+    else if (S.n === 2 && Math.abs(every - 10) <= 0.3) { say = 'Fl W 10s: one white flash every ten seconds, half a second long. That was Split Rock’s signal, printed in the Light List so a captain could tell it from every other light on the lake.'; cls = 'good'; }
+    else if (S.n !== 2 && Math.abs(every - 10) <= 0.3) say = `The rhythm is right, but ${S.n} panels share the lamp’s light ${S.n} ways, so each flash is ${S.n === 4 ? 'half' : 'a quarter'} as bright. Split Rock floated its lens on mercury so it could turn fast enough to need only two.`;
+    else { say = `Fl W ${every.toFixed(1)}s: a captain checking the Light List would take this for some other light and steer wrong. Split Rock flashed every 10 seconds.`; cls = 'warn'; }
+    if (inRange === false) say += ' Your ship is beyond the light’s 22-mile range: the lamp is below your horizon.';
+    if (say + cls !== lastSay) { lastSay = say + cls; sayChar.textContent = say; sayChar.className = 'say ' + cls; }
+    // watch room
+    const wy = TOP + (1 - S.w) * (BOTTOM - TOP);
+    tWeight.setAttribute('y', wy.toFixed(1));
+    tCable.setAttribute('y2', wy.toFixed(1));
+    const th = rad(S.theta);
+    const front = Math.cos(th) >= 0 ? th : th + Math.PI;
+    tEye.setAttribute('cx', (60 + 13 * Math.sin(front)).toFixed(1));
+    tEye.setAttribute('opacity', (0.25 + 0.75 * S.L * Math.abs(Math.cos(th))).toFixed(2));
+    tCrank.setAttribute('transform', `translate(78 71) rotate(${S.crankA.toFixed(0)})`);
+    wBar.style.width = (S.w * 100).toFixed(1) + '%';
+    $('#wBarBox').classList.toggle('low', S.w < 0.2);
+    const runFor = S.omega > 0 ? S.w * (S.night ? 2 * 3600 / NIGHT_SPEED : 120) * 18 / Math.max(S.omega, 1) : 0;
+    setText(wText, S.w <= 0 ? 'at the bottom' : S.night ? `about ${durText(runFor * NIGHT_SPEED)} of night left` : `runs ${Math.ceil(runFor)} s more here (two hours at Split Rock)`);
+    if (S.night) {
+      const n = S.night;
+      pBar.style.width = (S.p * 100).toFixed(1) + '%';
+      $('#pBarBox').classList.toggle('low', S.p < 0.3);
+      setText(pText, S.p > 0.25 ? 'pressure good' : S.p > 0.06 ? 'pressure low, flame failing' : 'lamp out');
+      const d = n.date;
+      const visTxt = vis === Infinity ? 'visibility good' : vis < 5 ? `fog · visibility ${vis.toFixed(1)} mi` : `haze · visibility ${vis.toFixed(0)} mi`;
+      const key = clockText(n.t) + visTxt + n.wind;
+      if (hud.dataset.key !== key) {
+        hud.dataset.key = key;
+        hud.innerHTML = `<span>${DAYS[d.getDay()].slice(0, 3)} ${d.getDate()} Nov 1910 · ${clockText(n.t)}</span><span>Wind ${n.wind.split(';')[0]}</span><span class="${vis < 5 ? 'fog' : ''}">${visTxt}</span>`;
+      }
+    }
+  }
+
+  function needsFrames() {
+    return S.omega > 0 || S.w > 0 && S.period > 0 && S.omega < 360 / S.period || S.night || S.fogOn || S.blastT >= 0 || S.quiet < 31;
+  }
+  function frame(now) {
+    S.raf = 0;
+    const dt = Math.min(0.1, Math.max(0, (now - S.last) / 1000));
+    S.last = now;
+    step(dt);
+    render();
+    if (S.visible && needsFrames()) S.raf = requestAnimationFrame(frame);
+  }
+  function wake() {
+    if (S.raf || !S.visible) return;
+    S.last = performance.now();
+    S.raf = requestAnimationFrame(frame);
+  }
+
+  // ---------- Controls ----------
+  const gov = $('#gov'), govOut = $('#govOut'), fogBtn = $('#fogBtn'), nightBtn = $('#nightBtn'), nightHelp = $('#nightHelp');
+  function hold(btn, fn) {
+    let timer = 0;
+    const stop = () => { clearInterval(timer); timer = 0; };
+    btn.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0 || btn.disabled) return;
+      e.preventDefault();
+      fn(); stop(); timer = setInterval(fn, 150);
+    });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach((t) => btn.addEventListener(t, stop));
+    btn.addEventListener('click', (e) => { if (e.detail === 0) fn(); });
+  }
+  hold($('#wind'), () => {
+    if (S.night && S.clock - S.lastWindAt > 1.2) S.night.winds++;
+    S.lastWindAt = S.clock;
+    S.w = Math.min(1, S.w + 0.08);
+    S.crankA = (S.crankA + 60) % 360;
+    tick(1800, 0.25);
+    wake(); render();
+  });
+  hold($('#pump'), () => {
+    if (!S.night) return;
+    if (S.clock - S.lastPumpAt > 1.2) S.night.pumps++;
+    S.lastPumpAt = S.clock;
+    S.p = Math.min(1, S.p + 0.1);
+    tick(600, 0.3);
+    wake(); render();
+  });
+  gov.addEventListener('input', () => {
+    S.period = +gov.value;
+    setText(govOut, S.period.toFixed(1) + ' s');
+    wake(); render();
+  });
+  function setN(n) {
+    S.n = n;
+    $$('.chip').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.n === n)));
+    buildBeams();
+  }
+  $$('.chip').forEach((b) => b.addEventListener('click', () => { setN(+b.dataset.n); wake(); render(); }));
+  function toggleFog() {
+    S.fogOn = !S.fogOn;
+    fogBtn.setAttribute('aria-pressed', String(S.fogOn));
+    fogBtn.textContent = S.fogOn ? 'Stop the fog signal' : 'Sound the fog signal';
+    if (S.fogOn) { audio(); S.fogClock = 0; wake(); }
+  }
+  fogBtn.addEventListener('click', toggleFog);
+  $('#soundBtn').addEventListener('click', (e) => {
+    S.sound = !S.sound;
+    e.currentTarget.setAttribute('aria-pressed', String(S.sound));
+    e.currentTarget.textContent = S.sound ? 'Sound on' : 'Sound off';
+  });
+  nightBtn.addEventListener('click', () => { if (S.night) { stopNight(); render(); } else startNight(); });
+  $('#againBtn').addEventListener('click', () => { $('#station').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' }); startNight(); });
+
+  // the ship
+  function svgPoint(e) {
+    const pt = map.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+    return pt.matrixTransform(map.getScreenCTM().inverse());
+  }
+  function moveShip(x, y) {
+    x = clamp(x, 10, 630); y = clamp(y, 10, 470);
+    if (onLand(x, y) || Math.hypot(x - C.x, y - C.y) < 0.6 * PX) return false;
+    S.ship.x = x; S.ship.y = y;
+    const v = shipView();
+    shipG.setAttribute('aria-label', `Your ship, ${v.dist.toFixed(1)} miles ${compass(v.bearing)} of the light. Arrow keys move it one mile.`);
+    wake(); render();
+    return true;
+  }
+  let dragging = false;
+  shipG.addEventListener('pointerdown', (e) => { dragging = true; shipG.setPointerCapture(e.pointerId); e.preventDefault(); });
+  shipG.addEventListener('pointermove', (e) => { if (!dragging) return; const p = svgPoint(e); moveShip(p.x, p.y); });
+  ['pointerup', 'pointercancel'].forEach((t) => shipG.addEventListener(t, () => { dragging = false; }));
+  shipG.addEventListener('keydown', (e) => {
+    const d = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }[e.key];
+    if (!d) return;
+    e.preventDefault();
+    moveShip(S.ship.x + d[0] * PX, S.ship.y + d[1] * PX);
+  });
+  moveShip(S.ship.x, S.ship.y);
+
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver((entries) => {
+      S.visible = entries[0].isIntersecting;
+      if (S.visible) wake();
+    }).observe($('#station'));
+  }
+  setText(govOut, '20.0 s');
+  render();
+  wake();
+
+  // ---------- Inside the lens ----------
+  const lens = $('#lensSvg');
+  const LF = { x: 340, y: 190 }, FPX = 180, MM = FPX / 500, SPREAD = deg(Math.atan(27.5 / 500));
+  const REFR = [-18, -12, -6, 0, 6, 12, 18], UP = [24, 30, 36, 42, 48, 54, 60], DOWN = [-24, -30, -36, -42, -48, -54];
+  const ELEMS = REFR.map((a) => ({ a, k: 'r', x: FPX, y: -FPX * Math.tan(rad(a)) }))
+    .concat(UP.concat(DOWN).map((a) => ({ a, k: 'p', x: 172 * Math.cos(rad(a)), y: -172 * Math.sin(rad(a)) })));
+  const lensStatic = el('g', null, lens);
+  const lensRays = el('g', null, lens);
+  const lensTop = el('g', null, lens);
+  el('line', { x1: 0, y1: LF.y, x2: 680, y2: LF.y, class: 'l-level' }, lensStatic);
+  el('text', { x: 676, y: LF.y - 6, 'text-anchor': 'end', class: 'l-t' }, lensStatic).textContent = 'level →';
+  el('text', { x: 6, y: 18, class: 'l-t' }, lensStatic).textContent = 'panel facing west';
+  el('text', { x: 674, y: 18, 'text-anchor': 'end', class: 'l-t' }, lensStatic).textContent = 'panel facing east';
+  const glassEls = [];
+  [1, -1].forEach((side) => {
+    ELEMS.forEach((e) => {
+      const cx = LF.x + side * e.x, cy = LF.y + e.y;
+      let pts;
+      if (e.k === 'r') {
+        const h = FPX * (Math.tan(rad(e.a + 3)) - Math.tan(rad(e.a - 3)));
+        const w = 9, s = 2 + Math.abs(e.a) / 6;
+        pts = [[0, -h / 2], [w, -h / 2 + s], [w, h / 2 - s], [0, h / 2]];
+      } else {
+        const up = e.a > 0 ? 1 : -1;
+        pts = [[-6, 7 * up], [9, 2 * up], [-1, -9 * up]];
+        const r = -e.a / 2;
+        pts = pts.map(([x, y]) => [x * Math.cos(rad(r)) - y * Math.sin(rad(r)), x * Math.sin(rad(r)) + y * Math.cos(rad(r))]);
+      }
+      const d = 'M' + pts.map(([x, y]) => (cx + side * x).toFixed(1) + ' ' + (cy + y).toFixed(1)).join(' L') + ' Z';
+      glassEls.push(el('path', { d, class: 'l-glass' }, lensStatic));
+    });
+  });
+  // brass frame arcs
+  [1, -1].forEach((side) => {
+    el('path', { d: `M${LF.x + side * 172 * Math.cos(rad(64))} ${LF.y - 172 * Math.sin(rad(64))} L${LF.x + side * 188} ${LF.y - 70} L${LF.x + side * 188} ${LF.y + 70} L${LF.x + side * 172 * Math.cos(rad(58))} ${LF.y + 172 * Math.sin(rad(58))}`, class: 'l-frame' }, lensStatic);
+  });
+  const burner = el('rect', { x: LF.x - 5, y: LF.y + 10, width: 10, height: 200, class: 'l-burner' }, lensStatic);
+  const mantleGlow = el('circle', { cx: LF.x, cy: LF.y, r: 18, fill: 'url(#lampGlow)' }, lensTop);
+  const mantle = el('rect', { x: LF.x - 7, y: LF.y - 10, width: 14, height: 20, rx: 5, class: 'l-mantle' }, lensTop);
+  // the lamp-glow gradient lives in the chart's defs; copy one into this drawing
+  {
+    const ld = el('defs', null, lens);
+    const g = el('radialGradient', { id: 'lensGlow' }, ld);
+    el('stop', { offset: 0, 'stop-color': '#fff6d6', 'stop-opacity': 1 }, g);
+    el('stop', { offset: 0.4, 'stop-color': '#ffd56a', 'stop-opacity': 0.5 }, g);
+    el('stop', { offset: 1, 'stop-color': '#ffd56a', 'stop-opacity': 0 }, g);
+    mantleGlow.setAttribute('fill', 'url(#lensGlow)');
+  }
+  const LS = { off: 0, bare: false };
+  function edgeY(x0, y0, dirDeg, side) {
+    // where a ray leaving (x0, y0) at dirDeg (up positive) meets the left/right edge
+    const xe = side > 0 ? 680 : 0;
+    return y0 - Math.abs(xe - x0) * Math.tan(rad(dirDeg));
+  }
+  function drawLens() {
+    lensRays.textContent = '';
+    const L = { x: LF.x, y: LF.y - LS.off * MM };
+    mantle.setAttribute('y', (L.y - 10).toFixed(1));
+    burner.setAttribute('y', (L.y + 10).toFixed(1));
+    mantleGlow.setAttribute('cy', L.y.toFixed(1));
+    glassEls.forEach((g) => g.classList.toggle('dim', LS.bare));
+    let caught = 0, aim = 0, near = 0;
+    if (LS.bare) {
+      for (let i = 0; i < 60; i++) {
+        const a = i * 6;
+        const x2 = L.x + 400 * Math.cos(rad(a)), y2 = L.y - 400 * Math.sin(rad(a));
+        const level = Math.abs(Math.sin(rad(a))) < Math.sin(rad(SPREAD));
+        if (level) near++;
+        el('line', { x1: L.x, y1: L.y, x2, y2, class: level ? 'l-out' : 'l-lost' }, lensRays);
+      }
+    } else {
+      [1, -1].forEach((side) => {
+        ELEMS.forEach((e) => {
+          const ex = LF.x + side * e.x, ey = LF.y + e.y;
+          const inA = deg(Math.atan2(-(ey - L.y), side * (ex - L.x)));
+          const out = e.k === 'r' ? inA - e.a : -(inA - e.a);
+          caught++;
+          aim += Math.max(0, 1 - Math.abs(out) / SPREAD);
+          el('line', { x1: L.x, y1: L.y, x2: ex, y2: ey, class: 'l-ray' }, lensRays);
+          const xe = side > 0 ? 680 : 0;
+          const yA = edgeY(ex, ey, out + SPREAD, side), yB = edgeY(ex, ey, out - SPREAD, side);
+          el('path', { d: `M${ex.toFixed(1)} ${ey.toFixed(1)} L${xe} ${yA.toFixed(1)} L${xe} ${yB.toFixed(1)} Z`, class: 'l-fan' }, lensRays);
+          el('line', { x1: ex, y1: ey, x2: xe, y2: edgeY(ex, ey, out, side), class: 'l-out' }, lensRays);
+        });
+      });
+      // light that escapes through the top and bottom openings
+      for (let a = 66; a <= 114; a += 6) el('line', { x1: L.x, y1: L.y, x2: L.x + 300 * Math.cos(rad(a)), y2: L.y - 300 * Math.sin(rad(a)), class: 'l-lost' }, lensRays);
+      for (let a = 240; a <= 300; a += 6) el('line', { x1: L.x, y1: L.y, x2: L.x + 300 * Math.cos(rad(a)), y2: L.y - 300 * Math.sin(rad(a)), class: 'l-lost' }, lensRays);
+    }
+    const tilt = deg(Math.atan(Math.abs(LS.off) / 500));
+    const feet = 52800 * Math.tan(rad(tilt));
+    setText($('#flameOut'), LS.off === 0 ? 'at the focus' : `${Math.abs(LS.off)} mm ${LS.off > 0 ? 'above' : 'below'} the focus`);
+    setText($('#roCaught'), LS.bare ? 'none' : `${caught} of 60`);
+    setText($('#roAim'), LS.bare ? `${near} of 60 rays` : Math.round(100 * aim / caught) + '%');
+    setText($('#roTilt'), LS.bare ? '—' : tilt.toFixed(1) + '°');
+    const say = $('#sayLens');
+    if (LS.bare) {
+      say.textContent = 'Without the lens the flame sends its light every way at once: up into the sky, down into the lantern floor, and only a sliver out toward the water. With the lens, 40 of these 60 rays are caught and sent out level. The Minnesota Historical Society puts the real lens’s catch at 60 percent of the lamp’s light.';
+      say.className = 'say';
+    } else if (LS.off === 0) {
+      say.textContent = 'The flame sits at the focus, 500 mm from the glass. Every ring and prism sends its light out level, and each panel’s light leaves as one beam. Turn the lens and the two beams sweep the lake.';
+      say.className = 'say good';
+    } else {
+      const dir = LS.off > 0 ? ['down', 'up'] : ['up', 'down'];
+      say.textContent = `With the flame ${Math.abs(LS.off)} mm off the focus, the middle rings tip their light ${tilt.toFixed(1)}° ${dir[0]} and the prisms tip theirs ${tilt.toFixed(1)}° ${dir[1]}. Ten miles out, ${tilt.toFixed(1)}° is about ${Math.round(feet / 10) * 10} feet, so the beams pass over and under the ships they were meant for.`;
+      say.className = 'say' + (Math.abs(LS.off) > 12 ? ' warn' : '');
+    }
+  }
+  $('#flame').addEventListener('input', (e) => { LS.off = +e.target.value; drawLens(); });
+  $('#bareBtn').addEventListener('click', (e) => {
+    LS.bare = !LS.bare;
+    e.currentTarget.setAttribute('aria-pressed', String(LS.bare));
+    e.currentTarget.textContent = LS.bare ? 'Put the lens back' : 'Take the lens away';
+    drawLens();
+  });
+  drawLens();
+
+  // ---------- Why 22 miles ----------
+  const rs = $('#rangeSvg');
+  const RX = (s) => 44 + s * 13.4, RY = (ft) => 204 - ft * 0.5;
+  const surf = (s) => s * (40 - s) / (K * K);   // the lake's bulge on a 40-mile chord, in feet
+  const RS = { d: 20, eye: 15, light: 168 };
+  const rsStatic = el('g', null, rs), rsDyn = el('g', null, rs);
+  el('rect', { x: 0, y: 0, width: 680, height: 300, class: 'r-sky' }, rsStatic);
+  {
+    let d = `M0 ${RY(-40)} L${RX(0)} ${RY(0)}`;
+    for (let s = 0; s <= 47; s += 0.5) d += ` L${RX(s).toFixed(1)} ${RY(surf(s)).toFixed(1)}`;
+    d += ' L680 300 L0 300 Z';
+    el('path', { d, class: 'r-water' }, rsStatic);
+    for (let s = 0; s <= 45; s += 5) {
+      el('line', { x1: RX(s), y1: 286, x2: RX(s), y2: 292, class: 'r-tick' }, rsStatic);
+      el('text', { x: RX(s), y: 284, 'text-anchor': 'middle', class: 'r-t' }, rsStatic).textContent = s === 0 ? '0' : s + (s === 45 ? ' mi' : '');
+    }
+    el('text', { x: 676, y: 16, 'text-anchor': 'end', class: 'r-t' }, rsStatic).textContent = 'heights stretched about 210 times';
+  }
+  function drawRange() {
+    rsDyn.textContent = '';
+    const H = RS.light, h = RS.eye, D = RS.d;
+    const dL = horizon(H), dO = horizon(h), reach = dL + dO;
+    const x0 = RX(0), y0 = RY(H);
+    // the cliff and the tower
+    if (H > 100) {
+      el('path', { d: `M0 ${RY(130)} L${x0} ${RY(130)} L${x0 + 4} ${RY(0)} L0 ${RY(-30)} Z`, class: 'r-land' }, rsDyn);
+      el('rect', { x: x0 - 9, y: RY(184), width: 7, height: RY(130) - RY(184), class: 'r-tower' }, rsDyn);
+    } else {
+      el('path', { d: `M0 ${RY(6)} L${x0 + 4} ${RY(4)} L${x0 + 8} ${RY(0)} L0 ${RY(-30)} Z`, class: 'r-land' }, rsDyn);
+      el('rect', { x: x0 - 3, y: RY(54), width: 7, height: RY(4) - RY(54), class: 'r-tower' }, rsDyn);
+    }
+    el('circle', { cx: x0 - (H > 100 ? 5.5 : 0.5), cy: y0, r: 3.5, class: 'r-lamp' }, rsDyn);
+    const lx = x0 - (H > 100 ? 5.5 : 0.5);
+    // ship
+    const sx = RX(D), base = surf(D), eyeY = RY(base + h);
+    el('path', { d: `M${sx - 9} ${RY(base) - 1} L${sx + 9} ${RY(base) - 1} L${sx + 6} ${RY(base) + 4} L${sx - 6} ${RY(base) + 4} Z`, class: 'r-ship' }, rsDyn);
+    el('line', { x1: sx, y1: RY(base) - 1, x2: sx, y2: eyeY, stroke: '#d8e4ec', 'stroke-width': 1.5 }, rsDyn);
+    el('circle', { cx: sx, cy: eyeY, r: 2.4, class: 'r-ship' }, rsDyn);
+    // horizons: tangent lines, whose touching points sit dL and dO along the water
+    const tL = Math.min(dL, 47), tO = Math.max(D - dO, 0);
+    el('line', { x1: lx, y1: y0, x2: RX(tL), y2: RY(surf(tL)), class: 'r-tan' }, rsDyn);
+    el('line', { x1: sx, y1: eyeY, x2: RX(tO), y2: RY(surf(tO)), class: 'r-tan' }, rsDyn);
+    el('circle', { cx: RX(tL), cy: RY(surf(tL)), r: 2.5, fill: '#c9d6e0' }, rsDyn);
+    el('circle', { cx: RX(tO), cy: RY(surf(tO)), r: 2.5, fill: '#c9d6e0' }, rsDyn);
+    const lab1 = el('text', { x: RX(tL), y: RY(surf(tL)) - 8, 'text-anchor': 'middle', class: 'r-tl' }, rsDyn);
+    lab1.textContent = `light’s horizon ${dL.toFixed(1)} mi`;
+    if (Math.abs(RX(tO) - RX(tL)) > 90 || D - dO < 0) {
+      const lab2 = el('text', { x: RX(Math.max(tO, 2)), y: RY(surf(Math.max(tO, 0))) + 18, 'text-anchor': 'middle', class: 'r-tl' }, rsDyn);
+      lab2.textContent = `your horizon ${dO.toFixed(1)} mi`;
+    } else lab1.textContent += ` · yours ${dO.toFixed(1)} mi`;
+    const visible = D <= reach;
+    el('line', { x1: lx, y1: y0, x2: sx, y2: eyeY, class: visible ? 'r-see' : 'r-blocked' }, rsDyn);
+    setText($('#distOut'), (D % 1 ? D.toFixed(1) : D) + ' miles');
+    const say = $('#sayRange');
+    const need = Math.pow((61 - horizon(168)) / K, 2);
+    let t = `The light’s horizon is ${dL.toFixed(1)} miles and yours is ${dO.toFixed(1)}, so the lamp can reach ${reach.toFixed(1)} miles. `;
+    t += visible ? `At ${D} miles your ship sees it.` : `At ${D} miles the bulge of the lake hides it, however bright it shines.`;
+    if (H === 168 && h === 15) t += ' That is the official 22-mile range.';
+    if (H === 50) t += ' Built at the water’s edge, the same tower would have reached barely half as far. The 130-foot cliff is part of the lighthouse.';
+    if (H === 168 && D >= 30) t += ` Fishermen claimed to have seen the light from Grand Marais, 61 miles away. To see the lamp itself from there you would need to stand about ${Math.round(need / 50) * 50} feet up, so they more likely saw its loom: the beam lighting haze or cloud above the horizon.`;
+    say.textContent = t;
+    say.className = 'say ' + (visible ? 'good' : 'warn');
+  }
+  $('#dist').addEventListener('input', (e) => { RS.d = +e.target.value; drawRange(); });
+  $$('.eye').forEach((b) => b.addEventListener('click', () => {
+    RS.eye = +b.dataset.h;
+    $$('.eye').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    drawRange();
+  }));
+  $$('.lamp').forEach((b) => b.addEventListener('click', () => {
+    RS.light = +b.dataset.h;
+    $$('.lamp').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    drawRange();
+  }));
+  drawRange();
+})();
+</script>
+</body>
+</html>

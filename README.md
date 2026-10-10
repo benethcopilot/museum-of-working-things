@@ -28,7 +28,7 @@ tools/check.mjs         checks the list, the folders and the links agree
 | Music & Sound | Carousel Band Organ, Thirty-Note Music Box, Autoharp Chords |
 | Life Science | Litter Lab, Broad Street Pump, Darwin's Finches |
 | Making & Mending | Kintsugi Bowl, Ebru Tray, Letterpress Type Case |
-| Machines & Messages | Lock and Dam No. 1, Enigma Machine, Telegraph Office, Jacquard Loom, Difference Engine |
+| Machines & Messages | Lock and Dam No. 1, Enigma Machine, Telegraph Office, Jacquard Loom, Difference Engine, Split Rock Lighthouse |
 | Numbers & Elements | Mendeleev's Table, Slide Rule, Napier's Bones, Galileo's Ramp |
 
 ## Adding an exhibit
