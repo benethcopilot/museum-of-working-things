@@ -49,6 +49,11 @@
       "try": "Name a mystery chord by ear"
     },
     {
+      "slug": "hammond", "hall": "sound", "title": "Hammond Organ", "ages": "8 and up",
+      "blurb": "Pull the nine drawbars of a tonewheel organ, spin up the Leslie speaker, and hear plain sine waves stack up into the sound of a jazz organ.",
+      "try": "Switch the motor off while holding a chord"
+    },
+    {
       "slug": "litter-lab", "hall": "life", "title": "Litter Lab", "ages": "9 and up",
       "blurb": "Predict Labrador puppy colors with Punnett squares and solve the 1899 mystery of Ben of Hyde.",
       "try": "Crack Mystery Molly’s genes"

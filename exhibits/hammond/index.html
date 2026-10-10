@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Hammond Organ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,500;0,700;0,800;1,500&family=Figtree:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  /* Layout: the organ itself as the hero: a walnut console with nine drawbars, preset keys, switches and a keyboard; beside it what the sound is made of. Then the ear game, the gears inside the tonewheel generator, and the history. */
+  --ground: #e8ebee;
+  --ground-2: #dbe0e5;
+  --card: #f6f8f9;
+  --ink: #15181d;
+  --muted: #5a616c;
+  --line: rgba(21, 24, 29, 0.13);
+  --line-strong: rgba(21, 24, 29, 0.3);
+  --accent: #1c5cc0;
+  --good: #2b7a47;
+  --bad: #b23a2e;
+  /* the console looks the same in both themes */
+  --walnut: #4a2c19;
+  --walnut-2: #3a2213;
+  --walnut-edge: #6b4329;
+  --console-ink: #f1e6d4;
+  --console-dim: #c4ad8e;
+  --bar-brown: #7a4520;
+  --bar-white: #f3eee4;
+  --bar-black: #1d1b1a;
+  --key-white: #f7f3ea;
+  --key-black: #17140f;
+  --key-down: #f0c46a;
+  --screen: #10151c;
+  --screen-ink: #cfd9e3;
+  --screen-dim: #7d8c9b;
+  --wave: #f0c46a;
+  --f-display: "Jost", "Futura", "Century Gothic", "Trebuchet MS", sans-serif;
+  --f-body: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --f-data: "JetBrains Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #101318;
+    --ground-2: #1a1f26;
+    --card: #151a20;
+    --ink: #e6eaef;
+    --muted: #9da6b2;
+    --line: rgba(230, 234, 239, 0.12);
+    --line-strong: rgba(230, 234, 239, 0.3);
+    --accent: #84aef0;
+    --good: #7fd09a;
+    --bad: #f08b7e;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #101318;
+  --ground-2: #1a1f26;
+  --card: #151a20;
+  --ink: #e6eaef;
+  --muted: #9da6b2;
+  --line: rgba(230, 234, 239, 0.12);
+  --line-strong: rgba(230, 234, 239, 0.3);
+  --accent: #84aef0;
+  --good: #7fd09a;
+  --bad: #f08b7e;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 700; line-height: 1.05; margin: 0; text-wrap: balance; }
+a { color: var(--accent); }
+
+.page { box-sizing: border-box; max-width: 1220px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 48px; }
+.masthead { display: grid; gap: 10px; }
+.eyebrow { margin: 0; font-family: var(--f-data); font-size: 0.76rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.masthead h1 { font-size: clamp(2.8rem, 8vw, 5.6rem); font-weight: 800; text-transform: uppercase; letter-spacing: 0.01em; }
+.lede { margin: 0; max-width: 66ch; color: var(--muted); }
+section > h2, .text h2 { font-size: clamp(1.7rem, 3.4vw, 2.4rem); }
+.text { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.text p { margin: 0; max-width: 64ch; }
+
+/* ---------- Console ---------- */
+.stage { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.console { box-sizing: border-box; padding: 18px 18px 20px; border-radius: 8px; background: linear-gradient(180deg, var(--walnut) 0%, var(--walnut-2) 100%); border: 1px solid var(--walnut-edge); box-shadow: 0 18px 30px -22px rgba(0, 0, 0, 0.7); color: var(--console-ink); display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.panel { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px 18px; align-items: start; }
+.bars { display: flex; gap: clamp(4px, 1.2vw, 10px); justify-content: center; padding: 0 6px 6px; border-top: 6px solid #23140b; border-radius: 2px; background: rgba(0, 0, 0, 0.18); }
+.db { display: flex; flex-direction: column; align-items: center; gap: 4px; width: clamp(26px, 4.2vw, 40px); touch-action: none; cursor: ns-resize; }
+.db .track { position: relative; width: 70%; height: 190px; }
+.db .shaft { position: absolute; left: 0; right: 0; top: 0; border-radius: 0 0 4px 4px; overflow: hidden; display: flex; flex-direction: column; transition: height 0.06s; }
+.db .shaft span { flex: 0 0 20px; display: grid; place-items: center; font-family: var(--f-data); font-size: 11px; border-bottom: 1px solid rgba(0, 0, 0, 0.18); }
+.db .tip { position: absolute; left: -12%; right: -12%; height: 26px; border-radius: 4px; display: grid; place-items: center; font-family: var(--f-display); font-weight: 700; font-size: 12px; box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4); }
+.db.brown .shaft, .db.brown .tip { background: var(--bar-brown); color: var(--console-ink); }
+.db.white .shaft, .db.white .tip { background: var(--bar-white); color: #2a2017; }
+.db.black .shaft, .db.black .tip { background: var(--bar-black); color: var(--console-ink); }
+.db:focus { outline: none; }
+.db:focus-visible .tip { outline: 3px solid var(--key-down); outline-offset: 2px; }
+.db .mark { font-family: var(--f-data); font-size: 0.8rem; min-height: 1.2em; }
+.db .mark.ok { color: #8fe0a8; }
+.db .mark.no { color: #ff9c8f; }
+.code { font-family: var(--f-data); font-size: 1.05rem; letter-spacing: 0.06em; color: var(--console-ink); text-align: center; }
+.switches { display: flex; flex-direction: column; gap: 10px; min-width: 9.5em; }
+.sw-group { display: flex; flex-direction: column; gap: 4px; }
+.sw-group > span { font-family: var(--f-data); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--console-dim); }
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+.tab { padding: 4px 9px; border-radius: 3px; border: 1px solid rgba(0, 0, 0, 0.5); background: #e9dcc6; color: #2a2017; font-family: var(--f-display); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.04em; text-transform: uppercase; box-shadow: 0 3px 0 #8f7a5c; }
+.tab[aria-pressed="true"] { background: #c2361f; color: #fff4e6; box-shadow: 0 1px 0 #6d1e11; transform: translateY(2px); }
+.tab.hold { background: #2c241c; color: var(--console-ink); box-shadow: 0 3px 0 #000; }
+.tab.hold[aria-pressed="true"] { background: #c2361f; }
+.motor { font-family: var(--f-data); font-size: 0.74rem; color: var(--console-dim); min-height: 2.6em; }
+.manual { display: flex; gap: 8px; align-items: stretch; }
+.presets { display: flex; flex-direction: column; gap: 3px; width: 5.6em; flex: 0 0 auto; }
+.preset { flex: 1; border: 0; border-radius: 3px; background: var(--key-black); color: var(--console-ink); font-family: var(--f-display); font-weight: 700; font-size: 0.68rem; letter-spacing: 0.03em; line-height: 1.15; padding: 4px; box-shadow: inset 0 -3px 0 #000; }
+.preset:hover { background: #2a251f; }
+.keys { position: relative; flex: 1; height: 150px; touch-action: none; user-select: none; -webkit-user-select: none; min-width: 0; }
+.key { position: absolute; top: 0; box-sizing: border-box; border-radius: 0 0 4px 4px; }
+.key.w { height: 100%; background: var(--key-white); border: 1px solid #9a8f7c; z-index: 1; }
+.key.b { height: 60%; background: var(--key-black); z-index: 2; box-shadow: inset 0 -4px 0 #000; }
+.key.on { background: var(--key-down); }
+.key .lab { position: absolute; bottom: 6px; left: 0; right: 0; text-align: center; font-family: var(--f-data); font-size: 9px; color: #8a7f6c; pointer-events: none; }
+.key.b .lab { color: #9a8e78; bottom: 4px; }
+.console-note { margin: 0; font-size: 0.82rem; color: var(--console-dim); }
+
+.side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.side h2 { font-size: 1.5rem; }
+.screen { border-radius: 4px; background: var(--screen); padding: 8px 10px 6px; }
+.screen svg { display: block; width: 100%; height: auto; }
+.cap { margin: -4px 0 0; font-size: 0.82rem; color: var(--muted); }
+.say { margin: 0; padding: 10px 12px; border-left: 3px solid var(--accent); background: var(--card); font-size: 0.95rem; }
+.say.good { border-left-color: var(--good); }
+.say.bad { border-left-color: var(--bad); }
+.s-axis { stroke: rgba(207, 217, 227, 0.25); stroke-width: 1; }
+.s-t { font-family: var(--f-data); font-size: 10px; fill: var(--screen-dim); }
+.s-wave { fill: none; stroke: var(--wave); stroke-width: 2; stroke-linejoin: round; }
+.btn { padding: 6px 13px; border: 1.5px solid var(--line-strong); border-radius: 3px; background: none; font-size: 0.92rem; }
+.btn:hover { background: var(--ground-2); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--ground); font-weight: 600; }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+/* ---------- Game, gears, history ---------- */
+.game { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.score { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.ro { padding: 8px 11px; border-radius: 3px; background: var(--ground-2); min-width: 0; }
+.ro span { display: block; font-size: 0.76rem; color: var(--muted); }
+.ro b { font-family: var(--f-data); font-weight: 500; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.gears { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 28px; align-items: start; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 3px; background: var(--card); }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+th, td { padding: 6px 10px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font-family: var(--f-data); font-weight: 500; font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+td { font-family: var(--f-data); }
+tr.hot td { background: var(--ground-2); font-weight: 500; }
+.formula { margin: 0; padding: 12px 14px; border-radius: 3px; background: var(--screen); color: var(--screen-ink); font-family: var(--f-data); font-size: 0.88rem; line-height: 1.7; overflow-x: auto; }
+.history { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-left: 2px solid var(--line-strong); }
+.timeline li { display: grid; grid-template-columns: 4.2em minmax(0, 1fr); gap: 12px; padding: 7px 0 7px 14px; position: relative; }
+.timeline li::before { content: ""; position: absolute; left: -6px; top: 15px; width: 10px; height: 10px; border-radius: 50%; background: var(--ground); border: 2px solid var(--ink); }
+.timeline b { font-family: var(--f-display); font-size: 1.2rem; }
+.timeline p { margin: 0; font-size: 0.95rem; }
+.sources { margin: 0; font-size: 0.86rem; color: var(--muted); max-width: 100ch; }
+
+@media (max-width: 960px) {
+  .stage, .game, .gears, .history { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .panel { grid-template-columns: minmax(0, 1fr); }
+  .switches { flex-direction: row; flex-wrap: wrap; min-width: 0; }
+  .db .track { height: 150px; }
+  .db .shaft span { flex-basis: 16px; font-size: 9px; }
+  .presets { width: 4.4em; }
+  .keys { height: 120px; }
+}
+@media (prefers-reduced-motion: reduce) { .db .shaft { transition: none; } }
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="hammond" defer></script>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <p class="eyebrow">Music &amp; Sound · Chicago · 1935</p>
+    <h1>Hammond Organ</h1>
+    <p class="lede">Inside a Hammond, ninety-one steel wheels spin past magnets, and each one hums a single pure tone. Nine drawbars mix those tones into one sound. Pull them, play, and hear how a church organ, a jazz trio and a rock band all came out of the same box.</p>
+  </header>
+
+  <section class="stage" aria-label="The organ">
+    <div class="console">
+      <div class="panel">
+        <div>
+          <div class="bars" id="bars" role="group" aria-label="Drawbars"></div>
+          <p class="code" id="code" aria-live="polite">88 8000 000</p>
+        </div>
+        <div class="switches">
+          <div class="sw-group"><span>Percussion</span>
+            <div class="tabs"><button class="tab" id="perc" type="button" aria-pressed="false">On</button><button class="tab" id="percH" type="button" aria-pressed="false">3rd</button><button class="tab" id="percF" type="button" aria-pressed="true">Fast</button></div>
+          </div>
+          <div class="sw-group"><span>Leslie speaker</span>
+            <div class="tabs" role="group" aria-label="Leslie speaker"><button class="tab les" type="button" data-l="0" aria-pressed="false">Off</button><button class="tab les" type="button" data-l="1" aria-pressed="true">Slow</button><button class="tab les" type="button" data-l="2" aria-pressed="false">Fast</button></div>
+          </div>
+          <div class="sw-group"><span>Motor</span>
+            <div class="tabs"><button class="tab hold" id="startBtn" type="button" aria-pressed="false">Start</button><button class="tab hold" id="runBtn" type="button" aria-pressed="true">Run</button></div>
+            <div class="motor" id="motor">Running at 1,200 rpm</div>
+          </div>
+        </div>
+      </div>
+      <div class="manual">
+        <div class="presets" role="group" aria-label="Preset keys">
+          <button class="preset" type="button" data-reg="888000000">Jimmy Smith</button>
+          <button class="preset" type="button" data-reg="008000000">Pure 8′</button>
+          <button class="preset" type="button" data-reg="808000008">Sub, 8′ and 1′</button>
+          <button class="preset" type="button" data-reg="888888888">Full organ</button>
+        </div>
+        <div class="keys" id="keys" aria-label="Keyboard, two octaves from C3 to C5. Computer keys Z to M play the lower octave, Q to I the upper."></div>
+      </div>
+      <p class="console-note">Click or drag across the keys, or use your computer keyboard: Z S X D C V G B H N J M for the lower octave, Q 2 W 3 E R 5 T 6 Y 7 U I for the upper. Drag a drawbar down to pull it out.</p>
+    </div>
+
+    <div class="side">
+      <h2>What you are hearing</h2>
+      <div class="screen"><svg id="spectrum" viewBox="0 0 360 150" role="img" aria-label="Loudness of each drawbar's tone, placed at its harmonic"></svg></div>
+      <p class="cap">Each bar is one drawbar’s tone, placed by how many times the 8′ pitch it vibrates.</p>
+      <div class="screen"><svg id="wave" viewBox="0 0 360 120" role="img" aria-label="The shape of the combined sound wave"></svg></div>
+      <p class="cap">Add the pure tones together and you get this wave shape, repeating hundreds of times a second.</p>
+      <p class="say" id="sayNow" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="game" aria-label="Match the sound">
+    <div class="text">
+      <h2>Match the sound by ear</h2>
+      <p>The organ hides a registration. Listen to it, set the drawbars until yours sounds the same, then check. A tick or a cross appears under each drawbar. Organists learned to do this by ear, and after a while you can hear a 4′ or a 2⅔′ sitting inside a sound.</p>
+      <div class="row">
+        <button class="btn primary" id="newRound" type="button">New sound</button>
+        <button class="btn" id="hearTarget" type="button" disabled>Hear the hidden sound</button>
+        <button class="btn" id="hearMine" type="button" disabled>Hear yours</button>
+        <button class="btn" id="check" type="button" disabled>Check</button>
+      </div>
+    </div>
+    <div class="text">
+      <div class="score">
+        <div class="ro"><span>Level</span><b id="lvl">1</b></div>
+        <div class="ro"><span>Matched</span><b id="won">0</b></div>
+        <div class="ro"><span>Checks this round</span><b id="tries">0</b></div>
+      </div>
+      <p class="say" id="sayGame" aria-live="polite">Level 1 hides one drawbar pulled all the way out. Each level adds another.</p>
+    </div>
+  </section>
+
+  <section class="gears" aria-label="Inside the tonewheel generator">
+    <div class="text">
+      <h2>Ninety-one wheels on one shaft</h2>
+      <p>A synchronous motor locked to the 60-cycle mains turns a long shaft at exactly 1,200 revolutions a minute: 20 turns a second. Twelve pairs of gears step that speed up or down, one pair for each note of the scale, and each gear drives small steel tonewheels with 2 to 192 bumps on their rims. Every bump that passes a magnet makes one cycle of the tone.</p>
+      <p>Gears only come in whole numbers of teeth, so Hammond chose pairs that land very close to the right pitch. The harmonic drawbars borrow those same wheels, which means the 1⅗′ drawbar is about 14 cents sharp of the true fifth harmonic. That slight sourness is part of the Hammond sound.</p>
+      <p class="formula" id="formula"></p>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Note</th><th>Gear pair</th><th>16-tooth wheel</th><th>Exact pitch</th><th>Off by</th></tr></thead>
+        <tbody id="gearRows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="history" aria-label="History">
+    <div class="text">
+      <h2>From clocks to jazz clubs</h2>
+      <p>Laurens Hammond was an engineer who made his money on electric clocks driven by synchronous motors, the same kind of motor that would keep his organ in tune. With John Hanert he patented an electric organ in 1934 and sold it to churches as a cheaper alternative to a pipe organ.</p>
+      <p>Jazz players took it into clubs instead. Jimmy Smith’s registration of 88 8000 000 became the classic organ-trio sound, and the B-3 of 1954, with its harmonic percussion, became the most famous Hammond of all. Most players ran it through a Leslie speaker, whose spinning horn and drum bend the sound with the Doppler effect. Don Leslie offered his invention to Hammond, who turned it down; Hammond bought the Leslie company in 1980.</p>
+    </div>
+    <ol class="timeline">
+      <li><b>1928</b><p>Laurens Hammond starts the Hammond Clock Company.</p></li>
+      <li><b>1934</b><p>Hammond and John Hanert patent an “electrical musical instrument”.</p></li>
+      <li><b>1935</b><p>The Model A goes on sale in June for $1,193, with two 61-note manuals and a pedalboard.</p></li>
+      <li><b>1936</b><p>The Model BC adds a second set of tonewheels, slightly sharp and flat, to thicken the sound.</p></li>
+      <li><b>1954</b><p>The B-3 and C-3 add harmonic percussion. The B-3 stays in production until 1974.</p></li>
+      <li><b>1975</b><p>Hammond stops making tonewheel organs and switches to electronics.</p></li>
+      <li><b>1985</b><p>The Hammond Organ Company goes out of business. Suzuki buys the name in 1989 and builds digital Hammonds today.</p></li>
+    </ol>
+  </section>
+
+  <p class="sources">Sources: Wikipedia, <a href="https://en.wikipedia.org/wiki/Hammond_organ" target="_blank" rel="noopener">Hammond organ</a> (drawbars and their footages, 888000000 as the classic Jimmy Smith sound, single-trigger harmonic percussion on the second or third harmonic, the Start and Run switches, the Leslie speaker and its two speeds, the models and dates) and <a href="https://en.wikipedia.org/wiki/Tonewheel" target="_blank" rel="noopener">Tonewheel</a>; Keyboard Exchange International, <a href="https://b3world.com/hammond-technical-information.html" target="_blank" rel="noopener">Hammond Organ Technical Information</a> (the 1,200 rpm synchronous run motor, tonewheels with 2 to 192 teeth, 91 frequencies). The twelve gear pairs are the standard Hammond ratios (for example 88:64 for A, which with a 16-tooth wheel at 20 turns a second gives 440 Hz). The sound here is synthesized: nine sine waves per key, tuned to the tonewheel frequencies, with a simulated Leslie. The Start motor here takes about 4 seconds; on a real organ it is held for about 12.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const NS = 'http://www.w3.org/2000/svg';
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  function el(tag, attrs, parent) {
+    const n = document.createElementNS(NS, tag);
+    if (attrs) for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+
+  // ---------- The tonewheel generator ----------
+  const NOTE = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
+  const GEARS = [[85, 104], [71, 82], [67, 73], [105, 108], [103, 100], [84, 77], [74, 64], [98, 80], [96, 74], [88, 64], [67, 46], [108, 70]];
+  // a 16-tooth wheel gives the octave from middle C; each octave up doubles the teeth
+  const wheelHz = (midi) => {
+    const pc = midi % 12, oct = Math.floor(midi / 12) - 1;
+    return 20 * 16 * (GEARS[pc][0] / GEARS[pc][1]) * Math.pow(2, oct - 4);
+  };
+  const exactHz = (midi) => 440 * Math.pow(2, (midi - 69) / 12);
+  const cents = (a, b) => 1200 * Math.log2(a / b);
+  const nameOf = (midi) => NOTE[midi % 12] + (Math.floor(midi / 12) - 1);
+
+  // ---------- Drawbars ----------
+  const DRAW = [
+    { foot: '16′', off: -12, h: 0.5, color: 'brown' },
+    { foot: '5⅓′', off: 7, h: 1.5, color: 'brown' },
+    { foot: '8′', off: 0, h: 1, color: 'white' },
+    { foot: '4′', off: 12, h: 2, color: 'white' },
+    { foot: '2⅔′', off: 19, h: 3, color: 'black' },
+    { foot: '2′', off: 24, h: 4, color: 'white' },
+    { foot: '1⅗′', off: 28, h: 5, color: 'black' },
+    { foot: '1⅓′', off: 31, h: 6, color: 'black' },
+    { foot: '1′', off: 36, h: 8, color: 'white' }
+  ];
+  const level = [8, 8, 8, 0, 0, 0, 0, 0, 0];
+  const amp = (lv) => (lv ? Math.pow(10, -3 * (8 - lv) / 20) : 0);
+  const barsBox = $('#bars');
+  const dbEls = DRAW.map((d, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'db ' + d.color;
+    wrap.tabIndex = 0;
+    wrap.setAttribute('role', 'slider');
+    wrap.setAttribute('aria-label', d.foot + ' drawbar');
+    wrap.setAttribute('aria-valuemin', '0');
+    wrap.setAttribute('aria-valuemax', '8');
+    wrap.innerHTML = `<div class="track"><div class="shaft">${[1, 2, 3, 4, 5, 6, 7, 8].map((n) => `<span>${n}</span>`).join('')}</div><div class="tip">${d.foot}</div></div><div class="mark"></div>`;
+    barsBox.appendChild(wrap);
+    const track = wrap.querySelector('.track');
+    const setFromY = (e) => {
+      const r = track.getBoundingClientRect();
+      const step = r.height / 9.3;
+      setLevel(i, Math.round((e.clientY - r.top - step * 0.5) / step));
+    };
+    let drag = false;
+    wrap.addEventListener('pointerdown', (e) => { drag = true; wrap.setPointerCapture(e.pointerId); setFromY(e); wrap.focus({ preventScroll: true }); });
+    wrap.addEventListener('pointermove', (e) => { if (drag) setFromY(e); });
+    ['pointerup', 'pointercancel'].forEach((t) => wrap.addEventListener(t, () => { drag = false; }));
+    wrap.addEventListener('keydown', (e) => {
+      const d2 = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
+      if (d2) { e.preventDefault(); setLevel(i, level[i] + d2); }
+      else if (e.key === 'Home') { e.preventDefault(); setLevel(i, 0); }
+      else if (e.key === 'End') { e.preventDefault(); setLevel(i, 8); }
+      else if (/^[0-8]$/.test(e.key)) { e.preventDefault(); setLevel(i, +e.key); }
+    });
+    return wrap;
+  });
+  function paintBar(i) {
+    const w = dbEls[i], track = w.querySelector('.track');
+    const h = track.clientHeight, step = h / 9.3;
+    w.querySelector('.shaft').style.height = (level[i] * step) + 'px';
+    w.querySelector('.tip').style.top = (level[i] * step) + 'px';
+    w.setAttribute('aria-valuenow', String(level[i]));
+    w.setAttribute('aria-valuetext', `${DRAW[i].foot} at ${level[i]}`);
+  }
+  function setLevel(i, v, quiet) {
+    v = Math.max(0, Math.min(8, v | 0));
+    if (level[i] === v && !quiet) return;
+    level[i] = v;
+    paintBar(i);
+    if (!quiet) {
+      dbEls[i].querySelector('.mark').textContent = '';
+      voices.forEach((vc) => vc.setLevels(level));
+      drawSound();
+    }
+  }
+  const regCode = (lv) => { const s = lv.join(''); return s.slice(0, 2) + ' ' + s.slice(2, 6) + ' ' + s.slice(6); };
+
+  // ---------- Sound ----------
+  let ac = null, out, speedSrc, perc = { on: false, third: false, fast: true }, leslieLevel = 1;
+  let horn = null, drum = null, dry, wet;
+  const motor = { speed: 1, state: 'run' };
+  function audio() {
+    if (ac) { if (ac.state === 'suspended') ac.resume(); return ac; }
+    try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
+    const master = ac.createGain(); master.gain.value = 0.5;
+    const comp = ac.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4;
+    master.connect(comp); comp.connect(ac.destination);
+    out = ac.createGain(); out.gain.value = 1;
+    dry = ac.createGain(); wet = ac.createGain();
+    out.connect(dry); dry.connect(master);
+    // the Leslie: a horn for the treble and a drum for the bass, each spinning
+    function rotor(type, freqCut, depthT, depthA) {
+      const f = ac.createBiquadFilter(); f.type = type; f.frequency.value = freqCut;
+      const d = ac.createDelay(0.02); d.delayTime.value = 0.004;
+      const a = ac.createGain(); a.gain.value = 0.75;
+      const lfo = ac.createOscillator(); lfo.frequency.value = 0.8;
+      const lt = ac.createGain(); lt.gain.value = depthT;
+      const la = ac.createGain(); la.gain.value = depthA;
+      lfo.connect(lt); lt.connect(d.delayTime); lfo.connect(la); la.connect(a.gain);
+      out.connect(f); f.connect(d); d.connect(a); a.connect(wet);
+      lfo.start();
+      return lfo;
+    }
+    horn = rotor('highpass', 800, 0.0009, 0.22);
+    drum = rotor('lowpass', 800, 0.0004, 0.12);
+    wet.connect(master);
+    speedSrc = ac.createConstantSource(); speedSrc.offset.value = motor.speed; speedSrc.start();
+    applyLeslie(true);
+    return ac;
+  }
+  function applyLeslie(now) {
+    if (!ac) return;
+    const t = ac.currentTime;
+    dry.gain.setTargetAtTime(leslieLevel === 0 ? 1 : 0, t, 0.05);
+    wet.gain.setTargetAtTime(leslieLevel === 0 ? 0 : 1, t, 0.05);
+    const hz = leslieLevel === 2 ? [6.7, 5.9] : [0.8, 0.7];
+    // the light horn changes speed quickly, the heavy drum slowly
+    horn.frequency.setTargetAtTime(hz[0], t, now ? 0.01 : 0.35);
+    drum.frequency.setTargetAtTime(hz[1], t, now ? 0.01 : 1.4);
+  }
+  class Voice {
+    constructor(midi, lv, startAt) {
+      this.midi = midi;
+      const t = startAt || ac.currentTime;
+      this.env = ac.createGain();
+      this.env.gain.setValueAtTime(0, t);
+      this.env.gain.linearRampToValueAtTime(1, t + 0.006);
+      this.env.connect(out);
+      this.parts = DRAW.map((d) => {
+        const o = ac.createOscillator();
+        o.frequency.value = 0;
+        const f = ac.createGain(); f.gain.value = wheelHz(midi + d.off);
+        speedSrc.connect(f); f.connect(o.frequency);
+        const g = ac.createGain(); g.gain.value = 0;
+        o.connect(g); g.connect(this.env);
+        o.start(t);
+        return { o, f, g };
+      });
+      this.setLevels(lv, true);
+      // key click: the nine contacts closing
+      const n = Math.floor(ac.sampleRate * 0.008), buf = ac.createBuffer(1, n, ac.sampleRate), ch = buf.getChannelData(0);
+      for (let i = 0; i < n; i++) ch[i] = (Math.random() * 2 - 1) * (1 - i / n);
+      const src = ac.createBufferSource(); src.buffer = buf;
+      const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2500;
+      const cg = ac.createGain(); cg.gain.value = 0.05;
+      src.connect(bp); bp.connect(cg); cg.connect(out); src.start(t);
+    }
+    setLevels(lv, now) {
+      const t = ac.currentTime;
+      this.parts.forEach((p, i) => p.g.gain.setTargetAtTime(amp(lv[i]) * 0.11, t, now ? 0.001 : 0.02));
+    }
+    percussion(third, fast) {
+      const t = ac.currentTime;
+      const o = ac.createOscillator(); o.frequency.value = 0;
+      const f = ac.createGain(); f.gain.value = wheelHz(this.midi + (third ? 19 : 12));
+      speedSrc.connect(f); f.connect(o.frequency);
+      const g = ac.createGain();
+      g.gain.setValueAtTime(0.16, t);
+      g.gain.setTargetAtTime(0.0001, t + 0.005, fast ? 0.09 : 0.35);
+      o.connect(g); g.connect(this.env); o.start(t); o.stop(t + (fast ? 1 : 3));
+    }
+    stop() {
+      const t = ac.currentTime;
+      this.env.gain.cancelScheduledValues(t);
+      this.env.gain.setValueAtTime(this.env.gain.value, t);
+      this.env.gain.linearRampToValueAtTime(0, t + 0.012);
+      this.parts.forEach((p) => p.o.stop(t + 0.03));
+    }
+  }
+  const voices = new Map();
+  function noteOn(midi) {
+    if (!audio() || voices.has(midi)) return;
+    const first = voices.size === 0;
+    const v = new Voice(midi, level);
+    voices.set(midi, v);
+    if (perc.on && first) v.percussion(perc.third, perc.fast);
+    lightKey(midi, true);
+    lastNote = midi;
+    showFormula(midi);
+    if (motor.speed < 0.98) say(motor.state === 'off' ? 'The motor is off, so the tonewheels are slowing down and every note sinks in pitch. Press Start, then Run.' : 'The generator is still coming up to speed, so the notes slide up as the wheels spin faster.');
+  }
+  function noteOff(midi) {
+    const v = voices.get(midi);
+    if (!v) return;
+    v.stop();
+    voices.delete(midi);
+    lightKey(midi, false);
+  }
+  function allOff() { Array.from(voices.keys()).forEach(noteOff); }
+
+  // ---------- Keyboard ----------
+  const LOW = 48, HIGH = 72;
+  const keysBox = $('#keys');
+  const keyEls = new Map();
+  {
+    const whites = [];
+    for (let m = LOW; m <= HIGH; m++) if (![1, 3, 6, 8, 10].includes(m % 12)) whites.push(m);
+    const ww = 100 / whites.length;
+    whites.forEach((m, i) => {
+      const k = document.createElement('div');
+      k.className = 'key w';
+      k.style.left = (i * ww) + '%'; k.style.width = ww + '%';
+      k.dataset.m = m;
+      if (m % 12 === 0) k.innerHTML = `<span class="lab">C${Math.floor(m / 12) - 1}</span>`;
+      keysBox.appendChild(k); keyEls.set(m, k);
+    });
+    for (let m = LOW; m <= HIGH; m++) {
+      if (![1, 3, 6, 8, 10].includes(m % 12)) continue;
+      const left = whites.indexOf(m - 1);
+      const k = document.createElement('div');
+      k.className = 'key b';
+      k.style.left = ((left + 1) * ww - ww * 0.32) + '%'; k.style.width = (ww * 0.64) + '%';
+      k.dataset.m = m;
+      keysBox.appendChild(k); keyEls.set(m, k);
+    }
+  }
+  function lightKey(m, on) { const k = keyEls.get(m); if (k) k.classList.toggle('on', on); }
+  const pointerNotes = new Map();
+  function keyAt(e) {
+    const t = document.elementFromPoint(e.clientX, e.clientY);
+    return t && t.closest && t.closest('.key') ? +t.closest('.key').dataset.m : null;
+  }
+  keysBox.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    keysBox.setPointerCapture(e.pointerId);
+    const m = keyAt(e);
+    pointerNotes.set(e.pointerId, m);
+    if (m !== null) noteOn(m);
+  });
+  keysBox.addEventListener('pointermove', (e) => {
+    if (!pointerNotes.has(e.pointerId)) return;
+    const m = keyAt(e), was = pointerNotes.get(e.pointerId);
+    if (m === was) return;
+    if (was !== null) noteOff(was);
+    if (m !== null) noteOn(m);
+    pointerNotes.set(e.pointerId, m);
+  });
+  ['pointerup', 'pointercancel'].forEach((t) => keysBox.addEventListener(t, (e) => {
+    const m = pointerNotes.get(e.pointerId);
+    if (m !== null && m !== undefined) noteOff(m);
+    pointerNotes.delete(e.pointerId);
+  }));
+  const KEYMAP = {};
+  'zsxdcvgbhnjm'.split('').forEach((c, i) => { KEYMAP[c] = 48 + i; });
+  'q2w3er5t6y7ui'.split('').forEach((c, i) => { KEYMAP[c] = 60 + i; });
+  window.addEventListener('keydown', (e) => {
+    if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+    const tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'input') return;
+    if (e.target.getAttribute && e.target.getAttribute('role') === 'slider' && /^[0-8]$/.test(e.key)) return;
+    const m = KEYMAP[e.key.toLowerCase()];
+    if (m !== undefined) { e.preventDefault(); noteOn(m); }
+  });
+  window.addEventListener('keyup', (e) => { const m = KEYMAP[e.key.toLowerCase()]; if (m !== undefined) noteOff(m); });
+  window.addEventListener('blur', allOff);
+
+  // ---------- Switches ----------
+  const percBtn = $('#perc'), percH = $('#percH'), percF = $('#percF');
+  percBtn.addEventListener('click', () => { perc.on = !perc.on; percBtn.setAttribute('aria-pressed', String(perc.on)); say(perc.on ? 'Percussion adds a fading ' + (perc.third ? 'third' : 'second') + ' harmonic to the start of each note. It only strikes when every key has been let go, so play short, separate notes to hear it.' : 'Percussion off.'); });
+  percH.addEventListener('click', () => { perc.third = !perc.third; percH.setAttribute('aria-pressed', String(perc.third)); percH.textContent = perc.third ? '3rd' : '2nd'; });
+  percH.textContent = '2nd';
+  percF.addEventListener('click', () => { perc.fast = !perc.fast; percF.setAttribute('aria-pressed', String(perc.fast)); percF.textContent = perc.fast ? 'Fast' : 'Slow'; });
+  $$('.les').forEach((b) => b.addEventListener('click', () => {
+    leslieLevel = +b.dataset.l;
+    $$('.les').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    applyLeslie(false);
+    say(['Leslie off: the plain sound of the tonewheels.', 'Leslie on slow, the chorale setting: the horn and drum turn slowly and the sound gently swims.', 'Leslie on fast, the tremolo setting. Listen to the horn catch up quickly while the heavy bass drum takes a few seconds to get there.'][leslieLevel]);
+  }));
+
+  // the motor: Start spins the generator up, Run locks it to the mains
+  const startBtn = $('#startBtn'), runBtn = $('#runBtn'), motorTxt = $('#motor');
+  let motorTimer = 0;
+  function setSpeed(target, tc) {
+    if (ac) speedSrc.offset.setTargetAtTime(target, ac.currentTime, tc);
+    const from = motor.speed, t0 = performance.now();
+    clearInterval(motorTimer);
+    motorTimer = setInterval(() => {
+      const k = 1 - Math.exp(-(performance.now() - t0) / 1000 / tc);
+      motor.speed = from + (target - from) * k;
+      motorTxt.textContent = motor.state === 'run' && motor.speed > 0.995 ? 'Running at 1,200 rpm' : `${Math.round(1200 * motor.speed).toLocaleString('en-US')} rpm${motor.state === 'start' ? ', starting' : motor.state === 'off' ? ', coasting down' : ''}`;
+      if (Math.abs(target - motor.speed) < 0.002) { motor.speed = target; clearInterval(motorTimer); motorTxt.textContent = target === 1 ? 'Running at 1,200 rpm' : target === 0 ? 'Stopped' : motorTxt.textContent; }
+    }, 100);
+  }
+  runBtn.addEventListener('click', () => {
+    audio();
+    if (motor.state === 'run') {
+      motor.state = 'off';
+      runBtn.setAttribute('aria-pressed', 'false');
+      setSpeed(0, 2.6);
+      say('Run is off. With nothing driving them the tonewheels coast down, and any note you hold sinks in pitch: the sound of a Hammond being switched off.');
+    } else if (motor.state === 'start' && motor.speed > 0.6) {
+      motor.state = 'run';
+      runBtn.setAttribute('aria-pressed', 'true');
+      startBtn.setAttribute('aria-pressed', 'false');
+      setSpeed(1, 0.35);
+      say('Run is on and Start is released. The synchronous motor locks the generator to exactly 1,200 rpm, so the organ is in tune again.');
+    } else {
+      say('The run motor can’t start the generator from rest. Press Start first and let it spin up.');
+    }
+  });
+  startBtn.addEventListener('click', () => {
+    audio();
+    if (motor.state === 'run') { say('The organ is already running. Switch Run off first if you want to start it from cold.'); return; }
+    motor.state = 'start';
+    startBtn.setAttribute('aria-pressed', 'true');
+    setSpeed(0.93, 1.3);
+    say('The starter motor is spinning the generator up. Hold a note to hear it rise. When it is near speed, press Run.');
+  });
+
+  // presets
+  $$('.preset').forEach((b) => b.addEventListener('click', () => {
+    b.dataset.reg.split('').forEach((c, i) => setLevel(i, +c, true));
+    voices.forEach((vc) => vc.setLevels(level));
+    dbEls.forEach((w) => { w.querySelector('.mark').textContent = ''; });
+    drawSound();
+    if (!voices.size && audio()) demo(level);
+  }));
+
+  // ---------- What you are hearing ----------
+  const spec = $('#spectrum'), wave = $('#wave');
+  const SX = (h) => 34 + h * 38, SY = (a) => 126 - a * 104;
+  [0.5, 1, 1.5, 2, 3, 4, 5, 6, 8].forEach((h) => {
+    el('text', { x: SX(h), y: 143, 'text-anchor': 'middle', class: 's-t' }, spec).textContent = h === 0.5 ? '½' : h === 1.5 ? '1½' : String(h);
+  });
+  el('line', { x1: 20, y1: SY(0), x2: 350, y2: SY(0), class: 's-axis' }, spec);
+  el('text', { x: 352, y: 12, 'text-anchor': 'end', class: 's-t' }, spec).textContent = 'harmonic: × the 8′ pitch';
+  const specBars = DRAW.map((d) => el('rect', { x: SX(d.h) - 8, y: SY(0), width: 16, height: 0, rx: 2, fill: { brown: '#a0602f', white: '#f3eee4', black: '#5b5752' }[d.color], stroke: '#000', 'stroke-opacity': 0.4 }, spec));
+  const specLabs = DRAW.map((d) => el('text', { x: SX(d.h), y: SY(0) - 4, 'text-anchor': 'middle', class: 's-t' }, spec));
+  el('line', { x1: 8, y1: 60, x2: 352, y2: 60, class: 's-axis' }, wave);
+  const wavePath = el('path', { d: '', class: 's-wave' }, wave);
+  function drawSound() {
+    DRAW.forEach((d, i) => {
+      const a = amp(level[i]), hgt = a * 104;
+      specBars[i].setAttribute('y', SY(a)); specBars[i].setAttribute('height', hgt);
+      specLabs[i].setAttribute('y', SY(a) - 4);
+      specLabs[i].textContent = level[i] ? d.foot : '';
+    });
+    const pts = [];
+    let max = 0;
+    const vals = [];
+    for (let s = 0; s <= 300; s++) {
+      const t = s / 300;   // one cycle of the 16′ tone: two of the 8′
+      let v = 0;
+      DRAW.forEach((d, i) => { v += amp(level[i]) * Math.sin(2 * Math.PI * d.h * 2 * t); });
+      vals.push(v); max = Math.max(max, Math.abs(v));
+    }
+    vals.forEach((v, s) => pts.push((10 + s * 340 / 300).toFixed(1) + ' ' + (60 - (max ? v / max : 0) * 48).toFixed(1)));
+    wavePath.setAttribute('d', 'M' + pts.join(' L'));
+    $('#code').textContent = regCode(level);
+  }
+  const sayNow = $('#sayNow');
+  function say(t) { sayNow.textContent = t; }
+
+  // a short phrase to audition a registration
+  let demoVoices = [];
+  function demo(lv, notes) {
+    if (!audio()) return;
+    demoVoices.forEach((v) => v.stop());
+    const t = ac.currentTime;
+    const chord = notes || [60, 64, 67];
+    demoVoices = chord.map((m) => new Voice(m, lv, t + 0.02));
+    const vs = demoVoices;
+    setTimeout(() => { vs.forEach((v) => v.stop()); if (demoVoices === vs) demoVoices = []; }, 1300);
+  }
+
+  // ---------- Match the sound ----------
+  let game = { lvl: 1, won: 0, tries: 0, target: null };
+  const sayGame = $('#sayGame');
+  function newRound() {
+    const n = Math.min(game.lvl, 4);
+    const idx = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+    const pick = [];
+    // level 1 and 2 use the drawbars that are easiest to hear
+    const pool = game.lvl <= 2 ? [0, 2, 3, 5, 8] : idx;
+    while (pick.length < n) { const i = pool[Math.floor(Math.random() * pool.length)]; if (!pick.includes(i)) pick.push(i); }
+    if (n >= 2 && !pick.includes(2)) pick[0] = 2;
+    game.target = DRAW.map((d, i) => (pick.includes(i) ? (game.lvl >= 4 && i !== 2 ? 4 + 4 * (Math.random() < 0.5) : 8) : 0));
+    game.tries = 0;
+    for (let i = 0; i < 9; i++) setLevel(i, 0, true);
+    voices.forEach((vc) => vc.setLevels(level));
+    dbEls.forEach((w) => { w.querySelector('.mark').textContent = ''; w.querySelector('.mark').className = 'mark'; });
+    drawSound();
+    $('#tries').textContent = '0';
+    ['#hearTarget', '#hearMine', '#check'].forEach((s) => { $(s).disabled = false; });
+    sayGame.className = 'say';
+    sayGame.textContent = `Level ${game.lvl}: ${n} drawbar${n > 1 ? 's' : ''} ${game.lvl >= 4 ? 'out, at 4 or 8' : 'pulled all the way out'}. All of yours are pushed in. Listen, then pull.`;
+    demo(game.target, [60]);
+  }
+  $('#newRound').addEventListener('click', newRound);
+  $('#hearTarget').addEventListener('click', () => game.target && demo(game.target, [60]));
+  $('#hearMine').addEventListener('click', () => demo(level, [60]));
+  $('#check').addEventListener('click', () => {
+    if (!game.target) return;
+    game.tries++;
+    $('#tries').textContent = game.tries;
+    let right = 0;
+    game.target.forEach((t, i) => {
+      const m = dbEls[i].querySelector('.mark');
+      const ok = level[i] === t;
+      if (ok) right++;
+      m.textContent = ok ? '✓' : '✗';
+      m.className = 'mark ' + (ok ? 'ok' : 'no');
+    });
+    if (right === 9) {
+      game.won++; $('#won').textContent = game.won;
+      sayGame.className = 'say good';
+      sayGame.textContent = `Matched: ${regCode(game.target)}, in ${game.tries} check${game.tries > 1 ? 's' : ''}. ${game.lvl < 4 ? 'On to level ' + (game.lvl + 1) + '.' : 'Another one at this level?'} Press New sound.`;
+      if (game.lvl < 4) game.lvl++;
+      $('#lvl').textContent = game.lvl;
+      ['#hearTarget', '#hearMine', '#check'].forEach((s) => { $(s).disabled = true; });
+      game.target = null;
+    } else if (game.tries >= 3) {
+      sayGame.className = 'say bad';
+      sayGame.textContent = `The hidden sound was ${regCode(game.target)}. Compare it with yours, then press New sound to try another.`;
+      game.target.forEach((t, i) => setLevel(i, t, true));
+      voices.forEach((vc) => vc.setLevels(level));
+      drawSound();
+      demo(level, [60]);
+      ['#hearTarget', '#hearMine', '#check'].forEach((s) => { $(s).disabled = true; });
+      game.target = null;
+    } else {
+      sayGame.className = 'say';
+      sayGame.textContent = `${right} of 9 drawbars are right. Fix the crosses and listen again. ${3 - game.tries} check${3 - game.tries > 1 ? 's' : ''} left.`;
+    }
+  });
+
+  // ---------- Gears ----------
+  const gearRows = $('#gearRows');
+  gearRows.innerHTML = GEARS.map((g, pc) => {
+    const m = 60 + pc, f = wheelHz(m), e = exactHz(m), c = cents(f, e);
+    return `<tr data-pc="${pc}"><td>${NOTE[pc]}4</td><td>${g[0]} : ${g[1]}</td><td>${f.toFixed(2)} Hz</td><td>${e.toFixed(2)} Hz</td><td>${c >= 0 ? '+' : '−'}${Math.abs(c).toFixed(2)} ¢</td></tr>`;
+  }).join('');
+  let lastNote = 60;
+  function showFormula(m) {
+    const pc = m % 12, g = GEARS[pc], teeth = 16 * Math.pow(2, Math.floor(m / 12) - 5);
+    gearRows.querySelectorAll('tr').forEach((r) => r.classList.toggle('hot', +r.dataset.pc === pc));
+    const f = wheelHz(m), third = wheelHz(m + 28), pure5 = 5 * f;
+    $('#formula').innerHTML = `${nameOf(m)} on the 8′ drawbar:<br>20 turns/s × ${g[0]}/${g[1]} × ${teeth} teeth = ${f.toFixed(2)} Hz<br>${nameOf(m + 28)} wheel for the 1⅗′ drawbar: ${third.toFixed(1)} Hz<br>true 5th harmonic, 5 × ${f.toFixed(2)}: ${pure5.toFixed(1)} Hz · ${cents(third, pure5) >= 0 ? '+' : '−'}${Math.abs(cents(third, pure5)).toFixed(1)} cents`;
+  }
+
+  // ---------- Start ----------
+  requestAnimationFrame(() => { dbEls.forEach((w, i) => paintBar(i)); });
+  window.addEventListener('resize', () => dbEls.forEach((w, i) => paintBar(i)));
+  drawSound();
+  showFormula(60);
+  say('This is 88 8000 000, the registration Jimmy Smith made famous. Play a few notes, then pull a white 4′ drawbar and hear the sound brighten.');
+})();
+</script>
+</body>
+</html>
