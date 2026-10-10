@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Compass and Straightedge Stars</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus+SC&family=Lato:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  /* Layout: a drafting board on the left where each construction step is drawn with compass and straightedge, the step list on the right, and below it the finished tile repeated across a wall; then the history of the patterns. */
+  --ground: #eeefe9;
+  --ground-2: #e1e3db;
+  --card: #f8f9f5;
+  --ink: #1c211f;
+  --muted: #5a605c;
+  --line: rgba(28, 33, 31, 0.13);
+  --line-strong: rgba(28, 33, 31, 0.3);
+  --teal: #1d6b6a;
+  --gold: #b4851c;
+  --good: #2c7449;
+  /* the drafting board looks the same in both themes */
+  --board: #f4efe2;
+  --board-line: #8a8170;
+  --board-ink: #22303a;
+  --f-display: "Marcellus SC", "Trajan Pro", Georgia, serif;
+  --f-body: "Lato", "Segoe UI", system-ui, sans-serif;
+  --f-data: "JetBrains Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #101312;
+    --ground-2: #1a1e1c;
+    --card: #151917;
+    --ink: #e5e9e6;
+    --muted: #a0a8a3;
+    --line: rgba(229, 233, 230, 0.12);
+    --line-strong: rgba(229, 233, 230, 0.3);
+    --teal: #7fcfcb;
+    --gold: #e9bd5a;
+    --good: #82cf9a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #101312;
+  --ground-2: #1a1e1c;
+  --card: #151917;
+  --ink: #e5e9e6;
+  --muted: #a0a8a3;
+  --line: rgba(229, 233, 230, 0.12);
+  --line-strong: rgba(229, 233, 230, 0.3);
+  --teal: #7fcfcb;
+  --gold: #e9bd5a;
+  --good: #82cf9a;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: default; opacity: 0.45; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 400; line-height: 1.08; margin: 0; text-wrap: balance; }
+a { color: var(--teal); }
+
+.page { box-sizing: border-box; max-width: 1220px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 48px; }
+.masthead { display: grid; gap: 10px; }
+.eyebrow { margin: 0; font-family: var(--f-data); font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.masthead h1 { font-size: clamp(2.4rem, 6.5vw, 4.6rem); color: var(--teal); }
+.lede { margin: 0; max-width: 66ch; color: var(--muted); }
+section > h2, .text h2 { font-size: clamp(1.7rem, 3.4vw, 2.4rem); }
+.text { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.text p { margin: 0; max-width: 64ch; }
+
+/* ---------- Drafting ---------- */
+.draft { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+.boardbox { padding: 12px; border-radius: 4px; background: #d8cfb8; border: 1px solid #b3a68a; }
+#board { display: block; width: 100%; height: auto; aspect-ratio: 1; background: var(--board); touch-action: none; cursor: crosshair; border-radius: 2px; }
+.side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.row > span { font-size: 0.9rem; color: var(--muted); margin-right: 2px; }
+.btn { padding: 6px 12px; border: 1.5px solid var(--line-strong); border-radius: 3px; background: none; font-size: 0.9rem; }
+.btn:hover:not(:disabled) { background: var(--ground-2); }
+.btn[aria-pressed="true"] { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+.btn.go { background: var(--teal); border-color: var(--teal); color: var(--ground); font-weight: 700; }
+.stepnow { padding: 14px 16px; border-radius: 4px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--gold); display: flex; flex-direction: column; gap: 6px; }
+.stepnow b { font-family: var(--f-data); font-weight: 500; font-size: 0.8rem; color: var(--muted); }
+.stepnow p { margin: 0; font-size: 1.02rem; }
+.tool { display: inline-flex; align-items: center; gap: 6px; font-family: var(--f-data); font-size: 0.8rem; padding: 2px 8px; border-radius: 99px; background: var(--ground-2); }
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; max-height: 300px; overflow-y: auto; }
+.steps li { display: grid; grid-template-columns: 1.8em minmax(0, 1fr); gap: 6px; font-size: 0.88rem; color: var(--muted); padding: 2px 4px; border-radius: 3px; }
+.steps li.done { color: var(--ink); }
+.steps li.done span:first-child { color: var(--good); }
+.steps li.now { background: var(--ground-2); color: var(--ink); font-weight: 700; }
+.say { margin: 0; padding: 10px 12px; border-left: 3px solid var(--teal); background: var(--card); font-size: 0.95rem; }
+.say.good { border-left-color: var(--good); }
+
+/* ---------- Wall ---------- */
+.wall { display: flex; flex-direction: column; gap: 12px; }
+#wall { display: block; width: 100%; height: auto; border-radius: 4px; border: 1px solid var(--line-strong); }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-left: 2px solid var(--line-strong); }
+.timeline li { display: grid; grid-template-columns: 5em minmax(0, 1fr); gap: 12px; padding: 7px 0 7px 14px; position: relative; }
+.timeline li::before { content: ""; position: absolute; left: -6px; top: 15px; width: 10px; height: 10px; border-radius: 50%; background: var(--ground); border: 2px solid var(--teal); }
+.timeline b { font-family: var(--f-display); font-weight: 400; font-size: 1.15rem; }
+.timeline p { margin: 0; font-size: 0.95rem; }
+.sources { margin: 0; font-size: 0.86rem; color: var(--muted); max-width: 100ch; }
+
+@media (max-width: 900px) { .draft, .two { grid-template-columns: minmax(0, 1fr); } }
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="geometry" defer></script>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <p class="eyebrow">Art Studio · the Islamic world · from the 9th century</p>
+    <h1>Compass and Straightedge Stars</h1>
+    <p class="lede">The star patterns that cover mosques, palaces and madrasas from Spain to Uzbekistan are built from circles and squares, and need nothing but a compass and a straightedge to draw. No measuring, no numbers: only circles swung from points you already have, and lines laid between them. Construct a star step by step, then cover a wall with it.</p>
+  </header>
+
+  <section class="draft" aria-label="The drafting board">
+    <div class="boardbox">
+      <canvas id="board" width="520" height="520" tabindex="0" aria-label="The drafting board. Press on a glowing point and drag to the other glowing point: for a circle, start at the centre."></canvas>
+    </div>
+    <div class="side">
+      <div class="row" role="group" aria-label="Which star">
+        <span>Construct</span>
+        <button class="btn star" type="button" data-s="six" aria-pressed="true">A six-pointed star</button>
+        <button class="btn star" type="button" data-s="eight" aria-pressed="false">An eight-pointed star</button>
+      </div>
+      <div class="stepnow" aria-live="polite">
+        <b id="stepNum">Step 1</b>
+        <p id="stepText"></p>
+        <span class="tool" id="stepTool"></span>
+      </div>
+      <div class="row">
+        <button class="btn" id="help" type="button">Do this step for me</button>
+        <button class="btn" id="rest" type="button">Draw the rest</button>
+        <button class="btn" id="restart" type="button">Start again</button>
+      </div>
+      <ol class="steps" id="steps"></ol>
+      <p class="say" id="say"></p>
+    </div>
+  </section>
+
+  <section class="wall" aria-label="The finished wall">
+    <h2>Repeat the tile</h2>
+    <p class="text" style="margin:0; max-width:66ch">Each finished tile repeats edge to edge, so the stars meet their neighbours point to point and the pattern could go on forever. Where a star falls in a corner of the panel, exactly a quarter of it shows; along an edge, exactly half.</p>
+    <div class="row" role="group" aria-label="Colours">
+      <span>Tiles in</span>
+      <button class="btn pal" type="button" data-p="0" aria-pressed="true">green and white</button>
+      <button class="btn pal" type="button" data-p="1" aria-pressed="false">cobalt and turquoise</button>
+      <button class="btn pal" type="button" data-p="2" aria-pressed="false">ochre and black</button>
+      <button class="btn" id="lines" type="button" aria-pressed="false">Show the construction lines</button>
+    </div>
+    <canvas id="wall" width="960" height="420" aria-label="The constructed star repeated across a wall"></canvas>
+  </section>
+
+  <section class="two" aria-label="History">
+    <div class="text">
+      <h2>Circles, squares and stars</h2>
+      <p>Many designs start from a circle, which stood for unity. A 15th-century mosque in Yazd, Persia, is decorated from one circle divided into six by six more circles around it, each passing through the centre: the same flower you drew. On that grid sits a six-pointed star. The eight-pointed star, everywhere in Islamic tilework, is simply two squares, one turned 45° against the other.</p>
+      <p>The forms reach into every craft: Persian girih strapwork, Moroccan zellij mosaics of glazed tiles set in plaster, jali pierced-stone screens, carpets, leather bindings, woodwork and stained glass. The Topkapı Scroll, drawn in Timurid Iran around 1500, collects 114 patterns as working drawings for builders.</p>
+    </div>
+    <ol class="timeline">
+      <li><b>836</b><p>Isolated eight-pointed stars at the Great Mosque of Kairouan, Tunisia.</p></li>
+      <li><b>879</b><p>Six- and eight-pointed stars at the Ibn Tulun Mosque in Cairo.</p></li>
+      <li><b>1086</b><p>Ten-point girih patterns in the Jameh Mosque of Isfahan.</p></li>
+      <li><b>1220</b><p>Eight- and twelve-point rosettes at the Alâeddin Mosque, Konya.</p></li>
+      <li><b>1338–1390</b><p>Sixteen-point patterns in the Alhambra, Granada.</p></li>
+      <li><b>c. 1500</b><p>The Topkapı Scroll records 114 patterns.</p></li>
+    </ol>
+  </section>
+
+  <p class="sources">Sources: Wikipedia, <a href="https://en.wikipedia.org/wiki/Islamic_geometric_patterns" target="_blank" rel="noopener">Islamic geometric patterns</a> (squares and circles, the eight-pointed star of two squares, construction with only ruler and compass, the Yazd circle divided by six circles, Hankin’s rule for stars at corners and edges, the crafts, the Topkapı Scroll, and the dates from Kairouan in 836 to the Alhambra). The constructions are standard ones drawn by this page; the colour schemes are not copied from any particular building.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const S = 520, O = [260, 260];
+  const deg = Math.PI / 180;
+
+  // ---------- The two constructions ----------
+  // points are revealed as the steps that create them are drawn; 'given' points are there from the start
+  function sixfold() {
+    const r = 110, P = { O, L: [40, 260], R: [480, 260], M: [O[0] + r, 260] };
+    for (let k = 0; k < 6; k++) P['A' + k] = [O[0] + r * Math.cos(60 * k * deg), O[1] - r * Math.sin(60 * k * deg)];
+    const steps = [
+      { t: 'line', a: 'L', b: 'R', show: [], text: 'Lay the straightedge across the board through the centre and draw a line.' },
+      { t: 'circle', a: 'O', b: 'M', show: ['A0', 'A3'], text: 'Set the compass point on the centre and open it to the mark. Swing a circle.' },
+      { t: 'circle', a: 'A0', b: 'O', show: ['A1', 'A5'], text: 'Without changing the opening, put the point where the circle meets the line on the right, and swing a circle through the centre.' },
+      { t: 'circle', a: 'A3', b: 'O', show: ['A2', 'A4'], text: 'Do the same from the crossing on the left.' },
+      { t: 'circle', a: 'A1', b: 'O', show: [], text: 'Keep going round: swing a circle from each new crossing point, always through the centre.' },
+      { t: 'circle', a: 'A2', b: 'O', show: [], text: 'And the next.' },
+      { t: 'circle', a: 'A4', b: 'O', show: [], text: 'And the next.' },
+      { t: 'circle', a: 'A5', b: 'O', show: [], text: 'The last one completes the six-petalled flower. The six points round the circle are the corners of a regular hexagon.' },
+      { t: 'line', a: 'A0', b: 'A2', ink: true, show: [], text: 'Now ink the star. Join every other point of the hexagon with the straightedge.' },
+      { t: 'line', a: 'A2', b: 'A4', ink: true, show: [], text: 'Next side of the first triangle.' },
+      { t: 'line', a: 'A4', b: 'A0', ink: true, show: [], text: 'And close it.' },
+      { t: 'line', a: 'A1', b: 'A3', ink: true, show: [], text: 'Now the second triangle, through the other three points.' },
+      { t: 'line', a: 'A3', b: 'A5', ink: true, show: [], text: 'Next side.' },
+      { t: 'line', a: 'A5', b: 'A1', ink: true, show: [], text: 'Close it, and the two triangles make a six-pointed star.' }
+    ];
+    return { P, given: ['O', 'L', 'R', 'M'], steps, r };
+  }
+  function eightfold() {
+    const h = 180, d = h / Math.SQRT2;
+    const P = { O, TL: [80, 80], TR: [440, 80], BR: [440, 440], BL: [80, 440], T: [260, 80], Rt: [440, 260], B: [260, 440], Lf: [80, 260],
+      D1: [O[0] - d, O[1] - d], D2: [O[0] + d, O[1] - d], D3: [O[0] + d, O[1] + d], D4: [O[0] - d, O[1] + d] };
+    const steps = [
+      { t: 'line', a: 'TL', b: 'BR', show: [], text: 'The board holds one square tile, with its halfway marks. Draw a diagonal from corner to corner.' },
+      { t: 'line', a: 'TR', b: 'BL', show: ['O'], text: 'Draw the other diagonal. Where they cross is the centre.' },
+      { t: 'line', a: 'T', b: 'B', show: [], text: 'Join the halfway marks top and bottom.' },
+      { t: 'line', a: 'Lf', b: 'Rt', show: [], text: 'And left and right.' },
+      { t: 'circle', a: 'O', b: 'T', show: ['D1', 'D2', 'D3', 'D4'], text: 'Set the compass on the centre, open it to a halfway mark, and swing the circle that touches all four sides.' },
+      { t: 'line', a: 'T', b: 'Rt', ink: true, show: [], text: 'Ink the first square, turned on its corner: join the four points where the circle meets the halfway lines.' },
+      { t: 'line', a: 'Rt', b: 'B', ink: true, show: [], text: 'Next side.' },
+      { t: 'line', a: 'B', b: 'Lf', ink: true, show: [], text: 'Next side.' },
+      { t: 'line', a: 'Lf', b: 'T', ink: true, show: [], text: 'Close the first square.' },
+      { t: 'line', a: 'D1', b: 'D2', ink: true, show: [], text: 'Now the second square, upright: join the points where the circle crosses the diagonals.' },
+      { t: 'line', a: 'D2', b: 'D3', ink: true, show: [], text: 'Next side.' },
+      { t: 'line', a: 'D3', b: 'D4', ink: true, show: [], text: 'Next side.' },
+      { t: 'line', a: 'D4', b: 'D1', ink: true, show: [], text: 'Close it. Two squares, one turned 45° on the other: the eight-pointed star.' }
+    ];
+    return { P, given: ['TL', 'TR', 'BR', 'BL', 'T', 'Rt', 'B', 'Lf'], steps, h };
+  }
+
+  // ---------- State ----------
+  let which = 'six', C = sixfold(), done = 0, visible = new Set(C.given), drawn = [], anim = null;
+  const say = (t, cls) => { const s = $('#say'); s.textContent = t; s.className = 'say' + (cls ? ' ' + cls : ''); };
+  function reset(w) {
+    which = w; C = w === 'six' ? sixfold() : eightfold(); done = 0; visible = new Set(C.given); drawn = []; anim = null;
+    $$('.star').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.s === w)));
+    stepList(); drawBoard(); drawWall();
+    say(w === 'six' ? 'Fourteen steps: a flower of seven circles, then two triangles.' : 'Thirteen steps: the tile’s diagonals and midlines, one circle, then two squares.');
+  }
+  function stepList() {
+    $('#steps').innerHTML = C.steps.map((s, i) => `<li class="${i < done ? 'done' : i === done ? 'now' : ''}"><span>${i < done ? '✓' : i + 1}</span><span>${s.t === 'circle' ? 'Compass' : s.ink ? 'Ink' : 'Straightedge'}: ${s.text.split('.')[0]}.</span></li>`).join('');
+    const cur = C.steps[done];
+    if (cur) {
+      $('#stepNum').textContent = `Step ${done + 1} of ${C.steps.length}`;
+      $('#stepText').textContent = cur.text;
+      $('#stepTool').textContent = cur.t === 'circle' ? 'compass: press on the centre point, drag to the other glowing point' : 'straightedge: press on one glowing point, drag to the other';
+      $('#stepTool').hidden = false;
+    } else {
+      $('#stepNum').textContent = 'Finished';
+      $('#stepText').textContent = which === 'six' ? 'The six-pointed star sits on its flower of circles. See it repeated below.' : 'The eight-pointed star, two squares, fills the tile. See it repeated below.';
+      $('#stepTool').hidden = true;
+    }
+    const nowLi = $('#steps').querySelector('.now'); if (nowLi) nowLi.scrollIntoView({ block: 'nearest' });
+  }
+
+  // ---------- Drawing the board ----------
+  const bc = $('#board'), bg = bc.getContext('2d');
+  let drag = null;
+  function drawBoard() {
+    const g = bg;
+    g.clearRect(0, 0, S, S);
+    g.fillStyle = '#f4efe2'; g.fillRect(0, 0, S, S);
+    if (which === 'eight') { g.strokeStyle = '#8a8170'; g.lineWidth = 1.5; g.strokeRect(80, 80, 360, 360); }
+    // construction lines thin and grey, inked lines dark
+    drawn.forEach((d) => drawElement(g, d, 1));
+    if (anim) drawElement(g, anim.el, anim.k);
+    // the points
+    const cur = C.steps[done];
+    visible.forEach((k) => {
+      const [x, y] = C.P[k];
+      const target = cur && (cur.a === k || cur.b === k);
+      if (target) { g.fillStyle = 'rgba(180, 133, 28, 0.25)'; g.beginPath(); g.arc(x, y, 13, 0, 7); g.fill(); g.strokeStyle = '#b4851c'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, 9, 0, 7); g.stroke(); }
+      g.fillStyle = '#22303a'; g.beginPath(); g.arc(x, y, 3.2, 0, 7); g.fill();
+    });
+    if (drag) {
+      g.save(); g.strokeStyle = 'rgba(29, 107, 106, 0.8)'; g.lineWidth = 1.5; g.setLineDash([5, 4]);
+      const [ax, ay] = drag.from, [bx, by] = drag.to;
+      if (drag.kind === 'circle') { g.beginPath(); g.arc(ax, ay, Math.hypot(bx - ax, by - ay), 0, 7); g.stroke(); g.beginPath(); g.moveTo(ax, ay); g.lineTo(bx, by); g.stroke(); }
+      else { g.beginPath(); g.moveTo(ax, ay); g.lineTo(bx, by); g.stroke(); }
+      g.restore();
+    }
+  }
+  function drawElement(g, d, k) {
+    g.save();
+    g.strokeStyle = d.ink ? '#1d4f6b' : 'rgba(100, 92, 78, 0.6)';
+    g.lineWidth = d.ink ? 3 : 1.1;
+    g.beginPath();
+    if (d.t === 'circle') {
+      const r = Math.hypot(d.b[0] - d.a[0], d.b[1] - d.a[1]), a0 = Math.atan2(d.b[1] - d.a[1], d.b[0] - d.a[0]);
+      g.arc(d.a[0], d.a[1], r, a0, a0 + Math.PI * 2 * k);
+    } else {
+      g.moveTo(d.a[0], d.a[1]); g.lineTo(d.a[0] + (d.b[0] - d.a[0]) * k, d.a[1] + (d.b[1] - d.a[1]) * k);
+    }
+    g.stroke(); g.restore();
+  }
+
+  // ---------- Doing a step ----------
+  function complete(byHand) {
+    const s = C.steps[done];
+    const el = { t: s.t, a: C.P[s.a], b: C.P[s.b], ink: !!s.ink };
+    const finish = () => {
+      anim = null; drawn.push(el); s.show.forEach((p) => visible.add(p));
+      done++; stepList(); drawBoard();
+      if (done === C.steps.length) { drawWall(); say(which === 'six' ? 'Done. Seven circles and six lines, and not one measurement.' : 'Done. Four lines, one circle and eight more lines, and not one measurement.', 'good'); }
+      else if (byHand) say(s.t === 'circle' ? 'A clean circle.' : 'A clean line.');
+    };
+    if (reduceMotion) { finish(); return; }
+    const t0 = performance.now(), dur = s.t === 'circle' ? 520 : 300;
+    const mine = { el, k: 0 };
+    anim = mine;
+    (function f(now) {
+      if (anim !== mine) return;          // the board was reset while this was drawing
+      mine.k = Math.min(1, (now - t0) / dur); drawBoard();
+      if (mine.k < 1) requestAnimationFrame(f); else finish();
+    })(t0);
+  }
+  function nearest(x, y) {
+    let best = null, bd = 18;
+    visible.forEach((k) => { const [px, py] = C.P[k]; const d = Math.hypot(px - x, py - y); if (d < bd) { bd = d; best = k; } });
+    return best;
+  }
+  function boardPt(e) { const r = bc.getBoundingClientRect(); return [(e.clientX - r.left) * S / r.width, (e.clientY - r.top) * S / r.height]; }
+  bc.addEventListener('pointerdown', (e) => {
+    const s = C.steps[done]; if (!s || anim) return;
+    const p = boardPt(e), k = nearest(p[0], p[1]);
+    if (!k) { say(s.t === 'circle' ? 'A compass needs a fixed point: start on the glowing centre point.' : 'Start the line on one of the glowing points.'); return; }
+    bc.setPointerCapture(e.pointerId);
+    drag = { kind: s.t, start: k, from: C.P[k], to: p };
+  });
+  bc.addEventListener('pointermove', (e) => { if (drag) { drag.to = boardPt(e); const k = nearest(drag.to[0], drag.to[1]); if (k) drag.to = C.P[k]; drawBoard(); } });
+  ['pointerup', 'pointercancel'].forEach((t) => bc.addEventListener(t, (e) => {
+    if (!drag) return;
+    const s = C.steps[done], end = nearest(drag.to[0], drag.to[1]), start = drag.start;
+    drag = null;
+    const ok = s.t === 'circle' ? start === s.a && end === s.b : (start === s.a && end === s.b) || (start === s.b && end === s.a);
+    if (ok) complete(true);
+    else {
+      drawBoard();
+      if (s.t === 'circle' && start === s.b && end === s.a) say('Nearly: the compass point goes on the other glowing point, the centre of this circle.');
+      else say('Not quite. Use the two glowing points.');
+    }
+  }));
+  bc.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); if (C.steps[done] && !anim) complete(false); } });
+  $('#help').addEventListener('click', () => { if (C.steps[done] && !anim) complete(false); });
+  $('#rest').addEventListener('click', () => {
+    if (anim) return;
+    while (done < C.steps.length) { const s = C.steps[done]; drawn.push({ t: s.t, a: C.P[s.a], b: C.P[s.b], ink: !!s.ink }); s.show.forEach((p) => visible.add(p)); done++; }
+    stepList(); drawBoard(); drawWall(); say('All drawn. The finished tile is repeated below.', 'good');
+  });
+  $('#restart').addEventListener('click', () => reset(which));
+  $$('.star').forEach((b) => b.addEventListener('click', () => reset(b.dataset.s)));
+
+  // ---------- The wall ----------
+  const PALS = [
+    { bg: '#f1ece0', star: '#1f6b4a', core: '#e9e3d2', band: '#2a2a28', small: '#c99a2e' },
+    { bg: '#1d3f8a', star: '#2aa3a8', core: '#f2f0e8', band: '#f6f2e6', small: '#0f2357' },
+    { bg: '#c58a2a', star: '#1d1b1a', core: '#e7c27a', band: '#f4ead2', small: '#6e3b1b' }
+  ];
+  let pal = 0, showLines = false;
+  const wc = $('#wall'), wg = wc.getContext('2d');
+  function starPath(g, cx, cy, R, n, inner) {
+    // a star polygon traced point, notch, point...
+    g.beginPath();
+    for (let i = 0; i < n * 2; i++) {
+      const a = (i * Math.PI / n) - Math.PI / 2, rr = i % 2 ? inner : R;
+      const x = cx + rr * Math.cos(a), y = cy + rr * Math.sin(a);
+      i ? g.lineTo(x, y) : g.moveTo(x, y);
+    }
+    g.closePath();
+  }
+  function drawWall() {
+    const g = wg, Wd = 960, Hd = 420, p = PALS[pal];
+    g.fillStyle = p.bg; g.fillRect(0, 0, Wd, Hd);
+    const complete = done === C.steps.length;
+    if (which === 'six') {
+      // hexagons of circumradius r in a honeycomb; each holds the star of its two triangles
+      const r = 72, w = Math.sqrt(3) * r;
+      for (let row = -1; row * 1.5 * r < Hd + r; row++) for (let col = -1; col * w < Wd + w; col++) {
+        const cx = col * w + (row % 2 ? w / 2 : 0), cy = row * 1.5 * r;
+        // points of the hexagon, with a 90° turn so they point up (the board's star is flat-sided at top)
+        const pts = []; for (let k = 0; k < 6; k++) pts.push([cx + r * Math.cos((60 * k + 30) * deg), cy + r * Math.sin((60 * k + 30) * deg)]);
+        if (showLines) { g.strokeStyle = 'rgba(0,0,0,0.18)'; g.lineWidth = 1; g.beginPath(); g.arc(cx, cy, r, 0, 7); g.stroke(); }
+        if (!complete) continue;
+        // the hexagram: two triangles
+        g.fillStyle = p.star; g.strokeStyle = p.band; g.lineWidth = 3; g.lineJoin = 'round';
+        [[0, 2, 4], [1, 3, 5]].forEach((tri) => { g.beginPath(); tri.forEach((i, j) => (j ? g.lineTo(...pts[i]) : g.moveTo(...pts[i]))); g.closePath(); g.fill(); });
+        [[0, 2, 4], [1, 3, 5]].forEach((tri) => { g.beginPath(); tri.forEach((i, j) => (j ? g.lineTo(...pts[i]) : g.moveTo(...pts[i]))); g.closePath(); g.stroke(); });
+        // the hexagon at its heart
+        const inner = 0.6 * r / Math.sqrt(3);
+        g.fillStyle = p.core; g.beginPath(); for (let k = 0; k < 6; k++) { const x = cx + inner * Math.cos((60 * k) * deg), y = cy + inner * Math.sin((60 * k) * deg); k ? g.lineTo(x, y) : g.moveTo(x, y); } g.closePath(); g.fill();
+      }
+    } else {
+      // square tiles; each holds the star of two squares, touching its neighbours at the tile edges
+      const t = 120, h = t / 2, d = h / Math.SQRT2;
+      for (let y = -1; y * t < Hd + t; y++) for (let x = -1; x * t < Wd + t; x++) {
+        const cx = x * t + h, cy = y * t + h;
+        if (showLines) { g.strokeStyle = 'rgba(0,0,0,0.18)'; g.lineWidth = 1; g.strokeRect(cx - h, cy - h, t, t); g.beginPath(); g.arc(cx, cy, h, 0, 7); g.moveTo(cx - h, cy - h); g.lineTo(cx + h, cy + h); g.moveTo(cx + h, cy - h); g.lineTo(cx - h, cy + h); g.stroke(); }
+        if (!complete) continue;
+        // the little square between four stars at each tile corner
+        g.fillStyle = p.small;
+        const sq = [[cx + h, cy - h + (h - d)], [cx + h + (h - d), cy - h], [cx + h, cy - h - (h - d)], [cx + h - (h - d), cy - h]];
+        g.beginPath(); sq.forEach((q, i) => (i ? g.lineTo(...q) : g.moveTo(...q))); g.closePath(); g.fill();
+        // two squares make the star
+        g.fillStyle = p.star; g.strokeStyle = p.band; g.lineWidth = 3; g.lineJoin = 'round';
+        const diamond = [[cx, cy - h], [cx + h, cy], [cx, cy + h], [cx - h, cy]], square = [[cx - d, cy - d], [cx + d, cy - d], [cx + d, cy + d], [cx - d, cy + d]];
+        [diamond, square].forEach((q) => { g.beginPath(); q.forEach((pt, i) => (i ? g.lineTo(...pt) : g.moveTo(...pt))); g.closePath(); g.fill(); });
+        [diamond, square].forEach((q) => { g.beginPath(); q.forEach((pt, i) => (i ? g.lineTo(...pt) : g.moveTo(...pt))); g.closePath(); g.stroke(); });
+        // the octagon in the middle
+        // a smaller octagon inside the overlap, so the star's body still reads as a star
+        const R8 = 0.6 * d / Math.cos(Math.PI / 8);
+        g.fillStyle = p.core; g.beginPath();
+        for (let k = 0; k < 8; k++) { const a = (22.5 + 45 * k) * deg; k ? g.lineTo(cx + R8 * Math.cos(a), cy + R8 * Math.sin(a)) : g.moveTo(cx + R8 * Math.cos(a), cy + R8 * Math.sin(a)); }
+        g.closePath(); g.fill();
+      }
+    }
+    if (!complete) {
+      g.fillStyle = 'rgba(0, 0, 0, 0.55)'; g.fillRect(0, Hd / 2 - 30, Wd, 60);
+      g.fillStyle = '#ffffff'; g.font = '18px "Lato", sans-serif'; g.textAlign = 'center';
+      g.fillText('Finish the construction above to tile the wall', Wd / 2, Hd / 2 + 6); g.textAlign = 'left';
+    }
+    // the panel's frame, so stars at the corners and edges are cut to a quarter and a half
+    g.strokeStyle = p.band; g.lineWidth = 8; g.strokeRect(4, 4, Wd - 8, Hd - 8);
+  }
+  $$('.pal').forEach((b) => b.addEventListener('click', () => { pal = +b.dataset.p; $$('.pal').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); drawWall(); }));
+  $('#lines').addEventListener('click', (e) => { showLines = !showLines; e.currentTarget.setAttribute('aria-pressed', String(showLines)); drawWall(); });
+
+  // ---------- Start: the six-pointed construction half done, so the board shows what it is for ----------
+  reset('six');
+  for (let i = 0; i < 4; i++) { const s = C.steps[done]; drawn.push({ t: s.t, a: C.P[s.a], b: C.P[s.b], ink: !!s.ink }); s.show.forEach((p) => visible.add(p)); done++; }
+  stepList(); drawBoard();
+  say('The first four steps are drawn: a line and three circles. Carry on with step 5, or switch to the eight-pointed star.');
+})();
+</script>
+</body>
+</html>
