@@ -130,6 +130,11 @@
       "try": "Build the eight-pointed star from two squares"
     },
     {
+      "slug": "stained-glass", "hall": "studio", "title": "Stained Glass Window", "ages": "6 and up",
+      "blurb": "Glaze a Gothic lancet or rose window piece by piece, fire on silver stain, abrade the ruby and paint lines, then move the sun and watch the colours fall across the chapel floor.",
+      "try": "Look at it on the bench, then in evening light"
+    },
+    {
       "slug": "mendeleev", "hall": "numbers", "title": "Mendeleev’s Table", "ages": "10 and up",
       "blurb": "Deal the elements onto Mendeleev’s 1871 table, leave gaps where nothing fits, and predict the elements nobody had found yet.",
       "try": "Decide where tellurium goes"

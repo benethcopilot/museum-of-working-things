@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Stained Glass Window</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  /* Layout: a chapel. The window in its stone wall with light falling through onto the floor, the glazier's bench of glass and tools beside it; then how a window is made, the colours of the glass, and the history. */
+  --ground: #ecebe7;
+  --ground-2: #dfdeda;
+  --card: #f8f7f4;
+  --ink: #1f1d1b;
+  --muted: #5d5954;
+  --line: rgba(31, 29, 27, 0.13);
+  --line-strong: rgba(31, 29, 27, 0.3);
+  --cobalt: #1c3f9c;
+  --ruby: #a3192a;
+  --good: #2c7449;
+  /* the chapel looks the same in both themes */
+  --stone: #b3aa9a;
+  --stone-2: #8e8676;
+  --f-display: "UnifrakturMaguntia", "Old English Text MT", Georgia, serif;
+  --f-body: "Crimson Pro", Georgia, serif;
+  --f-data: "IBM Plex Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #121110;
+    --ground-2: #1c1a18;
+    --card: #171513;
+    --ink: #ece9e4;
+    --muted: #a8a29b;
+    --line: rgba(236, 233, 228, 0.12);
+    --line-strong: rgba(236, 233, 228, 0.3);
+    --cobalt: #8ea9ef;
+    --ruby: #f07c84;
+    --good: #82cf9a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #121110;
+  --ground-2: #1c1a18;
+  --card: #171513;
+  --ink: #ece9e4;
+  --muted: #a8a29b;
+  --line: rgba(236, 233, 228, 0.12);
+  --line-strong: rgba(236, 233, 228, 0.3);
+  --cobalt: #8ea9ef;
+  --ruby: #f07c84;
+  --good: #82cf9a;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--f-body); font-size: 19px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: default; opacity: 0.45; }
+:focus-visible { outline: 3px solid #d9a62a; outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 400; line-height: 1.05; margin: 0; text-wrap: balance; }
+a { color: var(--cobalt); }
+
+.page { box-sizing: border-box; max-width: 1220px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 48px; }
+.masthead { display: grid; gap: 10px; }
+.eyebrow { margin: 0; font-family: var(--f-data); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.masthead h1 { font-size: clamp(3rem, 8vw, 5.6rem); color: var(--cobalt); }
+.lede { margin: 0; max-width: 64ch; color: var(--muted); }
+section > h2, .text h2 { font-size: clamp(2rem, 4vw, 2.8rem); }
+.text { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.text p { margin: 0; max-width: 62ch; }
+
+/* ---------- Chapel ---------- */
+.chapel { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+.scenebox { border-radius: 4px; overflow: hidden; border: 1px solid var(--line-strong); background: #3a342c; }
+#scene { display: block; width: 100%; height: auto; touch-action: none; }
+#scene .piece { cursor: pointer; }
+#scene.painting .piece { cursor: crosshair; }
+.bench { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.box { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; border-radius: 4px; background: var(--card); border: 1px solid var(--line); }
+.box > span { font-family: var(--f-data); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.glasses { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.glass { display: flex; flex-direction: column; gap: 3px; padding: 6px; border-radius: 4px; border: 1.5px solid var(--line-strong); background: none; text-align: left; font-size: 0.86rem; line-height: 1.2; }
+.glass i { display: block; height: 28px; border-radius: 3px; box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.35), inset 0 -4px 8px rgba(0, 0, 0, 0.25); }
+.glass small { color: var(--muted); font-size: 0.74rem; font-family: var(--f-data); }
+.glass[aria-pressed="true"] { border-color: var(--ink); box-shadow: 0 0 0 2px var(--ink); }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.row > span { font-size: 0.92rem; color: var(--muted); margin-right: 2px; }
+.btn { padding: 5px 12px; border: 1.5px solid var(--line-strong); border-radius: 3px; background: none; font-size: 0.92rem; }
+.btn:hover:not(:disabled) { background: var(--ground-2); }
+.btn[aria-pressed="true"] { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+.say { margin: 0; padding: 10px 12px; border-left: 3px solid #d9a62a; background: var(--card); font-size: 1rem; }
+.say.good { border-left-color: var(--good); }
+
+/* ---------- Below ---------- */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; counter-reset: s; }
+.steps li { padding: 12px 14px; border-radius: 4px; background: var(--card); border: 1px solid var(--line); counter-increment: s; }
+.steps li::before { content: counter(s); display: block; font-family: var(--f-display); font-size: 1.8rem; line-height: 1; color: var(--ruby); }
+.steps b { display: block; font-size: 1.05rem; }
+.steps p { margin: 2px 0 0; font-size: 0.92rem; color: var(--muted); }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.oxides { display: grid; gap: 6px; }
+.oxides div { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 10px; align-items: center; font-size: 0.95rem; }
+.oxides i { width: 26px; height: 26px; border-radius: 4px; box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.35); }
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-left: 2px solid var(--line-strong); }
+.timeline li { display: grid; grid-template-columns: 4.6em minmax(0, 1fr); gap: 12px; padding: 7px 0 7px 14px; position: relative; }
+.timeline li::before { content: ""; position: absolute; left: -6px; top: 15px; width: 10px; height: 10px; border-radius: 50%; background: var(--ground); border: 2px solid var(--cobalt); }
+.timeline b { font-family: var(--f-data); font-weight: 500; font-size: 0.95rem; }
+.timeline p { margin: 0; font-size: 0.98rem; }
+.sources { margin: 0; font-size: 0.9rem; color: var(--muted); max-width: 100ch; }
+
+@media (max-width: 920px) {
+  .chapel, .two { grid-template-columns: minmax(0, 1fr); }
+  .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 480px) { .steps { grid-template-columns: minmax(0, 1fr); } .glasses { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="stained-glass" defer></script>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <p class="eyebrow">Art Studio · the cathedrals of Europe · from the 7th century</p>
+    <h1>Stained Glass Window</h1>
+    <p class="lede">A stained-glass window is a puzzle of coloured glass held together by strips of lead, and it is dull and dark until light comes through it. Choose the glass for each piece, stain it, paint it, and then let the sun come round and throw your colours across the chapel floor.</p>
+  </header>
+
+  <section class="chapel" aria-label="The chapel">
+    <div class="scenebox">
+      <svg id="scene" viewBox="0 0 600 900" role="img" aria-label="A stained-glass window set in a stone wall, with the light it casts on the floor below"></svg>
+    </div>
+    <div class="bench">
+      <div class="row" role="group" aria-label="The cartoon">
+        <span>Cartoon</span>
+        <button class="btn cartoon" type="button" data-c="lancet" aria-pressed="true">Lancet with medallions</button>
+        <button class="btn cartoon" type="button" data-c="rose" aria-pressed="false">Rose window</button>
+      </div>
+      <div class="box">
+        <span>Glass</span>
+        <div class="glasses" id="glasses"></div>
+      </div>
+      <div class="box">
+        <span>Tools</span>
+        <div class="row" role="group" aria-label="Tool">
+          <button class="btn tool" type="button" data-t="glaze" aria-pressed="true">Glaze a piece</button>
+          <button class="btn tool" type="button" data-t="stain" aria-pressed="false">Silver stain</button>
+          <button class="btn tool" type="button" data-t="abrade" aria-pressed="false">Abrade the ruby</button>
+          <button class="btn tool" type="button" data-t="paint" aria-pressed="false">Paint lines</button>
+        </div>
+        <div class="row">
+          <span>Light</span>
+          <button class="btn light" type="button" data-l="none" aria-pressed="false">On the bench</button>
+          <button class="btn light" type="button" data-l="morning" aria-pressed="false">Morning</button>
+          <button class="btn light" type="button" data-l="noon" aria-pressed="true">Noon</button>
+          <button class="btn light" type="button" data-l="evening" aria-pressed="false">Evening</button>
+        </div>
+        <div class="row"><button class="btn" id="clearPaint" type="button">Wash off the paint</button><button class="btn" id="plain" type="button">All clear glass</button><button class="btn" id="classic" type="button">Glaze it the medieval way</button></div>
+      </div>
+      <p class="say" id="say" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="text" aria-label="How a window is made">
+    <h2>From cartoon to cathedral</h2>
+    <ol class="steps">
+      <li><b>The cartoon</b><p>A full-size drawing of each opening, in the Middle Ages drawn straight onto a whitewashed table, then divided into a pattern for every piece, with the lead lines marked.</p></li>
+      <li><b>Cut and groze</b><p>Each piece is chosen for its colour and cut to the pattern, its edges trimmed exactly with a grozing tool that nibbles away small bits.</p></li>
+      <li><b>Paint and fire</b><p>Faces, hair and folds are painted on in glass paint, ground lead or copper and glass in gum arabic, then fired in a kiln so they fuse to the glass.</p></li>
+      <li><b>Lead and cement</b><p>The pieces slot into H-shaped lead strips, cames; every joint is soldered, and an oily cement is pushed in to stop rattles and keep out the rain.</p></li>
+    </ol>
+  </section>
+
+  <section class="two" aria-label="Colours and history">
+    <div class="text">
+      <h2>Colour made in the pot</h2>
+      <p>Most coloured glass is pot metal: metal oxides stirred into the molten glass so the colour runs all the way through.</p>
+      <div class="oxides">
+        <div><i style="background:#1f4cc4"></i><span>Cobalt, at just 0.025 to 0.1 percent, gives the brilliant blue of Chartres Cathedral.</span></div>
+        <div><i style="background:#b0182c"></i><span>Red is so intense that glass thick enough to stand the wind would look black, so a thin red layer is flashed onto clear glass. Abrade through it and the clear shows.</span></div>
+        <div><i style="background:#7a3f98"></i><span>Manganese gives amethyst purple, one of the oldest glass colours of all.</span></div>
+        <div><i style="background:#e3a91c"></i><span>From about 1300, silver stain painted on and fired gives yellows from pale lemon to deep orange, and turns blue glass green.</span></div>
+      </div>
+    </div>
+    <div class="text">
+      <h2>Light for those who could not read</h2>
+      <p>In the Middle Ages stained glass became one of the great pictorial arts, telling the stories of the Bible to people who could not read. Gothic builders opened their walls to it, and the round rose window grew from simple pierced stone into vast wheels of glass.</p>
+      <ol class="timeline">
+        <li><b>675</b><p>Benedict Biscop brings glaziers from France for his monastery at Monkwearmouth, the earliest reference to church windows in Britain.</p></li>
+        <li><b>1200s</b><p>The windows of Chartres Cathedral, and the glass of the Sainte-Chapelle in Paris.</p></li>
+        <li><b>1313</b><p>The earliest dated window using silver stain, at Le Mesnil-Villeman in Normandy.</p></li>
+        <li><b>c. 1450</b><p>“Cousin’s rose”, a fired red, is used for flesh tones.</p></li>
+        <li><b>1880</b><p>John La Farge patents opalescent glass in February; Louis Comfort Tiffany patents his own versions that November.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <p class="sources">Sources: Wikipedia, <a href="https://en.wikipedia.org/wiki/Stained_glass" target="_blank" rel="noopener">Stained glass</a> (pot metal and the metal oxides, cobalt and the blue of Chartres, flashed red glass and abrading it, manganese, silver stain from about 1300 and the 1313 window, Cousin’s rose, the cartoon on a whitewashed table, cutting and grozing, glass paint and firing, H-section lead cames, solder and cement, Monkwearmouth in 675, the Middle Ages, rose windows, the Sainte-Chapelle, La Farge and Tiffany in 1880). The two cartoons are drawn by this page and do not copy a real window.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const NS = 'http://www.w3.org/2000/svg';
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const el = (tag, attrs, parent) => { const n = document.createElementNS(NS, tag); if (attrs) for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; };
+
+  // ---------- Glass ----------
+  const GLASS = [
+    { id: 'clear', name: 'Clear', note: 'white glass', c: '#dfe6da' },
+    { id: 'cobalt', name: 'Cobalt blue', note: 'cobalt', c: '#1f4cc4' },
+    { id: 'ruby', name: 'Ruby', note: 'flashed red', c: '#b0182c' },
+    { id: 'green', name: 'Green', note: 'pot metal', c: '#2f8a3c' },
+    { id: 'amethyst', name: 'Amethyst', note: 'manganese', c: '#7a3f98' },
+    { id: 'amber', name: 'Amber', note: 'pot metal', c: '#d18a1c' }
+  ];
+  const byId = Object.fromEntries(GLASS.map((g) => [g.id, g]));
+  // silver stain: yellow on clear, green on blue; on other colours it warms them a little
+  const STAINED = { clear: '#e8bf2c', cobalt: '#2f8a5a', green: '#6d9a22', amethyst: '#8a4a5e', amber: '#d9781a', ruby: '#b0302a' };
+
+  // ---------- The scene ----------
+  const svg = $('#scene');
+  const defs = el('defs', null, svg);
+  // lit glass glows; glass on the bench, without light behind it, is dark and dull
+  defs.innerHTML = `
+    <filter id="lit" x="-5%" y="-5%" width="110%" height="110%">
+      <feColorMatrix type="matrix" values="1.15 0 0 0 0.04  0 1.15 0 0 0.04  0 0 1.15 0 0.04  0 0 0 1 0" result="b"/>
+      <feGaussianBlur in="b" stdDeviation="3" result="glow"/>
+      <feMerge><feMergeNode in="glow"/><feMergeNode in="b"/></feMerge>
+    </filter>
+    <filter id="dull"><feColorMatrix type="matrix" values="0.32 0.08 0.04 0 0.04  0.06 0.32 0.04 0 0.04  0.04 0.06 0.32 0 0.04  0 0 0 1 0"/></filter>
+    <filter id="pool" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="7"/></filter>
+    <filter id="tex" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.035 0.02" numOctaves="2" seed="4"/><feColorMatrix type="matrix" values="0.5 0 0 0 0.55  0.5 0 0 0 0.55  0.5 0 0 0 0.55  0 0 0 0 1"/></filter>
+    <pattern id="abraded" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="8" cy="8" r="3.2" fill="#f4f1e6" opacity="0.9"/><circle cx="0" cy="0" r="1.6" fill="#f4f1e6" opacity="0.8"/><circle cx="16" cy="0" r="1.6" fill="#f4f1e6" opacity="0.8"/><circle cx="0" cy="16" r="1.6" fill="#f4f1e6" opacity="0.8"/><circle cx="16" cy="16" r="1.6" fill="#f4f1e6" opacity="0.8"/></pattern>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a5247"/><stop offset="1" stop-color="#2f2a24"/></linearGradient>
+    <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a8172"/><stop offset="1" stop-color="#6e665a"/></linearGradient>`;
+  const winClip = el('clipPath', { id: 'winClip' }, defs);
+  const winClipPath = el('path', {}, winClip);
+
+  el('rect', { x: 0, y: 0, width: 600, height: 640, fill: 'url(#wall)' }, svg);
+  // a few courses of ashlar
+  const courses = el('g', { stroke: 'rgba(40,34,26,0.25)', 'stroke-width': 1.2, fill: 'none' }, svg);
+  for (let y = 40; y < 640; y += 40) { el('line', { x1: 0, y1: y, x2: 600, y2: y }, courses); for (let x = (y / 40) % 2 ? 0 : 50; x < 600; x += 100) el('line', { x1: x, y1: y - 40, x2: x, y2: y }, courses); }
+  const floor = el('rect', { x: 0, y: 640, width: 600, height: 260, fill: 'url(#floor)' }, svg);
+  const floorLines = el('g', { stroke: 'rgba(0,0,0,0.25)', 'stroke-width': 1 }, svg);
+  for (let i = 0; i < 9; i++) el('line', { x1: 300 + (i - 4) * 40, y1: 640, x2: 300 + (i - 4) * 150, y2: 900 }, floorLines);
+  for (let y = 660; y < 900; y += 30 + (y - 640) * 0.2) el('line', { x1: 0, y1: y, x2: 600, y2: y }, floorLines);
+  // the light pooled on the floor: the same glass, squashed and blurred
+  const poolG = el('g', { filter: 'url(#pool)', style: 'mix-blend-mode: screen' }, svg);
+  const pool = el('use', { href: '#glassArt' }, poolG);
+  // the window itself
+  const embrasure = el('path', { fill: '#4a4338', stroke: '#2f2a24', 'stroke-width': 3 }, svg);
+  const backLight = el('path', { fill: '#fff8e8' }, svg);
+  const winG = el('g', { id: 'winG' }, svg);
+  const glassArt = el('g', { id: 'glassArt', 'clip-path': 'url(#winClip)' }, winG);
+  const piecesG = el('g', null, glassArt);
+  const texRect = el('rect', { x: 0, y: 0, width: 600, height: 640, filter: 'url(#tex)', style: 'mix-blend-mode: multiply', 'pointer-events': 'none' }, glassArt);
+  const paintG = el('g', { 'pointer-events': 'none' }, glassArt);
+  const leadG = el('g', { 'pointer-events': 'none', fill: 'none', stroke: '#26231f', 'stroke-linejoin': 'round' }, glassArt);
+  const frame = el('path', { fill: 'none', stroke: '#9c927f', 'stroke-width': 10 }, winG);
+  const bars = el('g', { stroke: '#1d1b18', 'stroke-width': 5, 'pointer-events': 'none' }, winG);
+
+  // ---------- Cartoons ----------
+  // each piece: a path and the glass a medieval glazier might choose
+  function circlePath(cx, cy, r) { return `M${cx - r} ${cy}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0Z`; }
+  function sector(cx, cy, r0, r1, a0, a1) {
+    const p = (r, a) => `${(cx + r * Math.cos(a)).toFixed(1)} ${(cy + r * Math.sin(a)).toFixed(1)}`;
+    return `M${p(r0, a0)}L${p(r1, a0)}A${r1} ${r1} 0 0 1 ${p(r1, a1)}L${p(r0, a1)}A${r0} ${r0} 0 0 0 ${p(r0, a0)}Z`;
+  }
+  function lancet() {
+    const L = 180, R = 420, top = 60, spring = 270, bottom = 600, span = R - L;
+    const outline = `M${L} ${bottom}L${L} ${spring}A${span} ${span} 0 0 1 ${(L + R) / 2} ${spring - span * Math.sin(Math.PI / 3)}A${span} ${span} 0 0 1 ${R} ${spring}L${R} ${bottom}Z`;
+    const pieces = [];
+    // background quarries: a lattice of lozenges
+    const qw = 40, qh = 64;
+    for (let row = -1; row * qh / 2 < bottom + qh; row++) for (let col = -1; col * qw < 600; col++) {
+      const cx = L - 20 + col * qw + (row % 2 ? qw / 2 : 0), cy = top - 40 + row * qh / 2;
+      if (cx < L - qw || cx > R + qw) continue;
+      pieces.push({ d: `M${cx} ${cy - qh / 2}L${cx + qw / 2} ${cy}L${cx} ${cy + qh / 2}L${cx - qw / 2} ${cy}Z`, g: (row + col) % 3 ? 'cobalt' : 'ruby', kind: 'quarry' });
+    }
+    // a border of small panes
+    const bw = 18;
+    for (let y = spring; y < bottom; y += 40) { pieces.push({ d: `M${L} ${y}h${bw}v40h${-bw}Z`, g: (y / 40) % 2 ? 'amber' : 'clear', kind: 'border' }); pieces.push({ d: `M${R - bw} ${y}h${bw}v40h${-bw}Z`, g: (y / 40) % 2 ? 'clear' : 'amber', kind: 'border' }); }
+    // two medallions: a centre, a ring of eight, and petals
+    [[(L + R) / 2, 215, 74], [(L + R) / 2, 440, 92]].forEach(([cx, cy, r], m) => {
+      pieces.push({ d: circlePath(cx, cy, r + 8), g: 'clear', kind: 'rim' });
+      for (let k = 0; k < 8; k++) pieces.push({ d: sector(cx, cy, r * 0.48, r, k * Math.PI / 4, (k + 1) * Math.PI / 4), g: k % 2 ? (m ? 'green' : 'amethyst') : 'ruby', kind: 'ring' });
+      for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2 + Math.PI / 4; pieces.push({ d: circlePath(cx + Math.cos(a) * r * 0.74, cy + Math.sin(a) * r * 0.74, r * 0.16), g: 'amber', kind: 'jewel' }); }
+      pieces.push({ d: circlePath(cx, cy, r * 0.48), g: m ? 'cobalt' : 'clear', kind: 'centre' });
+    });
+    const barsAt = [330, 390, 500, 560].map((y) => [L, y, R, y]);
+    return { outline, pieces, bars: barsAt, embrasure: `M${L - 34} ${bottom + 30}L${L - 34} ${spring}A${span + 34} ${span + 34} 0 0 1 ${(L + R) / 2} ${spring - (span + 34) * Math.sin(Math.PI / 3) - 4}A${span + 34} ${span + 34} 0 0 1 ${R + 34} ${spring}L${R + 34} ${bottom + 30}Z`, box: [L, 30, R, bottom] };
+  }
+  function rose() {
+    const cx = 300, cy = 310, R = 230;
+    const pieces = [];
+    pieces.push({ d: circlePath(cx, cy, R), g: 'cobalt', kind: 'ground' });
+    for (let k = 0; k < 24; k++) { const a = k * Math.PI / 12; pieces.push({ d: circlePath(cx + Math.cos(a) * (R - 22), cy + Math.sin(a) * (R - 22), 17), g: k % 2 ? 'ruby' : 'amber', kind: 'outer' }); }
+    for (let k = 0; k < 12; k++) {
+      const a = k * Math.PI / 6;
+      pieces.push({ d: circlePath(cx + Math.cos(a) * 150, cy + Math.sin(a) * 150, 46), g: k % 2 ? 'ruby' : 'green', kind: 'petal' });
+      pieces.push({ d: circlePath(cx + Math.cos(a) * 150, cy + Math.sin(a) * 150, 22), g: k % 2 ? 'amber' : 'clear', kind: 'petal-eye' });
+    }
+    for (let k = 0; k < 12; k++) pieces.push({ d: sector(cx, cy, 52, 98, k * Math.PI / 6 + 0.04, (k + 1) * Math.PI / 6 - 0.04), g: k % 2 ? 'amethyst' : 'ruby', kind: 'inner' });
+    pieces.push({ d: circlePath(cx, cy, 48), g: 'amber', kind: 'oculus' });
+    pieces.push({ d: circlePath(cx, cy, 22), g: 'clear', kind: 'oculus-eye' });
+    return { outline: circlePath(cx, cy, R), pieces, bars: [], embrasure: circlePath(cx, cy, R + 30), box: [cx - R, cy - R, cx + R, cy + R] };
+  }
+
+  // ---------- State and drawing ----------
+  let cartoon = 'lancet', C = null, sel = 'cobalt', tool = 'glaze', light = 'noon';
+  let state = [];   // per piece: { g, stain, abrade }
+  function build() {
+    C = cartoon === 'lancet' ? lancet() : rose();
+    state = C.pieces.map((p) => ({ g: p.g, stain: false, abrade: false }));
+    winClipPath.setAttribute('d', C.outline);
+    embrasure.setAttribute('d', C.embrasure);
+    backLight.setAttribute('d', C.outline);
+    frame.setAttribute('d', C.outline);
+    piecesG.textContent = ''; leadG.textContent = ''; paintG.textContent = ''; bars.textContent = '';
+    C.pieces.forEach((p, i) => {
+      // each piece carries its own lead, so a piece laid over another hides the lead beneath it
+      const g = el('g', { class: 'piece', 'data-i': i }, piecesG);
+      el('path', { d: p.d, stroke: '#26231f', 'stroke-width': p.kind === 'quarry' ? 3 : 4.5, 'stroke-linejoin': 'round' }, g);
+      el('path', { d: p.d, fill: 'url(#abraded)', class: 'abr', visibility: 'hidden', 'pointer-events': 'none' }, g);
+    });
+    C.bars.forEach(([x1, y1, x2, y2]) => el('line', { x1, y1, x2, y2 }, bars));
+    paint(); lighting();
+  }
+  function paint() {
+    Array.from(piecesG.children).forEach((g, i) => {
+      const s = state[i], base = byId[s.g].c;
+      g.firstChild.setAttribute('fill', s.stain ? STAINED[s.g] : base);
+      g.lastChild.setAttribute('visibility', s.abrade && s.g === 'ruby' ? 'visible' : 'hidden');
+    });
+  }
+  // the sun moves round: the pool of colour on the floor slides and stretches
+  const LIGHTS = {
+    none: { pool: 0, back: '#3b352d', filter: 'url(#dull)', tint: null },
+    morning: { pool: 0.75, back: '#fff1d8', filter: 'url(#lit)', sx: 1.25, sk: -38, ty: 650, tx: -50 },
+    noon: { pool: 0.85, back: '#fffaf0', filter: 'url(#lit)', sx: 1.05, sk: 0, ty: 650, tx: 0 },
+    evening: { pool: 0.8, back: '#ffd9a8', filter: 'url(#lit)', sx: 1.3, sk: 40, ty: 650, tx: 40 }
+  };
+  function lighting() {
+    const L = LIGHTS[light];
+    winG.setAttribute('filter', L.filter);
+    backLight.setAttribute('fill', L.back);
+    poolG.setAttribute('opacity', L.pool);
+    if (L.pool) {
+      const [x0, y0, x1, y1] = C.box, w = x1 - x0, h = y1 - y0;
+      // squash the window flat onto the floor and lean it with the sun: light through the bottom
+      // of the window lands by the wall, light through the top lands farthest out
+      const sy = 210 / h * 0.9;
+      pool.setAttribute('transform', `translate(${300 + L.tx} ${L.ty}) skewX(${L.sk}) scale(${L.sx} ${-sy}) translate(${-(x0 + w / 2)} ${-y1})`);
+    }
+    texRect.setAttribute('opacity', light === 'none' ? 0.9 : 0.6);
+  }
+
+  // ---------- Tools ----------
+  const say = (t, cls) => { const s = $('#say'); s.textContent = t; s.className = 'say' + (cls ? ' ' + cls : ''); };
+  function svgPt(e) { const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; return p.matrixTransform(svg.getScreenCTM().inverse()); }
+  let stroke = null;
+  svg.addEventListener('pointerdown', (e) => {
+    if (tool === 'paint') {
+      const p = svgPt(e);
+      svg.setPointerCapture(e.pointerId);
+      stroke = { pts: [[p.x, p.y]], path: el('path', { fill: 'none', stroke: '#2a1a10', 'stroke-width': 3.2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: 0.85 }, paintG) };
+      return;
+    }
+    const g = e.target.closest && e.target.closest('.piece');
+    if (!g) return;
+    const i = +g.dataset.i, s = state[i];
+    if (tool === 'glaze') { s.g = sel; s.stain = false; s.abrade = false; say(`${byId[sel].name} glass cut and grozed to fit.`); }
+    else if (tool === 'stain') {
+      s.stain = !s.stain;
+      say(s.stain ? (s.g === 'clear' ? 'Silver stain on white glass, fired: a clear yellow.' : s.g === 'cobalt' ? 'Silver stain on blue glass turns it green.' : 'Silver stain warms the colour a little.') : 'Stain removed.');
+    } else if (tool === 'abrade') {
+      if (s.g !== 'ruby') { say('Only flashed glass can be abraded: its colour is a thin layer on clear glass. Choose a ruby piece.'); return; }
+      s.abrade = !s.abrade;
+      say(s.abrade ? 'The thin red layer is ground away in spots, and clear glass shines through.' : 'A fresh piece of ruby.');
+    }
+    paint();
+  });
+  svg.addEventListener('pointermove', (e) => {
+    if (!stroke) return;
+    const p = svgPt(e), l = stroke.pts[stroke.pts.length - 1];
+    if (Math.hypot(p.x - l[0], p.y - l[1]) < 2) return;
+    stroke.pts.push([p.x, p.y]);
+    stroke.path.setAttribute('d', 'M' + stroke.pts.map((q) => q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join('L'));
+  });
+  ['pointerup', 'pointercancel'].forEach((t) => svg.addEventListener(t, () => { if (stroke) { stroke = null; say('Painted, ready to fire. Glass paint is opaque, so it shows as dark lines against the light.'); } }));
+
+  // ---------- Bench controls ----------
+  const glassBox = $('#glasses');
+  GLASS.forEach((g) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'glass';
+    b.innerHTML = `<i style="background:${g.c}"></i>${g.name}<small>${g.note}</small>`;
+    b.setAttribute('aria-pressed', String(g.id === sel));
+    b.addEventListener('click', () => { sel = g.id; $$('.glass').forEach((x, j) => x.setAttribute('aria-pressed', String(GLASS[j].id === sel))); setTool('glaze'); });
+    glassBox.appendChild(b);
+  });
+  function setTool(t) {
+    tool = t; $$('.tool').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.t === t)));
+    svg.classList.toggle('painting', t === 'paint');
+    say({ glaze: `Click a piece to glaze it in ${byId[sel].name.toLowerCase()}.`, stain: 'Click a piece to paint silver stain on its back and fire it.', abrade: 'Click a ruby piece to grind through its thin red layer.', paint: 'Drag to paint lines in glass paint: faces, leaves, folds of cloth.' }[t]);
+  }
+  $$('.tool').forEach((b) => b.addEventListener('click', () => setTool(b.dataset.t)));
+  $$('.light').forEach((b) => b.addEventListener('click', () => {
+    light = b.dataset.l; $$('.light').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); lighting();
+    say({ none: 'On the glazier’s bench, with no light behind it, the glass is dark and murky. It only comes alive against the sky.', morning: 'Morning: the sun is low in the east, and the colours lie long across the floor.', noon: 'Noon: the light falls almost straight down, a short pool of colour.', evening: 'Evening: low western sun, warm light, the colours stretched the other way.' }[light]);
+  }));
+  $$('.cartoon').forEach((b) => b.addEventListener('click', () => { cartoon = b.dataset.c; $$('.cartoon').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); build(); say(cartoon === 'rose' ? 'A rose window: a wheel of petals round a central oculus.' : 'A tall lancet with two medallions on a ground of diamond quarries.'); }));
+  $('#clearPaint').addEventListener('click', () => { paintG.textContent = ''; say('Unfired paint washes straight off.'); });
+  $('#plain').addEventListener('click', () => { state.forEach((s) => { s.g = 'clear'; s.stain = false; s.abrade = false; }); paint(); say('Every piece in clear glass, like a fresh cartoon waiting for colour.'); });
+  $('#classic').addEventListener('click', () => { state = C.pieces.map((p) => ({ g: p.g, stain: false, abrade: false })); paint(); say('Back to a medieval scheme: deep cobalt and ruby, with amber, green and purple.'); });
+
+  // ---------- Start ----------
+  build();
+  // open with a little stain and abrasion already done, so the tools show what they do
+  state.forEach((s, i) => { if (C.pieces[i].kind === 'jewel') s.stain = false; if (C.pieces[i].kind === 'centre' && s.g === 'clear') s.stain = true; if (C.pieces[i].kind === 'ring' && s.g === 'ruby' && i % 4 === 0) s.abrade = true; });
+  paint();
+  say('Noon light through a lancet window. Choose glass and click pieces to change them, then move the sun.');
+})();
+</script>
+</body>
+</html>
