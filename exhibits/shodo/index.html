@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Shodō Brush and Ink</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Mulish:ital,wght@0,400;0,700;1,400&family=Red+Hat+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@700&text=%E6%B0%B8%E5%81%B4%E5%8B%92%E5%8A%AA%E8%B6%AF%E7%AD%96%E6%8E%A0%E5%95%84%E7%A3%94%E6%9B%B8%E9%81%93%E6%96%87%E6%88%BF%E5%9B%9B%E5%AE%9D%E7%AD%86%E5%A2%A8%E7%A1%AF%E7%B4%99%E5%86%86%E7%9B%B8%E6%A5%B7%E8%A1%8C%E8%8D%89&display=swap">
+<style>
+:root {
+  /* Layout: the writing desk. A sheet of hanshi paper on dark felt with a paperweight across the top, the inkstone and brush beside it; then the eight principles of 永, the four treasures, and the three scripts. */
+  --ground: #e9eaec;
+  --ground-2: #dcdee2;
+  --card: #f6f7f8;
+  --ink: #1a1a1a;
+  --muted: #5a5d63;
+  --line: rgba(26, 26, 26, 0.13);
+  --line-strong: rgba(26, 26, 26, 0.3);
+  --shu: #c23b22;
+  --good: #2c7449;
+  /* the desk and the paper look the same in both themes */
+  --felt: #1f2a33;
+  --felt-2: #18212a;
+  --desk-ink: #e8e4da;
+  --desk-dim: #a7b0b8;
+  --paper: #f5f2ea;
+  --f-display: "Marcellus", "Trajan Pro", Georgia, serif;
+  --f-body: "Mulish", "Segoe UI", system-ui, sans-serif;
+  --f-data: "Red Hat Mono", Consolas, "Courier New", monospace;
+  --f-jp: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "MS Mincho", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #101215;
+    --ground-2: #1b1e23;
+    --card: #15181c;
+    --ink: #e8e9eb;
+    --muted: #a0a4ab;
+    --line: rgba(232, 233, 235, 0.12);
+    --line-strong: rgba(232, 233, 235, 0.3);
+    --shu: #f07a62;
+    --good: #80cf98;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #101215;
+  --ground-2: #1b1e23;
+  --card: #15181c;
+  --ink: #e8e9eb;
+  --muted: #a0a4ab;
+  --line: rgba(232, 233, 235, 0.12);
+  --line-strong: rgba(232, 233, 235, 0.3);
+  --shu: #f07a62;
+  --good: #80cf98;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: default; opacity: 0.45; }
+:focus-visible { outline: 3px solid var(--shu); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 400; line-height: 1.08; margin: 0; text-wrap: balance; }
+a { color: var(--shu); }
+.jp { font-family: var(--f-jp); font-weight: 700; }
+
+.page { box-sizing: border-box; max-width: 1200px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 50px; }
+.masthead { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 28px; align-items: end; }
+.eyebrow { margin: 0; font-family: var(--f-data); font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.masthead h1 { font-size: clamp(2.6rem, 7vw, 5rem); }
+.lede { margin: 0; max-width: 64ch; color: var(--muted); }
+.big-ei { font-family: var(--f-jp); font-weight: 700; font-size: clamp(5rem, 14vw, 9rem); line-height: 1; color: var(--ink); }
+section > h2, .text h2 { font-size: clamp(1.8rem, 3.6vw, 2.5rem); }
+.text { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.text p { margin: 0; max-width: 64ch; }
+
+/* ---------- Desk ---------- */
+.desk { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 22px; padding: 18px; border-radius: 6px; background: linear-gradient(180deg, var(--felt), var(--felt-2)); color: var(--desk-ink); }
+.sheet { position: relative; aspect-ratio: 640 / 880; width: 100%; max-width: 560px; margin-inline: auto; box-shadow: 0 10px 22px -12px rgba(0, 0, 0, 0.8); }
+.sheet canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+#ink { touch-action: none; cursor: crosshair; }
+#ink.seal { cursor: copy; }
+.weight { position: absolute; left: 6%; right: 6%; top: -10px; height: 18px; border-radius: 3px; background: linear-gradient(180deg, #4a4d52, #2a2c30); box-shadow: 0 3px 6px rgba(0, 0, 0, 0.5); pointer-events: none; }
+.tools { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.tools h2 { font-size: 1.4rem; color: var(--desk-ink); }
+.tool { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 4px; background: rgba(0, 0, 0, 0.22); border: 1px solid rgba(255, 255, 255, 0.07); }
+.tool > span { font-family: var(--f-data); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--desk-dim); }
+#stone { width: 100%; max-width: 300px; height: auto; touch-action: none; cursor: grab; border-radius: 6px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.dbtn { padding: 6px 12px; border-radius: 3px; border: 1.5px solid rgba(232, 228, 218, 0.5); background: none; color: var(--desk-ink); font-size: 0.92rem; }
+.dbtn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.08); }
+.dbtn.go { background: var(--desk-ink); color: var(--felt-2); border-color: var(--desk-ink); font-weight: 700; }
+.dbtn[aria-pressed="true"] { background: rgba(232, 228, 218, 0.22); border-color: var(--desk-ink); }
+.meter { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 4px 10px; align-items: center; font-size: 0.9rem; }
+.bar { height: 9px; border-radius: 5px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 50%; background: var(--desk-ink); }
+.seal-in { width: 4.5em; padding: 5px 8px; border-radius: 3px; border: 1.5px solid rgba(232, 228, 218, 0.5); background: rgba(0, 0, 0, 0.25); color: var(--desk-ink); text-transform: uppercase; font-family: var(--f-data); }
+.note { margin: 0; padding: 10px 12px; border-left: 3px solid #c9a46a; background: rgba(0, 0, 0, 0.22); font-size: 0.95rem; }
+.note.good { border-left-color: #8fd3a5; }
+.desk-note { margin: 0; font-size: 0.84rem; color: var(--desk-dim); }
+
+/* ---------- Below ---------- */
+.principles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.pr { display: flex; flex-direction: column; gap: 4px; padding: 10px; border-radius: 3px; background: var(--card); border: 1px solid var(--line); text-align: left; color: inherit; }
+.pr:hover { border-color: var(--line-strong); }
+.pr canvas { width: 100%; height: auto; aspect-ratio: 1; border-radius: 2px; background: var(--paper); }
+.pr .k { display: flex; gap: 8px; align-items: baseline; }
+.pr .k b { font-family: var(--f-jp); font-weight: 700; font-size: 1.6rem; line-height: 1; }
+.pr .k span { font-family: var(--f-data); font-size: 0.78rem; color: var(--muted); }
+.pr p { margin: 0; font-size: 0.88rem; color: var(--muted); }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.treasures { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.treasures li { padding: 10px 12px; border-radius: 3px; background: var(--card); border: 1px solid var(--line); display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; align-items: baseline; }
+.treasures b { font-family: var(--f-jp); font-weight: 700; font-size: 1.8rem; line-height: 1; grid-row: span 2; }
+.treasures strong { font-family: var(--f-display); font-weight: 400; font-size: 1.1rem; }
+.treasures span { font-size: 0.9rem; color: var(--muted); }
+.scripts { display: grid; gap: 10px; }
+.scripts div { display: grid; grid-template-columns: 3.2em minmax(0, 1fr); gap: 12px; align-items: start; padding: 10px 12px; border-radius: 3px; background: var(--card); border: 1px solid var(--line); }
+.scripts b { font-family: var(--f-jp); font-weight: 700; font-size: 2.2rem; line-height: 1; }
+.scripts p { margin: 0; font-size: 0.92rem; }
+.scripts strong { font-family: var(--f-display); font-weight: 400; font-size: 1.1rem; }
+.sources { margin: 0; font-size: 0.86rem; color: var(--muted); max-width: 100ch; }
+
+@media (max-width: 920px) {
+  .desk, .two { grid-template-columns: minmax(0, 1fr); }
+  .principles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .masthead { grid-template-columns: minmax(0, 1fr); }
+  .treasures { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="shodo" defer></script>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <div>
+      <p class="eyebrow">Making &amp; Mending · Japan and China · from the 4th century</p>
+      <h1>Shodō Brush and Ink</h1>
+      <p class="lede">Shodō, the way of writing, is done with a soft brush, ink ground from a stick of soot, and absorbent paper that takes every stroke at once. Nothing can be corrected. Beginners practise one character, 永, “forever”, because it holds the eight basic strokes of regular script.</p>
+    </div>
+    <div class="big-ei" aria-hidden="true">永</div>
+  </header>
+
+  <section class="desk" aria-label="The writing desk">
+    <div class="sheet" id="sheetBox">
+      <canvas id="paper" width="640" height="880" aria-hidden="true"></canvas>
+      <canvas id="ink" width="640" height="880" tabindex="0" aria-label="A sheet of hanshi paper. Press and drag to write; move slowly for a thick stroke and quickly for a thin one."></canvas>
+      <div class="weight"></div>
+    </div>
+    <div class="tools">
+      <h2 id="modeTitle">Write 永</h2>
+      <div class="row" role="group" aria-label="What to write">
+        <button class="dbtn mode" type="button" data-m="ei" aria-pressed="true">永</button>
+        <button class="dbtn mode" type="button" data-m="enso" aria-pressed="false">Ensō circle</button>
+        <button class="dbtn mode" type="button" data-m="free" aria-pressed="false">Free sheet</button>
+      </div>
+      <div class="row">
+        <button class="dbtn go" id="watch" type="button">Watch it written</button>
+        <button class="dbtn" id="guide" type="button" aria-pressed="true">Model underneath</button>
+        <button class="dbtn" id="newSheet" type="button">New sheet</button>
+      </div>
+      <div class="tool">
+        <span>Inkstone</span>
+        <canvas id="stone" width="300" height="150" aria-label="Inkstone. Drag the ink stick round in circles to grind darker ink."></canvas>
+        <div class="meter"><span>Ink darkness</span><div class="bar"><i id="darkBar"></i></div><span>Brush load</span><div class="bar"><i id="loadBar"></i></div></div>
+        <div class="row"><button class="dbtn" id="dip" type="button">Dip the brush</button><button class="dbtn" id="bottle" type="button">Use bottled ink</button></div>
+      </div>
+      <div class="tool">
+        <span>Your seal</span>
+        <div class="row"><input class="seal-in" id="sealText" maxlength="3" value="ME" aria-label="Letters for your seal"><button class="dbtn" id="sealBtn" type="button" aria-pressed="false">Press the seal</button><button class="dbtn" id="compare" type="button">Compare with the model</button></div>
+      </div>
+      <p class="note" id="note" aria-live="polite"></p>
+      <p class="desk-note">Slow strokes press the brush down and spread wide; fast ones lift it to a thin line. A brush that is running dry splits into streaks, called kasure. With a pen, pressure works too.</p>
+    </div>
+  </section>
+
+  <section class="text" aria-label="The eight principles">
+    <h2>The eight principles of 永</h2>
+    <p>Calligraphers since the Tang dynasty have taught the eight common strokes through 永. Each has an old name, a picture of how the brush should move. Select one to watch the brush write it.</p>
+    <div class="principles" id="principles"></div>
+  </section>
+
+  <section class="two" aria-label="Tools and scripts">
+    <div class="text">
+      <h2>The four treasures of the study</h2>
+      <ul class="treasures">
+        <li><b>筆</b><strong>Brush</strong><span>Animal hair, often goat, sheep or horse, set in a bamboo or wooden handle.</span></li>
+        <li><b>墨</b><strong>Ink stick</strong><span>Pine or vegetable soot bound with glue and dried hard.</span></li>
+        <li><b>硯</b><strong>Inkstone</strong><span>A stone slab with a well. Water is poured in and the stick ground against it.</span></li>
+        <li><b>紙</b><strong>Paper</strong><span>Thin and absorbent, laid on felt so the ink does not soak through, with a paperweight to hold it.</span></li>
+      </ul>
+      <p>Grinding ink takes time, so many beginners now use bottled ink, bokujū. Students are also encouraged to carve their own seal, and the seal goes where it looks best, but never on a copied sutra.</p>
+    </div>
+    <div class="text">
+      <h2>Three ways to write</h2>
+      <div class="scripts">
+        <div><b>楷</b><p><strong>Kaisho, regular script.</strong> Every stroke separate and complete, like printed capitals. The eight principles belong to this script.</p></div>
+        <div><b>行</b><p><strong>Gyōsho, semi-cursive.</strong> Strokes run into one another as the hand speeds up.</p></div>
+        <div><b>草</b><p><strong>Sōsho, cursive.</strong> Whole characters in a few flowing movements. The ensō circle is often drawn in this swift spirit.</p></div>
+      </div>
+      <p>Zen shaped Japanese calligraphy: the calligrapher has one chance at each sheet, and any lack of confidence shows. An ensō is drawn in one stroke and never changed afterwards. Some artists leave the circle open, some close it.</p>
+    </div>
+  </section>
+
+  <p class="sources">Sources: Wikipedia, <a href="https://en.wikipedia.org/wiki/Eight_Principles_of_Yong" target="_blank" rel="noopener">Eight Principles of Yong</a> (the eight strokes in 永, their Tang-era names and what each describes), <a href="https://en.wikipedia.org/wiki/Japanese_calligraphy" target="_blank" rel="noopener">Japanese calligraphy</a> (the four treasures, grinding ink and bokujū, felt and paperweight, the seal, the scripts, Zen and the single chance) and <a href="https://en.wikipedia.org/wiki/Ens%C5%8D" target="_blank" rel="noopener">Ensō</a> (one stroke, open or closed, never changed). The model 永 is drawn by this page’s own brush from hand-placed points in the shape of regular script; the brush is a simulation of bristles carrying a limited load of ink.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  function rng(seed) { let s = seed >>> 0; return () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  const W = 640, H = 880;
+
+  // ---------- The model 永, as the eight principles (points in a 1000 box: x, y, pressure) ----------
+  const P = {
+    dot: [[452, 92, 0.15], [470, 110, 0.5], [494, 136, 0.82], [516, 160, 0.95], [526, 176, 0.62]],
+    bridle: [[330, 300, 0.22], [352, 296, 0.72], [420, 290, 0.62], [490, 283, 0.62], [532, 278, 0.92]],
+    strive: [[542, 284, 0.95], [549, 304, 0.8], [547, 450, 0.7], [544, 650, 0.72], [541, 820, 0.8], [539, 878, 0.92]],
+    leap: [[539, 878, 0.92], [531, 896, 0.76], [506, 882, 0.5], [470, 852, 0.18]],
+    whip: [[232, 502, 0.36], [262, 498, 0.85], [330, 479, 0.55], [400, 456, 0.36], [432, 446, 0.66]],
+    skim: [[432, 446, 0.82], [408, 500, 0.7], [352, 590, 0.55], [282, 680, 0.38], [190, 762, 0.1]],
+    peck: [[782, 368, 0.48], [770, 384, 0.85], [722, 430, 0.6], [652, 480, 0.34], [604, 506, 0.2]],
+    knife: [[604, 506, 0.22], [652, 560, 0.4], [722, 650, 0.6], [792, 740, 0.85], [852, 810, 1.0], [882, 834, 0.96], [930, 850, 0.42], [976, 856, 0.08]]
+  };
+  const STROKES = [['dot'], ['bridle', 'strive', 'leap'], ['whip', 'skim'], ['peck'], ['knife']];
+  const PRINCIPLES = [
+    { key: 'dot', ch: '側', mean: 'side', desc: 'The dot. A tiny dash, pressed and stopped.' },
+    { key: 'bridle', ch: '勒', mean: 'bridle', desc: 'The horizontal, drawn rightward as if reining in a horse.' },
+    { key: 'strive', ch: '努', mean: 'strive', desc: 'The vertical, pushed straight down with steady force.' },
+    { key: 'leap', ch: '趯', mean: 'jump', desc: 'The hook, flicked suddenly off the end of another stroke.' },
+    { key: 'whip', ch: '策', mean: 'horsewhip', desc: 'The rising stroke, flicked up and to the right.' },
+    { key: 'skim', ch: '掠', mean: 'skim', desc: 'The long left-falling sweep, thinning as it goes, fast as if skimming.' },
+    { key: 'peck', ch: '啄', mean: 'to peck', desc: 'The short left-falling stroke, quick as a bird’s peck.' },
+    { key: 'knife', ch: '磔', mean: 'dismember', desc: 'The right-falling stroke, fattening at the foot to an edge sharp as a knife.' }
+  ];
+  // smooth a list of points with Catmull–Rom, about every 5 units
+  function dense(pts) {
+    const out = [];
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)];
+      const n = Math.max(2, Math.ceil(Math.hypot(p2[0] - p1[0], p2[1] - p1[1]) / 5));
+      for (let k = 0; k < n; k++) {
+        const t = k / n, t2 = t * t, t3 = t2 * t;
+        const f = (a, b, c, d) => 0.5 * (2 * b + (-a + c) * t + (2 * a - 5 * b + 4 * c - d) * t2 + (-a + 3 * b - 3 * c + d) * t3);
+        out.push([f(p0[0], p1[0], p2[0], p3[0]), f(p0[1], p1[1], p2[1], p3[1]), p1[2] + (p2[2] - p1[2]) * t]);
+      }
+    }
+    out.push(pts[pts.length - 1]);
+    return out;
+  }
+  const strokePts = (keys) => dense(keys.reduce((acc, k, i) => acc.concat(i ? P[k].slice(1) : P[k]), []));
+
+  // ---------- The brush ----------
+  class Brush {
+    constructor(ctx, opts) { this.ctx = ctx; this.o = Object.assign({ maxW: 46, color: [16, 15, 14], darkness: 0.85, nb: 26, seed: 1 }, opts); this.r = rng(this.o.seed); }
+    begin(x, y, p, load) {
+      const r = this.r;
+      this.bristles = Array.from({ length: this.o.nb }, (_, i) => ({
+        o: (i / (this.o.nb - 1)) * 2 - 1 + (r() - 0.5) * 0.08,
+        ink: load * (0.55 + 0.9 * r()),
+        len: 0.75 + 0.35 * r() - Math.abs((i / (this.o.nb - 1)) * 2 - 1) * 0.3
+      }));
+      this.last = { x, y, w: this.width(p) * 0.6 };
+      this.ang = null;
+      this.used = 0;
+      this.blot(x, y, p, load);
+    }
+    width(p) { return Math.max(1.2, this.o.maxW * Math.pow(clamp(p, 0, 1), 1.15)); }
+    blot(x, y, p, load) {
+      // the ink pools a little where the brush first presses down
+      if (load < 0.35 || p < 0.25) return;
+      const g = this.ctx, rad = this.width(p) * 0.55;
+      const gr = g.createRadialGradient(x, y, 0, x, y, rad * 1.3);
+      const c = this.o.color, a = this.o.darkness * 0.35 * load;
+      gr.addColorStop(0, `rgba(${c[0]},${c[1]},${c[2]},${a})`); gr.addColorStop(1, `rgba(${c[0]},${c[1]},${c[2]},0)`);
+      g.fillStyle = gr; g.beginPath(); g.arc(x, y, rad * 1.3, 0, 7); g.fill();
+    }
+    move(x, y, p, speed) {
+      const L = this.last, dx = x - L.x, dy = y - L.y, d = Math.hypot(dx, dy);
+      if (d < 0.6) return;
+      const a = Math.atan2(dy, dx);
+      this.ang = this.ang === null ? a : this.ang + Math.atan2(Math.sin(a - this.ang), Math.cos(a - this.ang)) * 0.35;
+      const nx = -Math.sin(this.ang), ny = Math.cos(this.ang);
+      const w = L.w + (this.width(p) - L.w) * 0.35;
+      const g = this.ctx, c = this.o.color, bw = (w / this.o.nb) * 2.6;
+      g.lineCap = 'round';
+      for (const b of this.bristles) {
+        if (b.ink <= 0) continue;
+        const reach = b.o * b.len;
+        const a0 = this.o.darkness * clamp(b.ink * 2.2, 0, 1) * 0.55;
+        g.strokeStyle = `rgba(${c[0]},${c[1]},${c[2]},${a0.toFixed(3)})`;
+        g.lineWidth = bw;
+        g.beginPath();
+        g.moveTo(L.x + nx * reach * L.w / 2, L.y + ny * reach * L.w / 2);
+        g.lineTo(x + nx * reach * w / 2, y + ny * reach * w / 2);
+        g.stroke();
+        b.ink -= d * (0.00045 + 0.0004 * clamp(speed, 0, 3)) * (0.6 + 0.8 * Math.abs(b.o));
+      }
+      this.used += d;
+      this.last = { x, y, w };
+    }
+    load() { let s = 0; for (const b of this.bristles) s += Math.max(0, b.ink); return s / this.bristles.length; }
+  }
+
+  // ---------- Paper and guide ----------
+  const paper = $('#paper'), pctx = paper.getContext('2d');
+  const inkC = $('#ink'), ictx = inkC.getContext('2d');
+  const BOX = { x: 60, y: 150, s: 520 };            // where the model character sits on the sheet
+  const toSheet = ([x, y, p]) => [BOX.x + x * BOX.s / 1000, BOX.y + y * BOX.s / 1000, p];
+  let mode = 'ei', showGuide = true;
+  function drawPaper() {
+    const im = pctx.createImageData(W, H), d = im.data, r = rng(4);
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const k = (y * W + x) * 4;
+      const fib = 0.975 + 0.025 * r() - (Math.sin(x * 0.9 + y * 0.13) > 0.995 ? 0.03 : 0);
+      d[k] = 245 * fib; d[k + 1] = 242 * fib; d[k + 2] = 234 * fib; d[k + 3] = 255;
+    }
+    pctx.putImageData(im, 0, 0);
+    // fold lines, as practice sheets are folded to place the character
+    pctx.strokeStyle = 'rgba(120, 110, 95, 0.12)'; pctx.lineWidth = 1;
+    pctx.beginPath(); pctx.moveTo(W / 2, 30); pctx.lineTo(W / 2, H - 30); pctx.moveTo(30, BOX.y + BOX.s / 2); pctx.lineTo(W - 30, BOX.y + BOX.s / 2); pctx.stroke();
+    if (showGuide && mode === 'ei') {
+      const off = document.createElement('canvas'); off.width = W; off.height = H;
+      const og = off.getContext('2d');
+      const br = new Brush(og, { maxW: 46 * BOX.s / 520, color: [150, 120, 105], darkness: 1, seed: 9 });
+      STROKES.forEach((keys) => { const pts = strokePts(keys).map(toSheet); br.begin(pts[0][0], pts[0][1], pts[0][2], 3); for (let i = 1; i < pts.length; i++) br.move(pts[i][0], pts[i][1], pts[i][2], 0.3); });
+      pctx.globalAlpha = 0.16; pctx.drawImage(off, 0, 0); pctx.globalAlpha = 1;
+      // stroke order numbers
+      pctx.font = '600 15px "Red Hat Mono", monospace'; pctx.fillStyle = 'rgba(194, 59, 34, 0.55)'; pctx.textAlign = 'center';
+      STROKES.forEach((keys, i) => { const [x, y] = toSheet(P[keys[0]][0]); pctx.fillText(String(i + 1), x - 16, y - 8); });
+    }
+    if (mode === 'enso') {
+      pctx.strokeStyle = 'rgba(120, 110, 95, 0.12)'; pctx.setLineDash([4, 8]);
+      pctx.beginPath(); pctx.arc(W / 2, BOX.y + BOX.s / 2, 200, 0, 7); pctx.stroke(); pctx.setLineDash([]);
+    }
+  }
+
+  // ---------- Ink and the inkstone ----------
+  let darkness = 0.72, brushLoad = 1;
+  const inkColor = () => { const t = darkness; return [Math.round(128 - 114 * t), Math.round(124 - 111 * t), Math.round(118 - 106 * t)]; };
+  const stone = $('#stone'), sctx = stone.getContext('2d');
+  let stick = { x: 200, y: 75 };
+  function drawStone() {
+    sctx.clearRect(0, 0, 300, 150);
+    sctx.fillStyle = '#2b2d30'; roundRect(sctx, 8, 10, 284, 130, 16); sctx.fill();
+    sctx.fillStyle = '#3a3c40'; roundRect(sctx, 18, 20, 264, 110, 12); sctx.fill();
+    // the well, where ground ink collects
+    const c = inkColor();
+    sctx.fillStyle = `rgb(${c[0] + 30},${c[1] + 32},${c[2] + 36})`; roundRect(sctx, 26, 30, 70, 90, 10); sctx.fill();
+    sctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${0.5 + 0.5 * darkness})`; roundRect(sctx, 30, 34, 62, 82, 8); sctx.fill();
+    // the ink stick
+    sctx.save(); sctx.translate(stick.x, stick.y); sctx.rotate(-0.3);
+    sctx.fillStyle = '#121212'; sctx.fillRect(-14, -46, 28, 92);
+    sctx.fillStyle = '#b08a3a'; sctx.font = '700 14px "Shippori Mincho", serif'; sctx.textAlign = 'center'; sctx.fillText('墨', 0, -18);
+    sctx.restore();
+  }
+  function roundRect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+  function meters() {
+    $('#darkBar').style.width = Math.round(darkness * 100) + '%';
+    $('#loadBar').style.width = Math.round(clamp(brushLoad, 0, 1) * 100) + '%';
+  }
+  let grinding = null;
+  stone.addEventListener('pointerdown', (e) => { stone.setPointerCapture(e.pointerId); grinding = stonePt(e); });
+  stone.addEventListener('pointermove', (e) => {
+    if (!grinding) return;
+    const p = stonePt(e);
+    const d = Math.hypot(p.x - grinding.x, p.y - grinding.y);
+    if (p.x > 110 && p.x < 280 && p.y > 20 && p.y < 130) { darkness = Math.min(1, darkness + d * 0.0009 * (1.1 - darkness)); stick = { x: clamp(p.x, 120, 270), y: clamp(p.y, 50, 100) }; }
+    grinding = p; drawStone(); meters();
+    if (darkness > 0.97) say('The ink is as dark as it will go. Dip the brush.');
+  });
+  ['pointerup', 'pointercancel'].forEach((t) => stone.addEventListener(t, () => { grinding = null; }));
+  const stonePt = (e) => { const r = stone.getBoundingClientRect(); return { x: (e.clientX - r.left) * 300 / r.width, y: (e.clientY - r.top) * 150 / r.height }; };
+
+  // ---------- Writing ----------
+  const note = $('#note');
+  const say = (t, cls) => { note.textContent = t; note.className = 'note' + (cls ? ' ' + cls : ''); };
+  let pen = null, lastT = 0, playing = 0, strokeCount = 0, sealMode = false, ensoPts = [];
+  function sheetPt(e) { const r = inkC.getBoundingClientRect(); return { x: (e.clientX - r.left) * W / r.width, y: (e.clientY - r.top) * H / r.height }; }
+  inkC.addEventListener('pointerdown', (e) => {
+    if (playing) return;
+    const p = sheetPt(e);
+    if (sealMode) { stamp(p.x, p.y); return; }
+    inkC.setPointerCapture(e.pointerId);
+    if (brushLoad < 0.05) say('The brush is dry and leaves almost nothing. Dip it in the ink first.');
+    const pressure = e.pointerType === 'pen' && e.pressure > 0 ? e.pressure : 0.45;
+    pen = { brush: new Brush(ictx, { maxW: 46, color: inkColor(), darkness: 0.55 + 0.45 * darkness, seed: (Math.random() * 1e9) | 0 }), x: p.x, y: p.y, p: pressure, type: e.pointerType, pts: [[p.x, p.y]] };
+    pen.brush.begin(p.x, p.y, pressure, brushLoad);
+    lastT = performance.now();
+  });
+  inkC.addEventListener('pointermove', (e) => {
+    if (!pen) return;
+    const co = e.getCoalescedEvents ? e.getCoalescedEvents() : [];
+    const evs = co.length ? co : [e];
+    for (const ev of evs) {
+      const p = sheetPt(ev), now = ev.timeStamp || performance.now();
+      const dt = Math.max(1, now - lastT); lastT = now;
+      const d = Math.hypot(p.x - pen.x, p.y - pen.y), speed = d / dt;
+      let target;
+      if (pen.type === 'pen' && ev.pressure > 0) target = ev.pressure;
+      else target = clamp(1.02 - speed * 0.55, 0.18, 1);
+      pen.p += (target - pen.p) * 0.22;
+      pen.brush.move(p.x, p.y, pen.p, speed);
+      pen.x = p.x; pen.y = p.y; pen.pts.push([p.x, p.y]);
+    }
+    brushLoad = pen.brush.load(); meters();
+  });
+  ['pointerup', 'pointercancel'].forEach((t) => inkC.addEventListener(t, () => {
+    if (!pen) return;
+    brushLoad = pen.brush.load();
+    const pts = pen.pts; pen = null; meters();
+    strokeCount++;
+    if (mode === 'enso') ensoVerdict(pts);
+    else if (mode === 'ei') {
+      if (strokeCount < 5) say(`Stroke ${strokeCount} done. ${['', 'Next, stroke 2: a short horizontal into the long vertical, ending in a hook.', 'Next, stroke 3 on the left: rise to the right, then sweep down to the left.', 'Next, stroke 4 on the right: a short quick stroke falling left.', 'Last, stroke 5: fall to the right, pressing harder, and sweep off flat.'][strokeCount]}`);
+      else if (strokeCount === 5) say('Five strokes, eight principles: that is 永. Press your seal, or compare it with the model.', 'good');
+    }
+    if (brushLoad < 0.25) say((mode === 'ei' && strokeCount < 5) || mode === 'free' ? 'The brush is nearly dry, which is why the stroke split into streaks. Dip it again.' : note.textContent + ' The brush is nearly dry now: dip it again.', note.className.includes('good') ? 'good' : '');
+  }));
+  function stamp(x, y) {
+    const t = ($('#sealText').value || 'ME').toUpperCase().slice(0, 3);
+    const s = 54, g = ictx;
+    g.save(); g.translate(x, y); g.rotate((Math.random() - 0.5) * 0.06);
+    g.fillStyle = 'rgba(190, 48, 30, 0.9)'; g.fillRect(-s / 2, -s / 2, s, s);
+    g.globalCompositeOperation = 'destination-out';
+    g.lineWidth = 3; g.strokeRect(-s / 2 + 5, -s / 2 + 5, s - 10, s - 10);
+    g.font = `700 ${t.length > 2 ? 15 : 20}px "Red Hat Mono", monospace`; g.textAlign = 'center'; g.textBaseline = 'middle';
+    if (t.length <= 2) g.fillText(t, 0, 1); else { g.fillText(t.slice(0, 2), 0, -7); g.fillText(t.slice(2), 0, 11); }
+    // uneven pressure: specks of paper show through
+    const r = rng(((x * 7) | 0) + ((y * 13) | 0));
+    for (let i = 0; i < 70; i++) { g.beginPath(); g.arc((r() - 0.5) * s, (r() - 0.5) * s, r() * 1.6, 0, 7); g.fill(); }
+    g.restore();
+    sealMode = false; $('#sealBtn').setAttribute('aria-pressed', 'false'); inkC.classList.remove('seal');
+    say('Sealed. The seal goes wherever it balances the writing best.', 'good');
+  }
+
+  // ---------- Watching the model ----------
+  function play(keysList, onDone) {
+    const my = ++playing;
+    ictx.clearRect(0, 0, W, H);
+    const br = new Brush(ictx, { maxW: 46, color: inkColor(), darkness: 0.55 + 0.45 * darkness, seed: 21 });
+    const strokes = keysList.map((keys) => strokePts(keys).map(toSheet));
+    let si = 0, pi = 0, carry = 0, last = performance.now();
+    if (reduceMotion) {
+      strokes.forEach((pts) => { br.begin(pts[0][0], pts[0][1], pts[0][2], 1.4); for (let i = 1; i < pts.length; i++) br.move(pts[i][0], pts[i][1], pts[i][2], 0.4); });
+      playing = 0; onDone && onDone(); return;
+    }
+    br.begin(strokes[0][0][0], strokes[0][0][1], strokes[0][0][2], 1.4);
+    (function f(now) {
+      if (my !== playing) return;
+      carry += now - last; last = now;
+      while (carry > 0 && si < strokes.length) {
+        const pts = strokes[si];
+        if (pi >= pts.length - 1) {
+          si++; pi = 0; carry -= 260;   // lift the brush between strokes
+          if (si < strokes.length) br.begin(strokes[si][0][0], strokes[si][0][1], strokes[si][0][2], 1.4);
+          continue;
+        }
+        const a = pts[pi], b = pts[pi + 1];
+        // heavy, pressed parts are written slowly, light sweeps quickly
+        const ms = Math.hypot(b[0] - a[0], b[1] - a[1]) / (0.12 + 0.55 * (1 - b[2]));
+        if (carry < ms) break;
+        carry -= ms; pi++;
+        br.move(b[0], b[1], b[2], 0.25 + (1 - b[2]));
+      }
+      if (si < strokes.length) requestAnimationFrame(f);
+      else { playing = 0; onDone && onDone(); }
+    })(last);
+  }
+  $('#watch').addEventListener('click', () => {
+    if (mode !== 'ei') setMode('ei');
+    say('Watch the order and the speed: slow where the brush presses, quick on the sweeps and flicks.');
+    strokeCount = 5;
+    play(STROKES, () => say('That is the model. Press New sheet and write your own over the faint guide.'));
+  });
+
+  // ---------- Comparing ----------
+  function compare() {
+    const off = document.createElement('canvas'); off.width = W; off.height = H;
+    const og = off.getContext('2d');
+    const br = new Brush(og, { maxW: 46, darkness: 1, seed: 3 });
+    STROKES.forEach((keys) => { const pts = strokePts(keys).map(toSheet); br.begin(pts[0][0], pts[0][1], pts[0][2], 3); for (let i = 1; i < pts.length; i++) br.move(pts[i][0], pts[i][1], pts[i][2], 0.3); });
+    const m = og.getImageData(0, 0, W, H).data, u = ictx.getImageData(0, 0, W, H).data;
+    let both = 0, mine = 0, model = 0;
+    for (let i = 3; i < m.length; i += 16) {
+      const a = m[i] > 90, b = u[i] > 90 && !(u[i - 3] > 150 && u[i - 2] < 90);   // ignore red seal pixels
+      if (a) model++; if (b) mine++; if (a && b) both++;
+    }
+    if (mine < 50) { say('Write 永 first, then compare.'); return; }
+    const precision = both / mine, recall = both / model, f = 2 * precision * recall / Math.max(0.001, precision + recall);
+    say(`Your ink covers ${Math.round(recall * 100)}% of the model, and ${Math.round(precision * 100)}% of your ink lies on it. ${f > 0.6 ? 'A close copy.' : f > 0.35 ? 'The shape is there; keep practising the proportions.' : 'Turn on the model underneath and follow it stroke by stroke.'} Teachers judge balance and life in the strokes, which no number catches.`, f > 0.6 ? 'good' : '');
+  }
+
+  // ---------- Ensō ----------
+  function ensoVerdict(pts) {
+    if (pts.length < 20) return;
+    let cx = 0, cy = 0; pts.forEach(([x, y]) => { cx += x; cy += y; }); cx /= pts.length; cy /= pts.length;
+    const rs = pts.map(([x, y]) => Math.hypot(x - cx, y - cy)), mean = rs.reduce((a, b) => a + b, 0) / rs.length;
+    const sd = Math.sqrt(rs.reduce((a, b) => a + (b - mean) * (b - mean), 0) / rs.length);
+    let turn = 0;
+    for (let i = 1; i < pts.length; i++) { const a0 = Math.atan2(pts[i - 1][1] - cy, pts[i - 1][0] - cx), a1 = Math.atan2(pts[i][1] - cy, pts[i][0] - cx); turn += Math.atan2(Math.sin(a1 - a0), Math.cos(a1 - a0)); }
+    const sweep = Math.abs(turn) * 180 / Math.PI;
+    const round = Math.round(100 * clamp(1 - sd / Math.max(1, mean), 0, 1));
+    if (sweep < 200) say(`That stroke turned through ${Math.round(sweep)}°. An ensō goes most or all of the way round in one breath.`);
+    else say(`Your ensō: ${round}% round, ${sweep >= 350 ? 'closed' : 'open, with a gap'}. ${sweep >= 350 ? 'A closed circle.' : 'Many Zen artists leave the circle open, room for movement and growth.'} Once drawn, it is not changed.`, 'good');
+  }
+
+  // ---------- Controls ----------
+  function setMode(m) {
+    mode = m; strokeCount = 0;
+    $$('.mode').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.m === m)));
+    $('#modeTitle').textContent = m === 'ei' ? 'Write 永' : m === 'enso' ? 'Paint an ensō' : 'A free sheet';
+    $('#guide').disabled = m !== 'ei'; $('#watch').disabled = false; $('#compare').disabled = m !== 'ei';
+    playing = 0; ictx.clearRect(0, 0, W, H); drawPaper();
+    say(m === 'ei' ? 'Follow the faint model, in the numbered order. Stroke 1 is the dot at the top.' : m === 'enso' ? 'One circle in a single stroke. Do not stop or go back.' : 'A clean sheet. Write anything you like.');
+  }
+  $$('.mode').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.m)));
+  $('#guide').addEventListener('click', (e) => { showGuide = !showGuide; e.currentTarget.setAttribute('aria-pressed', String(showGuide)); drawPaper(); });
+  $('#newSheet').addEventListener('click', () => { playing = 0; ictx.clearRect(0, 0, W, H); strokeCount = 0; ensoPts = []; say('A fresh sheet. There is no rubbing out in shodō, only the next sheet.'); });
+  $('#dip').addEventListener('click', () => { brushLoad = 1; meters(); say(darkness < 0.6 ? 'Loaded, but the ink is thin and grey. Grind more for a richer black.' : 'Brush loaded. Press it on the edge of the stone to shed the excess and begin.'); });
+  $('#bottle').addEventListener('click', () => { darkness = 1; brushLoad = 1; drawStone(); meters(); say('Bottled bokujū: dark and ready, without the twenty minutes of grinding.'); });
+  $('#sealBtn').addEventListener('click', (e) => { sealMode = !sealMode; e.currentTarget.setAttribute('aria-pressed', String(sealMode)); inkC.classList.toggle('seal', sealMode); if (sealMode) say('Click where the seal should go, usually beside or below the writing.'); });
+  $('#compare').addEventListener('click', compare);
+  // keyboard users: arrow keys are no way to hold a brush, so offer the model instead
+  inkC.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); $('#watch').click(); } });
+
+  // ---------- The eight principles ----------
+  const grid = $('#principles');
+  PRINCIPLES.forEach((pr, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'pr';
+    const c = document.createElement('canvas'); c.width = 240; c.height = 240;
+    b.appendChild(c);
+    b.insertAdjacentHTML('beforeend', `<div class="k"><b>${pr.ch}</b><span>${i + 1} · “${pr.mean}”</span></div><p>${pr.desc}</p>`);
+    grid.appendChild(b);
+    const g = c.getContext('2d');
+    // the whole character faintly, this stroke in full ink
+    const fit = (pts) => pts.map(([x, y, p]) => [20 + x * 0.2, 20 + y * 0.2, p]);
+    const faint = new Brush(g, { maxW: 9.5, color: [180, 170, 160], darkness: 0.6, nb: 14, seed: 5 });
+    STROKES.forEach((keys) => { const pts = fit(strokePts(keys)); faint.begin(pts[0][0], pts[0][1], pts[0][2], 3); pts.forEach((q) => faint.move(q[0], q[1], q[2], 0.3)); });
+    const full = new Brush(g, { maxW: 9.5, color: [16, 15, 14], darkness: 1, nb: 14, seed: 6 + i });
+    const pts = fit(dense(P[pr.key]));
+    full.begin(pts[0][0], pts[0][1], pts[0][2], 3); pts.forEach((q) => full.move(q[0], q[1], q[2], 0.3));
+    b.setAttribute('aria-label', `${pr.ch}, ${pr.mean}: ${pr.desc} Select to watch it written.`);
+    b.addEventListener('click', () => {
+      if (mode !== 'ei') setMode('ei');
+      $('#sheetBox').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+      say(`${pr.ch}, “${pr.mean}”: ${pr.desc}`);
+      play([[pr.key]]);
+    });
+  });
+
+  // ---------- Start ----------
+  const ready = document.fonts && document.fonts.load ? Promise.all([document.fonts.load('700 14px "Shippori Mincho"', '墨'), document.fonts.load('600 15px "Red Hat Mono"')]) : Promise.resolve();
+  Promise.race([ready, new Promise((r) => setTimeout(r, 1200))]).then(() => {
+    drawPaper(); drawStone(); meters();
+    // open on a finished 永, written by the model brush, so the sheet shows what it is for
+    strokeCount = 5;
+    const br = new Brush(ictx, { maxW: 46, color: inkColor(), darkness: 0.55 + 0.45 * darkness, seed: 21 });
+    STROKES.forEach((keys) => { const pts = strokePts(keys).map(toSheet); br.begin(pts[0][0], pts[0][1], pts[0][2], 1.4); for (let i = 1; i < pts.length; i++) br.move(pts[i][0], pts[i][1], pts[i][2], 0.25 + (1 - pts[i][2])); });
+    say('This 永 was written by the model brush. Press New sheet and try it yourself, or watch it written stroke by stroke.');
+  });
+})();
+</script>
+</body>
+</html>

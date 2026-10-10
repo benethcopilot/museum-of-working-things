@@ -24,7 +24,10 @@
   fetch(new URL('exhibits.json', root))
     .then((r) => r.json())
     .then((data) => {
-      const open = data.exhibits.filter((e) => e.status !== 'planned');
+      // walk the exhibits in the same order as the lobby: hall by hall
+      const halls = data.halls.map((h) => h.id);
+      const open = data.exhibits.filter((e) => e.status !== 'planned')
+        .sort((a, b) => halls.indexOf(a.hall) - halls.indexOf(b.hall));
       const i = open.findIndex((e) => e.slug === slug);
       if (i < 0) return;
       const ex = open[i];
