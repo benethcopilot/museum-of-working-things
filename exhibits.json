@@ -140,6 +140,11 @@
       "try": "Pull a drop of wax into a tear"
     },
     {
+      "slug": "ink-bamboo", "hall": "studio", "title": "Sumi-e Ink Bamboo", "ages": "6 and up",
+      "blurb": "Grind ink on the stone, load the brush and paint bamboo in the 1701 manual’s order: stem, knot, branches, leaves. Every stroke is final.",
+      "try": "Paint a leaf fast with a nearly dry brush"
+    },
+    {
       "slug": "mendeleev", "hall": "numbers", "title": "Mendeleev’s Table", "ages": "10 and up",
       "blurb": "Deal the elements onto Mendeleev’s 1871 table, leave gaps where nothing fits, and predict the elements nobody had found yet.",
       "try": "Decide where tellurium goes"

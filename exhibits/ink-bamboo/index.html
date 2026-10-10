@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Sumi-e Ink Bamboo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Shippori+Mincho:wght@500;700;800&family=Spectral:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+:root {
+  /* Layout: a hanging scroll on the left, the four treasures of the study on the right (inkstone, ink dishes, brush, strokes in the manual's order); then the manual, the Four Gentlemen, the treasures and the journey to Japan. */
+  --ground: #e9eae3;
+  --card: #f6f6f1;
+  --ink: #1d1f1b;
+  --muted: #565b53;
+  --line: rgba(29, 31, 27, 0.14);
+  --seal: #b23a2b;
+  --leaf: #46663f;
+  --f-display: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", Georgia, serif;
+  --f-body: "Spectral", Georgia, "Times New Roman", serif;
+  --f-data: "IBM Plex Mono", Consolas, "Courier New", monospace;
+  /* the scroll mount is silk and wood in both themes */
+  --silk: #6f6b52;
+  --silk-edge: #cbbd92;
+  --rod: #3b2a1c;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #121411;
+    --card: #1a1d19;
+    --ink: #e8eae4;
+    --muted: #a6aca1;
+    --line: rgba(232, 234, 228, 0.13);
+    --seal: #ef7f6c;
+    --leaf: #9cc48f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #121411;
+  --card: #1a1d19;
+  --ink: #e8eae4;
+  --muted: #a6aca1;
+  --line: rgba(232, 234, 228, 0.13);
+  --seal: #ef7f6c;
+  --leaf: #9cc48f;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--f-body); font-size: 18px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--seal); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 700; line-height: 1.1; margin: 0; text-wrap: balance; }
+a { color: var(--seal); }
+
+.page { box-sizing: border-box; max-width: 1180px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 48px; }
+.masthead { display: grid; gap: 10px; }
+.eyebrow { margin: 0; font-family: var(--f-data); font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.masthead h1 { font-size: clamp(2.8rem, 8vw, 5.2rem); font-weight: 800; }
+.masthead h1 span { color: var(--seal); font-weight: 500; }
+.lede { margin: 0; max-width: 64ch; color: var(--muted); }
+h2 { font-size: clamp(1.8rem, 3.6vw, 2.5rem); }
+.text { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.text p { margin: 0; max-width: 64ch; }
+
+/* ---------- Studio ---------- */
+.studio { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr); gap: 36px; align-items: start; }
+.scrollwrap { display: flex; justify-content: center; min-width: 0; padding-block: 10px; }
+.scroll { position: relative; width: 100%; max-width: 440px; box-sizing: border-box; padding: 30px 24px 40px; background: linear-gradient(90deg, #66624a, var(--silk) 12%, var(--silk) 88%, #66624a); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28); }
+.scroll::before, .scroll::after { content: ""; position: absolute; left: -12px; right: -12px; height: 14px; border-radius: 7px; background: linear-gradient(#5a4330, var(--rod) 60%, #2a1d12); }
+.scroll::before { top: -7px; }
+.scroll::after { bottom: -7px; }
+#sheet { display: block; width: 100%; height: auto; box-shadow: 0 0 0 3px var(--silk-edge); touch-action: none; cursor: crosshair; }
+.sheetnote { margin: 8px 0 0; font-size: 0.85rem; color: #e9e2cc; text-align: center; font-style: italic; }
+
+.tools { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.tray { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 3px; background: var(--card); border: 1px solid var(--line); }
+.tray > span { font-family: var(--f-data); font-size: 0.74rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.stonebox { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+#stone { width: 240px; max-width: 100%; height: auto; touch-action: none; cursor: grab; border-radius: 8px; }
+.strength { display: grid; gap: 6px; flex: 1; min-width: 150px; font-size: 0.92rem; }
+.bar { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--ink); border-radius: 4px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn { padding: 6px 12px; border-radius: 3px; border: 1.5px solid var(--line); background: none; font-size: 0.95rem; }
+.btn:hover { border-color: var(--ink); }
+.btn[aria-pressed="true"] { border-color: var(--ink); background: color-mix(in srgb, var(--ink) 10%, transparent); }
+.btn.main { background: var(--ink); color: var(--ground); border-color: var(--ink); font-weight: 600; }
+.dish { display: inline-flex; align-items: center; gap: 8px; }
+.dish i { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); }
+.strokes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.stroke { display: flex; flex-direction: column; align-items: center; gap: 0; padding: 6px 4px; }
+.stroke b { font-family: var(--f-display); font-size: 1.6rem; line-height: 1.1; font-weight: 700; }
+.stroke small { font-size: 0.82rem; }
+.stroke small::before { content: attr(data-n) " "; font-family: var(--f-data); color: var(--muted); }
+.hint { margin: 0; font-size: 0.97rem; }
+.note { margin: 0; padding: 10px 12px; border-left: 3px solid var(--seal); background: var(--card); font-size: 0.97rem; }
+.cover { margin: 0; font-family: var(--f-data); font-size: 0.82rem; color: var(--muted); }
+
+/* ---------- Below ---------- */
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 36px; align-items: start; }
+blockquote { margin: 0; padding: 12px 16px; border-left: 3px solid var(--leaf); background: var(--card); font-style: italic; }
+blockquote cite { display: block; margin-top: 6px; font-style: normal; font-size: 0.86rem; color: var(--muted); }
+.four { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.four div { padding: 10px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 3px; }
+.four b { display: block; font-family: var(--f-display); font-size: 2rem; line-height: 1.1; }
+.four em { display: block; font-style: normal; font-family: var(--f-data); font-size: 0.74rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.four p { margin: 4px 0 0; font-size: 0.93rem; }
+.sources { margin: 0; font-size: 0.86rem; color: var(--muted); max-width: 100ch; }
+
+@media (max-width: 900px) {
+  .studio, .two { grid-template-columns: minmax(0, 1fr); }
+  .four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="ink-bamboo" defer></script>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <p class="eyebrow">Art Studio · China and Japan · ink wash painting</p>
+    <h1>Ink Bamboo <span>墨竹</span></h1>
+    <p class="lede">Ink wash painting, called sumi-e in Japan, uses only black ink and water. A painter spends years on a few plants, and bamboo comes first: a stalk, its knots, its branches and its leaves, each laid down in one stroke that can never be taken back.</p>
+  </header>
+
+  <section class="studio" aria-label="Paint bamboo">
+    <div class="scrollwrap">
+      <div class="scroll">
+        <canvas id="sheet" width="600" height="880" aria-label="A sheet of xuan paper on a hanging scroll. Drag on it to paint with the brush."></canvas>
+        <p class="sheetnote">There is no undo, just as on real paper.</p>
+      </div>
+    </div>
+    <div class="tools">
+      <div class="tray">
+        <span>Inkstone</span>
+        <div class="stonebox">
+          <canvas id="stone" width="280" height="150" aria-label="An inkstone. Drag in circles on it to grind the inkstick."></canvas>
+          <div class="strength">
+            <div>Ink: <b id="strengthword">rich black</b></div>
+            <div class="bar"><i id="strengthbar"></i></div>
+            <div class="row"><button class="btn" id="grind" type="button">Grind ten circles</button><button class="btn" id="water" type="button">Add water</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="tray">
+        <span>Dip the brush</span>
+        <div class="row" id="dishes"></div>
+        <div style="font-size:.92rem">Brush: <b id="loadword">full</b></div>
+        <div class="bar"><i id="loadbar"></i></div>
+      </div>
+      <div class="tray">
+        <span>Strokes, in the manual's order</span>
+        <div class="strokes" role="group" aria-label="Stroke">
+          <button class="btn stroke" type="button" data-k="stem" aria-pressed="true"><b>竿</b><small data-n="1">stem</small></button>
+          <button class="btn stroke" type="button" data-k="knot" aria-pressed="false"><b>節</b><small data-n="2">knot</small></button>
+          <button class="btn stroke" type="button" data-k="branch" aria-pressed="false"><b>枝</b><small data-n="3">branch</small></button>
+          <button class="btn stroke" type="button" data-k="leaf" aria-pressed="false"><b>葉</b><small data-n="4">leaf</small></button>
+        </div>
+        <p class="hint" id="hint"></p>
+      </div>
+      <div class="row">
+        <button class="btn main" id="fresh" type="button">A fresh sheet</button>
+        <button class="btn" id="seal" type="button">Stamp your seal</button>
+        <button class="btn" id="example" type="button">Paint the example</button>
+      </div>
+      <p class="note" id="note" aria-live="polite"></p>
+      <p class="cover" id="cover"></p>
+    </div>
+  </section>
+
+  <section class="two" aria-label="The manual">
+    <div class="text">
+      <h2>Stem, knot, branches, leaves</h2>
+      <p>The Mustard Seed Garden Manual of Painting was printed in China from woodblocks, in colour. Its landscape volumes appeared in 1679, and Wang Gai and his two brothers added the volumes on plants and animals in 1701. Its Book of Bamboo opens with the rule this studio follows:</p>
+      <blockquote>“The first principle of bamboo composition is, the four parts of the plant should be considered in the following order: stem, knot, branches and leaves. If the basic rule is not followed, time and effort will be wasted and the picture will never be completed.”<cite>Mustard Seed Garden Manual, Book of Bamboo, 1701</cite></blockquote>
+      <p>Generations learned from it. Qi Baishi started his lessons with the manual, and woodblock copies reached Edo Japan, where painters of the nanga school trained on it.</p>
+    </div>
+    <div class="text">
+      <h2>Whole bamboos in his heart</h2>
+      <p>Bamboo bends in wind, storm and rain but never breaks, so it came to stand for a gentleman’s courage and endurance. Some painters painted nothing else all their lives, and painting ink bamboo was set as a subject in the imperial examinations.</p>
+      <p>Of Wen Tong, who painted bamboo around 1060, people said “there are whole bamboos in his heart” (胸有成竹). He held the plant complete in his mind before the brush touched the paper. The phrase is still used in Chinese for someone who has worked out a plan before starting.</p>
+      <p>The rule on the paper is strict: once a stroke is painted it cannot be changed or erased.</p>
+    </div>
+  </section>
+
+  <section class="text" aria-label="The Four Gentlemen">
+    <h2>The Four Gentlemen</h2>
+    <p>Bamboo is one of four plants that ink painters have painted as a set since the Song dynasty (960–1279). They stand for virtues such as uprightness, purity, humility and perseverance, and together they make a year.</p>
+    <div class="four">
+      <div><b>梅</b><em>Winter</em><p>Plum blossom, flowering in the cold.</p></div>
+      <div><b>蘭</b><em>Spring</em><p>Orchid, for nobility and loyalty.</p></div>
+      <div><b>竹</b><em>Summer</em><p>Bamboo, for dignity and service to others.</p></div>
+      <div><b>菊</b><em>Autumn</em><p>Chrysanthemum, for long life.</p></div>
+    </div>
+  </section>
+
+  <section class="two" aria-label="Materials and history">
+    <div class="text">
+      <h2>The four treasures of the study</h2>
+      <p><b>Brush, ink, paper, inkstone</b> (筆 墨 紙 硯). The brush is bamboo with hair from goats, wolves, rabbits or deer, tapered to a fine point. The ink is a stick of pine soot and animal glue, ground with a few drops of water on the inkstone in circles until the black is as strong as you want. The paper is Chinese xuan or Japanese washi, so absorbent that every stroke shows.</p>
+      <p>In a master’s hand one stroke can run from deep black to silvery grey, because the ink load and the pressure change as the brush moves.</p>
+    </div>
+    <div class="text">
+      <h2>From the Tang to Sesshū</h2>
+      <p>Ink wash painting began in Tang dynasty China (618–907) and flourished under the Song. Zen monks brought it to Japan in the 14th century, where it is called suibokuga or sumi-e, “ink picture”. Sesshū Tōyō (1420–1506), the great master of the Muromachi period, travelled to China in 1468–69 to study.</p>
+      <p>Empty paper matters as much as ink. Hasegawa Tōhaku’s Pine Trees screens, painted around 1595 and now a National Treasure of Japan, leave about 85 percent of the paper bare.</p>
+    </div>
+  </section>
+
+  <p class="sources">Sources: Wikipedia, <a href="https://en.wikipedia.org/wiki/Ink_wash_painting" target="_blank" rel="noopener">Ink wash painting</a> (the Tang and Song, the four treasures, inksticks and xuan paper, “cannot be changed or erased”, Zen monks and Muromachi Japan, Sesshū, Tōhaku’s Pine Trees with some 15% of the paper painted), <a href="https://en.wikipedia.org/wiki/Bamboo_painting" target="_blank" rel="noopener">Bamboo painting</a> (the Book of Bamboo quotation, Wen Tong, the examinations, bending without breaking), <a href="https://en.wikipedia.org/wiki/Four_Gentlemen" target="_blank" rel="noopener">Four Gentlemen</a> and <a href="https://en.wikipedia.org/wiki/Manual_of_the_Mustard_Seed_Garden" target="_blank" rel="noopener">Manual of the Mustard Seed Garden</a>; Inkston, <a href="https://www.inkston.com/stories/mustard-seed-garden/4gentlemen-bamboo/" target="_blank" rel="noopener">Mustard Seed Garden: bamboo</a> (segments short at the root and the top, the joint like 心 without its dots, leaves grouped as 个 and 人, each leaf one neat stroke). The brush on this page is a simple model: bristles that carry ink, run dry and leave streaks, on paper that drinks a little of every wet stroke.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const W = 600, H = 880, INK = '24,21,18';
+  const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+  const ink = (a) => `rgba(${INK},${clamp(a, 0, 1).toFixed(3)})`;
+
+  // a seeded random source, so the paper and the example look the same every time
+  let seed = 20231;
+  const srand = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  let rand = Math.random;
+
+  // ---------- Paper ----------
+  const sheet = $('#sheet'), sx = sheet.getContext('2d');
+  const paper = mk(W, H), pc = paper.getContext('2d');
+  const inkC = mk(W, H), ic = inkC.getContext('2d');
+  const tmp = mk(W, H), tc = tmp.getContext('2d');
+  (function makePaper() {
+    pc.fillStyle = '#f1ece0'; pc.fillRect(0, 0, W, H);
+    for (let i = 0; i < 500; i++) {
+      pc.fillStyle = srand() < 0.5 ? 'rgba(255,255,250,0.07)' : 'rgba(170,150,110,0.035)';
+      pc.beginPath(); pc.ellipse(srand() * W, srand() * H, 10 + srand() * 40, 6 + srand() * 30, srand() * 3, 0, 7); pc.fill();
+    }
+    pc.lineCap = 'round';
+    for (let i = 0; i < 1700; i++) {
+      const x = srand() * W, y = srand() * H, a = srand() * Math.PI * 2, l = 5 + srand() * 26, b = (srand() - 0.5) * 8;
+      pc.strokeStyle = srand() < 0.7 ? `rgba(140,120,90,${(0.05 + srand() * 0.09).toFixed(3)})` : `rgba(255,255,255,${(0.2 + srand() * 0.3).toFixed(3)})`;
+      pc.lineWidth = 0.4 + srand() * 0.8;
+      pc.beginPath(); pc.moveTo(x, y);
+      pc.quadraticCurveTo(x + Math.cos(a) * l / 2 - Math.sin(a) * b, y + Math.sin(a) * l / 2 + Math.cos(a) * b, x + Math.cos(a) * l, y + Math.sin(a) * l);
+      pc.stroke();
+    }
+  })();
+  // speckle that lets the paper show through ink, more in a dry stroke
+  const grain = mk(128, 128);
+  (function () { const g = grain.getContext('2d'), im = g.createImageData(128, 128); for (let i = 0; i < im.data.length; i += 4) im.data[i + 3] = Math.pow(srand(), 3) * 140; g.putImageData(im, 0, 0); })();
+  const grainPat = tc.createPattern(grain, 'repeat');
+
+  // ---------- Ink and brush ----------
+  let strength = 0.9;            // how long the inkstick has been ground
+  const TONES = { dark: 1, middle: 0.56, pale: 0.28 };
+  const brush = { tone: 'middle', load: 1 };
+  let kind = 'stem';
+  const counts = { stem: 0, knot: 0, branch: 0, leaf: 0 };
+  let sealed = false;
+
+  // each stroke kind: bristle count, how much the hand's path is smoothed and straightened, half-width and its profile from start (t=0) to end (t=1)
+  const KINDS = {
+    stem: { n: 26, smooth: 6, straight: 0.55, side: true, hw: () => 12, prof: (t, L) => 1 + 0.2 * Math.exp(-Math.pow(t * L / 7, 2)) + 0.24 * Math.exp(-Math.pow((1 - t) * L / 6, 2)) },
+    knot: { n: 8, smooth: 3, straight: 0, hw: () => 2.9, prof: (t) => 0.35 + 0.65 * Math.sin(Math.PI * t) },
+    branch: { n: 7, smooth: 4, straight: 0.2, hw: () => 2.6, prof: (t) => (1 - 0.45 * t) * Math.pow(Math.min(1, (1 - t) / 0.12), 0.6) },
+    leaf: { n: 18, smooth: 5, straight: 0.1, hw: (L) => clamp(L * 0.085, 5, 12.5), prof: (t) => t < 0.16 ? 0.2 + 0.8 * Math.pow(Math.sin(Math.PI / 2 * t / 0.16), 0.8) : Math.pow(1 - (t - 0.16) / 0.84, 0.75) }
+  };
+  const USE = 0.000055;          // brush load used per square pixel painted
+  const wetness = (l) => Math.pow(clamp(l / 0.45, 0.06, 1), 0.8);
+
+  function prepare(raw, K) {
+    let pts = [{ x: raw[0].x, y: raw[0].y }];
+    for (let r = 1; r < raw.length; r++) {
+      const q = pts[pts.length - 1], p = raw[r], d = Math.hypot(p.x - q.x, p.y - q.y);
+      if (d < 2) continue;
+      const n = Math.floor(d / 2);
+      for (let j = 1; j <= n; j++) pts.push({ x: q.x + (p.x - q.x) * j / n, y: q.y + (p.y - q.y) * j / n });
+    }
+    if (pts.length < 3) return pts;
+    // smooth out the hand's wobble, keeping both ends
+    const m = K.smooth, sm = pts.map((p, i) => {
+      if (i === 0 || i === pts.length - 1) return p;
+      let x = 0, y = 0, c = 0;
+      for (let j = Math.max(0, i - m); j <= Math.min(pts.length - 1, i + m); j++) { x += pts[j].x; y += pts[j].y; c++; }
+      return { x: x / c, y: y / c };
+    });
+    const a = sm[0], b = sm[sm.length - 1], vx = b.x - a.x, vy = b.y - a.y, l2 = vx * vx + vy * vy || 1;
+    return sm.map((p) => { const u = clamp(((p.x - a.x) * vx + (p.y - a.y) * vy) / l2, 0, 1); return { x: p.x + (a.x + vx * u - p.x) * K.straight, y: p.y + (a.y + vy * u - p.y) * K.straight }; });
+  }
+
+  // paints one stroke onto the scratch canvas and returns what the reveal needs
+  function render(raw, k, toneName, load, speedK, hwOverride) {
+    const K = KINDS[k], pts = prepare(raw, K), N = pts.length;
+    if (N < 3) return null;
+    const s = [0];
+    for (let i = 1; i < N; i++) s.push(s[i - 1] + Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y));
+    const L = s[N - 1];
+    if (L < 6) return null;
+    const nrm = pts.map((p, i) => {
+      const a = pts[Math.max(0, i - 2)], b = pts[Math.min(N - 1, i + 2)], dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 1;
+      return { x: -dy / d, y: dx / d };
+    });
+    const hw0 = hwOverride || K.hw(L), c = TONES[toneName] * strength;
+    const hwA = pts.map((p, i) => hw0 * K.prof(s[i] / L, L));
+    const eff = load * (1 - 0.35 * speedK);
+    let area = 0;
+    for (let i = 1; i < N; i++) area += 2 * hwA[i] * (s[i] - s[i - 1]);
+    const endLoad = Math.max(0, eff - area * USE);
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    pts.forEach((p, i) => { x0 = Math.min(x0, p.x - hwA[i]); y0 = Math.min(y0, p.y - hwA[i]); x1 = Math.max(x1, p.x + hwA[i]); y1 = Math.max(y1, p.y + hwA[i]); });
+    const bx = Math.floor(x0 - 14), by = Math.floor(y0 - 14), bw = Math.ceil(x1 - x0 + 28), bh = Math.ceil(y1 - y0 + 28);
+
+    tc.clearRect(0, 0, W, H);
+    tc.save();
+    // the wet body of the stroke
+    tc.beginPath();
+    pts.forEach((p, i) => { const x = p.x + nrm[i].x * hwA[i], y = p.y + nrm[i].y * hwA[i]; i ? tc.lineTo(x, y) : tc.moveTo(x, y); });
+    for (let i = N - 1; i >= 0; i--) tc.lineTo(pts[i].x - nrm[i].x * hwA[i], pts[i].y - nrm[i].y * hwA[i]);
+    tc.closePath();
+    const aBody = c * (K.side ? 0.78 : 0.88);
+    if (K.side) {
+      // a side brush: the tip edge of the stalk takes more ink than the heel edge, which makes it look round
+      const a = pts[0], b = pts[N - 1], mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2, d = Math.hypot(b.x - a.x, b.y - a.y) || 1, nx = -(b.y - a.y) / d, ny = (b.x - a.x) / d, r = hw0 * 1.3;
+      const g = tc.createLinearGradient(mx + nx * r, my + ny * r, mx - nx * r, my - ny * r);
+      g.addColorStop(0, ink(aBody)); g.addColorStop(0.5, ink(aBody * 0.7)); g.addColorStop(1, ink(aBody * 0.44));
+      tc.fillStyle = g;
+    } else tc.fillStyle = ink(aBody);
+    if (eff > 0.45) { tc.shadowColor = ink(c * 0.5); tc.shadowBlur = 2 + 6 * (eff - 0.45); }
+    tc.fill();
+    tc.shadowBlur = 0; tc.shadowColor = 'transparent';
+    // the ink runs out along the stroke
+    const a = pts[0], b = pts[N - 1], fade = tc.createLinearGradient(a.x, a.y, b.x === a.x && b.y === a.y ? a.x + 1 : b.x, b.y);
+    fade.addColorStop(0, `rgba(0,0,0,${wetness(eff)})`); fade.addColorStop(1, `rgba(0,0,0,${wetness(endLoad)})`);
+    tc.globalCompositeOperation = 'destination-in'; tc.fillStyle = fade; tc.fillRect(bx, by, bw, bh);
+    // bristle streaks: each hair carries its own ink and drops out when dry, leaving flying white
+    tc.globalCompositeOperation = 'source-over'; tc.lineCap = 'round'; tc.lineJoin = 'round';
+    const dryness = 1 - wetness(eff);
+    for (let bI = 0; bI < K.n; bI++) {
+      const o = -1 + (2 * bI + 1) / K.n + (rand() - 0.5) * 1.2 / K.n;
+      let inkB = eff * (0.8 + 0.4 * rand()) * (1 - 0.3 * Math.abs(o));
+      const sideF = K.side ? 1 - 0.27 * (o + 1) : 1 - 0.25 * Math.abs(o);
+      let on = inkB > 0.02, pen = false, px = pts[0].x + nrm[0].x * o * hwA[0] * 0.92, py = pts[0].y + nrm[0].y * o * hwA[0] * 0.92;
+      tc.beginPath();
+      for (let i = 1; i < N; i++) {
+        inkB -= (s[i] - s[i - 1]) * hwA[i] * 2 * USE * 1.1;
+        if (inkB < 0.2) { const q = clamp(inkB / 0.2, 0, 1); if (on && rand() < 0.3 * (1 - q) + 0.02) on = false; else if (!on && rand() < 0.35 * q + 0.03) on = true; }
+        if (inkB <= 0) on = false;
+        const x = pts[i].x + nrm[i].x * o * hwA[i] * 0.92, y = pts[i].y + nrm[i].y * o * hwA[i] * 0.92;
+        if (on) { if (!pen) { tc.moveTo(px, py); pen = true; } tc.lineTo(x, y); } else pen = false;
+        px = x; py = y;
+      }
+      tc.strokeStyle = ink(c * sideF * ((K.side ? 0.34 : 0.22) + 0.5 * dryness) * (0.6 + 0.8 * rand()));
+      tc.lineWidth = Math.max(0.7, hw0 * 2 / K.n * 1.25);
+      tc.stroke();
+    }
+    // the paper's grain shows through, more where the brush was dry
+    tc.globalCompositeOperation = 'destination-out'; tc.globalAlpha = 0.3 + 0.55 * dryness;
+    tc.fillStyle = grainPat; tc.fillRect(bx, by, bw, bh);
+    tc.restore();
+    return { pts, hwA, area, eff, endLoad };
+  }
+
+  // ---------- Showing the sheet ----------
+  let trace = null, reveal = null;
+  function show(upto, info) {
+    sx.drawImage(paper, 0, 0); sx.drawImage(inkC, 0, 0);
+    if (info) {
+      sx.save(); sx.beginPath();
+      for (let i = 0; i <= upto; i += 2) { const p = info.pts[i], r = info.hwA[i] + 10; sx.moveTo(p.x + r, p.y); sx.arc(p.x, p.y, r, 0, Math.PI * 2); }
+      sx.clip(); sx.drawImage(tmp, 0, 0); sx.restore();
+    }
+    if (trace && trace.length > 1) {
+      sx.strokeStyle = ink(0.22); sx.lineWidth = 1.5; sx.lineCap = 'round'; sx.beginPath();
+      trace.forEach((p, i) => i ? sx.lineTo(p.x, p.y) : sx.moveTo(p.x, p.y)); sx.stroke();
+    }
+  }
+  function commit() { reveal = null; ic.drawImage(tmp, 0, 0); tc.clearRect(0, 0, W, H); show(); coverage(); }
+  function startReveal(info) {
+    if (reduceMotion) { commit(); return; }
+    const frames = clamp(Math.round(info.pts.length / 10), 6, 22), token = {};
+    let f = 0; reveal = token;
+    (function step() {
+      if (reveal !== token) return;
+      f++;
+      show(Math.min(info.pts.length - 1, Math.round((info.pts.length - 1) * f / frames)), info);
+      if (f < frames) requestAnimationFrame(step); else commit();
+    })();
+  }
+
+  // ---------- Painting by hand ----------
+  function pt(e) { const r = sheet.getBoundingClientRect(); return { x: (e.clientX - r.left) * W / r.width, y: (e.clientY - r.top) * H / r.height, t: e.timeStamp }; }
+  sheet.addEventListener('pointerdown', (e) => {
+    if (reveal) commit();
+    try { sheet.setPointerCapture(e.pointerId); } catch (err) { /* capture is optional */ }
+    trace = [pt(e)];
+  });
+  sheet.addEventListener('pointermove', (e) => {
+    if (!trace) return;
+    const evs = (e.getCoalescedEvents && e.getCoalescedEvents().length) ? e.getCoalescedEvents() : [e];
+    evs.forEach((ev) => trace.push(pt(ev)));
+    show();
+  });
+  function finish() {
+    if (!trace) return;
+    const raw = trace; trace = null;
+    let len = 0; for (let i = 1; i < raw.length; i++) len += Math.hypot(raw[i].x - raw[i - 1].x, raw[i].y - raw[i - 1].y);
+    const ms = Math.max(1, raw[raw.length - 1].t - raw[0].t), speedK = clamp((len / ms - 0.5) / 1.5, 0, 1);
+    if (brush.load <= 0.01) { show(); say('The brush is dry. Dip it in one of the dishes to load it again.'); return; }
+    const info = render(raw, kind, brush.tone, brush.load, speedK);
+    if (!info) { show(); say('Drag to paint. Each stroke is one movement of the brush, from touching down to lifting off.'); return; }
+    brush.load = Math.max(0, brush.load - info.area * USE);
+    counts[kind]++;
+    updateBrush(); startReveal(info); advise(info, speedK);
+  }
+  sheet.addEventListener('pointerup', finish);
+  sheet.addEventListener('pointercancel', () => { trace = null; show(); });
+
+  // ---------- Words ----------
+  const HINTS = {
+    stem: 'Paint the stalk from the bottom up, one stroke for each segment. Lift the brush between them and leave a small gap for each knot. Segments are short near the ground, longest in the middle and short again at the top. Middle ink suits the stalk.',
+    knot: 'With dark ink, close each gap with one short stroke across the stalk, shaped like the heart character 心 without its three dots.',
+    branch: 'Quick, thin strokes in dark ink, growing out of the knots, never from the middle of a segment.',
+    leaf: 'Each leaf is one neat stroke: press, then lift as you pull away, without hesitating. Group them like 个 (three leaves) and 人 (two). Dark leaves in front, pale ones behind.'
+  };
+  const say = (t) => { $('#note').textContent = t; };
+  function advise(info, speedK) {
+    const dryEnd = info.endLoad < 0.12;
+    if (kind === 'stem' && counts.stem === 2) say('Two segments. Keep going up, then switch to Knot and close the gaps with dark ink.');
+    else if (kind === 'knot' && counts.knot === 1) say('A knot. When the stalk has its knots, the manual moves on to branches, then leaves.');
+    else if (kind === 'leaf' && counts.leaf === 3) say('Three leaves. Try grouping them like 个, then add pale leaves behind for depth.');
+    else if (dryEnd || speedK > 0.6) say('The white streaks where the brush ran dry or moved fast are called flying white. Painters use them on purpose.');
+    else if (brush.load < 0.15) say('The brush is running dry. Dip it again for a wet, solid stroke.');
+    else say('');
+  }
+  function updateBrush() {
+    const l = brush.load;
+    $('#loadbar').style.width = `${Math.round(l * 100)}%`;
+    $('#loadword').textContent = l > 0.75 ? 'full' : l > 0.4 ? 'half full' : l > 0.12 ? 'running dry' : 'dry';
+    $$('.dish').forEach((d) => d.setAttribute('aria-pressed', String(d.dataset.t === brush.tone)));
+  }
+  function updateStrength() {
+    $('#strengthbar').style.width = `${Math.round(strength * 100)}%`;
+    $('#strengthword').textContent = strength > 0.75 ? 'rich black' : strength > 0.45 ? 'dark grey' : 'thin and grey';
+    $$('.dish i').forEach((i) => { i.style.background = `linear-gradient(${ink(TONES[i.parentNode.dataset.t] * strength * 0.9)}, ${ink(TONES[i.parentNode.dataset.t] * strength * 0.9)}), #f1ece0`; });
+    drawStone();
+  }
+  function coverage() {
+    const small = mk(150, 220), g = small.getContext('2d', { willReadFrequently: true });
+    g.drawImage(inkC, 0, 0, 150, 220);
+    const d = g.getImageData(0, 0, 150, 220).data;
+    let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 40) n++;
+    const pct = Math.round(n / (150 * 220) * 100);
+    $('#cover').textContent = `Ink covers ${pct}% of the sheet. Tōhaku’s Pine Trees screens paint about 15%.`;
+  }
+
+  // ---------- Controls ----------
+  const dishes = $('#dishes');
+  Object.keys(TONES).forEach((t) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'btn dish'; b.dataset.t = t;
+    b.innerHTML = `<i></i>${t}`; b.setAttribute('aria-label', `Dip the brush in ${t} ink`);
+    b.addEventListener('click', () => { brush.tone = t; brush.load = 1; updateBrush(); say(`The brush is loaded with ${t} ink.`); });
+    dishes.appendChild(b);
+  });
+  $$('.stroke').forEach((b) => b.addEventListener('click', () => {
+    kind = b.dataset.k; $$('.stroke').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); $('#hint').textContent = HINTS[kind];
+  }));
+  $('#hint').textContent = HINTS[kind];
+
+  // the inkstone: drag in circles on the flat to grind
+  const stone = $('#stone'), st = stone.getContext('2d'), SC = { x: 180, y: 75 };
+  let stick = null, lastAng = null;
+  function drawStone() {
+    st.clearRect(0, 0, 280, 150);
+    st.fillStyle = '#2c2f30'; st.beginPath(); st.roundRect(4, 6, 272, 138, 22); st.fill();
+    st.fillStyle = '#3a3f40'; st.beginPath(); st.roundRect(14, 16, 252, 118, 16); st.fill();
+    // the well, where the ground ink collects
+    st.fillStyle = '#1f2223'; st.beginPath(); st.ellipse(62, 75, 38, 46, 0, 0, 7); st.fill();
+    st.fillStyle = ink(0.35 + 0.6 * strength); st.beginPath(); st.ellipse(62, 80, 30, 34, 0, 0, 7); st.fill();
+    st.fillStyle = 'rgba(255,255,255,0.12)'; st.beginPath(); st.ellipse(54, 68, 9, 5, -0.5, 0, 7); st.fill();
+    // a film of ink on the grinding flat
+    st.fillStyle = ink(0.15 + 0.35 * strength); st.beginPath(); st.ellipse(SC.x, SC.y, 62, 44, 0, 0, 7); st.fill();
+    const p = stick || { x: 222, y: 40 };
+    st.save(); st.translate(p.x, p.y); st.rotate(-0.35);
+    st.fillStyle = '#111'; st.beginPath(); st.roundRect(-11, -26, 22, 52, 3); st.fill();
+    st.fillStyle = '#c8a24a'; st.font = '700 14px "Shippori Mincho", serif'; st.textAlign = 'center'; st.fillText('墨', 0, 5);
+    st.restore();
+  }
+  function stonePt(e) { const r = stone.getBoundingClientRect(); return { x: (e.clientX - r.left) * 280 / r.width, y: (e.clientY - r.top) * 150 / r.height }; }
+  stone.addEventListener('pointerdown', (e) => { try { stone.setPointerCapture(e.pointerId); } catch (err) { /* capture is optional */ } stick = stonePt(e); lastAng = Math.atan2(stick.y - SC.y, stick.x - SC.x); drawStone(); });
+  stone.addEventListener('pointermove', (e) => {
+    if (!stick) return;
+    stick = stonePt(e);
+    const ang = Math.atan2(stick.y - SC.y, stick.x - SC.x), d = Math.hypot(stick.x - SC.x, stick.y - SC.y);
+    let da = ang - lastAng; if (da > Math.PI) da -= 2 * Math.PI; if (da < -Math.PI) da += 2 * Math.PI;
+    lastAng = ang;
+    if (d > 8 && d < 80) strength = Math.min(1, strength + Math.abs(da) * 0.01);
+    updateStrength();
+  });
+  ['pointerup', 'pointercancel'].forEach((t) => stone.addEventListener(t, () => { stick = null; drawStone(); }));
+  $('#grind').addEventListener('click', () => { strength = Math.min(1, strength + 10 * 2 * Math.PI * 0.01); updateStrength(); say('Ten slow circles of the inkstick in a little water. The ink grows blacker.'); });
+  $('#water').addEventListener('click', () => { strength = Math.max(0.2, strength - 0.2); updateStrength(); say('A few drops of water thin the ink in the well. Grind again to bring the black back.'); });
+
+  function fresh() { if (reveal) commit(); ic.clearRect(0, 0, W, H); sealed = false; Object.keys(counts).forEach((k) => { counts[k] = 0; }); show(); coverage(); }
+  $('#fresh').addEventListener('click', () => {
+    fresh(); $$('.stroke')[0].click(); brush.tone = 'middle'; brush.load = 1; updateBrush();
+    say('A fresh sheet and a full brush of middle ink. Start with the stem, from the bottom up.');
+  });
+
+  // ---------- The seal ----------
+  function stamp(x, y) {
+    const s = mk(52, 96), g = s.getContext('2d');
+    g.fillStyle = '#b8382a'; g.beginPath(); g.roundRect(2, 2, 48, 92, 3); g.fill();
+    g.globalCompositeOperation = 'destination-out';
+    g.font = '800 34px "Shippori Mincho", serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText('墨', 26, 28); g.fillText('竹', 26, 68);
+    g.globalAlpha = 0.55; g.fillStyle = g.createPattern(grain, 'repeat'); g.fillRect(0, 0, 52, 96);
+    ic.save(); ic.globalAlpha = 0.92; ic.drawImage(s, x, y); ic.restore();
+  }
+  $('#seal').addEventListener('click', () => {
+    if (reveal) commit();
+    if (sealed) { say('A painting takes one seal from its painter. Start a fresh sheet to paint another.'); return; }
+    const go = () => { stamp(W - 92, H - 140); sealed = true; show(); coverage(); say('Sealed in red seal paste. 墨竹 means ink bamboo.'); };
+    if (document.fonts && document.fonts.load) document.fonts.load('800 34px "Shippori Mincho"', '墨竹').then(go, go); else go();
+  });
+
+  // ---------- An example, painted in the manual's order ----------
+  function line(x0, y0, x1, y1, bend) {
+    const n = Math.max(4, Math.ceil(Math.hypot(x1 - x0, y1 - y0) / 3)), nx = -(y1 - y0), ny = x1 - x0, d = Math.hypot(nx, ny) || 1, pts = [];
+    for (let i = 0; i <= n; i++) { const t = i / n, b = Math.sin(Math.PI * t) * (bend || 0); pts.push({ x: x0 + (x1 - x0) * t + nx / d * b, y: y0 + (y1 - y0) * t + ny / d * b }); }
+    return pts;
+  }
+  function paintNow(raw, k, tone, opts) {
+    const o = opts || {}, info = render(raw, k, tone, o.load == null ? 1 : o.load, o.speed || 0, o.hw);
+    if (info) { ic.drawImage(tmp, 0, 0); tc.clearRect(0, 0, W, H); }
+    return info;
+  }
+  function stalk(bx, by, tx, segs, tone, hw) {
+    // segments from the root up; returns the knots
+    const total = segs.reduce((a, b) => a + b, 0) + 6 * (segs.length - 1);
+    let y = by, load = 1;
+    const knots = [];
+    segs.forEach((len, i) => {
+      const xa = bx + (tx - bx) * (by - y) / total, xb = bx + (tx - bx) * (by - y + len) / total;
+      const info = paintNow(line(xa, y, xb, y - len, 0.6), 'stem', tone, { load, hw });
+      load = info ? Math.max(0.25, info.endLoad) : load;
+      if (i === 3) load = 1;
+      y -= len;
+      if (i < segs.length - 1) { knots.push({ x: xb, y: y - 3 }); y -= 6; }
+    });
+    return knots;
+  }
+  function leaf(x, y, ang, len, tone, bend, load) {
+    const a = ang * Math.PI / 180;
+    paintNow(line(x, y, x + Math.cos(a) * len, y + Math.sin(a) * len, bend), 'leaf', tone, { load: load || 0.95 });
+  }
+  function example() {
+    if (reveal) commit();
+    fresh();
+    seed = 777; rand = srand;
+    // 1 stems: a dark one in front and a pale one behind
+    const back = stalk(400, 896, 432, [46, 78, 104, 112, 86, 54], 'pale', 9);
+    const front = stalk(232, 900, 286, [50, 86, 118, 134, 128, 106, 80, 54], 'middle', 12);
+    // 2 knots in dark ink
+    back.forEach((k) => paintNow(line(k.x - 11, k.y + 1, k.x + 11, k.y, 3), 'knot', 'middle', { hw: 2.4 }));
+    front.forEach((k) => paintNow(line(k.x - 15, k.y + 1, k.x + 15, k.y, 3.5), 'knot', 'dark'));
+    // 3 branches out of the upper knots
+    const br = [];
+    [[front[3], -1, 120], [front[4], 1, 110], [front[5], -1, 96], [front[6], 1, 80], [back[3], 1, 70]].forEach(([k, side, len], i) => {
+      const a = (-90 + side * 48) * Math.PI / 180, ex = k.x + Math.cos(a) * len, ey = k.y + Math.sin(a) * len;
+      paintNow(line(k.x + side * 8, k.y, ex, ey, side * 5), 'branch', i === 4 ? 'pale' : 'dark', { load: 0.9 });
+      br.push({ x: ex, y: ey, side });
+    });
+    // 4 leaves: 个 groups of three and 人 pairs, dark in front, pale behind
+    const ge = (x, y, base, tone, s) => { leaf(x, y, base - 36, 136 * s, tone, 9); leaf(x, y, base, 158 * s, tone, -7); leaf(x, y, base + 34, 128 * s, tone, -10); };
+    const ren = (x, y, base, tone, s) => { leaf(x, y, base - 20, 146 * s, tone, 8); leaf(x, y, base + 20, 132 * s, tone, -8); };
+    ge(br[4].x, br[4].y, 30, 'pale', 0.9);
+    ren(back[4].x + 6, back[4].y, 150, 'pale', 0.85);
+    ge(br[0].x, br[0].y, 150, 'dark', 1);
+    ren(br[0].x + 30, br[0].y + 28, 115, 'dark', 0.8);
+    ge(br[1].x, br[1].y, 40, 'dark', 1);
+    ren(br[2].x, br[2].y, 160, 'dark', 0.9);
+    ge(br[3].x, br[3].y, 60, 'dark', 0.85);
+    // young leaves at the top point up
+    const top = front[front.length - 1];
+    leaf(top.x + 2, top.y - 50, -60, 92, 'dark', 4, 0.8); leaf(top.x + 2, top.y - 50, -112, 84, 'dark', -5, 0.8);
+    rand = Math.random;
+    Object.assign(counts, { stem: 14, knot: 12, branch: 5, leaf: 23 });
+    brush.tone = 'dark'; brush.load = 0.6; updateBrush();
+    const done = () => { stamp(W - 92, H - 140); sealed = true; show(); coverage(); };
+    if (document.fonts && document.fonts.load) document.fonts.load('800 34px "Shippori Mincho"', '墨竹').then(done, done); else done();
+    show(); coverage();
+    say('An example in the manual’s order: two stems, their knots, branches from the upper knots, then leaves in groups of three and two, dark in front and pale behind. Start a fresh sheet and paint your own.');
+  }
+  $('#example').addEventListener('click', example);
+
+  updateStrength(); updateBrush();
+  example();
+})();
+</script>
+</body>
+</html>
