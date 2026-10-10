@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Difference Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prata&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Martian+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  /* Layout: the engine's columns of figure wheels stand on a dark frame beside the strip its printer produces; under them the difference table that sets it up, a misprinted table to catch, and the history. */
+  --ground: #e3e2de;
+  --ground-2: #d5d3cd;
+  --paper: #f3f1ea;
+  --text: #1f1d1b;
+  --muted: #5e5952;
+  --line: rgba(31, 29, 27, 0.14);
+  --line-strong: rgba(31, 29, 27, 0.32);
+  --accent: #8a2f23;
+  --good: #2f6b45;
+  /* The engine keeps its metal colours in both themes. */
+  --frame: #23262a;
+  --frame-2: #2f3338;
+  --brass-hi: #f0d48a;
+  --brass: #c49a3c;
+  --brass-lo: #7d5a17;
+  --steel: #9aa1a8;
+  --f-display: "Prata", "Didot", "Bodoni 72", Georgia, serif;
+  --f-body: "Source Serif 4", Georgia, serif;
+  --f-data: "Martian Mono", "Consolas", "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #121212;
+    --ground-2: #1d1c1b;
+    --paper: #1a1918;
+    --text: #ebe7e0;
+    --muted: #aaa49a;
+    --line: rgba(235, 231, 224, 0.12);
+    --line-strong: rgba(235, 231, 224, 0.3);
+    --accent: #f08a72;
+    --good: #86cf9c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #121212;
+  --ground-2: #1d1c1b;
+  --paper: #1a1918;
+  --text: #ebe7e0;
+  --muted: #aaa49a;
+  --line: rgba(235, 231, 224, 0.12);
+  --line-strong: rgba(235, 231, 224, 0.3);
+  --accent: #f08a72;
+  --good: #86cf9c;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--text); font-family: var(--f-body); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--brass); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 400; line-height: 1.1; margin: 0; text-wrap: balance; }
+
+.page { box-sizing: border-box; max-width: 1200px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 34px; }
+.masthead { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.eyebrow { margin: 0; font-family: var(--f-data); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+.masthead h1 { font-size: clamp(2.6rem, 7vw, 5rem); }
+.lede { margin: 0; max-width: 64ch; color: var(--muted); }
+
+/* ---------- The engine ---------- */
+.works { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(260px, 1fr); gap: 24px; align-items: start; }
+.engine { padding: 18px 16px 14px; border-radius: 8px; background: linear-gradient(var(--frame-2), var(--frame)); box-shadow: 0 18px 30px -18px rgba(0, 0, 0, 0.7); color: #e8e3d6; display: flex; flex-direction: column; gap: 12px; }
+.cols { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.col { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px 10px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.06); transition: background-color 0.2s; }
+.col.giving { background: rgba(240, 212, 138, 0.1); }
+.col.taking { background: rgba(240, 212, 138, 0.22); }
+.col h3 { font-family: var(--f-data); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: #c9c1ad; text-align: center; min-height: 2.6em; line-height: 1.3; }
+.col.off { opacity: 0.35; }
+.wheel { position: relative; width: min(100%, 60px); height: 34px; border-radius: 4px; background: linear-gradient(90deg, var(--brass-lo), var(--brass) 18%, var(--brass-hi) 48%, var(--brass) 80%, var(--brass-lo)); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4); overflow: hidden; display: grid; place-items: center; }
+.wheel b { font-family: var(--f-data); font-weight: 500; font-size: 1.15rem; color: #2a1d06; }
+.wheel.roll b { animation: roll 0.28s ease-out; }
+@keyframes roll { from { transform: translateY(-70%); opacity: 0.2; } to { transform: none; opacity: 1; } }
+.wheel::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--steel); opacity: 0.5; }
+.wheel.carry::before { background: #ffb43d; opacity: 1; box-shadow: 0 0 8px #ffb43d; }
+.wheel.lead b { opacity: 0.35; }
+.crankrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn { padding: 7px 14px; border: 1.5px solid var(--line-strong); border-radius: 4px; background: none; font-size: 0.92rem; }
+.btn:hover { background: var(--ground-2); }
+.engine .btn { border-color: rgba(255, 255, 255, 0.25); color: #ece6d6; }
+.engine .btn:hover { background: rgba(255, 255, 255, 0.08); }
+.btn.crank { background: var(--brass); border-color: var(--brass-lo); color: #1d1404; font-weight: 600; }
+.btn.crank:hover { background: var(--brass-hi); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.turns { margin-left: auto; font-family: var(--f-data); font-size: 0.8rem; color: #c9c1ad; }
+.engine .say { margin: 0; font-size: 0.92rem; color: #d7d0bf; min-height: 2.8em; }
+
+.side { display: flex; flex-direction: column; gap: 14px; }
+.setup { display: flex; flex-direction: column; gap: 8px; }
+.setup h2 { font-size: 1.4rem; }
+.presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.presets .btn[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.coef { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; font-family: var(--f-data); font-size: 0.85rem; }
+.coef input { width: 2.6em; padding: 3px 4px; border: 1.5px solid var(--line-strong); border-radius: 3px; background: var(--paper); font-family: var(--f-data); text-align: center; }
+.print { padding: 12px 14px; border-radius: 4px; background: var(--paper); border: 1px solid var(--line); }
+.print h3 { font-size: 1.1rem; margin-bottom: 6px; }
+.print ol { margin: 0; padding: 0; list-style: none; max-height: 300px; overflow-y: auto; font-family: var(--f-data); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+.print li { display: grid; grid-template-columns: 3.5em minmax(0, 1fr); gap: 8px; padding: 2px 0; border-bottom: 1px dotted var(--line); }
+.print li span:last-child { text-align: right; }
+.print li.new { color: var(--accent); }
+
+/* ---------- Teaching ---------- */
+.sec-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 24px; margin-bottom: 12px; }
+.sec-head h2 { font-size: clamp(1.7rem, 3.2vw, 2.3rem); }
+.sec-head p { margin: 0; max-width: 62ch; color: var(--muted); }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-family: var(--f-data); font-size: 0.82rem; font-variant-numeric: tabular-nums; }
+th, td { padding: 5px 8px; border-bottom: 1px solid var(--line); text-align: right; }
+th { font-family: var(--f-body); font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+tr.top td { background: rgba(196, 154, 60, 0.16); font-weight: 500; }
+td.const { color: var(--accent); }
+.two p { margin: 0 0 10px; }
+.mis table td.x, .mis table th.x { text-align: left; }
+.mis tr.pick { cursor: pointer; }
+.mis tr.pick:hover td { background: var(--ground-2); }
+.mis td.bad { color: var(--accent); font-weight: 500; }
+.mis tr.right td { background: rgba(47, 107, 69, 0.16); }
+.mis tr.wrong td { text-decoration: line-through; opacity: 0.6; }
+.mis .row { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.mis .say { margin: 0; min-height: 1.6em; font-weight: 600; }
+.mis .say.ok { color: var(--good); }
+
+/* ---------- History ---------- */
+.history { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 20px 40px; padding-top: 24px; border-top: 1px solid var(--line-strong); }
+.history h2 { font-size: 1.9rem; margin-bottom: 12px; }
+.timeline { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.timeline li { display: grid; grid-template-columns: 4em minmax(0, 1fr); gap: 12px; }
+.timeline .yr { font-family: var(--f-display); font-size: 1.3rem; line-height: 1.3; color: var(--accent); }
+.timeline p { margin: 0; font-size: 0.97rem; }
+.aside p { margin: 0 0 10px; font-size: 0.97rem; }
+.sources { grid-column: 1 / -1; margin: 0; font-size: 0.85rem; color: var(--muted); }
+.sources a { color: inherit; text-underline-offset: 3px; }
+
+@media (max-width: 920px) {
+  .works, .two, .history { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wheel.roll b { animation: none; }
+  .col { transition: none; }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="difference-engine" defer></script>
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Machines &amp; Messages · London, 1822–1991</p>
+    <h1>Difference Engine</h1>
+    <p class="lede">Printed tables of numbers ran navigation, banking and engineering, and they were full of mistakes. Charles Babbage designed a machine that could make them by turning a handle, using nothing but addition. Set it up, turn the crank, and watch the carries ripple up the wheels.</p>
+  </header>
+
+  <section class="works" aria-label="The engine">
+    <div class="engine">
+      <div class="cols" id="cols"></div>
+      <div class="crankrow">
+        <button type="button" class="btn crank" id="crank">Turn the handle</button>
+        <button type="button" class="btn" id="ten">Turn it ten times</button>
+        <span class="turns" id="turns">x = 0</span>
+      </div>
+      <p class="say" id="say" aria-live="polite"></p>
+    </div>
+
+    <div class="side">
+      <div class="setup">
+        <h2>What should it tabulate?</h2>
+        <div class="presets" id="presets" role="group" aria-label="Tables"></div>
+        <div class="coef" id="coef">
+          <span>f(x) =</span><input id="ca" inputmode="numeric" maxlength="1" value="0" aria-label="Coefficient of x cubed"><span>x³ +</span><input id="cb" inputmode="numeric" maxlength="1" value="1" aria-label="Coefficient of x squared"><span>x² +</span><input id="cc" inputmode="numeric" maxlength="1" value="1" aria-label="Coefficient of x"><span>x +</span><input id="cd" inputmode="numeric" maxlength="2" value="41" aria-label="Constant">
+          <button type="button" class="btn" id="custom">Set up</button>
+        </div>
+      </div>
+      <div class="print">
+        <h3>The printed table</h3>
+        <ol id="print" aria-live="polite"></ol>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="diff-h">
+    <div class="sec-head">
+      <h2 id="diff-h">Why addition is enough</h2>
+      <p>Write down a table of a polynomial, subtract each number from the next, then do the same to the differences. Sooner or later a column comes out the same all the way down.</p>
+    </div>
+    <div class="two">
+      <div class="tablewrap"><table id="dtable"></table></div>
+      <div>
+        <p>For a polynomial with x² as its biggest term, the second differences never change. For x³, the third differences never change. That constant column is the key.</p>
+        <p>Run the subtraction backwards and every number in the table can be built by adding. Set the top row on the engine’s columns: the first value, the first difference, and so on. Each turn of the handle adds every column into the one on its left, and out comes the next line of the table.</p>
+        <p>The engine never multiplies, and it never makes a slip of the pen.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mis" aria-labelledby="mis-h">
+    <div class="sec-head">
+      <h2 id="mis-h">Catch the misprint</h2>
+      <p>Many errors in old tables came from the typesetter, not the calculator: two digits swapped, one digit wrong. Differences catch them. Find the wrong line in this table.</p>
+    </div>
+    <div class="two">
+      <div class="tablewrap"><table id="mtable"></table></div>
+      <div>
+        <div class="row">
+          <button type="button" class="btn" id="d1">Work out the first differences</button>
+          <button type="button" class="btn" id="d2">And the second differences</button>
+          <button type="button" class="btn" id="mnew">Another table</button>
+        </div>
+        <p class="say" id="msay" aria-live="polite">Click the line you think is wrong.</p>
+        <p>In a correct table of a square-type polynomial the second differences are all the same. One bad number upsets three of them, and the biggest of the three sits on the wrong line.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="history">
+    <div>
+      <h2>A machine that took 170 years</h2>
+      <ol class="timeline">
+        <li><span class="yr">1822</span><p>Babbage announces his difference engine in a paper to the Astronomical Society. With John Herschel he had been asked to check tables for the <i>Nautical Almanac</i> and found the hand-made ones disagreeing.</p></li>
+        <li><span class="yr">1823</span><p>The government grants £1,700 to build a full-size engine. The design grows to some 25,000 precision parts.</p></li>
+        <li><span class="yr">1832</span><p>Babbage and his engineer Joseph Clement finish a working one-seventh section: six-digit numbers and second differences.</p></li>
+        <li><span class="yr">1833</span><p>Seventeen-year-old Ada Byron, later Ada Lovelace, meets Babbage in June and that month sees the working section turn.</p></li>
+        <li><span class="yr">1842</span><p>After more than £17,000 and no finished engine, the government gives up. Babbage has moved on to his Analytical Engine.</p></li>
+        <li><span class="yr">1853</span><p>In Sweden, Per Georg Scheutz and his son Edvard finish a working difference engine inspired by Babbage, with 15-digit numbers and fourth differences.</p></li>
+        <li><span class="yr">1991</span><p>London’s Science Museum completes Babbage’s Difference Engine No. 2, designed in 1846–49, for the 200th anniversary of his birth. It works. Its printer follows in 2002.</p></li>
+      </ol>
+    </div>
+    <div class="aside">
+      <h2>Errors by steam</h2>
+      <p>Babbage reckoned that many mistakes in published tables were not in the arithmetic at all but in copying and typesetting. So his designs included a printer that pressed the results straight into soft material to make printing plates, with no person in between.</p>
+      <p>Difference Engine No. 2 works on 31-digit numbers with seventh differences. This one has four columns of seven wheels, enough for cubes.</p>
+    </div>
+    <p class="sources">Sources: <a href="https://en.wikipedia.org/wiki/Difference_engine" target="_blank" rel="noopener">Difference engine</a> (the 1822 announcement, the grant, the 1832 section, the 1842 end, Scheutz, and the Science Museum build), <a href="https://en.wikipedia.org/wiki/Charles_Babbage" target="_blank" rel="noopener">Charles Babbage</a> (the <i>Nautical Almanac</i> tables) and <a href="https://en.wikipedia.org/wiki/Ada_Lovelace" target="_blank" rel="noopener">Ada Lovelace</a> on Wikipedia; the <a href="https://www.computerhistory.org/babbage/" target="_blank" rel="noopener">Computer History Museum’s Babbage Engine pages</a>.</p>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const NC = 4, ND = 7;                     // columns, wheels in each
+  const LIMIT = 10 ** ND;
+
+  /* ================================================================
+     Tables to set up
+     ================================================================ */
+  const PRESETS = [
+    { name: 'Squares', poly: [0, 1, 0, 0], note: 'x²: the second difference is always 2.' },
+    { name: 'Triangular numbers', poly: null, init: [0, 1, 1, 0], f: (x) => (x * (x + 1)) / 2, note: 'x(x+1)/2: stacks of 1, 3, 6, 10 marbles.' },
+    { name: 'Cubes', poly: [1, 0, 0, 0], note: 'x³: now the third difference is the constant one, 6.' },
+    { name: 'Euler’s primes', poly: [0, 1, 1, 41], note: 'x² + x + 41 gives a prime for every x from 0 to 39. At x = 40 it gives 1681, which is 41 × 41.' },
+  ];
+  // f(x) = a x³ + b x² + c x + d
+  const fOf = (p) => (x) => p[0] * x ** 3 + p[1] * x ** 2 + p[2] * x + p[3];
+  const initOf = (f) => {
+    const v = [f(0), f(1), f(2), f(3)];
+    return [v[0], v[1] - v[0], v[2] - 2 * v[1] + v[0], v[3] - 3 * v[2] + 3 * v[1] - v[0]];
+  };
+
+  let cols = [0, 0, 0, 0];
+  let fn = null, x = 0, busy = false, preset = 0;
+  let printed = [];
+
+  /* ================================================================
+     The wheels
+     ================================================================ */
+  const NAMES = ['Table value', '1st difference', '2nd difference', '3rd difference'];
+  $('cols').innerHTML = NAMES.map((n, c) => `<div class="col" id="col${c}"><h3>${n}</h3>${Array.from({ length: ND }, (_, w) => `<div class="wheel" id="w${c}-${ND - 1 - w}"><b>0</b></div>`).join('')}</div>`).join('');
+  const digits = (v) => Array.from({ length: ND }, (_, i) => Math.floor(v / 10 ** i) % 10);
+  function showCol(c, carries = []) {
+    const ds = digits(cols[c]);
+    const lead = String(cols[c]).length;
+    for (let i = 0; i < ND; i++) {
+      const el = $(`w${c}-${i}`);
+      const b = el.firstChild;
+      if (b.textContent !== String(ds[i])) {
+        b.textContent = ds[i];
+        if (!reduceMotion) { el.classList.remove('roll'); void el.offsetWidth; el.classList.add('roll'); }
+      }
+      el.classList.toggle('carry', carries.includes(i));
+      el.classList.toggle('lead', i >= lead && i > 0);
+    }
+  }
+  const showAll = () => { for (let c = 0; c < NC; c++) showCol(c); };
+
+  // Add column `from` into column `to` digit by digit, noting where a carry went up.
+  function addInto(to, from) {
+    const a = digits(cols[to]), b = digits(cols[from]);
+    const carries = [];
+    let carry = 0, out = 0;
+    for (let i = 0; i < ND; i++) {
+      const s = a[i] + b[i] + carry;
+      if (carry) carries.push(i);
+      carry = s >= 10 ? 1 : 0;
+      out += (s % 10) * 10 ** i;
+    }
+    cols[to] = out;
+    return { carries, overflow: !!carry };
+  }
+
+  /* ================================================================
+     Setting up and turning
+     ================================================================ */
+  function setUp(init, f, label) {
+    if (init.some((v) => v < 0)) { say('This engine only keeps positive numbers on its wheels. Babbage’s handled negatives with complements; try other numbers here.'); return; }
+    if (init.some((v) => v >= LIMIT)) { say('Those numbers are too big for seven wheels.'); return; }
+    cols = init.slice();
+    fn = f;
+    x = 0;
+    printed = [[0, cols[0]]];
+    showAll();
+    drawPrint();
+    drawDiffTable();
+    $('turns').textContent = 'x = 0';
+    for (let c = 0; c < NC; c++) $(`col${c}`).classList.toggle('off', c > 0 && cols.slice(c).every((v) => v === 0));
+    say(`Set up for ${label}. The top row of the difference table is now on the wheels: ${cols.join(', ')}. Turn the handle.`);
+  }
+  const say = (t) => { $('say').textContent = t; };
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  async function turn(fast) {
+    const step = reduceMotion ? 0 : fast ? 110 : 420;
+    const notes = [];
+    let overflow = false;
+    // Each column takes in the one to its right, starting with the table value.
+    for (let c = 0; c < NC - 1; c++) {
+      if (cols[c + 1] === 0 && c > 0) continue;
+      $(`col${c}`).classList.add('taking');
+      $(`col${c + 1}`).classList.add('giving');
+      const r = addInto(c, c + 1);
+      overflow = overflow || r.overflow;
+      showCol(c, r.carries);
+      if (r.carries.length) notes.push(`${r.carries.length} carr${r.carries.length === 1 ? 'y' : 'ies'} in the ${NAMES[c].toLowerCase()}`);
+      if (step) await wait(step);
+      $(`col${c}`).classList.remove('taking');
+      $(`col${c + 1}`).classList.remove('giving');
+    }
+    x++;
+    printed.push([x, cols[0]]);
+    drawPrint();
+    $('turns').textContent = `x = ${x}`;
+    if (overflow) { say('The top wheel ran past 9. The table has outgrown seven wheels: set up again.'); return false; }
+    const check = fn ? fn(x) : null;
+    say(`Line ${x} printed: ${cols[0].toLocaleString('en-US')}.${notes.length ? ` This turn: ${notes.join(', ')}.` : ''}${check != null && check !== cols[0] ? ' (That doesn’t match the formula.)' : ''}`);
+    return true;
+  }
+  async function crank(n) {
+    if (busy || !fn) return;
+    busy = true;
+    $('crank').disabled = true;
+    $('ten').disabled = true;
+    for (let i = 0; i < n; i++) { if (!(await turn(n > 1))) break; }
+    for (let c = 0; c < NC; c++) showCol(c);
+    busy = false;
+    $('crank').disabled = false;
+    $('ten').disabled = false;
+  }
+  function drawPrint() {
+    $('print').innerHTML = printed.map(([px, v], i) => `<li class="${i === printed.length - 1 && i > 0 ? 'new' : ''}"><span>${px}</span><span>${v.toLocaleString('en-US')}</span></li>`).join('');
+    const ol = $('print');
+    ol.scrollTop = ol.scrollHeight;
+  }
+  function drawDiffTable() {
+    const f = fn;
+    const rows = 7;
+    const vals = Array.from({ length: rows + 3 }, (_, i) => f(i));
+    const d = [vals];
+    for (let k = 1; k <= 3; k++) d.push(d[k - 1].slice(1).map((v, i) => v - d[k - 1][i]));
+    const constCol = [1, 2, 3].find((k) => d[k].slice(0, rows).every((v) => v === d[k][0]) && d[k][0] !== 0);
+    let h = '<thead><tr><th scope="col">x</th><th scope="col">f(x)</th><th scope="col">1st diff.</th><th scope="col">2nd diff.</th><th scope="col">3rd diff.</th></tr></thead><tbody>';
+    for (let i = 0; i < rows; i++) {
+      h += `<tr class="${i === 0 ? 'top' : ''}"><td>${i}</td>${[0, 1, 2, 3].map((k) => `<td class="${k === constCol ? 'const' : ''}">${d[k][i].toLocaleString('en-US')}</td>`).join('')}</tr>`;
+    }
+    $('dtable').innerHTML = h + '</tbody>';
+  }
+
+  $('presets').innerHTML = PRESETS.map((p, i) => `<button type="button" class="btn" data-p="${i}" aria-pressed="${i === preset}">${p.name}</button>`).join('');
+  function usePreset(i) {
+    preset = i;
+    const p = PRESETS[i];
+    const f = p.poly ? fOf(p.poly) : p.f;
+    setUp(p.poly ? initOf(f) : p.init, f, `${p.name.toLowerCase()}. ${p.note}`);
+    document.querySelectorAll('[data-p]').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.p) === i)));
+    if (p.poly) { ['ca', 'cb', 'cc', 'cd'].forEach((id, k) => { $(id).value = p.poly[k]; }); }
+  }
+  $('presets').addEventListener('click', (e) => { const b = e.target.closest('[data-p]'); if (b && !busy) usePreset(Number(b.dataset.p)); });
+  $('custom').addEventListener('click', () => {
+    if (busy) return;
+    const p = ['ca', 'cb', 'cc', 'cd'].map((id) => Math.max(0, Math.min(99, parseInt($(id).value, 10) || 0)));
+    const f = fOf(p);
+    document.querySelectorAll('[data-p]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+    setUp(initOf(f), f, `${p[0]}x³ + ${p[1]}x² + ${p[2]}x + ${p[3]}`);
+  });
+  $('crank').addEventListener('click', () => crank(1));
+  $('ten').addEventListener('click', () => crank(10));
+
+  /* ================================================================
+     Catch the misprint
+     ================================================================ */
+  let mis = null, shown = 0, solvedMis = false;
+  function newMis() {
+    const polys = [[0, 1, 0, 0], [0, 1, 1, 41], [0, 2, 3, 7], [0, 3, 0, 11]];
+    const p = polys[Math.floor(Math.random() * polys.length)];
+    const f = fOf(p);
+    const x0 = 20 + Math.floor(Math.random() * 40);
+    const vals = Array.from({ length: 10 }, (_, i) => f(x0 + i));
+    const bad = 2 + Math.floor(Math.random() * 6);
+    const s = String(vals[bad]).split('');
+    // a typesetter's slip: swap two different neighbouring digits, or change one digit
+    const pairs = [];
+    for (let i = 0; i < s.length - 1; i++) if (s[i] !== s[i + 1]) pairs.push(i);
+    if (pairs.length && Math.random() < 0.6) {
+      const i = pairs[Math.floor(Math.random() * pairs.length)];
+      [s[i], s[i + 1]] = [s[i + 1], s[i]];
+    } else {
+      const i = 1 + Math.floor(Math.random() * (s.length - 1));
+      s[i] = String((Number(s[i]) + 1 + Math.floor(Math.random() * 8)) % 10);
+    }
+    const shownVals = vals.slice();
+    shownVals[bad] = Number(s.join(''));
+    mis = { x0, vals: shownVals, truth: vals, bad };
+    shown = 0;
+    solvedMis = false;
+    $('msay').textContent = 'Click the line you think is wrong.';
+    $('msay').classList.remove('ok');
+    drawMis();
+  }
+  function drawMis(picked) {
+    const v = mis.vals;
+    // On row i: the difference from the line before, and the second difference centred on line i.
+    const d1 = v.map((y, i) => (i ? y - v[i - 1] : null));
+    const d2 = v.map((y, i) => (i && i < v.length - 1 ? v[i + 1] - 2 * y + v[i - 1] : null));
+    const known = d2.filter((q) => q != null);
+    const mode = known.slice().sort((a, b) => known.filter((q) => q === b).length - known.filter((q) => q === a).length)[0];
+    let h = `<thead><tr><th scope="col" class="x">x</th><th scope="col">Printed value</th>${shown >= 1 ? '<th scope="col">1st diff.</th>' : ''}${shown >= 2 ? '<th scope="col">2nd diff.</th>' : ''}</tr></thead><tbody>`;
+    v.forEach((y, i) => {
+      const cls = solvedMis && i === mis.bad ? 'right' : picked === i ? 'wrong' : '';
+      h += `<tr class="pick ${cls}" data-row="${i}" tabindex="0"><td class="x">${mis.x0 + i}</td><td>${y.toLocaleString('en-US')}</td>`;
+      if (shown >= 1) h += `<td>${d1[i] != null ? d1[i].toLocaleString('en-US') : ''}</td>`;
+      if (shown >= 2) h += `<td class="${d2[i] != null && d2[i] !== mode ? 'bad' : ''}">${d2[i] != null ? d2[i].toLocaleString('en-US') : ''}</td>`;
+      h += '</tr>';
+    });
+    $('mtable').innerHTML = h + '</tbody>';
+  }
+  function pickRow(i) {
+    if (!mis || solvedMis) return;
+    if (i === mis.bad) {
+      solvedMis = true;
+      $('msay').classList.add('ok');
+      $('msay').textContent = `Yes. Line ${mis.x0 + i} should read ${mis.truth[i].toLocaleString('en-US')}, not ${mis.vals[i].toLocaleString('en-US')}.`;
+      drawMis();
+    } else {
+      $('msay').classList.remove('ok');
+      $('msay').textContent = `Line ${mis.x0 + i} is fine. ${shown < 2 ? 'Try working out the differences.' : 'Look for the odd second differences.'}`;
+      drawMis(i);
+    }
+  }
+  $('mtable').addEventListener('click', (e) => { const r = e.target.closest('[data-row]'); if (r) pickRow(Number(r.dataset.row)); });
+  $('mtable').addEventListener('keydown', (e) => { const r = e.target.closest('[data-row]'); if (r && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); pickRow(Number(r.dataset.row)); } });
+  $('d1').addEventListener('click', () => { shown = Math.max(shown, 1); drawMis(); });
+  $('d2').addEventListener('click', () => { shown = 2; drawMis(); });
+  $('mnew').addEventListener('click', newMis);
+
+  usePreset(0);
+  // Open with a few lines already printed so the table and the carries show.
+  crank(4).then(() => say('Four lines printed. Turn the handle for the next square, or choose another table.'));
+  newMis();
+})();
+</script>
+</body>
+</html>
