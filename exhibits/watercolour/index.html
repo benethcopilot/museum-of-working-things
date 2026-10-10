@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Watercolour Washes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Instrument+Sans:ital,wght@0,400;0,600;1,400&family=Overpass+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  /* Layout: a painting table. A sheet of rough paper taped to a board, the paint box and brush beside it, and four lessons below; then the techniques, the paint box’s history and the English school. */
+  --ground: #eef0ee;
+  --ground-2: #e0e4e0;
+  --card: #f8f9f7;
+  --ink: #1d2120;
+  --muted: #59605d;
+  --line: rgba(29, 33, 32, 0.13);
+  --line-strong: rgba(29, 33, 32, 0.3);
+  --wash: #2f5d8a;
+  --good: #2c7449;
+  /* the board and paper look the same in both themes */
+  --board: #b89a72;
+  --board-edge: #8d714d;
+  --tape: rgba(233, 222, 190, 0.9);
+  --f-display: "Gloock", "Didot", Georgia, serif;
+  --f-body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --f-data: "Overpass Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #111413;
+    --ground-2: #1b1f1d;
+    --card: #161a18;
+    --ink: #e4e8e6;
+    --muted: #a0a8a4;
+    --line: rgba(228, 232, 230, 0.12);
+    --line-strong: rgba(228, 232, 230, 0.3);
+    --wash: #8fb5e0;
+    --good: #82cf9a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #111413;
+  --ground-2: #1b1f1d;
+  --card: #161a18;
+  --ink: #e4e8e6;
+  --muted: #a0a8a4;
+  --line: rgba(228, 232, 230, 0.12);
+  --line-strong: rgba(228, 232, 230, 0.3);
+  --wash: #8fb5e0;
+  --good: #82cf9a;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: default; opacity: 0.45; }
+:focus-visible { outline: 3px solid var(--wash); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 400; line-height: 1.05; margin: 0; text-wrap: balance; }
+a { color: var(--wash); }
+
+.page { box-sizing: border-box; max-width: 1220px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 48px; }
+.masthead { display: grid; gap: 10px; }
+.eyebrow { margin: 0; font-family: var(--f-data); font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.masthead h1 { font-size: clamp(2.8rem, 8vw, 5.6rem); }
+.lede { margin: 0; max-width: 66ch; color: var(--muted); }
+section > h2, .text h2 { font-size: clamp(1.8rem, 3.6vw, 2.5rem); }
+.text { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.text p { margin: 0; max-width: 64ch; }
+
+/* ---------- Table ---------- */
+.table { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+.board { position: relative; padding: 22px; border-radius: 6px; background: var(--board); border: 1px solid var(--board-edge); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15); }
+.board canvas { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; touch-action: none; cursor: none; background: #f6f2e8; }
+.tape { position: absolute; background: var(--tape); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); pointer-events: none; }
+.tape.t { left: 22px; right: 22px; top: 14px; height: 16px; }
+.tape.b { left: 22px; right: 22px; bottom: 14px; height: 16px; }
+.tape.l { top: 22px; bottom: 22px; left: 14px; width: 16px; }
+.tape.r { top: 22px; bottom: 22px; right: 14px; width: 16px; }
+.status { position: absolute; left: 30px; bottom: 36px; font-family: var(--f-data); font-size: 0.74rem; color: #3a3a34; background: rgba(246, 242, 232, 0.85); padding: 2px 8px; border-radius: 3px; pointer-events: none; }
+.side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.box { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; border-radius: 4px; background: var(--card); border: 1px solid var(--line); }
+.box > span { font-family: var(--f-data); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.pans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.pan { display: flex; flex-direction: column; gap: 4px; align-items: stretch; padding: 6px; border-radius: 4px; border: 1.5px solid var(--line-strong); background: #ffffff; color: #2a2a26; text-align: left; font-size: 0.78rem; line-height: 1.2; }
+.pan i { display: block; height: 30px; border-radius: 3px; box-shadow: inset 0 -6px 10px rgba(0, 0, 0, 0.18); }
+.pan small { color: #6a6a62; font-size: 0.68rem; }
+.pan[aria-pressed="true"] { border-color: var(--ink); box-shadow: 0 0 0 2px var(--ink); }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.row > span { font-size: 0.88rem; color: var(--muted); margin-right: 2px; }
+.btn { padding: 5px 11px; border: 1.5px solid var(--line-strong); border-radius: 3px; background: none; font-size: 0.88rem; }
+.btn:hover:not(:disabled) { background: var(--ground-2); }
+.btn[aria-pressed="true"] { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+.btn.go { background: var(--wash); border-color: var(--wash); color: var(--ground); font-weight: 600; }
+.slider { display: flex; flex-direction: column; gap: 2px; font-size: 0.88rem; flex: 1 1 140px; min-width: 0; }
+.slider input { width: 100%; accent-color: var(--wash); }
+.slider output { font-family: var(--f-data); font-size: 0.8rem; }
+.say { margin: 0; padding: 10px 12px; border-left: 3px solid var(--wash); background: var(--card); font-size: 0.95rem; }
+.say.good { border-left-color: var(--good); }
+
+/* ---------- Below ---------- */
+.lessons { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.lesson { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 4px; background: var(--card); border: 1px solid var(--line); text-align: left; color: inherit; }
+.lesson:hover { border-color: var(--line-strong); }
+.lesson b { font-family: var(--f-display); font-weight: 400; font-size: 1.3rem; line-height: 1.1; }
+.lesson span { font-size: 0.9rem; color: var(--muted); }
+.lesson em { font-style: normal; font-family: var(--f-data); font-size: 0.74rem; color: var(--wash); }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-left: 2px solid var(--line-strong); }
+.timeline li { display: grid; grid-template-columns: 5.2em minmax(0, 1fr); gap: 12px; padding: 7px 0 7px 14px; position: relative; }
+.timeline li::before { content: ""; position: absolute; left: -6px; top: 15px; width: 10px; height: 10px; border-radius: 50%; background: var(--ground); border: 2px solid var(--wash); }
+.timeline b { font-family: var(--f-display); font-weight: 400; font-size: 1.2rem; }
+.timeline p { margin: 0; font-size: 0.95rem; }
+.sources { margin: 0; font-size: 0.86rem; color: var(--muted); max-width: 100ch; }
+
+@media (max-width: 920px) {
+  .table, .two { grid-template-columns: minmax(0, 1fr); }
+  .lessons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 480px) {
+  .lessons { grid-template-columns: minmax(0, 1fr); }
+  .pans { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="watercolour" defer></script>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <p class="eyebrow">Art Studio · England · 1780s to today</p>
+    <h1>Watercolour Washes</h1>
+    <p class="lede">Watercolour is pigment held in gum arabic, thinned with water, and so transparent that the white of the paper does the work of white paint. The water decides as much as the painter: on damp paper colour runs and blooms, on dry paper it stops where the brush stops, and as a puddle dries it carries its pigment to the edge. Paint on the sheet and watch it dry.</p>
+  </header>
+
+  <section class="table" aria-label="The painting table">
+    <div class="board">
+      <canvas id="sheet" width="640" height="480" tabindex="0" aria-label="A sheet of rough watercolour paper. Drag to paint; slow strokes leave more water."></canvas>
+      <div class="tape t"></div><div class="tape b"></div><div class="tape l"></div><div class="tape r"></div>
+      <div class="status" id="status">dry</div>
+    </div>
+    <div class="side">
+      <div class="box">
+        <span>Paint box</span>
+        <div class="pans" id="pans"></div>
+      </div>
+      <div class="box">
+        <span>Brush</span>
+        <div class="row" role="group" aria-label="Tool">
+          <button class="btn tool" type="button" data-t="paint" aria-pressed="true">Paint</button>
+          <button class="btn tool" type="button" data-t="water" aria-pressed="false">Clear water</button>
+          <button class="btn tool" type="button" data-t="lift" aria-pressed="false">Lift with tissue</button>
+          <button class="btn tool" type="button" data-t="salt" aria-pressed="false">Sprinkle salt</button>
+        </div>
+        <div class="row">
+          <label class="slider" for="size"><span>Size <output id="sizeOut" for="size"></output></span><input id="size" type="range" min="2" max="14" value="7"></label>
+          <label class="slider" for="wet"><span>Water in the brush <output id="wetOut" for="wet"></output></span><input id="wet" type="range" min="0.05" max="1" step="0.05" value="0.7"></label>
+          <label class="slider" for="strength"><span>Paint <output id="strengthOut" for="strength"></output></span><input id="strength" type="range" min="0.1" max="1.6" step="0.05" value="0.7"></label>
+        </div>
+        <div class="row">
+          <button class="btn" id="tilt" type="button" aria-pressed="false">Tilt the board</button>
+          <button class="btn" id="dryNow" type="button">Dry it with warm air</button>
+          <button class="btn" id="newSheet" type="button">New sheet</button>
+        </div>
+      </div>
+      <p class="say" id="say" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="text" aria-label="Lessons">
+    <h2>Four lessons</h2>
+    <p>Each lesson starts a fresh sheet and lays down its first strokes for you. Then it is your turn, while the paper is still wet.</p>
+    <div class="lessons">
+      <button class="lesson" type="button" data-l="flat"><b>Flat and graded wash</b><span>A band of colour laid row under row, each catching the bead of the last. The lower half gets more water each row, so it fades.</span><em>try: tilt the board</em></button>
+      <button class="lesson" type="button" data-l="wetwet"><b>Wet on wet</b><span>The sky is wetted with clear water first. Touch colour into it and watch it spread and soften.</span><em>try: drop rose into the blue</em></button>
+      <button class="lesson" type="button" data-l="glaze"><b>Glazing</b><span>Yellow is laid and dried. Paint blue across it: the transparent layers mix into green on the paper.</span><em>try: a third glaze of rose</em></button>
+      <button class="lesson" type="button" data-l="salt"><b>Lifting and salt</b><span>A dark, wet sky. Lift clouds out with the tissue, or sprinkle salt for snowy blooms.</span><em>try: salt before it dries</em></button>
+    </div>
+  </section>
+
+  <section class="two" aria-label="Techniques and paints">
+    <div class="text">
+      <h2>What the water does</h2>
+      <p>In a wash, diluted pigment is spread evenly across the paper, flat or graded from dark to light. Wet on wet, colour put onto damp paper spreads and blends softly; wet on dry, it keeps sharp edges. Because the paint is transparent, a glaze over dry colour lets the layer beneath show through, so blue over yellow reads as green.</p>
+      <p>Lifting takes pigment back off with a brush, sponge or cloth, though staining colours resist it. Salt sprinkled on a wash that is wet, but not too wet, soaks up water and pushes the pigment away, leaving pale blooms. Some pigments, ultramarine above all, have heavy grains that settle into the hollows of rough paper and leave a speckled texture called granulation.</p>
+    </div>
+    <div class="text">
+      <h2>The paint box</h2>
+      <p>Until the late 1700s painters ground their own colours or bought hard, resinous blocks that had to be laboriously rubbed out in water. Around 1781 William and Thomas Reeves won the Society of Arts’ silver palette for a moist paint-cake that dissolved at the touch of a wet brush. Since the 19th century the binder has been gum arabic, with glycerin or honey added so the paint stays soluble.</p>
+      <p>The English made watercolour an art of its own. Paul Sandby is called the father of English watercolour, Thomas Girtin painted large romantic landscapes, and J. M. W. Turner took the medium to its height.</p>
+    </div>
+  </section>
+
+  <section class="two" aria-label="History">
+    <div class="text">
+      <h2>Older than any other paint</h2>
+      <p>In its simplest form, earth and water, watercolour is as old as the cave paintings of the Upper Palaeolithic. Monks used it to brighten manuscripts. Albrecht Dürer painted his <i>Young Hare</i> in watercolour and bodycolour in 1502, but for centuries most painters kept it for sketches until the English school made it a medium for finished pictures.</p>
+    </div>
+    <ol class="timeline">
+      <li><b>Palaeolithic</b><p>Red earth mixed with water, painted on cave walls.</p></li>
+      <li><b>1502</b><p>Dürer’s <i>Young Hare</i>.</p></li>
+      <li><b>1781</b><p>The Reeves brothers’ moist paint-cake.</p></li>
+      <li><b>1798</b><p>Thomas Girtin paints <i>Jedburgh Abbey from the River</i>.</p></li>
+      <li><b>1804</b><p>The Society of Painters in Water Colours is founded, now the Royal Watercolour Society.</p></li>
+      <li><b>1832</b><p>The New Water Colour Society follows.</p></li>
+    </ol>
+  </section>
+
+  <p class="sources">Sources: Wikipedia, <a href="https://en.wikipedia.org/wiki/Watercolor_painting" target="_blank" rel="noopener">Watercolor painting</a> (gum arabic and its additives, transparency and the white of the paper, washes, wet on wet and wet on dry, glazing, dry brush, lifting and staining, salt, the Reeves paint-cake of 1781, Sandby, Girtin and Turner, the societies of 1804 and 1832, cave paintings, manuscripts, Dürer’s <i>Young Hare</i>); Winsor &amp; Newton, <a href="https://www.winsornewton.com/uk/discover/tips-and-techniques/for-water-colour/professional-water-colour-techniques-three-contributors-to-granulation" target="_blank" rel="noopener">Three contributors to granulation</a> (heavy pigment settling into the hollows of rough paper). The painting is a simple simulation of water, floating pigment and settled pigment on a coarse grid; colours mix as transparent layers.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  function rng(seed) { let s = seed >>> 0; return () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  const W = 640, H = 480, GW = 160, GH = 120, GN = GW * GH, CELL = W / GW;
+  const PAPER = [246, 242, 232];
+
+  // ---------- Pigments: how strongly each absorbs red, green and blue light ----------
+  const ab = (r, g, b) => [-Math.log(r / 255), -Math.log(g / 255), -Math.log(b / 255)];
+  const PIGMENTS = [
+    { name: 'Gamboge', note: 'warm yellow', a: ab(228, 172, 30), gran: 0, stain: 0.3, swatch: '#e4ac1e' },
+    { name: 'Rose madder', note: 'soft rose', a: ab(206, 82, 118), gran: 0, stain: 0.4, swatch: '#ce5276' },
+    { name: 'Burnt sienna', note: 'earth, granulates a little', a: ab(158, 76, 44), gran: 0.45, stain: 0.2, swatch: '#9e4c2c' },
+    { name: 'Ultramarine', note: 'granulates', a: ab(52, 70, 168), gran: 1, stain: 0.2, swatch: '#3446a8' },
+    { name: 'Prussian blue', note: 'staining', a: ab(26, 66, 104), gran: 0, stain: 0.9, swatch: '#1a4268' },
+    { name: 'Sepia', note: 'brown-black', a: ab(78, 62, 50), gran: 0.2, stain: 0.5, swatch: '#4e3e32' }
+  ];
+
+  // ---------- The sheet: water, floating pigment, settled pigment ----------
+  const w = new Float32Array(GN);
+  const S = [new Float32Array(GN), new Float32Array(GN), new Float32Array(GN)], Sg = new Float32Array(GN);
+  const D = [new Float32Array(GN), new Float32Array(GN), new Float32Array(GN)], Dg = new Float32Array(GN);
+  const salt = new Float32Array(GN);
+  const dw = new Float32Array(GN), dS = [new Float32Array(GN), new Float32Array(GN), new Float32Array(GN)], dSg = new Float32Array(GN);
+  let tilt = false;
+
+  // the paper's tooth, at full resolution, for texture and granulation
+  const tooth = new Float32Array(W * H);
+  {
+    const r = rng(42), grid = (n) => { const g = new Float32Array((n + 1) * (n + 1)); for (let i = 0; i < g.length; i++) g[i] = r(); return g; };
+    const oct = [[24, 0.5, grid(24)], [64, 0.3, grid(64)], [160, 0.2, grid(160)]];
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      let v = 0;
+      for (const [n, amp, g] of oct) {
+        const gx = x / W * n, gy = y / H * n, x0 = Math.floor(gx), y0 = Math.floor(gy), fx = gx - x0, fy = gy - y0, s = n + 1;
+        const a = g[y0 * s + x0], b = g[y0 * s + x0 + 1], c = g[(y0 + 1) * s + x0], d = g[(y0 + 1) * s + x0 + 1];
+        v += amp * ((a * (1 - fx) + b * fx) * (1 - fy) + (c * (1 - fx) + d * fx) * fy);
+      }
+      tooth[y * W + x] = v;
+    }
+  }
+  // the coarse tooth, for the dry brush
+  const toothG = new Float32Array(GN);
+  for (let gy = 0; gy < GH; gy++) for (let gx = 0; gx < GW; gx++) toothG[gy * GW + gx] = tooth[(gy * CELL + 2) * W + gx * CELL + 2];
+
+  const WET = 0.025;
+  function step() {
+    dw.fill(0); dSg.fill(0); dS.forEach((a) => a.fill(0));
+    let active = false;
+    for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) {
+      const i = y * GW + x, wi = w[i];
+      if (wi > 0.0008 || S[0][i] + S[1][i] + S[2][i] > 1e-5) active = true;
+      // flow to the right and down neighbours (each pair once)
+      for (let k = 0; k < 2; k++) {
+        const nx = x + (k === 0 ? 1 : 0), ny = y + (k === 1 ? 1 : 0);
+        if (nx >= GW || ny >= GH) continue;
+        const j = ny * GW + nx, wj = w[j];
+        const lo = Math.min(wi, wj), hi = Math.max(wi, wj);
+        if (hi < 0.002) continue;
+        // water spreads only through damp paper; a deep puddle creeps slowly onto dry paper
+        let rate = lo > WET ? 0.2 : hi > 0.85 ? 0.03 : 0;
+        if (!rate) continue;
+        let f = rate * (wi - wj);
+        if (tilt && k === 1 && lo > WET) f += 0.05 * lo;             // the board is tilted: water runs down
+        if (salt[i] > 0 || salt[j] > 0) f += 0.12 * (salt[j] - salt[i]) * lo; // salt pulls water toward itself
+        f = clamp(f, -wj * 0.24, wi * 0.24);
+        if (Math.abs(f) < 1e-6) continue;
+        dw[i] -= f; dw[j] += f;
+        // the moving water carries its pigment with it
+        const src = f > 0 ? i : j, dst = f > 0 ? j : i, frac = Math.abs(f) / Math.max(w[src], 1e-4);
+        for (let c = 0; c < 3; c++) { const m = S[c][src] * frac; dS[c][src] -= m; dS[c][dst] += m; }
+        const mg = Sg[src] * frac; dSg[src] -= mg; dSg[dst] += mg;
+        // and in wet paper the colour also diffuses gently
+        if (lo > 0.05) {
+          const kd = 0.17 * Math.min(1, lo / 0.4);
+          for (let c = 0; c < 3; c++) { const m = kd * (S[c][i] - S[c][j]); dS[c][i] -= m; dS[c][j] += m; }
+          const mg2 = kd * (Sg[i] - Sg[j]); dSg[i] -= mg2; dSg[j] += mg2;
+        }
+      }
+    }
+    if (!active) return false;
+    for (let i = 0; i < GN; i++) {
+      w[i] = Math.max(0, w[i] + dw[i]);
+      for (let c = 0; c < 3; c++) S[c][i] = Math.max(0, S[c][i] + dS[c][i]);
+      Sg[i] = Math.max(0, Sg[i] + dSg[i]);
+    }
+    for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) {
+      const i = y * GW + x;
+      if (w[i] <= 0 && !(S[0][i] + S[1][i] + S[2][i])) continue;
+      // edges dry first, so the water still in the middle keeps flowing outward to them
+      let dryN = 0;
+      if (x === 0 || w[i - 1] < WET) dryN++; if (x === GW - 1 || w[i + 1] < WET) dryN++;
+      if (y === 0 || w[i - GW] < WET) dryN++; if (y === GH - 1 || w[i + GW] < WET) dryN++;
+      const ev = 0.0042 * (1 + dryN * 0.6) + (salt[i] > 0 ? 0.02 * salt[i] : 0);
+      w[i] = Math.max(0, w[i] - ev);
+      if (salt[i] > 0) salt[i] = Math.max(0, salt[i] - 0.004);
+      // pigment settles as the water thins; all of it once the paper is dry
+      const rate = w[i] < 0.004 ? 1 : 0.012 + 0.25 * Math.max(0, 1 - w[i] / 0.3);
+      for (let c = 0; c < 3; c++) { const m = S[c][i] * rate; S[c][i] -= m; D[c][i] += m; }
+      const mg = Sg[i] * rate; Sg[i] -= mg; Dg[i] += mg;
+    }
+    return true;
+  }
+
+  // ---------- Painting ----------
+  let pig = 3, tool = 'paint', size = 7, wet = 0.7, strength = 0.7;
+  function stamp(gx, gy, kind, amount) {
+    const r = size, r2 = r * r, P = PIGMENTS[pig];
+    const rr = rng(((gx * 73) | 0) + ((gy * 151) | 0));
+    for (let y = Math.max(0, Math.floor(gy - r)); y <= Math.min(GH - 1, Math.ceil(gy + r)); y++) {
+      for (let x = Math.max(0, Math.floor(gx - r)); x <= Math.min(GW - 1, Math.ceil(gx + r)); x++) {
+        const d2 = (x - gx) * (x - gx) + (y - gy) * (y - gy);
+        if (d2 > r2) continue;
+        const i = y * GW + x, fall = 1 - Math.sqrt(d2) / r;
+        const soft = Math.min(1, fall * 2.2) * amount;
+        if (kind === 'paint' || kind === 'water') {
+          const water = kind === 'water' ? Math.max(0.5, wet) : wet;
+          // a nearly dry brush only touches the tops of the paper's tooth
+          if (water < 0.3 && toothG[i] < 0.46 - water * 0.5 + rr() * 0.14) continue;
+          const add = water * 0.55 * soft;
+          // fresh water loosens a little of the colour already on the paper
+          if (add > 0.02) for (let c = 0; c < 3; c++) { const m = D[c][i] * 0.025 * soft; D[c][i] -= m; S[c][i] += m; }
+          w[i] = Math.min(1.4, w[i] + add);
+          if (kind === 'paint') {
+            const p = strength * soft * (0.25 + 0.75 * water) * 0.32;
+            for (let c = 0; c < 3; c++) S[c][i] += P.a[c] * p;
+            Sg[i] += P.gran * (P.a[0] + P.a[1] + P.a[2]) * p;
+          }
+        } else if (kind === 'lift') {
+          // a tissue soaks up water and the colour floating in it, and a little of what has settled
+          const k = 0.55 * soft;
+          w[i] *= 1 - k;
+          for (let c = 0; c < 3; c++) { S[c][i] *= 1 - k; D[c][i] *= 1 - 0.18 * soft * (1 - PIGMENTS[pig].stain * 0.5); }
+          Sg[i] *= 1 - k; Dg[i] *= 1 - 0.18 * soft;
+        }
+      }
+    }
+    if (kind === 'salt') {
+      for (let n = 0; n < 9; n++) {
+        const sx = Math.round(gx + (rr() - 0.5) * r * 2), sy = Math.round(gy + (rr() - 0.5) * r * 2);
+        if (sx < 0 || sy < 0 || sx >= GW || sy >= GH) continue;
+        const i = sy * GW + sx;
+        // salt only works on a wash that is wet but not swimming
+        if (w[i] > 0.05 && w[i] < 0.9) salt[i] = 1;
+      }
+    }
+    dryImage = null;
+    wake();
+  }
+
+  // ---------- Rendering ----------
+  const sheet = $('#sheet'), ctx = sheet.getContext('2d');
+  const low = document.createElement('canvas'); low.width = GW; low.height = GH;
+  const lctx = low.getContext('2d'), limg = lctx.createImageData(GW, GH);
+  const paperC = document.createElement('canvas'); paperC.width = W; paperC.height = H;
+  {
+    const g = paperC.getContext('2d'), im = g.createImageData(W, H);
+    for (let i = 0; i < W * H; i++) { const t = 0.9 + 0.1 * tooth[i]; im.data[i * 4] = 255 * t; im.data[i * 4 + 1] = 255 * t; im.data[i * 4 + 2] = 252 * t; im.data[i * 4 + 3] = 255; }
+    g.putImageData(im, 0, 0);
+  }
+  let cursor = null;
+  function renderWet() {
+    const d = limg.data;
+    for (let i = 0; i < GN; i++) {
+      const wi = Math.min(1, w[i]), sheen = 0.07 * wi;
+      for (let c = 0; c < 3; c++) {
+        const A = D[c][i] + S[c][i];
+        const v = PAPER[c] * Math.exp(-A);
+        d[i * 4 + c] = v + (255 - v) * sheen;
+      }
+      d[i * 4 + 3] = 255;
+    }
+    lctx.putImageData(limg, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.drawImage(low, 0, 0, W, H);
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.drawImage(paperC, 0, 0);
+    ctx.globalCompositeOperation = 'source-over';
+    drawCursor();
+  }
+  // once dry, paint the sheet at full resolution, letting heavy pigment settle into the hollows
+  const full = ctx.createImageData(W, H);
+  function renderDry() {
+    const d = full.data;
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        // nudge where each pixel samples the coarse grid by the paper's own texture,
+        // so dried edges come out ragged like real ones instead of stair-stepped
+        const k0 = y * W + x;
+        const wx = (tooth[k0] - 0.5) * 7, wy = (tooth[(H - 1 - y) * W + (W - 1 - x)] - 0.5) * 7;
+        const gy = clamp((y + wy) / CELL - 0.5, 0, GH - 1), y0 = gy | 0, y1 = Math.min(GH - 1, y0 + 1), fy = gy - y0;
+        const gx = clamp((x + wx) / CELL - 0.5, 0, GW - 1), x0 = gx | 0, x1 = Math.min(GW - 1, x0 + 1), fx = gx - x0;
+        const a = y0 * GW + x0, b = y0 * GW + x1, c2 = y1 * GW + x0, e = y1 * GW + x1;
+        const bl = (arr) => (arr[a] * (1 - fx) + arr[b] * fx) * (1 - fy) + (arr[c2] * (1 - fx) + arr[e] * fx) * fy;
+        const k = y * W + x, t = tooth[k];
+        const sum = bl(D[0]) + bl(D[1]) + bl(D[2]), g = sum > 0.001 ? bl(Dg) / sum : 0;
+        const grain = 1 + Math.min(1, g) * 1.3 * (0.5 - t);   // hollows (low tooth) collect more
+        for (let ch = 0; ch < 3; ch++) {
+          const A = bl(D[ch]) * Math.max(0.2, grain);
+          d[k * 4 + ch] = PAPER[ch] * Math.exp(-A) * (0.9 + 0.1 * t);
+        }
+        d[k * 4 + 3] = 255;
+      }
+    }
+    ctx.putImageData(full, 0, 0);
+    dryImage = full;
+    drawCursor();
+  }
+  let dryImage = null;
+  function drawCursor() {
+    if (!cursor) return;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(30, 30, 30, 0.55)'; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.arc(cursor.x, cursor.y, size * CELL, 0, 7); ctx.stroke();
+    ctx.restore();
+  }
+
+  // ---------- Animation: only while the paper is wet ----------
+  let raf = 0, wetNow = false, lastFrame = 0;
+  function wake() { if (!raf) { raf = requestAnimationFrame(frame); } }
+  function frame(now) {
+    raf = 0;
+    // about 30 steps of the simulation a second, catching up a little if a frame was slow
+    const steps = lastFrame ? clamp(Math.round((now - lastFrame) / 33), 1, 3) : 1;
+    lastFrame = now;
+    let active = false;
+    for (let s = 0; s < steps; s++) active = step() || active;
+    if (active) {
+      wetNow = true; dryImage = null;
+      renderWet(); updateStatus();
+      raf = requestAnimationFrame(frame);
+    } else {
+      lastFrame = 0;
+      if (wetNow || !dryImage) { wetNow = false; renderDry(); updateStatus(); }
+    }
+  }
+  function updateStatus() {
+    let n = 0; for (let i = 0; i < GN; i++) if (w[i] > WET) n++;
+    $('#status').textContent = n ? `wet: ${Math.round(100 * n / GN)}% of the sheet` : 'dry';
+  }
+
+  // ---------- Pointer ----------
+  function toGrid(e) { const r = sheet.getBoundingClientRect(); const x = (e.clientX - r.left) * W / r.width, y = (e.clientY - r.top) * H / r.height; return { x, y, gx: x / CELL, gy: y / CELL }; }
+  let painting = null;
+  sheet.addEventListener('pointerdown', (e) => {
+    sheet.setPointerCapture(e.pointerId);
+    const p = toGrid(e);
+    painting = { gx: p.gx, gy: p.gy, t: performance.now() };
+    stamp(p.gx, p.gy, tool, 1);
+  });
+  sheet.addEventListener('pointermove', (e) => {
+    const p = toGrid(e);
+    cursor = { x: p.x, y: p.y };
+    if (painting) {
+      const dist = Math.hypot(p.gx - painting.gx, p.gy - painting.gy), now = performance.now();
+      // slow strokes leave more water and paint than quick ones
+      const speed = dist / Math.max(1, now - painting.t);
+      const amt = clamp(0.9 - speed * 3, 0.25, 0.9);
+      const n = Math.max(1, Math.ceil(dist / Math.max(1, size * 0.45)));
+      if (tool !== 'salt' || dist > size) {
+        for (let k = 1; k <= n; k++) stamp(painting.gx + (p.gx - painting.gx) * k / n, painting.gy + (p.gy - painting.gy) * k / n, tool, amt / Math.sqrt(n) * 1.2);
+        painting.gx = p.gx; painting.gy = p.gy; painting.t = now;
+      }
+    } else if (!raf) {
+      // just moving the brush over dry paper: redraw the dry sheet and the brush ring
+      if (dryImage) { ctx.putImageData(dryImage, 0, 0); drawCursor(); }
+    }
+  });
+  ['pointerup', 'pointercancel'].forEach((t) => sheet.addEventListener(t, () => { painting = null; }));
+  sheet.addEventListener('pointerleave', () => { cursor = null; if (!raf && dryImage) ctx.putImageData(dryImage, 0, 0); });
+
+  // ---------- Controls ----------
+  const say = (t, cls) => { const s = $('#say'); s.textContent = t; s.className = 'say' + (cls ? ' ' + cls : ''); };
+  const pans = $('#pans');
+  PIGMENTS.forEach((P, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'pan';
+    b.innerHTML = `<i style="background:${P.swatch}"></i>${P.name}<small>${P.note}</small>`;
+    b.setAttribute('aria-pressed', String(i === pig));
+    b.addEventListener('click', () => { pig = i; $$('.pan').forEach((x, j) => x.setAttribute('aria-pressed', String(j === i))); if (tool !== 'paint') setTool('paint'); });
+    pans.appendChild(b);
+  });
+  function setTool(t) {
+    tool = t; $$('.tool').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.t === t)));
+    say({ paint: 'Painting. Slow strokes leave more water; a nearly dry brush catches only the tops of the paper.', water: 'Clear water. Wet an area first and colour touched into it will spread: wet on wet.', lift: 'Tissue. Blot a wet wash to lift the colour out, for clouds or highlights. Staining colours like Prussian blue lift less.', salt: 'Salt. Sprinkle it on a wash that is wet but not swimming, then let it dry.' }[t]);
+  }
+  $$('.tool').forEach((b) => b.addEventListener('click', () => setTool(b.dataset.t)));
+  const sliders = [['size', (v) => { size = v; return v <= 4 ? 'fine' : v <= 9 ? 'medium' : 'broad'; }], ['wet', (v) => { wet = v; return v < 0.3 ? 'dry brush' : v < 0.65 ? 'damp' : 'loaded'; }], ['strength', (v) => { strength = v; return v < 0.45 ? 'pale' : v < 1 ? 'medium' : 'strong'; }]];
+  sliders.forEach(([id, f]) => { const el = $('#' + id), out = $('#' + id + 'Out'); const upd = () => { out.textContent = f(+el.value); }; el.addEventListener('input', upd); upd(); });
+  $('#tilt').addEventListener('click', (e) => { tilt = !tilt; e.currentTarget.setAttribute('aria-pressed', String(tilt)); say(tilt ? 'The board is tilted. Wet paint creeps downhill and gathers in a bead along the bottom of each stroke.' : 'The board is flat again.'); wake(); });
+  function clearSheet() { w.fill(0); Sg.fill(0); Dg.fill(0); salt.fill(0); S.forEach((a) => a.fill(0)); D.forEach((a) => a.fill(0)); dryImage = null; }
+  $('#newSheet').addEventListener('click', () => { clearSheet(); wetNow = true; wake(); say('A clean sheet of rough paper, taped down so it dries flat.'); });
+  $('#dryNow').addEventListener('click', () => { let n = 0; while (step() && n < 3000) n++; wetNow = true; wake(); say('Dried. The colour that was floating has settled where the water left it.'); });
+
+  // ---------- Lessons ----------
+  function strokeLine(x0, y0, x1, y1, kind, amt) {
+    const n = Math.ceil(Math.hypot(x1 - x0, y1 - y0) / Math.max(1, size * 0.45));
+    for (let k = 0; k <= n; k++) stamp(x0 + (x1 - x0) * k / n, y0 + (y1 - y0) * k / n, kind, amt);
+  }
+  function settle(n) { for (let k = 0; k < n; k++) if (!step()) break; }
+  function withBrush(o, f) { const keep = { pig, size, wet, strength }; pig = o.pig ?? pig; size = o.size ?? size; wet = o.wet ?? wet; strength = o.strength ?? strength; f(); pig = keep.pig; size = keep.size; wet = keep.wet; strength = keep.strength; }
+  const LESSONS = {
+    flat() {
+      withBrush({ pig: 3, size: 6, wet: 0.85, strength: 0.75 }, () => { for (let r = 0; r < 6; r++) strokeLine(14, 14 + r * 5, 146, 14 + r * 5, 'paint', 0.9); });
+      withBrush({ pig: 3, size: 6, wet: 0.95 }, () => { for (let r = 0; r < 7; r++) { strength = 0.75 * (1 - r / 7); strokeLine(14, 66 + r * 6, 146, 66 + r * 6, 'paint', 0.9); } });
+      say('A flat wash above and a graded wash below, still wet. Tilt the board to help the bead run down evenly, or add another row at the bottom.');
+    },
+    wetwet() {
+      withBrush({ size: 12, wet: 1 }, () => { for (let r = 0; r < 8; r++) strokeLine(8, 8 + r * 8, 152, 8 + r * 8, 'water', 1); });
+      settle(10);
+      withBrush({ pig: 3, size: 7, wet: 0.8, strength: 0.9 }, () => { strokeLine(20, 14, 140, 18, 'paint', 1); strokeLine(30, 30, 110, 26, 'paint', 0.8); });
+      withBrush({ pig: 0, size: 6, wet: 0.8, strength: 0.6 }, () => { strokeLine(30, 54, 130, 58, 'paint', 0.9); });
+      withBrush({ pig: 5, size: 4, wet: 0.5, strength: 1.2 }, () => { strokeLine(6, 96, 154, 92, 'paint', 1); });
+      say('The sky was wetted first, then blue and yellow were touched in: watch them soften and run together. The dark land below was painted while the paper there was still dry, so it keeps its edge.');
+    },
+    glaze() {
+      withBrush({ pig: 0, size: 9, wet: 0.7, strength: 0.8 }, () => { for (let r = 0; r < 5; r++) strokeLine(20, 30 + r * 9, 90, 30 + r * 9, 'paint', 0.9); });
+      settle(3000);
+      say('The yellow is dry. Choose ultramarine or Prussian blue and paint across it: where the layers overlap you get green.');
+      pig = 4; $$('.pan').forEach((x, j) => x.setAttribute('aria-pressed', String(j === 4)));
+    },
+    salt() {
+      withBrush({ pig: 4, size: 12, wet: 0.95, strength: 1.1 }, () => { for (let r = 0; r < 9; r++) strokeLine(8, 8 + r * 9, 152, 8 + r * 9, 'paint', 1); });
+      settle(25);
+      setTool('lift');
+      say('A wet Prussian-blue sky. Blot clouds out with the tissue now, or switch to salt and sprinkle it while the wash is still damp. Prussian blue stains, so the lifted clouds stay faintly blue.');
+    }
+  };
+  $$('.lesson').forEach((b) => b.addEventListener('click', () => {
+    clearSheet(); tilt = false; $('#tilt').setAttribute('aria-pressed', 'false');
+    if (b.dataset.l !== 'salt') setTool('paint');
+    LESSONS[b.dataset.l]();
+    wetNow = true; wake();
+    $('#sheet').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }));
+
+  // ---------- Opening: a small finished painting, dried ----------
+  (function opening() {
+    withBrush({ size: 13, wet: 1 }, () => { for (let r = 0; r < 9; r++) strokeLine(6, 6 + r * 8, 154, 6 + r * 8, 'water', 1); });
+    settle(6);
+    withBrush({ pig: 0, size: 9, wet: 0.8, strength: 0.7 }, () => { strokeLine(10, 62, 150, 60, 'paint', 1); strokeLine(20, 52, 140, 50, 'paint', 0.7); });
+    withBrush({ pig: 1, size: 8, wet: 0.8, strength: 0.5 }, () => { strokeLine(30, 44, 130, 40, 'paint', 0.8); });
+    withBrush({ pig: 3, size: 10, wet: 0.85, strength: 0.95 }, () => { strokeLine(8, 10, 152, 12, 'paint', 1); strokeLine(14, 24, 120, 22, 'paint', 0.7); });
+    settle(3000);
+    // a hill: rows that shorten smoothly toward the top, so its edge slopes
+    withBrush({ pig: 2, size: 5, wet: 0.6, strength: 0.42 }, () => { for (let r = 0; r < 12; r++) { const y = 74 + r * 2, x1 = 64 + r * 3.2 + Math.sin(r * 0.9) * 3; strokeLine(4, y + 2, x1, y - 1, 'paint', 0.9); } });
+    withBrush({ pig: 5, size: 5, wet: 0.5, strength: 0.5 }, () => { for (let r = 0; r < 14; r++) { const y = 88 + r * 2, x0 = 96 - r * 3 + Math.sin(r * 1.3) * 2; strokeLine(x0, y + 1, 156, y - 3, 'paint', 1); } });
+    withBrush({ pig: 4, size: 4, wet: 0.2, strength: 1.2 }, () => { strokeLine(10, 112, 150, 110, 'paint', 1); });
+    settle(3000);
+    wetNow = true; wake();
+    setTool('paint');
+    say('A small landscape: a wet-on-wet sunset sky, then hills and a dry-brush shore painted once it had dried. Ultramarine is selected. Paint on it, or start a lesson below.');
+  })();
+})();
+</script>
+</body>
+</html>

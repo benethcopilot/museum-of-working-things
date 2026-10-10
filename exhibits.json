@@ -115,6 +115,11 @@
       "try": "Keep dipping until it reaches kon"
     },
     {
+      "slug": "watercolour", "hall": "studio", "title": "Watercolour Washes", "ages": "7 and up",
+      "blurb": "Paint on rough paper with six transparent pigments and watch the water spread, bloom and dry, from flat washes and wet-on-wet skies to glazes, lifted clouds and salt.",
+      "try": "Sprinkle salt on a wet sky"
+    },
+    {
       "slug": "mendeleev", "hall": "numbers", "title": "Mendeleev’s Table", "ages": "10 and up",
       "blurb": "Deal the elements onto Mendeleev’s 1871 table, leave gaps where nothing fits, and predict the elements nobody had found yet.",
       "try": "Decide where tellurium goes"
