@@ -110,6 +110,11 @@
       "try": "Change the season and watch the water move"
     },
     {
+      "slug": "shibori", "hall": "studio", "title": "Shibori Indigo", "ages": "7 and up",
+      "blurb": "Fold and clamp, bind, wrap or stitch a cloth, dip it in the indigo vat, watch it turn from yellow-green to blue in the air, then untie it to find the pattern.",
+      "try": "Keep dipping until it reaches kon"
+    },
+    {
       "slug": "mendeleev", "hall": "numbers", "title": "Mendeleev’s Table", "ages": "10 and up",
       "blurb": "Deal the elements onto Mendeleev’s 1871 table, leave gaps where nothing fits, and predict the elements nobody had found yet.",
       "try": "Decide where tellurium goes"
