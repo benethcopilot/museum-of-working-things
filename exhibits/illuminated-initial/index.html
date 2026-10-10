@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Illuminated Initial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Grenze:wght@600;800&family=Uncial+Antiqua&family=UnifrakturMaguntia&display=swap">
+<style>
+:root {
+  /* Layout: a vellum leaf with the initial set into the Psalm text on the left, the illuminator's bench of tools in working order on the right; then the twelve steps, the colours and the gold. */
+  --ground: #e8e4dc;
+  --card: #f5f2ec;
+  --ink: #221b14;
+  --muted: #5f564b;
+  --line: rgba(34, 27, 20, 0.14);
+  --rubric: #a3271b;
+  --blue: #27449c;
+  --f-display: "Grenze", "Palatino Linotype", Georgia, serif;
+  --f-body: "EB Garamond", Garamond, Georgia, serif;
+  --f-data: "Courier Prime", "Courier New", monospace;
+  /* the vellum leaf is the object and keeps its colours in both themes */
+  --vellum: #f0e4cc;
+  --vellum-ink: #2a1d12;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #15120f;
+    --card: #1d1a16;
+    --ink: #ece6dc;
+    --muted: #ab9f90;
+    --line: rgba(236, 230, 220, 0.13);
+    --rubric: #f08a7c;
+    --blue: #9db3f0;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #15120f;
+  --card: #1d1a16;
+  --ink: #ece6dc;
+  --muted: #ab9f90;
+  --line: rgba(236, 230, 220, 0.13);
+  --rubric: #f08a7c;
+  --blue: #9db3f0;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--f-body); font-size: 19px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+button, select, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid #d7a630; outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 800; line-height: 1.05; margin: 0; text-wrap: balance; }
+a { color: var(--rubric); }
+
+.page { box-sizing: border-box; max-width: 1200px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 48px; }
+.masthead { display: grid; gap: 10px; }
+.eyebrow { margin: 0; font-family: var(--f-data); font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.masthead h1 { font-size: clamp(2.8rem, 8vw, 5.2rem); }
+.masthead h1 span { color: var(--rubric); }
+.lede { margin: 0; max-width: 64ch; color: var(--muted); }
+h2 { font-size: clamp(1.8rem, 3.6vw, 2.5rem); }
+.text { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.text p { margin: 0; max-width: 64ch; }
+
+/* ---------- Bench ---------- */
+.bench { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 30px; align-items: start; }
+.leaf { position: relative; box-sizing: border-box; padding: clamp(18px, 4vw, 40px); background: var(--vellum); color: var(--vellum-ink); border-radius: 2px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22), inset 0 0 60px rgba(150, 110, 60, 0.18); min-width: 0; }
+.initial { position: relative; float: left; width: 64%; margin: 0 16px 6px 0; }
+#ini { display: block; width: 100%; height: auto; touch-action: none; cursor: crosshair; }
+.breath { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at 50% 55%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 65%); opacity: 0; transition: opacity 6s linear; }
+.breath.on { opacity: 1; transition: none; }
+.psalm { margin: 0; font-family: "UnifrakturMaguntia", "Old English Text MT", serif; font-size: clamp(1.1rem, 2.2vw, 1.45rem); line-height: 1.5; }
+.psalm .caps { letter-spacing: 0.04em; }
+.psalm .para { color: #a3271b; }
+.ruled { display: grid; gap: 1.45em; padding-top: 0.6em; }
+.ruled i { display: block; height: 1px; background: rgba(120, 80, 40, 0.28); }
+.leafnote { clear: both; margin: 14px 0 0; padding-top: 8px; font-size: 0.86rem; color: #6a5843; border-top: 1px solid rgba(120, 80, 40, 0.25); font-style: italic; }
+
+.tools { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.tray { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; background: var(--card); border: 1px solid var(--line); border-radius: 3px; }
+.tray > span { font-family: var(--f-data); font-size: 0.76rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.btn { padding: 5px 11px; border-radius: 3px; border: 1.5px solid var(--line); background: none; font-size: 0.95rem; }
+.btn:hover { border-color: var(--ink); }
+.btn[aria-pressed="true"] { border-color: var(--ink); background: color-mix(in srgb, var(--ink) 10%, transparent); }
+.btn.main { background: var(--ink); color: var(--ground); border-color: var(--ink); font-weight: 600; }
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.step { display: flex; flex-direction: column; align-items: flex-start; gap: 0; text-align: left; padding: 6px 9px; }
+.step em { font-style: normal; font-family: var(--f-display); font-size: 0.9rem; color: var(--rubric); }
+.pots { display: flex; flex-wrap: wrap; gap: 6px; }
+.pot { display: inline-flex; align-items: center; gap: 6px; }
+.pot i { width: 18px; height: 18px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3); }
+.tilt { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center; font-size: 0.95rem; }
+.tilt input { width: 100%; accent-color: #b8860b; }
+.hint { margin: 0; font-size: 0.97rem; }
+.note { margin: 0; padding: 10px 12px; border-left: 3px solid #c8962a; background: var(--card); font-size: 0.97rem; }
+.tally { margin: 0; font-family: var(--f-data); font-size: 0.84rem; color: var(--muted); }
+select { padding: 4px 6px; border-radius: 3px; border: 1.5px solid var(--line); background: var(--card); }
+
+/* ---------- Below ---------- */
+.twelve { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; counter-reset: s; }
+.twelve li { padding: 8px 10px; background: var(--card); border: 1px solid var(--line); border-radius: 3px; font-size: 0.95rem; counter-increment: s; }
+.twelve li::before { content: counter(s, upper-roman) " "; font-family: var(--f-display); color: var(--rubric); }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 36px; align-items: start; }
+.colours { display: grid; gap: 6px; }
+.colours div { display: grid; grid-template-columns: 26px 1fr; gap: 10px; align-items: start; padding: 8px 10px; background: var(--card); border: 1px solid var(--line); border-radius: 3px; }
+.colours i { width: 26px; height: 26px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3); }
+.colours p { margin: 0; font-size: 0.95rem; }
+.quote { margin: 0; padding: 12px 16px; border-left: 3px solid var(--rubric); background: var(--card); font-style: italic; }
+.quote cite { display: block; margin-top: 6px; font-style: normal; font-size: 0.86rem; color: var(--muted); }
+.sources { margin: 0; font-size: 0.88rem; color: var(--muted); max-width: 100ch; }
+
+@media (max-width: 940px) {
+  .bench, .two { grid-template-columns: minmax(0, 1fr); }
+  .twelve { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 480px) { .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } .initial { width: 70%; } }
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="illuminated-initial" defer></script>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <p class="eyebrow">Art Studio · Medieval Europe · 12th to 15th century</p>
+    <h1>Illuminated <span>Initial</span></h1>
+    <p class="lede">Strictly speaking, a manuscript is only “illuminated” if it holds metal, usually gold. Raise the letter in gesso, breathe on it, lay the gold leaf and burnish it until it flashes, then paint the ground in lapis blue and vermilion, in the order the illuminators worked.</p>
+  </header>
+
+  <section class="bench" aria-label="Illuminate the initial">
+    <div class="leaf">
+      <div class="initial">
+        <canvas id="ini" width="600" height="600" aria-label="A large initial letter on vellum, drawn in ink and waiting to be gilded and painted."></canvas>
+        <div class="breath" id="breath"></div>
+      </div>
+      <p class="psalm" id="psalm"><span class="caps">EATUS VIR</span> qui non abiit in consilio impiorum, et in via peccatorum non stetit, et in cathedra pestilentiæ non sedit: <span class="para">¶</span> sed in lege Domini voluntas ejus, et in lege ejus meditabitur die ac nocte.</p>
+      <div class="ruled" id="ruled" hidden><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <p class="leafnote" id="leafnote">Psalm 1, “Blessed is the man…”. Psalters gave this B, the Beatus initial, their richest decoration.</p>
+    </div>
+    <div class="tools">
+      <div class="tray">
+        <span>The work, in order</span>
+        <div class="steps" role="group" aria-label="Tool">
+          <button class="btn step" type="button" data-t="gesso" aria-pressed="true"><em>IV</em>Gesso</button>
+          <button class="btn step" type="button" data-t="gold" aria-pressed="false"><em>V</em>Gold leaf</button>
+          <button class="btn step" type="button" data-t="burnish" aria-pressed="false"><em>VI</em>Burnish</button>
+          <button class="btn step" type="button" data-t="punch" aria-pressed="false"><em>VII</em>Punch</button>
+          <button class="btn step" type="button" data-t="paint" aria-pressed="false"><em>VIII</em>Colours</button>
+          <button class="btn step" type="button" data-t="pen" aria-pressed="false"><em>XI</em>White penwork</button>
+        </div>
+        <p class="hint" id="hint"></p>
+        <div class="row" id="goldrow" hidden><button class="btn" id="breathe" type="button">Breathe on the gesso</button></div>
+        <div class="pots" id="pots" hidden></div>
+      </div>
+      <div class="tray">
+        <span>The light</span>
+        <label class="tilt">Tilt the page <input type="range" id="tilt" min="0" max="100" value="62"></label>
+      </div>
+      <div class="row">
+        <button class="btn" id="outline" type="button"><em style="font-style:normal;font-family:var(--f-display);color:var(--rubric)">XII</em> Outline in ink</button>
+        <button class="btn main" id="fresh" type="button">A fresh leaf</button>
+        <button class="btn" id="example" type="button">Finished example</button>
+        <label class="row" style="gap:6px">Letter <select id="letter" aria-label="Letter to illuminate"></select></label>
+      </div>
+      <p class="note" id="note" aria-live="polite"></p>
+      <p class="tally" id="tally"></p>
+    </div>
+  </section>
+
+  <section class="text" aria-label="The twelve steps">
+    <h2>Twelve steps to one letter</h2>
+    <p>The text was written first, with a space left for the initial. The design was planned, often on wax tablets, and transferred to the vellum, sometimes by pricking holes along its lines. Then the illuminator worked through the page in a fixed order:</p>
+    <ol class="twelve">
+      <li>Charcoal dust is dotted through to mark the outline</li>
+      <li>A drawing in silverpoint</li>
+      <li>The drawing is retraced in ink</li>
+      <li>The surface is prepared for gold</li>
+      <li>Gold leaf is laid down</li>
+      <li>The gold is burnished to a mirror shine</li>
+      <li>Decorations are pressed into the gold</li>
+      <li>Base colours are painted</li>
+      <li>Darker tones give volume</li>
+      <li>Further details are drawn</li>
+      <li>Lighter colours pick out particulars</li>
+      <li>Ink outlines finish the work</li>
+    </ol>
+    <p>Gold always comes before colour. Gold leaf will stick to any pigment already on the page, and burnishing is vigorous enough to smudge paint nearby. Try laying gold over a painted ground and see.</p>
+  </section>
+
+  <section class="two" aria-label="Gold and colours">
+    <div class="text">
+      <h2>Gesso, breath and a tooth</h2>
+      <p>Cennino Cennini, writing in Padua around 1400, gave the recipe for gilding on parchment: fine gesso, a little white lead and a little sugar candy, ground with water, dried out of the sun and tempered with beaten egg white. Laid thick, it stands up from the page, and the relief lets the gold catch light from every direction.</p>
+      <p class="quote">The gold may be laid “either with breathing or without breathing”, then burnished with a smooth, solid wooden panel under the parchment.<cite>Cennino Cennini, The Craftsman’s Handbook, chapter 157, in D. V. Thompson’s translation</cite></p>
+      <p>For burnishing, Cennini lists hematite, precious stones, and the teeth of a dog or a wolf. From the 12th century gold leaf was usually burnished. Scraps of leaf that miss the letter were swept up and ground with honey into shell gold, a paint named after the sea shells painters mixed their colours in.</p>
+    </div>
+    <div class="text">
+      <h2>The illuminator’s colours</h2>
+      <div class="colours">
+        <div><i style="background:#26409e"></i><p><b>Ultramarine</b>, from the stone lapis lazuli: rare, costly and kept for the robes of the Virgin Mary and important figures.</p></div>
+        <div><i style="background:#3468a8"></i><p><b>Azurite</b>, a cheaper blue mineral, often used for initials and borders.</p></div>
+        <div><i style="background:#cc3420"></i><p><b>Vermilion</b>, mercury sulfide, found as the mineral cinnabar.</p></div>
+        <div><i style="background:#e0602e"></i><p><b>Minium</b>, red lead. Colouring with it was miniare, which gave us the word miniature.</p></div>
+        <div><i style="background:#2b8068"></i><p><b>Verdigris</b>, made by boiling copper plates in vinegar. Green was rare on the page.</p></div>
+        <div><i style="background:#f3eee2"></i><p><b>White lead</b>, made by corroding lead with vinegar, for highlights and fine penwork.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <p class="sources">Sources: Wikipedia, <a href="https://en.wikipedia.org/wiki/Illuminated_manuscript" target="_blank" rel="noopener">Illuminated manuscript</a> (the definition by metal, burnishing from the 12th century, the twelve steps, planning on wax tablets and pricking, gold before colour, the pigments), <a href="https://en.wikipedia.org/wiki/Psalter" target="_blank" rel="noopener">Psalter</a> (the Beatus initial), <a href="https://en.wikipedia.org/wiki/Miniature_(illuminated_manuscript)" target="_blank" rel="noopener">Miniature</a> (miniare, minium) and <a href="https://en.wikipedia.org/wiki/Shell_gold" target="_blank" rel="noopener">Shell gold</a>; Cennino Cennini, Il Libro dell’Arte, translated by D. V. Thompson, chapters <a href="https://noteaccess.com/Texts/Cennini/9TM.htm" target="_blank" rel="noopener">157–159</a> (gilding on parchment) and <a href="https://noteaccess.com/Texts/Cennini/6a.htm" target="_blank" rel="noopener">135</a> (burnishing stones and teeth); Natural Pigments, <a href="https://www.naturalpigments.com/artist-materials/gilding-illuminated-manuscripts-historical-methods" target="_blank" rel="noopener">Gilding on illuminated manuscripts</a> (raised gesso catching the light). The Latin is Psalm 1:1–2 in the Vulgate. The gold on this page is a lighting model: matte leaf scatters light, burnished leaf mirrors it.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const S = 600, N = 300, C = 2, SQ0 = 22, SQ1 = 578;   // canvas size, cell grid, square ground
+
+  const cv = $('#ini'), g = cv.getContext('2d');
+  const img = g.createImageData(S, S), px = img.data;
+  const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+
+  // ---------- Maps ----------
+  const region = new Uint8Array(S * S);        // 0 margin, 255 letter, 1 outer ground, 2.. counters
+  const cellLetter = new Uint8Array(N * N);
+  const gesso = new Float32Array(N * N), gold = new Uint8Array(N * N), burn = new Float32Array(N * N);
+  let height = new Float32Array(N * N), hx = new Float32Array(N * N), hy = new Float32Array(N * N);
+  let regionPaint = [], punches = [], pen = [], outlined = false, nRegions = 1;
+  let letter = 'B', font = '"Uncial Antiqua", "Times New Roman", serif', fontPx = 430, tx = 300, ty = 300;
+  let wetUntil = 0, tackUntil = 0, leaves = 0, skew = 0, tilt = 0.62;
+  let groundMask = null;
+
+  // fixed grain for vellum, paint and gold
+  const grain = new Float32Array(S * S);
+  let rs = 7; const srand = () => { rs = (rs * 16807) % 2147483647; return (rs - 1) / 2147483646; };
+  for (let i = 0; i < S * S; i++) grain[i] = srand() - 0.5;
+  // smooth blotches in the vellum
+  const blot = new Float32Array(S * S);
+  (function () {
+    const G = 12, v = []; for (let i = 0; i < (G + 1) * (G + 1); i++) v.push(srand() - 0.5);
+    for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
+      const fx = x / S * G, fy = y / S * G, x0 = Math.floor(fx), y0 = Math.floor(fy), ax = fx - x0, ay = fy - y0;
+      const s = (a) => a * a * (3 - 2 * a), a = v[y0 * (G + 1) + x0], b = v[y0 * (G + 1) + x0 + 1], c = v[(y0 + 1) * (G + 1) + x0], d = v[(y0 + 1) * (G + 1) + x0 + 1];
+      blot[y * S + x] = (a + (b - a) * s(ax)) + ((c + (d - c) * s(ax)) - (a + (b - a) * s(ax))) * s(ay);
+    }
+  })();
+
+  const PIGMENTS = [
+    { id: 'ultramarine', name: 'ultramarine', rgb: [38, 64, 158] },
+    { id: 'azurite', name: 'azurite', rgb: [52, 104, 168] },
+    { id: 'vermilion', name: 'vermilion', rgb: [204, 52, 32] },
+    { id: 'minium', name: 'minium', rgb: [224, 96, 46] },
+    { id: 'verdigris', name: 'verdigris', rgb: [43, 128, 104] }
+  ];
+  let pigment = 0, tool = 'gesso';
+
+  function drawLetter(x, mode) {
+    x.font = `${fontPx}px ${font}`; x.textAlign = 'left'; x.textBaseline = 'alphabetic';
+    if (mode === 'fill') x.fillText(letter, tx, ty); else x.strokeText(letter, tx, ty);
+  }
+  function buildLetter() {
+    // fit the letter in the square
+    const m = mk(S, S), x = m.getContext('2d');
+    fontPx = 430;
+    x.font = `${fontPx}px ${font}`; x.textAlign = 'left'; x.textBaseline = 'alphabetic';
+    let mt = x.measureText(letter);
+    const w = mt.actualBoundingBoxLeft + mt.actualBoundingBoxRight, h = mt.actualBoundingBoxAscent + mt.actualBoundingBoxDescent;
+    fontPx = Math.floor(fontPx * Math.min(400 / w, 420 / h));
+    x.font = `${fontPx}px ${font}`; mt = x.measureText(letter);
+    tx = 300 - (mt.actualBoundingBoxRight - mt.actualBoundingBoxLeft) / 2;
+    ty = 300 + (mt.actualBoundingBoxAscent - mt.actualBoundingBoxDescent) / 2;
+    x.fillStyle = '#000'; drawLetter(x, 'fill');
+    const d = x.getImageData(0, 0, S, S).data;
+    region.fill(0);
+    for (let y = SQ0; y < SQ1; y++) for (let xx = SQ0; xx < SQ1; xx++) { const i = y * S + xx; region[i] = d[i * 4 + 3] > 110 ? 255 : 254; }
+    // flood the ground from the square's edge; what is left over are the counters
+    let id = 1;
+    const flood = (start, lab) => {
+      const st = [start]; region[start] = lab;
+      while (st.length) {
+        const i = st.pop(), x0 = i % S;
+        [x0 > 0 ? i - 1 : -1, x0 < S - 1 ? i + 1 : -1, i - S, i + S].forEach((j) => { if (j >= 0 && j < S * S && region[j] === 254) { region[j] = lab; st.push(j); } });
+      }
+    };
+    for (let k = SQ0; k < SQ1; k++) [SQ0 * S + k, (SQ1 - 1) * S + k, k * S + SQ0, k * S + SQ1 - 1].forEach((i) => { if (region[i] === 254) flood(i, 1); });
+    for (let i = 0; i < S * S; i++) if (region[i] === 254) { id++; flood(i, Math.min(id, 250)); }
+    nRegions = id;
+    for (let cy = 0; cy < N; cy++) for (let cx = 0; cx < N; cx++) {
+      let n = 0; for (let a = 0; a < 2; a++) for (let b = 0; b < 2; b++) if (region[(cy * 2 + a) * S + cx * 2 + b] === 255) n++;
+      cellLetter[cy * N + cx] = n >= 2 ? 1 : 0;
+    }
+    // a mask of the painted ground, for keeping white penwork off the gold
+    groundMask = mk(S, S);
+    const gm = groundMask.getContext('2d'), gi = gm.createImageData(S, S);
+    for (let i = 0; i < S * S; i++) gi.data[i * 4 + 3] = region[i] !== 0 && region[i] !== 255 ? 255 : 0;
+    gm.putImageData(gi, 0, 0);
+  }
+  function reset() {
+    gesso.fill(0); gold.fill(0); burn.fill(0); regionPaint = []; punches = []; pen = []; outlined = false;
+    leaves = 0; skew = 0; wetUntil = 0; tackUntil = 0; relief();
+  }
+  // a raised, rounded surface from the gesso, and its slopes for lighting
+  function relief() {
+    const a = new Float32Array(N * N), b = new Float32Array(N * N);
+    for (let i = 0; i < N * N; i++) a[i] = gesso[i] * cellLetter[i];
+    for (let pass = 0; pass < 3; pass++) {
+      for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { let s = 0, n = 0; for (let k = -2; k <= 2; k++) { const xx = x + k; if (xx >= 0 && xx < N) { s += a[y * N + xx]; n++; } } b[y * N + x] = s / n; }
+      for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { let s = 0, n = 0; for (let k = -2; k <= 2; k++) { const yy = y + k; if (yy >= 0 && yy < N) { s += b[yy * N + x]; n++; } } a[y * N + x] = s / n; }
+    }
+    height = a;
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+      const i = y * N + x;
+      hx[i] = (a[y * N + Math.min(N - 1, x + 1)] - a[y * N + Math.max(0, x - 1)]) / 2;
+      hy[i] = (a[Math.min(N - 1, y + 1) * N + x] - a[Math.max(0, y - 1) * N + x]) / 2;
+    }
+  }
+
+  // ---------- Rendering ----------
+  function render() {
+    const now = performance.now(), wet = now < wetUntil;
+    const el = 0.45 + tilt * 1.0, az = -2.4 + tilt * 0.8, L = [Math.cos(el) * Math.cos(az), Math.cos(el) * Math.sin(az), Math.sin(el)];
+    const band = 0.15 + 0.7 * tilt;
+    for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
+      const i = y * S + x, k = i * 4, c = (y >> 1) * N + (x >> 1), r = region[i], gr = grain[i];
+      const v = 1 + blot[i] * 0.08 + gr * 0.035;
+      let R = 240 * v, G = 228 * v, B = 204 * v;   // bare vellum
+      if (gold[c] && r !== 0) {
+        // the normal of the raised gesso under the gold
+        const sx = r === 255 ? hx[c] * 9 : 0, sy = r === 255 ? hy[c] * 9 : 0, nl = Math.hypot(sx, sy, 1), nx = -sx / nl, ny = -sy / nl, nz = 1 / nl;
+        const ndl = nx * L[0] + ny * L[1] + nz * L[2], dif = Math.max(0, ndl);
+        const rz = 2 * ndl * nz - L[2];
+        const matte = 0.52 + 0.6 * dif + gr * 0.13;
+        const glint = Math.exp(-Math.pow((x + y) / 1200 - band, 2) / 0.012) * 0.55;
+        const mirror = 0.22 + 1.05 * Math.pow(Math.max(0, rz), 3) + glint * nz;
+        const b = burn[c], m = matte * (1 - b) + mirror * b;
+        R = 205 * m + 40 * b * Math.max(0, m - 1); G = 158 * m + 50 * b * Math.max(0, m - 1); B = 64 * m + 40 * b * Math.max(0, m - 1);
+        if (r !== 255 && b < 0.2) { R *= 0.95; G *= 0.95; B *= 0.95; }
+      } else if (r === 255 && gesso[c] > 0.03) {
+        const sx = hx[c] * 9, sy = hy[c] * 9, nl = Math.hypot(sx, sy, 1), ndl = (-sx * L[0] - sy * L[1] + L[2]) / nl;
+        const t = Math.min(1, gesso[c] * 1.4);
+        const gs = 0.8 + 0.3 * Math.max(0, ndl) + gr * 0.03, spec = wet ? Math.pow(Math.max(0, (2 * ndl / nl - L[2])), 14) * 0.5 : 0;
+        R = R * (1 - t) + (236 * gs + 255 * spec) * t; G = G * (1 - t) + (226 * gs + 255 * spec) * t; B = B * (1 - t) + (214 * gs + 255 * spec) * t;
+        if (wet) { R *= 0.96; G *= 0.96; B *= 0.97; }
+      } else if (r !== 0 && r !== 255 && regionPaint[r] != null) {
+        const p = PIGMENTS[regionPaint[r]].rgb, pv = 1 + gr * 0.07 + blot[i] * 0.1;
+        R = p[0] * pv; G = p[1] * pv; B = p[2] * pv;
+      }
+      px[k] = R; px[k + 1] = G; px[k + 2] = B; px[k + 3] = 255;
+    }
+    g.putImageData(img, 0, 0);
+    // white lead penwork, kept to the painted ground
+    if (pen.length) {
+      const pc = mk(S, S), p = pc.getContext('2d');
+      p.strokeStyle = '#f6f1e6'; p.fillStyle = '#f6f1e6'; p.lineCap = 'round'; p.lineJoin = 'round'; p.lineWidth = 2.6;
+      pen.forEach((st) => {
+        if (st.dot) { p.beginPath(); p.arc(st.dot[0], st.dot[1], st.r || 3, 0, Math.PI * 2); p.fill(); return; }
+        p.beginPath(); st.forEach((q, j) => (j ? p.lineTo(q[0], q[1]) : p.moveTo(q[0], q[1]))); p.stroke();
+      });
+      p.globalCompositeOperation = 'destination-in'; p.drawImage(groundMask, 0, 0);
+      g.drawImage(pc, 0, 0);
+    }
+    // punched dots catch the light on the side away from it
+    punches.forEach(([x, y]) => {
+      g.fillStyle = 'rgba(90,58,12,0.6)'; g.beginPath(); g.arc(x, y, 4.2, 0, Math.PI * 2); g.fill();
+      g.fillStyle = 'rgba(255,238,170,0.95)'; g.beginPath(); g.arc(x - 0.9, y - 0.9, 2.2, 0, Math.PI * 2); g.fill();
+    });
+    // the ink drawing: faint and brown until the final outline
+    g.lineJoin = 'round';
+    g.strokeStyle = outlined ? '#1d140c' : 'rgba(110,70,40,0.55)'; g.lineWidth = outlined ? 5 : 1.3;
+    drawLetter(g, 'stroke');
+    g.strokeRect(SQ0, SQ0, SQ1 - SQ0, SQ1 - SQ0);
+    if (outlined) { g.lineWidth = 2; g.strokeRect(SQ0 - 7, SQ0 - 7, SQ1 - SQ0 + 14, SQ1 - SQ0 + 14); }
+  }
+  let pending = false;
+  const redraw = () => { if (!pending) { pending = true; requestAnimationFrame(() => { pending = false; render(); }); } };
+
+  // ---------- Working with the tools ----------
+  const say = (t) => { $('#note').textContent = t; };
+  function tally() {
+    let L = 0, gs = 0, gl = 0, bu = 0;
+    for (let i = 0; i < N * N; i++) if (cellLetter[i]) { L++; if (gesso[i] > 0.5) gs++; if (gold[i]) { gl++; if (burn[i] > 0.6) bu++; } }
+    const pct = (a) => `${Math.round(a / Math.max(1, L) * 100)}%`;
+    $('#tally').textContent = `gesso ${pct(gs)} · gold ${pct(gl)} · burnished ${pct(bu)} · leaves used ${leaves}${skew ? ` · scraps saved for shell gold ${skew}` : ''}`;
+    return { gs: gs / Math.max(1, L), gl: gl / Math.max(1, L), bu: bu / Math.max(1, L) };
+  }
+  function cellsNear(x, y, r, fn) {
+    const cx = x / C, cy = y / C, rc = r / C;
+    for (let yy = Math.max(0, Math.floor(cy - rc)); yy <= Math.min(N - 1, Math.ceil(cy + rc)); yy++)
+      for (let xx = Math.max(0, Math.floor(cx - rc)); xx <= Math.min(N - 1, Math.ceil(cx + rc)); xx++) {
+        const d2 = (xx + 0.5 - cx) ** 2 + (yy + 0.5 - cy) ** 2;
+        if (d2 <= rc * rc) fn(yy * N + xx, Math.sqrt(d2) / rc);
+      }
+  }
+  let dryTimer = 0;
+  function gessoAt(x, y) {
+    let touched = false;
+    cellsNear(x, y, 17, (i, d) => { if (cellLetter[i]) { gesso[i] = Math.min(1, gesso[i] + 0.3 * (1 - d * d)); touched = true; } });
+    if (!touched) return;
+    wetUntil = performance.now() + 1600;
+    clearTimeout(dryTimer); dryTimer = setTimeout(() => { relief(); redraw(); const t = tally(); if (t.gs > 0.9) say('The gesso is dry and stands up from the page like a cushion. Choose Gold leaf, breathe on the gesso and lay the leaf.'); }, 1650);
+  }
+  function leafAt(x, y) {
+    const now = performance.now(), wet = now < wetUntil, tacky = now < tackUntil;
+    let stuck = 0, onPaint = 0, missed = 0;
+    const h = 52;
+    for (let yy = Math.max(0, Math.floor((y - h) / C)); yy < Math.min(N, Math.ceil((y + h) / C)); yy++)
+      for (let xx = Math.max(0, Math.floor((x - h) / C)); xx < Math.min(N, Math.ceil((x + h) / C)); xx++) {
+        const i = yy * N + xx, r = region[(yy * 2) * S + xx * 2];
+        if (gold[i] || r === 0) continue;
+        if (cellLetter[i] && gesso[i] > 0.45 && !wet) {
+          // without breath the gesso grips only in places; the patches are lumpy, not salt and pepper
+          const patch = grain[((yy >> 3) * 8) * S + ((xx >> 3) * 8)] + 0.5;
+          if (tacky || patch < 0.6) { gold[i] = 1; stuck++; } else missed++;
+        } else if (r !== 255 && regionPaint[r] != null && grain[(yy * 2) * S + xx * 2] < 0.25) { gold[i] = 1; onPaint++; }
+        else missed++;
+      }
+    leaves++; if (stuck && missed > 200) skew++;
+    if (onPaint) say('The leaf has stuck to the paint! Gold grips any pigment already on the page, which is why illuminators laid the gold before any colour.');
+    else if (wet) say('The gesso is still wet. Cennini let it dry before gilding.');
+    else if (!stuck && missed) say('Gold leaf needs gesso to hold it. Lay gesso on the letter first.');
+    else if (!tacky) say('Cennini says you may gild with breathing or without. Without breath, the leaf only grips in patches. Breathe on the gesso and lay another leaf over the gaps.');
+    else say('The leaf grips the damp gesso. Scraps that miss are swept up to make shell gold. When the letter is covered, burnish it.');
+  }
+  function burnishAt(x, y) {
+    let any = false;
+    cellsNear(x, y, 13, (i, d) => { if (gold[i]) { burn[i] = Math.min(1, burn[i] + 0.16 * (1 - d)); any = true; } });
+    return any;
+  }
+
+  function pt(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * S / r.width, (e.clientY - r.top) * S / r.height]; }
+  let drag = null;
+  cv.addEventListener('pointerdown', (e) => {
+    try { cv.setPointerCapture(e.pointerId); } catch (err) { /* capture is optional */ }
+    const p = pt(e); drag = { last: p, run: 0 };
+    if (tool === 'gesso') { gessoAt(p[0], p[1]); relief(); }
+    else if (tool === 'gold') leafAt(p[0], p[1]);
+    else if (tool === 'burnish') { if (!burnishAt(p[0], p[1])) say('Burnishing needs gold to work on.'); }
+    else if (tool === 'punch') {
+      const c = (Math.floor(p[1] / C)) * N + Math.floor(p[0] / C);
+      if (gold[c]) { punches.push(p); say('A dot pressed into the gold. Rows of punched dots decorated haloes and gold grounds.'); } else say('Punches are pressed into gold.');
+      drag = null;
+    } else if (tool === 'paint') {
+      const r = region[Math.floor(p[1]) * S + Math.floor(p[0])];
+      if (r === 255) say('The letter is for the gold. Paint the ground around it and the spaces inside it.');
+      else if (r) { regionPaint[r] = pigment; say(PAINT_NOTES[pigment]); }
+      drag = null;
+    } else if (tool === 'pen') pen.push([p]);
+    redraw(); tally();
+  });
+  cv.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const p = pt(e), [x0, y0] = drag.last, d = Math.hypot(p[0] - x0, p[1] - y0), n = Math.max(1, Math.ceil(d / 5));
+    if (tool === 'gesso') { for (let k = 1; k <= n; k++) gessoAt(x0 + (p[0] - x0) * k / n, y0 + (p[1] - y0) * k / n); relief(); }
+    else if (tool === 'gold') { drag.run += d; if (drag.run > 60) { drag.run = 0; leafAt(p[0], p[1]); } }
+    else if (tool === 'burnish') for (let k = 1; k <= n; k++) burnishAt(x0 + (p[0] - x0) * k / n, y0 + (p[1] - y0) * k / n);
+    else if (tool === 'pen') pen[pen.length - 1].push(p);
+    drag.last = p; redraw();
+  });
+  ['pointerup', 'pointercancel'].forEach((t) => cv.addEventListener(t, () => {
+    if (drag && tool === 'burnish') { const s = tally(); if (s.bu > 0.6) say('Burnished gold is a mirror: it looks dark from one angle and blazes from another. Tilt the page and watch it.'); }
+    if (drag) tally();
+    drag = null;
+  }));
+
+  // ---------- Controls ----------
+  const HINTS = {
+    gesso: 'Brush gesso onto the letter, thick enough to stand up from the page. It goes only inside the inked outline.',
+    gold: 'Breathe on the dry gesso to make it tacky, then press gold leaf onto the letter. Click or drag to lay leaves.',
+    burnish: 'Rub the gold with the burnisher, a polished stone or a dog’s tooth, until it shines.',
+    punch: 'Click on the gold to press decorative dots into it.',
+    paint: 'Choose a colour, then click the ground or a space inside the letter to paint it. Colours on parchment were tempered with gum arabic.',
+    pen: 'Draw fine white lines and curls over the painted ground in white lead.'
+  };
+  const PAINT_NOTES = [
+    'Ultramarine, ground from lapis lazuli, the most precious blue of all.',
+    'Azurite, a cheaper blue mineral, often used for initials and borders.',
+    'Vermilion, from the red mineral cinnabar.',
+    'Minium, red lead. Painting with it was miniare, the root of the word miniature.',
+    'Verdigris, made by boiling copper plates in vinegar. Green was rare on the page.'
+  ];
+  function setTool(t) {
+    tool = t; $$('.step').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.t === t)));
+    $('#hint').textContent = HINTS[t]; $('#goldrow').hidden = t !== 'gold'; $('#pots').hidden = t !== 'paint';
+    cv.style.cursor = t === 'paint' ? 'pointer' : 'crosshair';
+  }
+  $$('.step').forEach((b) => b.addEventListener('click', () => setTool(b.dataset.t)));
+  PIGMENTS.forEach((p, k) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'btn pot'; b.setAttribute('aria-pressed', String(k === pigment));
+    b.innerHTML = `<i style="background:rgb(${p.rgb.join(',')})"></i>${p.name}`;
+    b.addEventListener('click', () => { pigment = k; $$('.pot').forEach((x, j) => x.setAttribute('aria-pressed', String(j === k))); });
+    $('#pots').appendChild(b);
+  });
+  $('#breathe').addEventListener('click', () => {
+    tackUntil = performance.now() + 6000;
+    const b = $('#breath'); b.classList.add('on'); void b.offsetWidth; b.classList.remove('on');
+    say(performance.now() < wetUntil ? 'The gesso is still wet; wait a moment for it to dry.' : 'A warm breath dampens the gesso for a few seconds. Lay the gold now.');
+  });
+  $('#tilt').addEventListener('input', (e) => { tilt = e.target.value / 100; redraw(); });
+  $('#outline').addEventListener('click', () => { outlined = !outlined; redraw(); say(outlined ? 'The last step: outlines in ink sharpen the edges of the gold and colour.' : 'The outline is back to the faint ink drawing.'); });
+  $('#fresh').addEventListener('click', () => { reset(); setTool('gesso'); redraw(); tally(); say('A fresh leaf. The design is drawn and inked, steps I to III. Start with step IV: lay the gesso on the letter.'); });
+
+  function example() {
+    reset();
+    for (let i = 0; i < N * N; i++) if (cellLetter[i]) { gesso[i] = 1; gold[i] = 1; burn[i] = 0.92; }
+    relief();
+    regionPaint[1] = 0; for (let r = 2; r <= nRegions; r++) regionPaint[r] = 2;
+    // punched dots along the middle of the strokes
+    for (let y = SQ0 + 20, row = 0; y < SQ1 - 20; y += 28, row++) for (let x = SQ0 + 20 + (row % 2) * 14; x < SQ1 - 20; x += 28) {
+      const ok = [[0, 0], [15, 0], [-15, 0], [0, 15], [0, -15]].every(([a, b]) => region[(y + b) * S + x + a] === 255);
+      if (ok) punches.push([x, y]);
+    }
+    punches = punches.filter(([x, y]) => region[Math.round(y) * S + Math.round(x)] === 255);
+    // white penwork: a ruled line inside the frame and small curls across the blue
+    pen.push([[SQ0 + 9, SQ0 + 9], [SQ1 - 9, SQ0 + 9], [SQ1 - 9, SQ1 - 9], [SQ0 + 9, SQ1 - 9], [SQ0 + 9, SQ0 + 9]]);
+    // clusters of three white dots on a lattice, and a small scroll along the frame
+    for (let y = SQ0 + 40, row = 0; y < SQ1 - 24; y += 46, row++) for (let x = SQ0 + 40 + (row % 2) * 23; x < SQ1 - 24; x += 46) {
+      [[0, -4], [-3.6, 2.4], [3.6, 2.4]].forEach(([a, b]) => pen.push({ dot: [x + a, y + b], r: 2.3 }));
+    }
+    for (let x = SQ0 + 22; x < SQ1 - 30; x += 28) {
+      [SQ0 + 16, SQ1 - 16].forEach((y, k) => { const s = []; for (let a = 0; a <= 12; a++) { const t = a / 12; s.push([x + t * 28, y + (k ? -1 : 1) * Math.sin(t * Math.PI * 2) * 3.5]); } pen.push(s); });
+    }
+    outlined = true; leaves = 9; skew = 4;
+    setTool('pen'); redraw(); tally();
+    say('A finished initial: raised and burnished gold on lapis blue, vermilion in the spaces of the letter, white lead penwork and an ink outline. Tilt the page, or start a fresh leaf.');
+  }
+  $('#example').addEventListener('click', example);
+
+  const sel = $('#letter');
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach((l) => { const o = document.createElement('option'); o.value = l; o.textContent = l; if (l === 'B') o.selected = true; sel.appendChild(o); });
+  sel.addEventListener('change', () => {
+    letter = sel.value; buildLetter(); reset();
+    const b = letter === 'B';
+    $('#psalm').hidden = !b; $('#ruled').hidden = b;
+    $('#leafnote').textContent = b ? 'Psalm 1, “Blessed is the man…”. Psalters gave this B, the Beatus initial, their richest decoration.' : 'The scribe has ruled the page and left a space. The text comes later; the initial is yours.';
+    setTool('gesso'); redraw(); tally(); say(`A fresh leaf with the letter ${letter} drawn and inked. Begin with the gesso.`);
+  });
+
+  function start() { buildLetter(); setTool('gesso'); example(); }
+  const fontReady = document.fonts && document.fonts.load ? Promise.race([document.fonts.load(`430px ${font}`, 'B'), new Promise((r) => setTimeout(r, 2500))]) : Promise.resolve();
+  render();
+  fontReady.then(start, start);
+})();
+</script>
+</body>
+</html>

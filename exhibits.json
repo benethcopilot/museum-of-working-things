@@ -150,6 +150,11 @@
       "try": "Lay the fish in musivum, then in a grid"
     },
     {
+      "slug": "illuminated-initial", "hall": "studio", "title": "Illuminated Initial", "ages": "6 and up",
+      "blurb": "Raise a letter in gesso, breathe on it, lay and burnish gold leaf, punch it, and paint the ground in lapis blue and vermilion, in the order medieval illuminators worked.",
+      "try": "Illuminate your own initial, then tilt the page"
+    },
+    {
       "slug": "mendeleev", "hall": "numbers", "title": "Mendeleev’s Table", "ages": "10 and up",
       "blurb": "Deal the elements onto Mendeleev’s 1871 table, leave gaps where nothing fits, and predict the elements nobody had found yet.",
       "try": "Decide where tellurium goes"
