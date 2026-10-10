@@ -1,0 +1,158 @@
+{
+  "museum": {
+    "name": "The Museum of Working Things",
+    "tagline": "Instruments, machines and mysteries you can operate. Every exhibit works, and every one has a true story behind it.",
+    "repo": "https://github.com/benethcopilot/museum-of-working-things"
+  },
+  "halls": [
+    { "id": "sky", "name": "Sky & Time", "color": "#2f56a6", "blurb": "How people read the heavens and kept the hours." },
+    { "id": "sound", "name": "Music & Sound", "color": "#b23f2a", "blurb": "Machines that make music, and the ideas inside a chord." },
+    { "id": "life", "name": "Life Science", "color": "#2b7a4b", "blurb": "How living things pass traits from parents to their young." },
+    { "id": "studio", "name": "Art Studio", "color": "#1b7f86", "blurb": "Paint, print, write and arrange the way artists have for centuries." },
+    { "id": "making", "name": "Making & Mending", "color": "#a5741a", "blurb": "Crafts where the process is the lesson." },
+    { "id": "machines", "name": "Machines & Messages", "color": "#4b5b6b", "blurb": "Codes, wires and water: how messages and boats got through." },
+    { "id": "numbers", "name": "Numbers & Elements", "color": "#7a4aa0", "blurb": "Tools for calculating, and the table that put matter in order." }
+  ],
+  "exhibits": [
+    {
+      "slug": "astrolabe", "hall": "sky", "title": "Brass Astrolabe", "ages": "10 and up",
+      "blurb": "Turn a working astrolabe to tell the time, find the sunrise and see which stars are up over your city.",
+      "try": "Solve the four sky puzzles"
+    },
+    {
+      "slug": "eratosthenes", "hall": "sky", "title": "Eratosthenes’ Shadow", "ages": "9 and up",
+      "blurb": "Measure the whole Earth the way a Greek librarian did in 240 BC, with two sticks, two shadows and one distance.",
+      "try": "Flatten the Earth and watch the shadows"
+    },
+    {
+      "slug": "harrison", "hall": "sky", "title": "Harrison’s Sea Watch", "ages": "10 and up",
+      "blurb": "Find a ship’s longitude from the gap between local noon and a watch set to home, and see how John Harrison’s H4 won the race to Jamaica.",
+      "try": "Sail with a watch that loses a minute a day"
+    },
+    {
+      "slug": "foucault", "hall": "sky", "title": "Foucault’s Pendulum", "ages": "8 and up",
+      "blurb": "Watch the Earth turn under Foucault’s 1851 pendulum as it knocks over a ring of pegs, at the pole, in Paris, in Minneapolis and on the equator.",
+      "try": "Take it to the equator"
+    },
+    {
+      "slug": "band-organ", "hall": "sound", "title": "Carousel Band Organ", "ages": "All ages",
+      "blurb": "A paper roll plays carousel tunes from before 1914, after the Wurlitzer organ at Como Park.",
+      "try": "Punch your own roll and play it"
+    },
+    {
+      "slug": "music-box", "hall": "sound", "title": "Thirty-Note Music Box", "ages": "6 and up",
+      "blurb": "Punch holes in a paper strip and crank it through a tuned steel comb.",
+      "try": "Punch a tune of your own"
+    },
+    {
+      "slug": "autoharp", "hall": "sound", "title": "Autoharp Chords", "ages": "8 and up",
+      "blurb": "Press a felt-lined bar and strum to see what a chord really is.",
+      "try": "Name a mystery chord by ear"
+    },
+    {
+      "slug": "hammond", "hall": "sound", "title": "Hammond Organ", "ages": "8 and up",
+      "blurb": "Pull the nine drawbars of a tonewheel organ, spin up the Leslie speaker, and hear plain sine waves stack up into the sound of a jazz organ.",
+      "try": "Switch the motor off while holding a chord"
+    },
+    {
+      "slug": "litter-lab", "hall": "life", "title": "Litter Lab", "ages": "9 and up",
+      "blurb": "Predict Labrador puppy colors with Punnett squares and solve the 1899 mystery of Ben of Hyde.",
+      "try": "Crack Mystery Molly’s genes"
+    },
+    {
+      "slug": "broad-street", "hall": "life", "title": "Broad Street Pump", "ages": "10 and up",
+      "blurb": "Find the source of the 1854 London cholera outbreak on John Snow’s map, using the real positions of 578 deaths and 13 pumps.",
+      "try": "Take the handle off and check the dates"
+    },
+    {
+      "slug": "finches", "hall": "life", "title": "Darwin’s Finches", "ages": "10 and up",
+      "blurb": "Run a drought on Daphne Major and watch natural selection reshape 1,200 finches’ beaks, matched to the Grants’ 1977 measurements.",
+      "try": "Follow a drought with a very wet year"
+    },
+    {
+      "slug": "semmelweis", "hall": "life", "title": "Semmelweis’s Two Clinics", "ages": "11 and up",
+      "blurb": "Turn the pages of Vienna’s 1840s maternity register, test six theories of childbed fever against the hospital’s own numbers, and find the month the doctors began washing their hands.",
+      "try": "Find the month without peeking"
+    },
+    {
+      "slug": "kintsugi", "hall": "making", "title": "Kintsugi Bowl", "ages": "All ages",
+      "blurb": "Break a tea bowl, then mend it with lacquer and gold, one real step at a time.",
+      "try": "Break a mended bowl again"
+    },
+    {
+      "slug": "ebru", "hall": "studio", "title": "Ebru Tray", "ages": "All ages",
+      "blurb": "Marble paper on water with a brush, an awl and a comb, then pull your one print.",
+      "try": "Pull a print"
+    },
+    {
+      "slug": "letterpress", "hall": "making", "title": "Letterpress Type Case", "ages": "8 and up",
+      "blurb": "Set metal type by hand from a real 1871 type case, justify it in the stick, then ink it and pull a print you can keep.",
+      "try": "Find the e box without labels"
+    },
+    {
+      "slug": "cyanotype", "hall": "studio", "title": "Cyanotype Sun Prints", "ages": "7 and up",
+      "blurb": "Brush iron salts onto paper, lay out seaweeds and a feather, and let the sun print them in Prussian blue, the way Anna Atkins made the first book of photographs in 1843.",
+      "try": "Leave it in the sun far too long"
+    },
+    {
+      "slug": "woodblock", "hall": "studio", "title": "Edo Woodblock Print", "ages": "8 and up",
+      "blurb": "Be the printer of a Japanese colour print: ink seven reversed cherry blocks, drop each sheet into the kentō notches, rub with the baren and brush your own bokashi skies.",
+      "try": "Turn the kentō off and print by eye"
+    },
+    {
+      "slug": "shodo", "hall": "studio", "title": "Shodō Brush and Ink", "ages": "7 and up",
+      "blurb": "Grind ink on an inkstone and write 永, the character that holds the eight basic brush strokes, with a brush that thins when you hurry and splits when it runs dry.",
+      "try": "Paint an ensō in one breath"
+    },
+    {
+      "slug": "mendeleev", "hall": "numbers", "title": "Mendeleev’s Table", "ages": "10 and up",
+      "blurb": "Deal the elements onto Mendeleev’s 1871 table, leave gaps where nothing fits, and predict the elements nobody had found yet.",
+      "try": "Decide where tellurium goes"
+    },
+    {
+      "slug": "slide-rule", "hall": "numbers", "title": "Slide Rule", "ages": "10 and up",
+      "blurb": "Multiply, divide and find square roots on a working slide rule, the way engineers did from 1622 until the pocket calculator.",
+      "try": "Work out where the decimal point goes"
+    },
+    {
+      "slug": "napier", "hall": "numbers", "title": "Napier’s Bones", "ages": "8 and up",
+      "blurb": "Multiply big numbers with John Napier’s 1617 ivory rods: lay them side by side and add along the diagonals.",
+      "try": "Multiply 825 by 913"
+    },
+    {
+      "slug": "galileo", "hall": "numbers", "title": "Galileo’s Ramp", "ages": "9 and up",
+      "blurb": "Set frets along Galileo’s twelve-cubit ramp until a rolling ball clicks in an even rhythm, and find the odd numbers hiding in falling.",
+      "try": "Tilt the ramp and check the pattern holds"
+    },
+    {
+      "slug": "lock-and-dam", "hall": "machines", "title": "Lock and Dam No. 1", "ages": "7 and up",
+      "blurb": "Work the gates and valves of the Mississippi’s Ford Dam lock and lift a towboat 35.9 feet using nothing but gravity.",
+      "try": "Open a gate before the water is level"
+    },
+    {
+      "slug": "enigma", "hall": "machines", "title": "Enigma Machine", "ages": "11 and up",
+      "blurb": "Type on an Army Enigma with the real rotor wirings, follow the current through it, and break an intercept the way Bletchley Park did.",
+      "try": "Run the bombe on the intercept"
+    },
+    {
+      "slug": "telegraph", "hall": "machines", "title": "Telegraph Office", "ages": "8 and up",
+      "blurb": "Tap Morse on a brass key and sounder, price a telegram by the word, and send the Wright brothers’ 1903 telegram down the line.",
+      "try": "Send SOS with the space bar"
+    },
+    {
+      "slug": "jacquard", "hall": "machines", "title": "Jacquard Loom", "ages": "7 and up",
+      "blurb": "Draw a pattern on point paper, punch it into a chain of cards and weave it in silk on the 1804 loom that led to computer punched cards.",
+      "try": "Weave your initials"
+    },
+    {
+      "slug": "difference-engine", "hall": "machines", "title": "Difference Engine", "ages": "10 and up",
+      "blurb": "Turn the handle of Charles Babbage’s calculating engine and watch it print tables of squares, cubes and primes using nothing but addition.",
+      "try": "Catch the typesetter’s misprint"
+    },
+    {
+      "slug": "split-rock", "hall": "machines", "title": "Split Rock Lighthouse", "ages": "8 and up",
+      "blurb": "Wind the weights and set the governor so Split Rock’s 1910 lens flashes every ten seconds across Lake Superior, then open the lens and find out why the light reached 22 miles.",
+      "try": "Keep the light through a November night"
+    }
+  ]
+}
