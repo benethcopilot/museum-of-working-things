@@ -120,6 +120,11 @@
       "try": "Sprinkle salt on a wet sky"
     },
     {
+      "slug": "papercut", "hall": "studio", "title": "Jianzhi Window Flowers", "ages": "6 and up",
+      "blurb": "Fold red paper in halves, quarters or eighths, cut through every layer at once, and open it out on a lattice window as a Chinese round flower or a double happiness.",
+      "try": "Cut half of 喜 against the fold"
+    },
+    {
       "slug": "mendeleev", "hall": "numbers", "title": "Mendeleev’s Table", "ages": "10 and up",
       "blurb": "Deal the elements onto Mendeleev’s 1871 table, leave gaps where nothing fits, and predict the elements nobody had found yet.",
       "try": "Decide where tellurium goes"

@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Jianzhi Window Flowers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Hanken+Grotesk:ital,wght@0,400;0,600;1,400&family=Azeret+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@900&text=%E5%96%9C%E5%9B%8D%E7%A6%8F%E5%89%AA%E7%BA%B8%E5%9B%A2%E8%8A%B1%E7%AA%97&display=swap">
+<style>
+:root {
+  /* Layout: a cutting table on the left where the folded red paper is cut, and a lattice window on the right where the unfolded cut hangs against the light; then the symbols, the two methods, the regional schools and the history. */
+  --ground: #f0eeec;
+  --ground-2: #e4e1de;
+  --card: #faf9f8;
+  --ink: #221a18;
+  --muted: #625855;
+  --line: rgba(34, 26, 24, 0.13);
+  --line-strong: rgba(34, 26, 24, 0.3);
+  --zhu: #b8241c;
+  --good: #2c7449;
+  /* the table and the window look the same in both themes */
+  --table: #3b2f2a;
+  --table-2: #2e2420;
+  --table-ink: #f1e6db;
+  --table-dim: #c7b5a5;
+  --f-display: "Rozha One", "Bodoni 72", Georgia, serif;
+  --f-body: "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+  --f-data: "Azeret Mono", Consolas, "Courier New", monospace;
+  --f-cn: "Noto Serif SC", "Songti SC", "SimSun", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #141110;
+    --ground-2: #1f1a18;
+    --card: #191514;
+    --ink: #efe8e4;
+    --muted: #b2a6a1;
+    --line: rgba(239, 232, 228, 0.12);
+    --line-strong: rgba(239, 232, 228, 0.3);
+    --zhu: #f27a6c;
+    --good: #82cf9a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #141110;
+  --ground-2: #1f1a18;
+  --card: #191514;
+  --ink: #efe8e4;
+  --muted: #b2a6a1;
+  --line: rgba(239, 232, 228, 0.12);
+  --line-strong: rgba(239, 232, 228, 0.3);
+  --zhu: #f27a6c;
+  --good: #82cf9a;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: default; opacity: 0.45; }
+:focus-visible { outline: 3px solid #e4b24a; outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 400; line-height: 1.05; margin: 0; text-wrap: balance; }
+a { color: var(--zhu); }
+.cn { font-family: var(--f-cn); font-weight: 900; }
+
+.page { box-sizing: border-box; max-width: 1220px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 48px; }
+.masthead { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 28px; align-items: end; }
+.eyebrow { margin: 0; font-family: var(--f-data); font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.masthead h1 { font-size: clamp(2.6rem, 7.5vw, 5.2rem); color: var(--zhu); }
+.lede { margin: 0; max-width: 66ch; color: var(--muted); }
+.seal { font-family: var(--f-cn); font-weight: 900; font-size: clamp(3.4rem, 9vw, 6rem); line-height: 1; color: var(--zhu); }
+section > h2, .text h2 { font-size: clamp(1.8rem, 3.6vw, 2.5rem); }
+.text { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.text p { margin: 0; max-width: 64ch; }
+
+/* ---------- Table and window ---------- */
+.studio { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px 22px; padding: 18px; border-radius: 6px; background: linear-gradient(180deg, var(--table), var(--table-2)); color: var(--table-ink); }
+.studio h2 { font-size: 1.4rem; color: var(--table-ink); }
+.pane { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.pane canvas { display: block; width: 100%; height: auto; border-radius: 3px; }
+#fold { touch-action: none; cursor: crosshair; background: #2a201c; }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.row > span { font-size: 0.88rem; color: var(--table-dim); margin-right: 2px; }
+.tbtn { padding: 5px 11px; border-radius: 3px; border: 1.5px solid rgba(241, 230, 219, 0.45); background: none; color: var(--table-ink); font-size: 0.88rem; }
+.tbtn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.08); }
+.tbtn[aria-pressed="true"] { background: rgba(241, 230, 219, 0.2); border-color: var(--table-ink); }
+.tbtn.go { background: var(--table-ink); color: var(--table-2); border-color: var(--table-ink); font-weight: 600; }
+.slider { display: flex; flex-direction: column; gap: 2px; font-size: 0.88rem; flex: 1 1 140px; min-width: 0; }
+.slider input { width: 100%; accent-color: #e4b24a; }
+.slider output { font-family: var(--f-data); font-size: 0.8rem; }
+.tools { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; border-radius: 4px; background: rgba(0, 0, 0, 0.22); }
+.note { margin: 0; padding: 10px 12px; border-left: 3px solid #e4b24a; background: rgba(0, 0, 0, 0.22); font-size: 0.95rem; }
+.note.good { border-left-color: #8fd3a5; }
+
+/* ---------- Below ---------- */
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.symbols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.sym { padding: 10px 12px; border-radius: 3px; background: var(--card); border: 1px solid var(--line); }
+.sym b { display: block; font-family: var(--f-cn); font-weight: 900; font-size: 2.4rem; line-height: 1.1; color: var(--zhu); }
+.sym strong { font-family: var(--f-display); font-weight: 400; font-size: 1.1rem; }
+.sym p { margin: 2px 0 0; font-size: 0.88rem; color: var(--muted); }
+.schools { display: grid; gap: 10px; }
+.schools div { padding: 10px 12px; border-radius: 3px; background: var(--card); border: 1px solid var(--line); }
+.schools b { font-family: var(--f-display); font-weight: 400; font-size: 1.15rem; }
+.schools p { margin: 2px 0 0; font-size: 0.92rem; color: var(--muted); }
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-left: 2px solid var(--line-strong); }
+.timeline li { display: grid; grid-template-columns: 5.6em minmax(0, 1fr); gap: 12px; padding: 7px 0 7px 14px; position: relative; }
+.timeline li::before { content: ""; position: absolute; left: -6px; top: 15px; width: 10px; height: 10px; border-radius: 50%; background: var(--ground); border: 2px solid var(--zhu); }
+.timeline b { font-family: var(--f-display); font-weight: 400; font-size: 1.15rem; }
+.timeline p { margin: 0; font-size: 0.95rem; }
+.sources { margin: 0; font-size: 0.86rem; color: var(--muted); max-width: 100ch; }
+
+@media (max-width: 900px) {
+  .studio, .two { grid-template-columns: minmax(0, 1fr); }
+  .symbols { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 520px) { .masthead { grid-template-columns: minmax(0, 1fr); } }
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="papercut" defer></script>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <div>
+      <p class="eyebrow">Art Studio · China · from the 6th century</p>
+      <h1>Jianzhi Window Flowers</h1>
+      <p class="lede">Fold a square of red paper, cut through every layer at once, and open it out: one cut becomes two, four or eight, in perfect symmetry. Chinese families paste these cuttings, “flowers”, on their windows to welcome the spring and the new year. Fold, cut, and hang yours against the light.</p>
+    </div>
+    <div class="seal" aria-hidden="true">剪纸</div>
+  </header>
+
+  <section class="studio" aria-label="The cutting table and the window">
+    <div class="pane">
+      <h2>On the table, folded</h2>
+      <canvas id="fold" width="480" height="480" tabindex="0" aria-label="The folded paper. Draw a closed loop to cut it out, or click to cut the chosen shape."></canvas>
+      <div class="tools">
+        <div class="row" role="group" aria-label="How the paper is folded">
+          <span>Fold</span>
+          <button class="tbtn fold" type="button" data-f="half" aria-pressed="false">In half</button>
+          <button class="tbtn fold" type="button" data-f="quarter" aria-pressed="false">In quarters</button>
+          <button class="tbtn fold" type="button" data-f="eighth" aria-pressed="true">In eighths</button>
+        </div>
+        <div class="row" role="group" aria-label="Cutting tool">
+          <span>Cut</span>
+          <button class="tbtn tool" type="button" data-t="free" aria-pressed="true">Scissors</button>
+          <button class="tbtn tool" type="button" data-t="crescent" aria-pressed="false">Crescent</button>
+          <button class="tbtn tool" type="button" data-t="drop" aria-pressed="false">Drop</button>
+          <button class="tbtn tool" type="button" data-t="petal" aria-pressed="false">Petal</button>
+          <button class="tbtn tool" type="button" data-t="dot" aria-pressed="false">Dot</button>
+          <button class="tbtn tool" type="button" data-t="saw" aria-pressed="false">Sawtooth</button>
+        </div>
+        <div class="row">
+          <label class="slider" for="shapeSize"><span>Shape size <output id="sizeOut" for="shapeSize">24</output></span><input id="shapeSize" type="range" min="8" max="60" value="24"></label>
+          <label class="slider" for="shapeTurn"><span>Turn <output id="turnOut" for="shapeTurn">0°</output></span><input id="shapeTurn" type="range" min="0" max="345" step="15" value="0"></label>
+        </div>
+        <div class="row">
+          <button class="tbtn" id="undo" type="button">Undo the last cut</button>
+          <button class="tbtn" id="fresh" type="button">Fresh sheet</button>
+          <span>Paper</span>
+          <button class="tbtn paper" type="button" data-c="#b8241c" aria-pressed="true">red</button>
+          <button class="tbtn paper" type="button" data-c="#c98f1d" aria-pressed="false">gold</button>
+          <button class="tbtn paper" type="button" data-c="#1f1a19" aria-pressed="false">black</button>
+        </div>
+      </div>
+    </div>
+    <div class="pane">
+      <h2>On the window, opened</h2>
+      <canvas id="window" width="480" height="480" aria-label="The unfolded paper cut pasted on a lattice window with light behind it"></canvas>
+      <div class="row">
+        <span>Start from</span>
+        <button class="tbtn go preset" type="button" data-p="tuanhua">A round flower</button>
+        <button class="tbtn go preset" type="button" data-p="xi">Double happiness 囍</button>
+        <button class="tbtn go preset" type="button" data-p="window">A window corner</button>
+      </div>
+      <p class="note" id="note" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="two" aria-label="Symbols and methods">
+    <div class="text">
+      <h2>What the cuts say</h2>
+      <p>Most cuttings are called hua, “flowers”, meaning a pattern rather than a plant. Red paper is the favourite because red stands for happiness and good fortune, though any colour can be used.</p>
+      <div class="symbols">
+        <div class="sym"><b>福</b><strong>Fu</strong><p>Good fortune, cut for the Chinese New Year.</p></div>
+        <div class="sym"><b>囍</b><strong>Shuangxi</strong><p>Double happiness, cut for weddings: two 喜, “joy”, side by side.</p></div>
+        <div class="sym"><b>团花</b><strong>Tuanhua</strong><p>Round flowers, folded to symmetry, standing for balance and wholeness.</p></div>
+      </div>
+      <p>Folding makes the symmetry. The paper is usually folded an even number of times, twice or four times, so that a single cut repeats around the centre when it is opened. Try cutting half of 囍 against the fold: the double happiness appears only when you unfold it.</p>
+    </div>
+    <div class="text">
+      <h2>Scissors or knife</h2>
+      <p>With scissors, up to eight sheets are fastened together and cut at once with sharp, pointed blades. With a knife, the layers of paper lie on a soft bed of tallow and ash, and the craftsman carves the pattern, usually following a design but sometimes freehand.</p>
+      <div class="schools">
+        <div><b>The northern style</b><p>From Yuxian and Fengning in Hebei and from northern Shaanxi: bold, exaggerated shapes, animals and patterns, often simple and symmetrical. Yuxian cuttings are dyed in layers of bright colour.</p></div>
+        <div><b>The southern style</b><p>From Foshan in Guangdong and from Fujian: precise, decorative and elegant.</p></div>
+        <div><b>Miao cuttings</b><p>In southeast Guizhou, papercuts are not for windows but patterns for embroidery.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="two" aria-label="History">
+    <div class="text">
+      <h2>Older than most of the paper</h2>
+      <p>Before paper, patterns were cut from gold and silver leaf, silk and leather. Paper made the craft cheap and everywhere. Because damp rots paper, few old cuttings survive in the rainy south, while the dry north kept more. In 2009 Chinese paper cutting was added to UNESCO’s list of the intangible cultural heritage of humanity.</p>
+    </div>
+    <ol class="timeline">
+      <li><b>105</b><p>The court official Cai Lun is credited with inventing paper.</p></li>
+      <li><b>386–581</b><p>The oldest known paper cutting, found in a grave in Xinjiang in 1959.</p></li>
+      <li><b>618–907</b><p>Under the Tang, paper cutting becomes an art as well as a craft.</p></li>
+      <li><b>960–1368</b><p>From the Song and Yuan, cuttings are pasted on windows to welcome the spring.</p></li>
+      <li><b>1368–1912</b><p>Under the Ming and Qing, the art reaches its height.</p></li>
+      <li><b>2009</b><p>Added to UNESCO’s Intangible Cultural Heritage list.</p></li>
+    </ol>
+  </section>
+
+  <p class="sources">Sources: Wikipedia, <a href="https://en.wikipedia.org/wiki/Chinese_paper_cutting" target="_blank" rel="noopener">Chinese paper cutting</a> (Cai Lun and paper, gold and silver leaf before paper, the Xinjiang find of 1959 dated 386–581, Tang, Song, Yuan, Ming and Qing, windows and the spring, hua, red for happiness, 福 and 囍, tuanhua, folding an even number of times, scissors and knife methods, the northern, southern and Miao styles, survival in the north and south, UNESCO 2009). The shapes and presets are drawn by this page.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const S = 480, C = 240, M = 30;          // canvas size, centre, margin of table around the sheet
+  const SH = S - 2 * M;                    // sheet side
+  const X0 = M, X1 = S - M;
+  function rng(seed) { let s = seed >>> 0; return () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+
+  // ---------- Folds: the folded packet, and the moves that open it ----------
+  const FOLDS = {
+    half: { region: (g) => { g.rect(X0, X0, C - X0, SH); }, ops: [[1, 0, 0, 1, 0, 0], [-1, 0, 0, 1, 2 * C, 0]], label: 'two' },
+    quarter: { region: (g) => { g.rect(X0, X0, C - X0, C - X0); }, ops: [[1, 0, 0, 1, 0, 0], [-1, 0, 0, 1, 2 * C, 0], [1, 0, 0, -1, 0, 2 * C], [-1, 0, 0, -1, 2 * C, 2 * C]], label: 'four' },
+    eighth: { region: (g) => { g.moveTo(C, C); g.lineTo(C, X0); g.lineTo(X0, X0); g.closePath(); }, ops: [], label: 'eight' }
+  };
+  // eight moves for the round fold: four quarter turns, each with or without a mirror
+  for (let k = 0; k < 4; k++) {
+    const a = k * Math.PI / 2, c = Math.round(Math.cos(a)), s = Math.round(Math.sin(a));
+    const rot = [c, s, -s, c, C - c * C + s * C, C - s * C - c * C];
+    FOLDS.eighth.ops.push(rot);
+    FOLDS.eighth.ops.push(mul(rot, [-1, 0, 0, 1, 2 * C, 0]));
+  }
+  function mul(a, b) { // the canvas transform a then b
+    return [a[0] * b[0] + a[2] * b[1], a[1] * b[0] + a[3] * b[1], a[0] * b[2] + a[2] * b[3], a[1] * b[2] + a[3] * b[3], a[0] * b[4] + a[2] * b[5] + a[4], a[1] * b[4] + a[3] * b[5] + a[5]];
+  }
+
+  // ---------- State ----------
+  let fold = 'eighth', tool = 'free', shapeSize = 24, shapeTurn = 0, paper = '#b8241c';
+  const cuts = document.createElement('canvas'); cuts.width = S; cuts.height = S;
+  const kctx = cuts.getContext('2d');
+  const undo = [];
+  const fiber = document.createElement('canvas'); fiber.width = S; fiber.height = S;
+  {
+    const g = fiber.getContext('2d'), im = g.createImageData(S, S), r = rng(8);
+    for (let i = 0; i < S * S; i++) { const v = 200 + r() * 55; im.data[i * 4] = v; im.data[i * 4 + 1] = v; im.data[i * 4 + 2] = v; im.data[i * 4 + 3] = 30; }
+    g.putImageData(im, 0, 0);
+  }
+
+  // ---------- Drawing cut shapes into the packet ----------
+  function regionClip(g) { g.beginPath(); FOLDS[fold].region(g); g.clip(); }
+  function cutPath(build) {
+    snapshot();
+    kctx.save(); regionClip(kctx);
+    kctx.fillStyle = '#000'; kctx.beginPath(); build(kctx); kctx.fill('evenodd');
+    kctx.restore();
+  }
+  function shape(g, kind, x, y, s, turn) {
+    const t = new DOMMatrix().translate(x, y).rotate(turn);
+    const P = (px, py) => { const p = t.transformPoint(new DOMPoint(px, py)); return [p.x, p.y]; };
+    const poly = (pts) => { pts.forEach(([px, py], i) => { const [a, b] = P(px, py); i ? g.lineTo(a, b) : g.moveTo(a, b); }); g.closePath(); };
+    if (kind === 'dot') { g.moveTo(x + s * 0.5, y); g.arc(x, y, s * 0.5, 0, Math.PI * 2); return; }
+    const pts = [];
+    if (kind === 'crescent') {
+      // a moon: the outer arc one way, an offset inner arc back
+      for (let a = -150; a <= 150; a += 10) pts.push([Math.cos(a * Math.PI / 180) * s * 0.55, Math.sin(a * Math.PI / 180) * s * 0.55]);
+      for (let a = 125; a >= -125; a -= 10) pts.push([Math.cos(a * Math.PI / 180) * s * 0.48 - s * 0.2, Math.sin(a * Math.PI / 180) * s * 0.48]);
+    } else if (kind === 'drop') {
+      // a teardrop: pointed at the top, round at the bottom
+      for (let a = 0; a <= 360; a += 8) { const r = a * Math.PI / 180; pts.push([Math.sin(r) * Math.sin(r / 2) * s * 0.42, -Math.cos(r) * s * 0.5]); }
+    } else if (kind === 'petal') {
+      // an almond: pointed at both ends
+      for (let k = 0; k <= 20; k++) { const t = -1 + k / 10; pts.push([(1 - t * t) * s * 0.22, t * s * 0.5]); }
+      for (let k = 19; k >= 1; k--) { const t = -1 + k / 10; pts.push([-(1 - t * t) * s * 0.22, t * s * 0.5]); }
+    }
+    poly(pts);
+  }
+  function cutShape(kind, x, y) { cutPath((g) => shape(g, kind, x, y, shapeSize, shapeTurn)); render(); }
+  function cutSaw(a, b) {
+    const len = Math.hypot(b[0] - a[0], b[1] - a[1]); if (len < 8) return;
+    const ux = (b[0] - a[0]) / len, uy = (b[1] - a[1]) / len, nx = -uy, ny = ux;
+    const tooth = Math.max(6, shapeSize * 0.4), n = Math.floor(len / tooth);
+    // a row of small triangular notches, the sawtooth that edges so many cuts
+    cutPath((g) => {
+      for (let i = 0; i < n; i++) {
+        const x = a[0] + ux * tooth * i, y = a[1] + uy * tooth * i;
+        g.moveTo(x, y); g.lineTo(x + ux * tooth, y + uy * tooth); g.lineTo(x + ux * tooth / 2 + nx * tooth * 0.9, y + uy * tooth / 2 + ny * tooth * 0.9); g.closePath();
+      }
+    });
+    render();
+  }
+  function snapshot() { const c = document.createElement('canvas'); c.width = S; c.height = S; c.getContext('2d').drawImage(cuts, 0, 0); undo.push(c); if (undo.length > 30) undo.shift(); }
+
+  // ---------- Rendering ----------
+  const fc = $('#fold'), fg = fc.getContext('2d');
+  const wc = $('#window'), wg = wc.getContext('2d');
+  const full = document.createElement('canvas'); full.width = S; full.height = S;
+  const ug = full.getContext('2d');
+  function buildFull(ops) {
+    ug.setTransform(1, 0, 0, 1, 0, 0);
+    ug.clearRect(0, 0, S, S);
+    ug.globalCompositeOperation = 'source-over';
+    ug.fillStyle = paper; ug.fillRect(X0, X0, SH, SH);
+    ug.drawImage(fiber, 0, 0);
+    ug.globalCompositeOperation = 'destination-in'; ug.fillRect(X0, X0, SH, SH);
+    ug.globalCompositeOperation = 'destination-out';
+    (ops || FOLDS[fold].ops).forEach((m) => { ug.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]); ug.drawImage(cuts, 0, 0); });
+    ug.setTransform(1, 0, 0, 1, 0, 0);
+    ug.globalCompositeOperation = 'source-over';
+  }
+  let lasso = null, sawStart = null, hover = null;
+  // the table view is zoomed so the folded packet fills it
+  function view() {
+    const bx = X0, by = X0, w = C - X0, h = fold === 'half' ? SH : C - X0;
+    const sc = Math.min((S - 48) / w, (S - 48) / h);
+    return { sc, tx: (S - w * sc) / 2 - bx * sc, ty: (S - h * sc) / 2 - by * sc };
+  }
+  function renderFold() {
+    const g = fg, V = view();
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.clearRect(0, 0, S, S);
+    g.fillStyle = '#2a201c'; g.fillRect(0, 0, S, S);
+    g.save();
+    g.setTransform(V.sc, 0, 0, V.sc, V.tx, V.ty);
+    drawPacket(g, V.sc);
+    g.restore();
+    g.fillStyle = 'rgba(241, 230, 219, 0.75)'; g.font = '12px "Azeret Mono", monospace';
+    g.fillText(fold === 'eighth' ? 'dashed: the folds, meeting at the centre' : 'dashed: the folded edge', 12, S - 10);
+  }
+  function drawPacket(g, sc) {
+    // the folded packet: thick layers of paper with the cuts through them
+    g.save();
+    g.shadowColor = 'rgba(0,0,0,0.6)'; g.shadowBlur = 12; g.shadowOffsetY = 4;
+    g.beginPath(); FOLDS[fold].region(g); g.fillStyle = 'rgba(0,0,0,0.01)'; g.fill();
+    g.restore();
+    const packet = document.createElement('canvas'); packet.width = S; packet.height = S;
+    const p = packet.getContext('2d');
+    p.fillStyle = paper; p.beginPath(); FOLDS[fold].region(p); p.fill();
+    p.drawImage(fiber, 0, 0);
+    p.globalCompositeOperation = 'destination-in'; p.beginPath(); FOLDS[fold].region(p); p.fill();
+    p.globalCompositeOperation = 'destination-out'; p.drawImage(cuts, 0, 0);
+    g.drawImage(packet, 0, 0);
+    // the fold edges
+    g.save(); g.strokeStyle = 'rgba(255,255,255,0.35)'; g.lineWidth = 2 / sc; g.setLineDash([6 / sc, 5 / sc]);
+    g.beginPath();
+    if (fold === 'half') { g.moveTo(C, X0); g.lineTo(C, X1); }
+    if (fold === 'quarter') { g.moveTo(C, X0); g.lineTo(C, C); g.lineTo(X0, C); }
+    if (fold === 'eighth') { g.moveTo(C, X0); g.lineTo(C, C); g.lineTo(X0, X0); }
+    g.stroke(); g.restore();
+    // what is being drawn
+    if (lasso && lasso.length > 1) {
+      g.save(); g.strokeStyle = '#ffe9a8'; g.lineWidth = 1.5 / sc; g.setLineDash([4 / sc, 3 / sc]);
+      g.beginPath(); lasso.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.stroke(); g.restore();
+    }
+    if (sawStart && hover) { g.save(); g.strokeStyle = '#ffe9a8'; g.lineWidth = 1.5 / sc; g.setLineDash([4 / sc, 3 / sc]); g.beginPath(); g.moveTo(sawStart[0], sawStart[1]); g.lineTo(hover[0], hover[1]); g.stroke(); g.restore(); }
+    if (hover && !lasso && !sawStart && tool !== 'free' && tool !== 'saw') {
+      g.save(); g.strokeStyle = 'rgba(255, 233, 168, 0.9)'; g.lineWidth = 1.5 / sc; g.beginPath(); shape(g, tool, hover[0], hover[1], shapeSize, shapeTurn); g.stroke(); g.restore();
+    }
+  }
+  function renderWindow(img) {
+    const g = wg;
+    // light through window paper, and the wooden lattice
+    const light = g.createRadialGradient(C, C * 0.8, 40, C, C, S * 0.75);
+    light.addColorStop(0, '#fffaf0'); light.addColorStop(1, '#efe2c9');
+    g.fillStyle = light; g.fillRect(0, 0, S, S);
+    g.strokeStyle = 'rgba(120, 90, 60, 0.18)'; g.lineWidth = 1;
+    for (let i = 0; i < 12; i++) { g.beginPath(); g.moveTo(0, i * 40 + 20); g.lineTo(S, i * 40 + 20); g.stroke(); }
+    // the paper cut, pasted on, with the faintest shadow
+    g.save(); g.shadowColor = 'rgba(80, 40, 20, 0.35)'; g.shadowBlur = 3; g.shadowOffsetX = 1; g.shadowOffsetY = 2;
+    g.drawImage(img || full, 0, 0); g.restore();
+    // the lattice frame
+    g.fillStyle = '#5b3a24';
+    g.fillRect(0, 0, S, 12); g.fillRect(0, S - 12, S, 12); g.fillRect(0, 0, 12, S); g.fillRect(S - 12, 0, 12, S);
+    g.fillStyle = 'rgba(91, 58, 36, 0.75)';
+    for (const v of [6, S - 14]) { for (let k = 1; k < 6; k++) { g.fillRect(v, k * 80, 8, 4); g.fillRect(k * 80, v, 4, 8); } }
+  }
+  function render() { buildFull(); renderFold(); renderWindow(); }
+
+  // the unfolding: open the packet one fold at a time
+  let unfolding = 0;
+  function unfold() {
+    const ops = FOLDS[fold].ops, my = ++unfolding;
+    if (reduceMotion) { render(); return; }
+    let k = 1;
+    (function next() {
+      if (my !== unfolding) return;
+      const upto = fold === 'eighth' ? [1, 2, 4, 8][k] : fold === 'quarter' ? [1, 2, 4][k] : [1, 2][k];
+      if (!upto) { render(); return; }
+      const order = fold === 'eighth' ? [0, 1, 7, 6, 2, 3, 5, 4] : [0, 1, 2, 3];
+      // show only the layers opened so far: the paper outside them is still folded underneath
+      const open = order.slice(0, upto).map((i) => ops[i]);
+      const show = document.createElement('canvas'); show.width = S; show.height = S;
+      const sg = show.getContext('2d');
+      open.forEach((m) => {
+        sg.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        const piece = document.createElement('canvas'); piece.width = S; piece.height = S;
+        const pg = piece.getContext('2d');
+        pg.fillStyle = paper; pg.beginPath(); FOLDS[fold].region(pg); pg.fill();
+        pg.globalCompositeOperation = 'destination-out'; pg.drawImage(cuts, 0, 0);
+        sg.drawImage(piece, 0, 0);
+      });
+      renderWindow(show);
+      k++;
+      setTimeout(next, 360);
+    })();
+  }
+
+  // ---------- Pointer ----------
+  const note = $('#note');
+  const say = (t, cls) => { note.textContent = t; note.className = 'note' + (cls ? ' ' + cls : ''); };
+  function pt(e) {
+    const r = fc.getBoundingClientRect(), V = view();
+    const x = (e.clientX - r.left) * S / r.width, y = (e.clientY - r.top) * S / r.height;
+    return [(x - V.tx) / V.sc, (y - V.ty) / V.sc];
+  }
+  fc.addEventListener('pointerdown', (e) => {
+    const p = pt(e);
+    fc.setPointerCapture(e.pointerId);
+    if (tool === 'free') lasso = [p];
+    else if (tool === 'saw') sawStart = p;
+    else { cutShape(tool, p[0], p[1]); unfold(); }
+  });
+  fc.addEventListener('pointermove', (e) => {
+    const p = pt(e); hover = p;
+    if (lasso) { const l = lasso[lasso.length - 1]; if (Math.hypot(p[0] - l[0], p[1] - l[1]) > 3) lasso.push(p); }
+    renderFold();
+  });
+  ['pointerup', 'pointercancel'].forEach((t) => fc.addEventListener(t, () => {
+    if (lasso) {
+      const pts = lasso; lasso = null;
+      if (pts.length > 4) { cutPath((g) => { pts.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.closePath(); }); render(); unfold(); }
+      else renderFold();
+    }
+    if (sawStart) { const a = sawStart; sawStart = null; if (hover) { cutSaw(a, hover); unfold(); } }
+  }));
+  fc.addEventListener('pointerleave', () => { hover = null; renderFold(); });
+  fc.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && tool !== 'free' && tool !== 'saw') { e.preventDefault(); const c = fold === 'half' ? [C - 60, C] : fold === 'quarter' ? [C - 60, C - 60] : [C - 30, C - 110]; cutShape(tool, c[0], c[1]); unfold(); }
+  });
+
+  // ---------- Controls ----------
+  function setFold(f, quiet) {
+    fold = f; kctx.clearRect(0, 0, S, S); undo.length = 0;
+    $$('.fold').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.f === f)));
+    render();
+    if (!quiet) say(`A fresh sheet folded in ${f === 'half' ? 'half' : f === 'quarter' ? 'quarters' : 'eighths'}. Every cut goes through ${FOLDS[f].label} layers, so it will appear ${FOLDS[f].label} times when you open it.`);
+  }
+  $$('.fold').forEach((b) => b.addEventListener('click', () => setFold(b.dataset.f)));
+  $$('.tool').forEach((b) => b.addEventListener('click', () => {
+    tool = b.dataset.t; $$('.tool').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    say({ free: 'Scissors: draw a closed loop on the packet and that piece is cut out of every layer.', saw: 'Sawtooth: drag a line to cut a row of little teeth along it.', crescent: 'Crescent: click to cut a moon shape. Turn it with the slider.', drop: 'Drop: click to cut a teardrop.', petal: 'Petal: click to cut a petal.', dot: 'Dot: click to punch a round hole.' }[tool]);
+    renderFold();
+  }));
+  $('#shapeSize').addEventListener('input', (e) => { shapeSize = +e.target.value; $('#sizeOut').textContent = shapeSize; renderFold(); });
+  $('#shapeTurn').addEventListener('input', (e) => { shapeTurn = +e.target.value; $('#turnOut').textContent = shapeTurn + '°'; renderFold(); });
+  $('#undo').addEventListener('click', () => { const c = undo.pop(); if (!c) return; kctx.clearRect(0, 0, S, S); kctx.drawImage(c, 0, 0); render(); say('That cut is mended. Real scissors are less forgiving.'); });
+  $('#fresh').addEventListener('click', () => setFold(fold));
+  $$('.paper').forEach((b) => b.addEventListener('click', () => { paper = b.dataset.c; $$('.paper').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); render(); }));
+
+  // ---------- Presets ----------
+  const PRESETS = {
+    tuanhua() {
+      setFold('eighth', true);
+      const at = (r, deg) => [C - Math.sin(deg * Math.PI / 180) * r, C - Math.cos(deg * Math.PI / 180) * r];
+      const keep = { shapeSize, shapeTurn };
+      const put = (kind, r, deg, s, turn) => { shapeSize = s; shapeTurn = turn; const [x, y] = at(r, deg); cutPath((g) => shape(g, kind, x, y, s, turn)); };
+      put('dot', 0, 0, 26, 0);
+      put('petal', 52, 22, 30, -22);
+      put('drop', 96, 10, 26, -10);
+      put('crescent', 96, 34, 22, 56);
+      put('petal', 140, 22, 34, -22);
+      put('dot', 170, 6, 10, 0); put('dot', 172, 38, 10, 0);
+      put('drop', 196, 22, 20, -22 + 180);
+      // sawtooth inside the rim
+      const a = at(120, 2), b = at(120, 44); cutSaw(a, b);
+      shapeSize = keep.shapeSize; shapeTurn = keep.shapeTurn;
+      render(); unfold();
+      say('A round flower, tuanhua, folded in eighths: eight petals, eight drops and a sawtooth ring, each cut only once.', 'good');
+    },
+    xi() {
+      setFold('half', true);
+      // everything but one 喜 set against the fold is cut away
+      snapshot();
+      const t = document.createElement('canvas'); t.width = S; t.height = S;
+      const g = t.getContext('2d');
+      g.fillStyle = '#000'; g.fillRect(X0, X0, C - X0, SH);
+      g.globalCompositeOperation = 'destination-out';
+      g.font = '900 184px "Noto Serif SC", "SimSun", serif'; g.textAlign = 'right'; g.textBaseline = 'middle';
+      // the right side of the character just reaches past the fold, so the two halves join
+      g.fillText('喜', C + 18, C + 8);
+      g.fillRect(C - 8, C - 20, 16, 40);
+      kctx.save(); regionClip(kctx); kctx.drawImage(t, 0, 0); kctx.restore();
+      render(); unfold();
+      say('Folded once, only one 喜, “joy”, was cut, pressed against the fold. Opened, it becomes 囍, double happiness, the wedding cutting.', 'good');
+    },
+    window() {
+      setFold('quarter', true);
+      const keep = { shapeSize, shapeTurn };
+      const put = (kind, x, y, s, turn) => { shapeSize = s; shapeTurn = turn; cutPath((g) => shape(g, kind, x, y, s, turn)); };
+      for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) if (i + j < 5) put((i + j) % 2 ? 'crescent' : 'petal', 70 + i * 44, 70 + j * 44, 26, (i * 45 + j * 30) % 360);
+      cutSaw([X0 + 18, X0 + 18], [C - 6, X0 + 18]); cutSaw([X0 + 18, C - 6], [X0 + 18, X0 + 18]);
+      put('dot', C - 16, C - 16, 26, 0);
+      shapeSize = keep.shapeSize; shapeTurn = keep.shapeTurn;
+      render(); unfold();
+      say('Folded in quarters: a lattice of petals and moons, edged with sawtooth, repeated four ways.', 'good');
+    }
+  };
+  $$('.preset').forEach((b) => b.addEventListener('click', () => PRESETS[b.dataset.p]()));
+
+  // ---------- Start ----------
+  const ready = document.fonts && document.fonts.load ? document.fonts.load('900 40px "Noto Serif SC"', '喜') : Promise.resolve();
+  Promise.race([ready, new Promise((r) => setTimeout(r, 1500))]).then(() => {
+    PRESETS.tuanhua();
+    say('This round flower was cut once on paper folded into eighths. Cut more into the packet on the left, or start a fresh sheet.');
+  });
+})();
+</script>
+</body>
+</html>

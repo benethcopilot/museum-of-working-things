@@ -28,7 +28,7 @@ tools/check.mjs         checks the list, the folders and the links agree
 | Sky & Time | Brass Astrolabe, Eratosthenes' Shadow, Harrison's Sea Watch, Foucault's Pendulum |
 | Music & Sound | Carousel Band Organ, Thirty-Note Music Box, Autoharp Chords, Hammond Organ |
 | Life Science | Litter Lab, Broad Street Pump, Darwin's Finches, Semmelweis's Two Clinics |
-| Art Studio | Ebru Tray, Cyanotype Sun Prints, Edo Woodblock Print, Shodō Brush and Ink, Ikebana Moribana, Shibori Indigo, Watercolour Washes |
+| Art Studio | Ebru Tray, Cyanotype Sun Prints, Edo Woodblock Print, Shodō Brush and Ink, Ikebana Moribana, Shibori Indigo, Watercolour Washes, Jianzhi Window Flowers |
 | Making & Mending | Kintsugi Bowl, Letterpress Type Case |
 | Machines & Messages | Lock and Dam No. 1, Enigma Machine, Telegraph Office, Jacquard Loom, Difference Engine, Split Rock Lighthouse |
 | Numbers & Elements | Mendeleev's Table, Slide Rule, Napier's Bones, Galileo's Ramp |
