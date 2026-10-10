@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Roman Mosaic Workshop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,600;1,400&family=Cinzel:wght@600;800&family=DM+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  /* Layout: the floor panel on the left, the mosaicist's bench on the right (design, opus, tesserae, lay and grout); then the steps, the kinds of opus and famous floors. */
+  --ground: #e5e3dd;
+  --card: #f3f2ee;
+  --ink: #1f1d1b;
+  --muted: #5c5852;
+  --line: rgba(31, 29, 27, 0.14);
+  --red: #a02c22;
+  --ochre: #9a6c1c;
+  --f-display: "Cinzel", "Trajan Pro", Georgia, serif;
+  --f-body: "Alegreya", Georgia, "Times New Roman", serif;
+  --f-data: "DM Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #141312;
+    --card: #1c1b19;
+    --ink: #ebe8e2;
+    --muted: #aaa49b;
+    --line: rgba(235, 232, 226, 0.13);
+    --red: #ec8a7c;
+    --ochre: #e0b562;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #141312;
+  --card: #1c1b19;
+  --ink: #ebe8e2;
+  --muted: #aaa49b;
+  --line: rgba(235, 232, 226, 0.13);
+  --red: #ec8a7c;
+  --ochre: #e0b562;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--f-body); font-size: 19px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--ochre); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 800; line-height: 1.1; margin: 0; text-wrap: balance; letter-spacing: 0.02em; }
+a { color: var(--red); }
+
+.page { box-sizing: border-box; max-width: 1200px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 48px; }
+.masthead { display: grid; gap: 10px; }
+.eyebrow { margin: 0; font-family: var(--f-data); font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.masthead h1 { font-size: clamp(2.6rem, 7.5vw, 5rem); }
+.masthead h1 span { color: var(--red); }
+.lede { margin: 0; max-width: 64ch; color: var(--muted); }
+h2 { font-size: clamp(1.6rem, 3.2vw, 2.2rem); }
+.text { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.text p { margin: 0; max-width: 64ch; }
+
+/* ---------- Workshop ---------- */
+.shop { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+.floorbox { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+#floor { display: block; width: 100%; height: auto; border-radius: 2px; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25); touch-action: none; cursor: crosshair; background: #8a8174; }
+.caption { margin: 0; font-size: 0.9rem; color: var(--muted); }
+.count { margin: 0; font-family: var(--f-data); font-size: 0.86rem; }
+.bench { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.tray { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; background: var(--card); border: 1px solid var(--line); border-radius: 3px; }
+.tray > span { font-family: var(--f-data); font-size: 0.74rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.btn { padding: 5px 11px; border-radius: 3px; border: 1.5px solid var(--line); background: none; font-size: 0.95rem; }
+.btn:hover { border-color: var(--ink); }
+.btn[aria-pressed="true"] { border-color: var(--ink); background: color-mix(in srgb, var(--ink) 10%, transparent); }
+.btn.main { background: var(--ink); color: var(--ground); border-color: var(--ink); font-weight: 600; }
+.stone { display: inline-flex; align-items: center; gap: 6px; }
+.stone i { width: 18px; height: 18px; border-radius: 2px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25); }
+.opus { display: grid; gap: 4px; }
+.opus label { display: grid; grid-template-columns: auto 1fr; gap: 0 8px; align-items: baseline; padding: 5px 6px; border-radius: 3px; cursor: pointer; }
+.opus label:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.opus input { margin: 0; accent-color: var(--red); }
+.opus b { font-family: var(--f-display); font-size: 0.92rem; letter-spacing: 0.03em; }
+.opus small { grid-column: 2; font-size: 0.88rem; color: var(--muted); }
+.note { margin: 0; padding: 10px 12px; border-left: 3px solid var(--ochre); background: var(--card); font-size: 0.98rem; }
+
+/* ---------- Below ---------- */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; counter-reset: s; }
+.steps li { padding: 12px 14px; background: var(--card); border: 1px solid var(--line); border-radius: 3px; counter-increment: s; }
+.steps li::before { content: counter(s, upper-roman); display: block; font-family: var(--f-display); font-size: 1.5rem; color: var(--red); line-height: 1.1; }
+.steps b { display: block; }
+.steps p { margin: 2px 0 0; font-size: 0.95rem; color: var(--muted); }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 36px; align-items: start; }
+dl { margin: 0; display: grid; gap: 6px; }
+dl div { padding: 8px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 3px; }
+dt { font-family: var(--f-display); font-weight: 600; font-size: 0.98rem; }
+dd { margin: 0; font-size: 0.95rem; color: var(--muted); }
+.sources { margin: 0; font-size: 0.88rem; color: var(--muted); max-width: 100ch; }
+
+@media (max-width: 940px) {
+  .shop, .two { grid-template-columns: minmax(0, 1fr); }
+  .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 480px) { .steps { grid-template-columns: minmax(0, 1fr); } }
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="roman-mosaic" defer></script>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <p class="eyebrow">Art Studio · Pompeii and the Roman world · 2nd century BC to 4th century AD</p>
+    <h1>Roman Mosaic <span>Workshop</span></h1>
+    <p class="lede">A Roman floor was made of thousands of small cut stones called tesserae, pressed one at a time into wet mortar. Paint the design on the mortar, choose how the stones will be laid, and watch the rows go down. The way they flow, which mosaicists call the andamento, is half the picture.</p>
+  </header>
+
+  <section class="shop" aria-label="The mosaic workshop">
+    <div class="floorbox">
+      <canvas id="floor" width="1280" height="880" aria-label="A mosaic panel. Drag on it to paint guidelines on the mortar."></canvas>
+      <p class="count" id="count"></p>
+      <p class="caption">Drag on the panel to paint the design on the mortar in the stone you have chosen. Then lay the tesserae.</p>
+    </div>
+    <div class="bench">
+      <div class="tray">
+        <span>The design</span>
+        <div class="row" role="group" aria-label="Designs">
+          <button class="btn preset" type="button" data-p="dog" aria-pressed="true">Cave canem</button>
+          <button class="btn preset" type="button" data-p="fish" aria-pressed="false">Fish and waves</button>
+          <button class="btn preset" type="button" data-p="maze" aria-pressed="false">Labyrinth</button>
+          <button class="btn preset" type="button" data-p="blank" aria-pressed="false">Blank floor</button>
+        </div>
+        <div class="row" role="group" aria-label="Stone to paint with" id="stones"></div>
+        <div class="row" role="group" aria-label="Brush">
+          <button class="btn brush" type="button" data-r="5" aria-pressed="false">fine brush</button>
+          <button class="btn brush" type="button" data-r="12" aria-pressed="true">broad brush</button>
+        </div>
+      </div>
+      <div class="tray">
+        <span>The opus: how the stones are laid</span>
+        <div class="opus" role="radiogroup" aria-label="Opus">
+          <label><input type="radio" name="opus" value="regulatum"><b>Regulatum</b><small>A grid. Every stone lines up across and down.</small></label>
+          <label><input type="radio" name="opus" value="tessellatum"><b>Tessellatum</b><small>Straight rows across, but not lined up down.</small></label>
+          <label><input type="radio" name="opus" value="classicum" checked><b>Vermiculatum with tessellatum</b><small>Rows hug each figure like worms, then the ground goes in straight rows.</small></label>
+          <label><input type="radio" name="opus" value="musivum"><b>Musivum</b><small>Rows follow the outlines everywhere, background too.</small></label>
+        </div>
+        <div class="row" role="group" aria-label="Tesserae size">
+          <button class="btn size" type="button" data-s="11" aria-pressed="true">floor tesserae, about 1 cm</button>
+          <button class="btn size" type="button" data-s="6" aria-pressed="false">emblem tesserae, about 5 mm</button>
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn main" id="lay" type="button">Lay the tesserae</button>
+        <button class="btn" id="grout" type="button">Grout the floor</button>
+        <button class="btn" id="look" type="button">Show the guidelines</button>
+      </div>
+      <p class="note" id="note" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="text" aria-label="How a floor was laid">
+    <h2>How a floor was laid</h2>
+    <ol class="steps">
+      <li><b>Gather the stones</b><p>Local stone, with cut brick, tile and broken pottery, gave mostly white, black, red, yellow and blue. Marble, glass and even gold were used now and then.</p></li>
+      <li><b>Mark the design</b><p>Guidelines were scored or painted onto the mortar bed. Some designs were pegged out with string.</p></li>
+      <li><b>Lay the tesserae</b><p>Fine pictures called emblemata were made in a workshop with tiny tesserae and set into the floor as its heart. The rest was laid on site in rows.</p></li>
+      <li><b>Grout</b><p>The gaps between the stones are filled, binding them into one hard surface to walk on for centuries.</p></li>
+    </ol>
+  </section>
+
+  <section class="two" aria-label="The opus and famous floors">
+    <div class="text">
+      <h2>The opus</h2>
+      <p>Opus is Latin for “work”, and in mosaic it means the way the pieces are cut and placed. The movement and flow of the rows is the andamento.</p>
+      <dl>
+        <div><dt>Opus regulatum</dt><dd>A grid: every tessera lines up across and down.</dd></div>
+        <div><dt>Opus tessellatum</dt><dd>Rows across or down, but not both. The everyday Roman floor, laid on site.</dd></div>
+        <div><dt>Opus vermiculatum</dt><dd>“Worm-like work”: lines of tesserae follow the edge of a figure, one of the most demanding kinds. It reached Italy in the 1st century BC.</dd></div>
+        <div><dt>Opus musivum</dt><dd>Vermiculatum carried through the whole background.</dd></div>
+        <div><dt>Opus sectile</dt><dd>A whole shape cut from a single piece of stone.</dd></div>
+      </dl>
+    </div>
+    <div class="text">
+      <h2>Floors to walk on</h2>
+      <p><b>Cave canem.</b> “Beware of the dog” greets visitors in black and white tesserae at the door of the House of the Tragic Poet in Pompeii, 1st century AD. Petronius’ Satyricon describes the same words painted in big letters on the wall at Trimalchio’s dinner.</p>
+      <p><b>The Alexander Mosaic.</b> Made around 120–100 BC for the House of the Faun in Pompeii, it shows Alexander the Great charging Darius III. It is 2.7 by 5.1 metres, in reds, yellows, black and white, with tesserae about 2 mm wide: an estimated one and a half million of them, perhaps more than four million.</p>
+      <p><b>Labyrinths.</b> Fifty-seven Roman maze floors are known, many in bathhouses. Making your way through one was thought to bring good luck.</p>
+      <p>A cheaper Italian style used only black on white. At the other end, the hunting gallery of the Villa Romana del Casale in Sicily, about 300 AD, covers some 300 square metres.</p>
+    </div>
+  </section>
+
+  <p class="sources">Sources: Wikipedia, <a href="https://en.wikipedia.org/wiki/Roman_mosaic" target="_blank" rel="noopener">Roman mosaic</a> (stones, brick, tile and pottery in blue, black, red, white and yellow; marble, glass and gold; guidelines scored or painted on the mortar or pegged in string; emblems; labyrinths; Villa Romana del Casale), <a href="https://en.wikipedia.org/wiki/Mosaic" target="_blank" rel="noopener">Mosaic</a> (the kinds of opus, andamento, interstices and grout, vermiculatum emblemata made in workshops, tessellatum laid on site, black on white), <a href="https://en.wikipedia.org/wiki/Opus_vermiculatum" target="_blank" rel="noopener">Opus vermiculatum</a>, <a href="https://en.wikipedia.org/wiki/Alexander_Mosaic" target="_blank" rel="noopener">Alexander Mosaic</a> and <a href="https://en.wikipedia.org/wiki/Beware_of_the_dog" target="_blank" rel="noopener">Beware of the dog</a>. The designs here are simple drawings in the spirit of those floors, not copies. The laying follows each opus with a computer rule: stones are set along rows or outlines, never overlapping, and small cut pieces fill the corners.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  // The panel is 640 by 440 units (about 60 by 40 cm with floor tesserae), drawn at twice that for sharpness.
+  const CW = 640, CH = 440, K = 2, CELL = 2, GW = CW / CELL, GH = CH / CELL, GAP = 1.6;
+  const STONES = [
+    { name: 'white', rgb: [234, 228, 214] },
+    { name: 'black', rgb: [44, 42, 40] },
+    { name: 'red', rgb: [168, 76, 50] },
+    { name: 'yellow', rgb: [212, 164, 66] },
+    { name: 'blue', rgb: [92, 120, 138] }
+  ];
+  const labels = new Uint8Array(GW * GH);
+  const occ = new Uint8Array(GW * GH);
+  let dist = new Float32Array(GW * GH);
+  let tiles = [], opus = 'classicum', size = 11, paintLab = 1, brushR = 12, view = 'tiles', grouted = false;
+
+  const cv = $('#floor'), g = cv.getContext('2d');
+  const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+
+  // ---------- Mortar ----------
+  let rs = 99;
+  const srand = () => { rs = (rs * 16807) % 2147483647; return (rs - 1) / 2147483646; };
+  function bed(base, spread) {
+    const c = mk(CW * K, CH * K), x = c.getContext('2d'), im = x.createImageData(CW * K, CH * K), d = im.data;
+    for (let i = 0; i < d.length; i += 4) { const n = (srand() - 0.5) * spread; d[i] = base[0] + n; d[i + 1] = base[1] + n; d[i + 2] = base[2] + n; d[i + 3] = 255; }
+    x.putImageData(im, 0, 0);
+    return c;
+  }
+  const wetBed = bed([150, 141, 126], 26), setBed = bed([112, 104, 93], 20), groutBed = bed([205, 197, 181], 14);
+
+  // ---------- The design (guidelines on the mortar) ----------
+  // plain Roman capitals as strokes in a box one unit high
+  const GLYPHS = {
+    A: { w: 0.7, s: [[[0, 1], [0.35, 0], [0.7, 1]], [[0.16, 0.64], [0.54, 0.64]]] },
+    C: { w: 0.66, s: [Array.from({ length: 15 }, (_, k) => { const a = (40 + k * 20) * Math.PI / 180; return [0.36 + 0.36 * Math.cos(a), 0.5 - 0.5 * Math.sin(a)]; })] },
+    E: { w: 0.56, s: [[[0.56, 0], [0, 0], [0, 1], [0.56, 1]], [[0, 0.5], [0.46, 0.5]]] },
+    M: { w: 0.84, s: [[[0, 1], [0.06, 0], [0.42, 0.78], [0.78, 0], [0.84, 1]]] },
+    N: { w: 0.66, s: [[[0, 1], [0, 0], [0.66, 1], [0.66, 0]]] },
+    V: { w: 0.7, s: [[[0, 0], [0.35, 1], [0.7, 0]]] },
+    ' ': { w: 0.3, s: [] }
+  };
+  function lettering(text, cx, top, h, lab) {
+    const gap = 0.26, total = text.split('').reduce((a, ch) => a + GLYPHS[ch].w + gap, -gap) * h;
+    let x0 = cx - total / 2;
+    const lines = [];
+    text.split('').forEach((ch) => {
+      const gl = GLYPHS[ch];
+      gl.s.forEach((st) => lines.push({ pts: st.map(([u, v]) => [x0 + u * h, top + v * h]), lab }));
+      x0 += (gl.w + gap) * h;
+    });
+    return lines;
+  }
+  let lines = [];
+  function fromDrawing(draw) {
+    const c = mk(CW, CH), x = c.getContext('2d');
+    x.fillStyle = rgb(STONES[0].rgb); x.fillRect(0, 0, CW, CH);
+    lines = draw(x) || [];
+    // single-line features are painted about one stone wide on the mortar
+    x.lineCap = 'round'; x.lineJoin = 'round'; x.lineWidth = 13;
+    lines.forEach((l) => { x.strokeStyle = col(l.lab); x.beginPath(); l.pts.forEach((p, i) => (i ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1]))); x.stroke(); });
+    const d = x.getImageData(0, 0, CW, CH).data, UNSURE = 255;
+    for (let gy = 0; gy < GH; gy++) for (let gx = 0; gx < GW; gx++) {
+      const p = ((gy * CELL + 1) * CW + gx * CELL + 1) * 4;
+      let best = 0, bd = Infinity;
+      STONES.forEach((s, k) => { const e = (d[p] - s.rgb[0]) ** 2 + (d[p + 1] - s.rgb[1]) ** 2 + (d[p + 2] - s.rgb[2]) ** 2; if (e < bd) { bd = e; best = k; } });
+      // a smoothed edge pixel is a blend of two stones; decide it from its neighbours instead
+      labels[gy * GW + gx] = bd < 900 ? best : UNSURE;
+    }
+    for (let pass = 0; pass < 6; pass++) {
+      let left = 0;
+      for (let i = 0; i < GW * GH; i++) {
+        if (labels[i] !== UNSURE) continue;
+        const x0 = i % GW, n = [x0 > 0 ? i - 1 : -1, x0 < GW - 1 ? i + 1 : -1, i - GW, i + GW].find((j) => j >= 0 && j < GW * GH && labels[j] !== UNSURE);
+        if (n === undefined) left++; else labels[i] = labels[n];
+      }
+      if (!left) break;
+    }
+    for (let i = 0; i < GW * GH; i++) if (labels[i] === UNSURE) labels[i] = 0;
+  }
+  const rgb = (c, f) => `rgb(${c.map((v) => clamp(Math.round(v * (f || 1)), 0, 255)).join(',')})`;
+  const col = (k) => rgb(STONES[k].rgb);
+  const PRESETS = {
+    dog(x) {
+      // a chained guard dog in the spirit of the Pompeii doorstep, with its inscription
+      x.strokeStyle = col(1); x.lineWidth = 12; x.strokeRect(14, 14, CW - 28, CH - 28);
+      x.fillStyle = col(1); x.strokeStyle = col(1); x.lineCap = 'round'; x.lineJoin = 'round';
+      x.beginPath(); x.ellipse(345, 186, 112, 44, -0.06, 0, Math.PI * 2); x.fill();
+      x.lineWidth = 64; x.beginPath(); x.moveTo(262, 180); x.lineTo(206, 128); x.stroke();
+      x.beginPath(); x.ellipse(188, 110, 48, 35, -0.25, 0, Math.PI * 2); x.fill();
+      // the open jaws
+      x.beginPath(); x.moveTo(166, 88); x.lineTo(112, 98); x.lineTo(108, 114); x.lineTo(150, 118); x.fill();
+      x.beginPath(); x.moveTo(160, 124); x.lineTo(118, 132); x.lineTo(122, 146); x.lineTo(170, 144); x.fill();
+      x.beginPath(); x.moveTo(194, 82); x.lineTo(226, 46); x.lineTo(230, 92); x.fill();
+      x.lineWidth = 21;
+      [[[262, 214], [214, 268], [178, 300]], [[290, 220], [282, 282], [262, 318]], [[408, 212], [446, 258], [432, 316]], [[432, 200], [494, 234], [520, 300]]].forEach((leg) => {
+        x.beginPath(); x.moveTo(leg[0][0], leg[0][1]); x.lineTo(leg[1][0], leg[1][1]); x.lineTo(leg[2][0], leg[2][1]); x.stroke();
+      });
+      x.lineWidth = 14; x.beginPath(); x.moveTo(448, 174); x.quadraticCurveTo(500, 158, 520, 102); x.stroke();
+      x.strokeStyle = col(2); x.lineWidth = 13; x.beginPath(); x.moveTo(216, 170); x.lineTo(250, 122); x.stroke();
+      x.fillStyle = col(0); x.beginPath(); x.arc(176, 100, 7, 0, Math.PI * 2); x.fill();
+      // the chain and the letters are laid as single lines of tesserae, the way mosaicists set lettering
+      const chain = []; for (let k = 0; k <= 30; k++) { const t = k / 30, a = 1 - t; chain.push([a * a * 236 + 2 * a * t * 150 + t * t * 40, a * a * 148 + 2 * a * t * 230 + t * t * 216]); }
+      return [{ pts: chain, lab: 1 }].concat(lettering('CAVE CANEM', CW / 2, 352, 56, 1));
+    },
+    fish(x) {
+      // a running meander, the Greek key, along the top and bottom, laid as single lines of black stones
+      const lines = [];
+      const band = (y0, flip) => {
+        // each hook leaves white channels at least two stones wide, so the pattern survives being laid in stone
+        const n = 7, w = 78, x0 = (CW - n * w + 26) / 2, P = (a, b) => (flip ? [CW - (x0 + a), CH - (y0 + b)] : [x0 + a, y0 + b]);
+        lines.push({ pts: [P(-26, 52), P(n * w, 52)], lab: 1 });
+        for (let k = 0; k < n; k++) { const o = k * w; lines.push({ pts: [[0, 52], [0, 0], [52, 0], [52, 26], [26, 26]].map(([a, b]) => P(o + a, b)), lab: 1 }); }
+      };
+      band(16, false); band(16, true);
+      lines.push({ pts: [[40, 92], [CW - 40, 92], [CW - 40, CH - 92], [40, CH - 92], [40, 92]], lab: 1 });
+      // waves
+      [292, 324].forEach((y, j) => { const pts = []; for (let px = 76; px <= CW - 76; px += 4) pts.push([px, y + 10 * Math.sin((px + j * 30) / 22)]); lines.push({ pts, lab: 4 }); });
+      // the fish
+      x.fillStyle = col(2); x.beginPath(); x.moveTo(430, 190); x.lineTo(520, 132); x.lineTo(505, 190); x.lineTo(522, 250); x.closePath(); x.fill();
+      x.beginPath(); x.moveTo(280, 150); x.lineTo(330, 110); x.lineTo(380, 150); x.fill();
+      x.fillStyle = col(3); x.beginPath(); x.ellipse(320, 192, 128, 58, 0, 0, Math.PI * 2); x.fill();
+      x.fillStyle = col(2); x.beginPath(); x.ellipse(320, 192, 128, 58, 0, Math.PI, Math.PI * 2); x.fill();
+      x.strokeStyle = col(1); x.lineWidth = 7; x.beginPath(); x.ellipse(320, 192, 128, 58, 0, 0, Math.PI * 2); x.stroke();
+      x.beginPath(); x.moveTo(250, 146); x.quadraticCurveTo(232, 192, 250, 238); x.stroke();
+      x.fillStyle = col(0); x.beginPath(); x.arc(225, 178, 12, 0, Math.PI * 2); x.fill();
+      x.fillStyle = col(1); x.beginPath(); x.arc(222, 178, 6, 0, Math.PI * 2); x.fill();
+      return lines;
+    },
+    maze(x) {
+      // concentric walls with doors that switch sides, and a red room at the heart
+      x.strokeStyle = col(1); x.lineWidth = 11; x.lineCap = 'butt';
+      x.strokeRect(14, 14, CW - 28, CH - 28);
+      const cx = CW / 2, cy = CH / 2;
+      for (let k = 0; k < 5; k++) {
+        const w = 560 - k * 104, h = 360 - k * 64, x0 = cx - w / 2, y0 = cy - h / 2, door = 34;
+        x.beginPath();
+        const side = k % 4;
+        const segs = [[[x0, y0], [x0 + w, y0]], [[x0 + w, y0], [x0 + w, y0 + h]], [[x0 + w, y0 + h], [x0, y0 + h]], [[x0, y0 + h], [x0, y0]]];
+        segs.forEach((s, j) => {
+          if (j === side) {
+            const mx = (s[0][0] + s[1][0]) / 2, my = (s[0][1] + s[1][1]) / 2, ux = Math.sign(s[1][0] - s[0][0]), uy = Math.sign(s[1][1] - s[0][1]);
+            x.moveTo(s[0][0], s[0][1]); x.lineTo(mx - ux * door, my - uy * door); x.moveTo(mx + ux * door, my + uy * door); x.lineTo(s[1][0], s[1][1]);
+          } else { x.moveTo(s[0][0], s[0][1]); x.lineTo(s[1][0], s[1][1]); }
+        });
+        x.stroke();
+      }
+      x.fillStyle = col(2); x.fillRect(cx - 50, cy - 26, 100, 52);
+      x.fillStyle = col(3); x.beginPath(); x.arc(cx, cy, 14, 0, Math.PI * 2); x.fill();
+    },
+    blank() {}
+  };
+
+  // distance from every cell to the nearest edge of its colour (or of the panel), in units
+  function distanceField() {
+    const INF = 1e9, d = new Float32Array(GW * GH), R2 = Math.SQRT2;
+    for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) {
+      const i = y * GW + x, l = labels[i];
+      const edge = x === 0 || y === 0 || x === GW - 1 || y === GH - 1 || labels[i - 1] !== l || labels[i + 1] !== l || labels[i - GW] !== l || labels[i + GW] !== l;
+      d[i] = edge ? 0.5 : INF;
+    }
+    for (let y = 1; y < GH; y++) for (let x = 1; x < GW - 1; x++) {
+      const i = y * GW + x;
+      d[i] = Math.min(d[i], d[i - 1] + 1, d[i - GW] + 1, d[i - GW - 1] + R2, d[i - GW + 1] + R2);
+    }
+    for (let y = GH - 2; y >= 0; y--) for (let x = GW - 2; x >= 1; x--) {
+      const i = y * GW + x;
+      d[i] = Math.min(d[i], d[i + 1] + 1, d[i + GW] + 1, d[i + GW + 1] + R2, d[i + GW - 1] + R2);
+    }
+    for (let i = 0; i < d.length; i++) d[i] *= CELL;
+    dist = d;
+  }
+
+  // ---------- Laying the tesserae ----------
+  function tryTile(cx, cy, th, s, lab, need) {
+    const c = Math.cos(th), sn = Math.sin(th), half = s / 2, hg = half + GAP / 2, R = Math.ceil(hg * 1.42 / CELL) + 1;
+    const gx0 = Math.floor(cx / CELL), gy0 = Math.floor(cy / CELL), cells = [];
+    let inside = 0, same = 0;
+    for (let gy = gy0 - R; gy <= gy0 + R; gy++) for (let gx = gx0 - R; gx <= gx0 + R; gx++) {
+      const px = (gx + 0.5) * CELL - cx, py = (gy + 0.5) * CELL - cy;
+      const u = Math.abs(px * c + py * sn), v = Math.abs(-px * sn + py * c);
+      // a cell exactly on the line between two stones belongs to neither
+      if (u >= hg - 1e-6 || v >= hg - 1e-6) continue;
+      const core = u <= half && v <= half;
+      if (gx < 0 || gy < 0 || gx >= GW || gy >= GH) { if (core) return false; continue; }
+      const i = gy * GW + gx;
+      if (occ[i]) return false;
+      cells.push(i);
+      if (core) { inside++; if (labels[i] === lab) same++; }
+    }
+    if (!inside || same < inside * need) return false;
+    cells.forEach((i) => { occ[i] = 1; });
+    const j = []; for (let k = 0; k < 8; k++) j.push((Math.random() - 0.5) * s * 0.16);
+    const tone = lab === 0 ? 0.93 + Math.random() * 0.1 : lab === 1 ? 0.85 + Math.random() * 0.4 : 0.86 + Math.random() * 0.22;
+    tiles.push({ x: cx, y: cy, th: th + (Math.random() - 0.5) * 0.08, s, lab, j, tone, warm: (Math.random() - 0.5) * 10 });
+    return true;
+  }
+  function layout() {
+    occ.fill(0); tiles = [];
+    distanceField();
+    const s = size, P = s + GAP, N = GW * GH, d = dist;
+    // the background is whichever stone covers the most floor
+    const area = new Array(STONES.length).fill(0); for (let i = 0; i < N; i++) area[labels[i]]++;
+    const bg = area.indexOf(Math.max(...area));
+    const fig = (i) => labels[i] !== bg;
+    const ang = (i) => {
+      const x = i % GW, y = (i / GW) | 0;
+      const gx = d[x < GW - 1 ? i + 1 : i] - d[x > 0 ? i - 1 : i], gy = d[y < GH - 1 ? i + GW : i] - d[y > 0 ? i - GW : i];
+      return Math.atan2(gy, gx) + Math.PI / 2;
+    };
+    const centre = (i) => [((i % GW) + 0.5) * CELL, (((i / GW) | 0) + 0.5) * CELL];
+    const contour = (pred) => {
+      const cand = [];
+      for (let i = 0; i < N; i++) { if (!pred(i)) continue; const t = d[i] / P; if (Math.abs(t - Math.floor(t) - 0.5) * P < 1.25) cand.push(i); }
+      cand.sort((a, b) => (Math.floor(d[a] / P) - Math.floor(d[b] / P)) || (a - b));
+      cand.forEach((i) => { const [x, y] = centre(i); tryTile(x, y, ang(i), s, labels[i], 0.82); });
+    };
+    const rows = (pred) => {
+      for (let k = 0; (k + 0.5) * P < CH; k++) {
+        const y = (k + 0.5) * P, gy = Math.floor(y / CELL);
+        for (let gx = 0; gx < GW; gx++) { const i = gy * GW + gx; if (pred(i)) tryTile((gx + 0.5) * CELL, y, 0, s, labels[i], 0.82); }
+      }
+    };
+    const fill = (angle) => {
+      [0.62, 0.42].forEach((f) => { for (let i = 0; i < N; i++) if (!occ[i]) { const [x, y] = centre(i); tryTile(x, y, angle(i), s * f, labels[i], 0.7); } });
+    };
+    // lettering and other single lines: one stone every pitch, turned along the stroke
+    if (opus !== 'regulatum') lines.forEach((l) => {
+      const pts = [];
+      for (let k = 1; k < l.pts.length; k++) {
+        const [ax, ay] = l.pts[k - 1], [bx, by] = l.pts[k], n = Math.max(1, Math.ceil(Math.hypot(bx - ax, by - ay)));
+        for (let j = k === 1 ? 0 : 1; j <= n; j++) pts.push([ax + (bx - ax) * j / n, ay + (by - ay) * j / n]);
+      }
+      let acc = P / 2;
+      for (let k = 1; k < pts.length; k++) {
+        acc += Math.hypot(pts[k][0] - pts[k - 1][0], pts[k][1] - pts[k - 1][1]);
+        if (acc < P) continue;
+        acc -= P;
+        const a = pts[Math.max(0, k - 3)], b = pts[Math.min(pts.length - 1, k + 3)];
+        tryTile(pts[k][0], pts[k][1], Math.atan2(b[1] - a[1], b[0] - a[0]), s, l.lab, 0.5);
+      }
+    });
+    if (opus === 'regulatum') {
+      for (let y = P / 2; y < CH; y += P) for (let x = P / 2; x < CW; x += P) { const i = Math.floor(y / CELL) * GW + Math.floor(x / CELL); tryTile(x, y, 0, s, labels[i], 0); }
+    } else if (opus === 'tessellatum') {
+      rows(() => true); fill(() => 0);
+    } else if (opus === 'classicum') {
+      contour(fig); contour((i) => !fig(i) && d[i] < 2 * P); rows((i) => !fig(i)); fill((i) => (fig(i) || d[i] < 2 * P ? ang(i) : 0));
+    } else {
+      contour(() => true); fill(ang);
+    }
+    // straight rows came out with no jitter in angle along them; keep regulatum perfectly square
+    if (opus === 'regulatum') tiles.forEach((t) => { t.th = 0; });
+  }
+
+  // ---------- Drawing ----------
+  function drawTile(t, polished) {
+    const c = Math.cos(t.th), s = Math.sin(t.th), h = t.s / 2, j = t.j, base = STONES[t.lab].rgb;
+    g.setTransform(K * c, K * s, -K * s, K * c, K * t.x, K * t.y);
+    g.beginPath();
+    g.moveTo(-h + j[0], -h + j[1]); g.lineTo(h + j[2], -h + j[3]); g.lineTo(h + j[4], h + j[5]); g.lineTo(-h + j[6], h + j[7]); g.closePath();
+    g.fillStyle = rgb([base[0] + t.warm, base[1] + t.warm * 0.4, base[2] - t.warm * 0.3], t.tone);
+    g.fill();
+    // light from the upper left catches the edges of each stone
+    g.lineWidth = 0.7;
+    g.strokeStyle = polished ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.22)';
+    g.beginPath(); g.moveTo(-h + j[6], h + j[7]); g.lineTo(-h + j[0], -h + j[1]); g.lineTo(h + j[2], -h + j[3]); g.stroke();
+    g.strokeStyle = polished ? 'rgba(0,0,0,0.12)' : 'rgba(0,0,0,0.3)';
+    g.beginPath(); g.moveTo(h + j[2], -h + j[3]); g.lineTo(h + j[4], h + j[5]); g.lineTo(-h + j[6], h + j[7]); g.stroke();
+  }
+  function drawBed(c) { g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(c, 0, 0); }
+  function sheen() {
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    const s = g.createLinearGradient(0, 0, CW * K, CH * K);
+    s.addColorStop(0, 'rgba(255,255,255,0.10)'); s.addColorStop(0.5, 'rgba(255,255,255,0)'); s.addColorStop(1, 'rgba(0,0,0,0.06)');
+    g.fillStyle = s; g.fillRect(0, 0, CW * K, CH * K);
+  }
+  const small = mk(GW, GH), smx = small.getContext('2d'), smi = smx.createImageData(GW, GH);
+  function drawGuides() {
+    drawBed(wetBed);
+    for (let i = 0; i < GW * GH; i++) { const c = STONES[labels[i]].rgb; smi.data[i * 4] = c[0]; smi.data[i * 4 + 1] = c[1]; smi.data[i * 4 + 2] = c[2]; smi.data[i * 4 + 3] = 165; }
+    smx.putImageData(smi, 0, 0);
+    g.imageSmoothingEnabled = true; g.drawImage(small, 0, 0, CW * K, CH * K);
+  }
+  function drawAll() {
+    $('#look').textContent = view === 'guides' ? 'Show the tesserae' : 'Show the guidelines';
+    if (view === 'guides') { drawGuides(); return; }
+    drawBed(grouted ? groutBed : setBed);
+    tiles.forEach((t) => drawTile(t, grouted));
+    if (grouted) sheen();
+  }
+
+  let anim = null;
+  function lay(animate) {
+    grouted = false; view = 'tiles';
+    layout();
+    countLine();
+    if (!animate || reduceMotion) { drawAll(); return; }
+    const token = {}; anim = token;
+    $('#look').textContent = 'Show the guidelines';
+    drawBed(setBed);
+    const per = Math.max(20, Math.ceil(tiles.length / 90));
+    let n = 0;
+    (function step() {
+      if (anim !== token) return;
+      const end = Math.min(tiles.length, n + per);
+      for (; n < end; n++) drawTile(tiles[n], false);
+      if (n < tiles.length) requestAnimationFrame(step); else anim = null;
+    })();
+  }
+  function countLine() {
+    $('#count').textContent = `${tiles.length.toLocaleString('en')} tesserae on this panel. The Alexander Mosaic used about 1,500,000.`;
+  }
+
+  // ---------- Painting the guidelines ----------
+  function pt(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * CW / r.width, (e.clientY - r.top) * CH / r.height]; }
+  function dab(x, y) {
+    const r = brushR / CELL, cx = x / CELL, cy = y / CELL;
+    for (let gy = Math.max(0, Math.floor(cy - r)); gy <= Math.min(GH - 1, Math.ceil(cy + r)); gy++)
+      for (let gx = Math.max(0, Math.floor(cx - r)); gx <= Math.min(GW - 1, Math.ceil(cx + r)); gx++)
+        if ((gx + 0.5 - cx) ** 2 + (gy + 0.5 - cy) ** 2 <= r * r) labels[gy * GW + gx] = paintLab;
+  }
+  let drag = null, pending = false;
+  const redraw = () => { if (!pending) { pending = true; requestAnimationFrame(() => { pending = false; drawAll(); }); } };
+  cv.addEventListener('pointerdown', (e) => {
+    try { cv.setPointerCapture(e.pointerId); } catch (err) { /* capture is optional */ }
+    anim = null;
+    if (view !== 'guides') { view = 'guides'; say('The tesserae are lifted so you can paint guidelines on the wet mortar. Lay the tesserae when the design is ready.'); }
+    $$('.preset').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+    drag = pt(e); dab(drag[0], drag[1]); redraw();
+  });
+  cv.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const p = pt(e), n = Math.max(1, Math.ceil(Math.hypot(p[0] - drag[0], p[1] - drag[1]) / 2));
+    for (let k = 1; k <= n; k++) dab(drag[0] + (p[0] - drag[0]) * k / n, drag[1] + (p[1] - drag[1]) * k / n);
+    drag = p; redraw();
+  });
+  ['pointerup', 'pointercancel'].forEach((t) => cv.addEventListener(t, () => { drag = null; }));
+
+  // ---------- Controls ----------
+  const say = (t) => { $('#note').textContent = t; };
+  const stones = $('#stones');
+  STONES.forEach((s, k) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'btn stone'; b.setAttribute('aria-pressed', String(k === paintLab));
+    b.innerHTML = `<i style="background:${rgb(s.rgb)}"></i>${s.name}`;
+    b.addEventListener('click', () => { paintLab = k; $$('.stone').forEach((x, j) => x.setAttribute('aria-pressed', String(j === k))); });
+    stones.appendChild(b);
+  });
+  $$('.brush').forEach((b) => b.addEventListener('click', () => { brushR = +b.dataset.r; $$('.brush').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); }));
+  const NOTES = {
+    dog: 'Cave canem, “beware of the dog”, as on a Pompeii doorstep. The dog and letters are laid first, then the white ground in rows.',
+    fish: 'A fish over blue waves inside a Greek key border. Try musivum and watch the water and the ground follow the fish.',
+    maze: 'A labyrinth like the ones in Roman bathhouses, with a red room at its heart. Trace the way in with your finger for luck.',
+    blank: 'A blank white floor. Paint your own design on the mortar with the stones, then lay the tesserae.'
+  };
+  function preset(name, animate) {
+    anim = null;
+    fromDrawing(PRESETS[name]);
+    $$('.preset').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.p === name)));
+    if (name === 'blank') { view = 'guides'; tiles = []; $('#count').textContent = ''; drawAll(); } else lay(animate);
+    say(NOTES[name]);
+  }
+  $$('.preset').forEach((b) => b.addEventListener('click', () => preset(b.dataset.p, true)));
+  $$('input[name="opus"]').forEach((r) => r.addEventListener('change', () => {
+    opus = r.value; lay(true);
+    say({
+      regulatum: 'Regulatum: a strict grid. Curves turn into steps, like a picture made of squares.',
+      tessellatum: 'Tessellatum: rows run straight across, and the figures are cut out of them.',
+      classicum: 'Vermiculatum around the figures, tessellatum in the ground: the outline rows make each shape glow against straight rows.',
+      musivum: 'Musivum: every row echoes the outlines, so the whole floor ripples around the design.'
+    }[opus]);
+  }));
+  $$('.size').forEach((b) => b.addEventListener('click', () => {
+    size = +b.dataset.s; $$('.size').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); lay(true);
+    say(size < 8 ? 'Emblem tesserae: smaller stones, many more of them, and much finer curves. Emblems were made this way in a workshop.' : 'Floor tesserae, about a centimetre each, laid on site.');
+  }));
+  $('#lay').addEventListener('click', () => { lay(true); say('Laying the tesserae row by row, figures first.'); });
+  $('#grout').addEventListener('click', () => {
+    if (anim) { anim = null; }
+    if (!tiles.length) { say('Lay the tesserae first.'); return; }
+    view = 'tiles'; grouted = true; drawAll();
+    say('Grout fills the gaps between the stones and the floor is washed. It is ready to walk on.');
+  });
+  $('#look').addEventListener('click', () => {
+    anim = null;
+    if (view === 'guides' && !tiles.length) { say('Lay the tesserae first.'); return; }
+    view = view === 'guides' ? 'tiles' : 'guides'; drawAll();
+  });
+
+  // open on the finished doorstep
+  let touched = false;
+  fromDrawing(PRESETS.dog);
+  lay(false); grouted = true; drawAll();
+  say(NOTES.dog);
+  if (document.fonts && document.fonts.load) document.fonts.load('800 58px Cinzel').then(() => {
+    // redraw the inscription in the Roman capitals once the font has arrived, if nobody has touched the floor yet
+    if (!touched) { fromDrawing(PRESETS.dog); lay(false); grouted = true; drawAll(); }
+  }, () => {});
+  document.addEventListener('pointerdown', () => { touched = true; }, { once: true, capture: true });
+  document.addEventListener('keydown', () => { touched = true; }, { once: true, capture: true });
+})();
+</script>
+</body>
+</html>

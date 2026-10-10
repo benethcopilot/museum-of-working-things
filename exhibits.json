@@ -145,6 +145,11 @@
       "try": "Paint a leaf fast with a nearly dry brush"
     },
     {
+      "slug": "roman-mosaic", "hall": "studio", "title": "Roman Mosaic Workshop", "ages": "All ages",
+      "blurb": "Paint a design on the wet mortar, choose the opus, and watch a Roman floor go down stone by stone, from a CAVE CANEM doorstep to a labyrinth.",
+      "try": "Lay the fish in musivum, then in a grid"
+    },
+    {
       "slug": "mendeleev", "hall": "numbers", "title": "Mendeleev’s Table", "ages": "10 and up",
       "blurb": "Deal the elements onto Mendeleev’s 1871 table, leave gaps where nothing fits, and predict the elements nobody had found yet.",
       "try": "Decide where tellurium goes"
