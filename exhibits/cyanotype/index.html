@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Cyanotype Sun Prints</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=Karla:ital,wght@0,400;0,600;1,400&family=Space+Mono&display=swap">
+<style>
+:root {
+  /* Layout: a print table in the sun. The sheet on its board with a tray of specimens beside it, and the five steps of the process down the side; then the test strip, the chemistry, and Anna Atkins's book. */
+  --ground: #e7ecef;
+  --ground-2: #d9e1e6;
+  --card: #f5f8f9;
+  --ink: #142029;
+  --muted: #53616c;
+  --line: rgba(20, 32, 41, 0.13);
+  --line-strong: rgba(20, 32, 41, 0.3);
+  --prussian: #1b3f86;
+  --sun: #b77d12;
+  --good: #2b7546;
+  --bad: #ad3a2f;
+  /* the paper and the board look the same in both themes */
+  --board: #6d5a43;
+  --board-edge: #4d3f2f;
+  --paper: #f4f1ea;
+  --f-display: "Cormorant Garamond", "Garamond", Georgia, serif;
+  --f-body: "Karla", "Segoe UI", system-ui, sans-serif;
+  --f-data: "Space Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0e141a;
+    --ground-2: #18212a;
+    --card: #131b23;
+    --ink: #e3e9ee;
+    --muted: #9ba8b4;
+    --line: rgba(227, 233, 238, 0.12);
+    --line-strong: rgba(227, 233, 238, 0.3);
+    --prussian: #8fb0f0;
+    --sun: #f0c25a;
+    --good: #80cf98;
+    --bad: #f08b7e;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #0e141a;
+  --ground-2: #18212a;
+  --card: #131b23;
+  --ink: #e3e9ee;
+  --muted: #9ba8b4;
+  --line: rgba(227, 233, 238, 0.12);
+  --line-strong: rgba(227, 233, 238, 0.3);
+  --prussian: #8fb0f0;
+  --sun: #f0c25a;
+  --good: #80cf98;
+  --bad: #f08b7e;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: default; opacity: 0.45; }
+:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 700; line-height: 1.02; margin: 0; text-wrap: balance; }
+a { color: var(--prussian); }
+
+.page { box-sizing: border-box; max-width: 1200px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 50px; }
+.masthead { display: grid; gap: 10px; }
+.eyebrow { margin: 0; font-family: var(--f-data); font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.masthead h1 { font-size: clamp(3rem, 8vw, 5.8rem); font-weight: 700; letter-spacing: -0.01em; color: var(--prussian); }
+.masthead h1 i { font-weight: 500; color: var(--ink); }
+.lede { margin: 0; max-width: 66ch; color: var(--muted); }
+.text { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.text h2, section > h2 { font-size: clamp(2rem, 4vw, 2.8rem); }
+.text p { margin: 0; max-width: 64ch; }
+
+/* ---------- The print table ---------- */
+.table { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.board { padding: 16px; border-radius: 6px; background: var(--board); border: 1px solid var(--board-edge); box-shadow: inset 0 0 0 6px rgba(0, 0, 0, 0.08); display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+#sheet { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; border-radius: 2px; box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.6); touch-action: none; cursor: crosshair; background: var(--paper); }
+#sheet.moving { cursor: grab; }
+.tray { display: flex; gap: 8px; flex-wrap: wrap; }
+.spec { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 6px 4px; border: 1px solid rgba(0, 0, 0, 0.35); border-radius: 4px; background: rgba(244, 241, 234, 0.92); color: #2a2a26; font-size: 0.72rem; line-height: 1.15; width: 84px; text-align: center; }
+.spec canvas { width: 54px; height: 72px; }
+.spec:hover:not(:disabled) { background: #fffdf7; }
+.board-note { margin: 0; font-size: 0.82rem; color: #efe6d6; }
+
+.steps { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.steps h2 { font-size: 2rem; }
+.step { padding: 10px 14px 12px; border: 1px solid var(--line); border-left: 4px solid var(--line-strong); border-radius: 3px; background: var(--card); display: flex; flex-direction: column; gap: 8px; }
+.step.now { border-left-color: var(--sun); }
+.step.done { border-left-color: var(--prussian); }
+.step h3 { font-family: var(--f-body); font-size: 0.95rem; font-weight: 600; display: flex; gap: 8px; align-items: baseline; }
+.step h3 b { font-family: var(--f-data); font-weight: 400; font-size: 0.78rem; color: var(--muted); }
+.step p { margin: 0; font-size: 0.9rem; color: var(--muted); }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.btn { padding: 5px 12px; border: 1.5px solid var(--line-strong); border-radius: 3px; background: none; font-size: 0.9rem; }
+.btn:hover:not(:disabled) { background: var(--ground-2); }
+.btn.go { background: var(--prussian); border-color: var(--prussian); color: var(--ground); font-weight: 600; }
+.btn[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--ground); }
+.slider { display: flex; flex-direction: column; gap: 2px; font-size: 0.9rem; }
+.slider input { width: 100%; accent-color: var(--sun); }
+.slider output { font-family: var(--f-data); }
+.say { margin: 0; padding: 10px 13px; border-left: 3px solid var(--sun); background: var(--card); font-size: 0.95rem; }
+.say.good { border-left-color: var(--good); }
+.say.bad { border-left-color: var(--bad); }
+.readouts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.ro { padding: 7px 10px; border-radius: 3px; background: var(--ground-2); min-width: 0; }
+.ro span { display: block; font-size: 0.74rem; color: var(--muted); }
+.ro b { font-family: var(--f-data); font-weight: 400; font-size: 1rem; font-variant-numeric: tabular-nums; }
+
+/* ---------- Strip, chemistry, history ---------- */
+.strip { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 26px; align-items: start; }
+.stripbox { padding: 12px; border-radius: 6px; background: var(--board); border: 1px solid var(--board-edge); display: flex; flex-direction: column; gap: 6px; }
+#strip { display: block; width: 100%; height: auto; aspect-ratio: 5 / 1.4; border-radius: 2px; background: var(--paper); }
+.strip-labels { display: grid; grid-template-columns: repeat(5, 1fr); font-family: var(--f-data); font-size: 0.74rem; color: #efe6d6; text-align: center; }
+.chem { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px; align-items: start; }
+.eq { display: grid; gap: 8px; }
+.eq div { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 10px; align-items: center; padding: 10px 12px; border-radius: 3px; background: var(--card); border: 1px solid var(--line); font-size: 0.92rem; }
+.eq .arrow { font-family: var(--f-data); color: var(--sun); white-space: nowrap; }
+.chip { display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; border: 1px solid rgba(0, 0, 0, 0.25); }
+.history { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-left: 2px solid var(--line-strong); }
+.timeline li { display: grid; grid-template-columns: 4.2em minmax(0, 1fr); gap: 12px; padding: 7px 0 7px 14px; position: relative; }
+.timeline li::before { content: ""; position: absolute; left: -6px; top: 15px; width: 10px; height: 10px; border-radius: 50%; background: var(--ground); border: 2px solid var(--prussian); }
+.timeline b { font-family: var(--f-display); font-size: 1.35rem; }
+.timeline p { margin: 0; font-size: 0.95rem; }
+.sources { margin: 0; font-size: 0.86rem; color: var(--muted); max-width: 100ch; }
+
+@media (max-width: 920px) {
+  .table, .strip, .chem, .history { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 520px) {
+  .spec { width: 64px; }
+  .spec canvas { width: 40px; height: 54px; }
+  .eq div { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="cyanotype" defer></script>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <p class="eyebrow">Making &amp; Mending · Kent, England · 1843</p>
+    <h1>Cyanotype <i>Sun Prints</i></h1>
+    <p class="lede">In 1843 Anna Atkins laid seaweeds on paper brushed with iron salts, set them in the sun, and rinsed the sheets in water. Where light fell the paper turned a deep Prussian blue, and the plants stayed white. She bound hundreds of these prints into the first book ever illustrated with photographs. Make your own.</p>
+  </header>
+
+  <section class="table" aria-label="The print table">
+    <div class="board">
+      <canvas id="sheet" width="480" height="360" aria-label="The printing sheet"></canvas>
+      <div class="tray" id="tray" role="group" aria-label="Specimens to lay on the sheet"></div>
+      <p class="board-note" id="boardNote">A finished print is on the board. Start a new sheet to make your own.</p>
+    </div>
+    <div class="steps">
+      <h2>Five steps, one sheet</h2>
+      <div class="step" id="st1">
+        <h3><b>1</b>Coat the paper</h3>
+        <p>In dim light, brush the yellow-green sensitizer onto the sheet: iron salts that will react to sunlight. Paint with the pointer, or coat it all.</p>
+        <div class="row"><button class="btn" id="newSheet" type="button">New sheet</button><button class="btn" id="coatAll" type="button">Coat the whole sheet</button></div>
+      </div>
+      <div class="step" id="st2">
+        <h3><b>2</b>Lay out specimens</h3>
+        <p>Pick specimens from the tray and drag them into place. Select one and press Turn to rotate it. Drag it off the sheet to take it away.</p>
+        <div class="row"><button class="btn" id="turn" type="button">Turn</button><button class="btn" id="clearSpecs" type="button">Clear specimens</button></div>
+      </div>
+      <div class="step" id="st3">
+        <h3><b>3</b>Expose to the sun</h3>
+        <div class="row" role="group" aria-label="Sky">
+          <button class="btn sky" type="button" data-uv="1" aria-pressed="true">Summer sun</button>
+          <button class="btn sky" type="button" data-uv="0.45" aria-pressed="false">Hazy</button>
+          <button class="btn sky" type="button" data-uv="0.18" aria-pressed="false">Overcast</button>
+        </div>
+        <label class="slider" for="mins"><span>Exposure: <output id="minsOut" for="mins">5 minutes</output></span><input id="mins" type="range" min="1" max="30" step="1" value="5"></label>
+        <div class="row"><button class="btn go" id="expose" type="button">Expose</button></div>
+      </div>
+      <div class="step" id="st4">
+        <h3><b>4</b>Wash in cold water</h3>
+        <p>The unexposed yellow salts dissolve and wash away. The blue stays.</p>
+        <div class="row"><button class="btn go" id="wash" type="button">Wash</button></div>
+      </div>
+      <div class="step" id="st5">
+        <h3><b>5</b>Dry</h3>
+        <p>As the print dries, the blue darkens.</p>
+        <div class="row"><button class="btn go" id="dry" type="button">Hang it to dry</button></div>
+      </div>
+      <div class="readouts">
+        <div class="ro"><span>Background blue</span><b id="roBg">—</b></div>
+        <div class="ro"><span>Detail in the plants</span><b id="roDetail">—</b></div>
+      </div>
+      <p class="say" id="say" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="strip" aria-label="Test strip">
+    <div class="text">
+      <h2>Make a test strip</h2>
+      <p>Printers find the right exposure by covering a strip with a card and sliding it back every few minutes, so each band gets twice the light of the one before. Too little and the blue is weak. Too much and light soaks through the thinner parts of the specimen until its detail fills in.</p>
+      <div class="row"><button class="btn go" id="stripBtn" type="button">Expose a test strip</button><span id="stripSky" class="slider"></span></div>
+    </div>
+    <div class="stripbox">
+      <canvas id="strip" width="500" height="140" aria-label="Test strip with five exposures"></canvas>
+      <div class="strip-labels" id="stripLabels"><span>1 min</span><span>2 min</span><span>4 min</span><span>8 min</span><span>16 min</span></div>
+    </div>
+  </section>
+
+  <section class="chem" aria-label="What the sun does">
+    <div class="text">
+      <h2>What the sun does</h2>
+      <p>John Herschel mixed two iron salts: ferric ammonium citrate and potassium ferricyanide. Together they make a yellow-green coating that dissolves in water. Ultraviolet light in sunshine changes the iron in the citrate, and the changed iron reacts with the ferricyanide to make Prussian blue, a pigment that does not dissolve. Washing carries away everything the sun did not touch.</p>
+      <p>The paper only needs water to develop, so engineers and architects used the same process to copy drawings. From 1872 it was sold as “ferro-prussiate” paper, and until the 1940s most plans were copied this way. That is why a plan is still called a blueprint.</p>
+    </div>
+    <div class="eq">
+      <div><span><i class="chip" style="background: #ddd98a"></i>Ferric ammonium citrate + potassium ferricyanide</span><span class="arrow">sunlight →</span><span>Iron changed by light, in the paper</span></div>
+      <div><span>Changed iron + ferricyanide</span><span class="arrow">reacts →</span><span><i class="chip" style="background: #1d4088"></i>Prussian blue, which will not wash out</span></div>
+      <div><span>Unexposed salts under the plants</span><span class="arrow">water →</span><span><i class="chip" style="background: #f4f1ea"></i>Washed away, leaving white paper</span></div>
+    </div>
+  </section>
+
+  <section class="history" aria-label="Anna Atkins">
+    <div class="text">
+      <h2>The first book of photographs</h2>
+      <p>Anna Atkins grew up close to her father, the scientist John George Children. Both were friends of William Henry Fox Talbot, who taught her his early photographic methods, and of John Herschel, who invented the cyanotype in 1842. Within a year she had turned it on seaweed.</p>
+      <p>She meant her prints to illustrate William Harvey’s <i>Manual of British Algae</i>, which had no pictures. She made every plate by hand, one sheet in the sun at a time, and published the first part of <i>Photographs of British Algae: Cyanotype Impressions</i> in October 1843, eight months before Talbot’s <i>Pencil of Nature</i>. She finished three volumes by 1853. Only 17 copies are known today.</p>
+    </div>
+    <ol class="timeline">
+      <li><b>1799</b><p>Anna Children is born in Tonbridge, Kent, on 16 March.</p></li>
+      <li><b>1842</b><p>John Herschel discovers and names the cyanotype. He never patents it.</p></li>
+      <li><b>1843</b><p>Atkins publishes the first part of <i>Photographs of British Algae</i> in October.</p></li>
+      <li><b>1844</b><p>The first part of Talbot’s <i>The Pencil of Nature</i>, the first photographically illustrated book sold commercially, follows in June.</p></li>
+      <li><b>1853</b><p>She completes the third volume of algae, and with Anne Dixon makes <i>Cyanotypes of British and Foreign Ferns</i>.</p></li>
+      <li><b>1871</b><p>Atkins dies on 9 June.</p></li>
+      <li><b>1872</b><p>Marion and Company of Paris start selling cyanotype paper for copying plans.</p></li>
+    </ol>
+  </section>
+
+  <p class="sources">Sources: Wikipedia, <a href="https://en.wikipedia.org/wiki/Anna_Atkins" target="_blank" rel="noopener">Anna Atkins</a> (her life, Talbot and Herschel, the October 1843 first installment, Harvey’s manual, three volumes by 1853, 17 known copies, the ferns with Anne Dixon) and <a href="https://en.wikipedia.org/wiki/Cyanotype" target="_blank" rel="noopener">Cyanotype</a> (Herschel in 1842, the two iron salts, ultraviolet light, Prussian blue, washing in cold water, the blue darkening as it dries, exposures from very short in strong sun to 10–20 minutes on a dull day, ferro-prussiate paper from 1872 and blueprints until the 1940s). The specimens are drawn by the page, after the kinds of seaweed, fern and feather Atkins printed, and the paper’s response to light is a simple model, not a measurement.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const W = 480, H = 360, N = W * H;
+  const TAU = 1.6;                       // light needed, in sun-minutes, for the blue to build (model)
+  const PAPER = [244, 241, 234], COAT = [221, 216, 126], GREY = [104, 116, 126];
+  const BLUE_WET = [27, 66, 136], BLUE_DRY = [16, 46, 112];
+  const mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+  function rng(seed) { let s = seed >>> 0; return () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+
+  // paper grain, fixed
+  const grain = new Float32Array(N);
+  { const r = rng(7); for (let i = 0; i < N; i++) grain[i] = 0.965 + 0.035 * r(); }
+
+  // ---------- Specimens, drawn as shadows ----------
+  // each returns an offscreen canvas whose darkness is how much light the specimen blocks
+  function layer(w, h, draw, alpha) {
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const g = c.getContext('2d'); g.fillStyle = '#000'; g.strokeStyle = '#000'; g.lineCap = 'round'; g.lineJoin = 'round';
+    draw(g);
+    const out = document.createElement('canvas'); out.width = w; out.height = h;
+    const o = out.getContext('2d'); o.globalAlpha = alpha; o.drawImage(c, 0, 0);
+    return out;
+  }
+  function stack(w, h, layers) {
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const g = c.getContext('2d');
+    layers.forEach((l) => g.drawImage(l, 0, 0));
+    return c;
+  }
+  const SPECIMENS = [
+    { name: 'Forked seaweed', make() {
+      const r = rng(11), w = 150, h = 210;
+      const blade = layer(w, h, (g) => {
+        (function br(x, y, a, len, wd, d) {
+          const x2 = x + Math.sin(a) * len, y2 = y - Math.cos(a) * len;
+          g.lineWidth = wd; g.beginPath(); g.moveTo(x, y);
+          g.quadraticCurveTo(x + Math.sin(a + 0.2) * len * 0.5, y - Math.cos(a + 0.2) * len * 0.5, x2, y2); g.stroke();
+          if (d === 0) { g.beginPath(); g.arc(x2, y2, wd * 0.55, 0, 7); g.fill(); return; }
+          const s = 0.32 + r() * 0.14;
+          br(x2, y2, a - s, len * (0.78 + r() * 0.1), wd * 0.86, d - 1);
+          br(x2, y2, a + s, len * (0.78 + r() * 0.1), wd * 0.86, d - 1);
+        })(75, 206, 0, 38, 9, 5);
+      }, 0.7);
+      const rib = layer(w, h, (g) => { g.lineWidth = 1.2; g.beginPath(); g.moveTo(75, 206); g.lineTo(75, 168); g.stroke(); }, 0.5);
+      return stack(w, h, [blade, rib]);
+    } },
+    { name: 'Feathery red seaweed', make() {
+      const r = rng(23), w = 150, h = 210;
+      return stack(w, h, [layer(w, h, (g) => {
+        function axis(x, y, a, len, d) {
+          let px = x, py = y, ang = a;
+          const seg = 12;
+          for (let i = 0; i < len / seg; i++) {
+            ang += (r() - 0.5) * 0.25;
+            const nx = px + Math.sin(ang) * seg, ny = py - Math.cos(ang) * seg;
+            g.lineWidth = Math.max(0.8, 2.6 - d * 0.7 - i * 0.05); g.beginPath(); g.moveTo(px, py); g.lineTo(nx, ny); g.stroke();
+            // a comb of fine branchlets on alternate sides
+            const side = i % 2 ? 1 : -1;
+            for (let k = 0; k < 3; k++) {
+              const bx = px + (nx - px) * k / 3, by = py + (ny - py) * k / 3, bl = 7 + r() * 5 - d * 2;
+              g.lineWidth = 0.8; g.beginPath(); g.moveTo(bx, by); g.lineTo(bx + Math.sin(ang + side * 1.1) * bl, by - Math.cos(ang + side * 1.1) * bl); g.stroke();
+            }
+            if (d < 2 && i % 3 === 1) axis(nx, ny, ang + side * (0.55 + r() * 0.3), len * 0.45, d + 1);
+            px = nx; py = ny;
+          }
+        }
+        axis(75, 206, 0, 180, 0);
+      }, 0.85)]);
+    } },
+    { name: 'Kelp blade', make() {
+      const w = 150, h = 210;
+      const blade = layer(w, h, (g) => {
+        g.beginPath(); g.moveTo(70, 205); g.lineTo(80, 205); g.lineTo(78, 150);
+        g.bezierCurveTo(120, 140, 128, 90, 118, 30);
+        g.lineTo(108, 8); g.lineTo(100, 34); g.lineTo(92, 4); g.lineTo(84, 32); g.lineTo(74, 2); g.lineTo(66, 34); g.lineTo(56, 6); g.lineTo(46, 36);
+        g.bezierCurveTo(22, 90, 30, 140, 72, 150); g.closePath(); g.fill();
+      }, 0.62);
+      const stipe = layer(w, h, (g) => { g.lineWidth = 7; g.beginPath(); g.moveTo(75, 206); g.quadraticCurveTo(73, 175, 75, 150); g.stroke(); }, 0.95);
+      const spots = layer(w, h, (g) => { const r = rng(5); for (let i = 0; i < 14; i++) { g.beginPath(); g.ellipse(50 + r() * 50, 50 + r() * 90, 2 + r() * 4, 1 + r() * 3, r() * 3, 0, 7); g.fill(); } }, 0.25);
+      return stack(w, h, [blade, stipe, spots]);
+    } },
+    { name: 'Lady fern', make() {
+      const w = 150, h = 210;
+      return stack(w, h, [layer(w, h, (g) => {
+        const P = (t) => [75 + 10 * Math.sin(t * 2.6), 206 - t * 198];
+        g.lineWidth = 2.4; g.beginPath(); for (let t = 0; t <= 1; t += 0.02) { const p = P(t); t ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]); } g.stroke();
+        for (let i = 2; i < 22; i++) {
+          const t = i / 22, [x, y] = P(t), side = i % 2 ? 1 : -1;
+          const len = 58 * Math.pow(1 - t, 0.75) * Math.min(1, 0.55 + t * 2);
+          const a = side * (1.05 - t * 0.35);
+          for (let k = 1; k <= 8; k++) {
+            const s = k / 8, px = x + Math.sin(a) * len * s, py = y - Math.cos(a) * len * s;
+            const sz = (1 - s * 0.7) * len * 0.11 + 1;
+            g.beginPath(); g.ellipse(px, py, sz, sz * 0.6, a, 0, 7); g.fill();
+          }
+          g.lineWidth = 1; g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.sin(a) * len, y - Math.cos(a) * len); g.stroke();
+        }
+      }, 0.93)]);
+    } },
+    { name: 'Feather', make() {
+      const r = rng(31), w = 150, h = 210;
+      const vane = layer(w, h, (g) => {
+        g.lineWidth = 0.7;
+        for (let t = 0.12; t < 0.98; t += 0.008) {
+          const x = 75 + 14 * Math.sin(t * 1.7), y = 205 - t * 196;
+          const env = Math.sin(Math.min(1, t * 1.25) * Math.PI) * 0.8 + 0.2;
+          [[-1, 46], [1, 34]].forEach(([s, L]) => {
+            const l = L * env * (0.85 + r() * 0.3);
+            g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + s * l * 0.6, y - l * 0.2, x + s * l, y - l * 0.55); g.stroke();
+          });
+        }
+      }, 0.55);
+      const down = layer(w, h, (g) => { g.lineWidth = 0.6; for (let i = 0; i < 40; i++) { const y = 196 - i * 0.8, s = i % 2 ? 1 : -1; g.beginPath(); g.moveTo(75, y); g.bezierCurveTo(75 + s * 10, y - 6, 75 + s * (14 + r() * 10), y + 4, 75 + s * (22 + r() * 8), y - 8 - r() * 6); g.stroke(); } }, 0.35);
+      const shaft = layer(w, h, (g) => { g.lineWidth = 2.2; g.beginPath(); for (let t = 0; t <= 1; t += 0.02) { const x = 75 + 14 * Math.sin(t * 1.7), y = 208 - t * 200; t ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); }, 0.9);
+      return stack(w, h, [vane, down, shaft]);
+    } }
+  ];
+  SPECIMENS.forEach((s) => {
+    s.canvas = s.make();
+    const d = s.canvas.getContext('2d').getImageData(0, 0, s.canvas.width, s.canvas.height).data;
+    s.alpha = new Uint8Array(d.length / 4);
+    for (let i = 0; i < s.alpha.length; i++) s.alpha[i] = d[i * 4 + 3];
+  });
+
+  // ---------- State ----------
+  const sheet = $('#sheet'), ctx = sheet.getContext('2d');
+  const img = ctx.createImageData(W, H);
+  const coat = new Float32Array(N);       // how much sensitizer is on each spot
+  const trans = new Float32Array(N);      // how much light reaches the paper through the specimens
+  const dose = new Float32Array(N);       // light received, in sun-minutes
+  const occ = document.createElement('canvas'); occ.width = W; occ.height = H;
+  const occCtx = occ.getContext('2d', { willReadFrequently: true });
+  let placed = [];                        // { s, x, y, rot, scale }
+  let stage = 'coat', selected = -1, uv = 1, minutes = 5, washT = 0, dryT = 0;
+
+  function computeTrans() {
+    occCtx.setTransform(1, 0, 0, 1, 0, 0);
+    occCtx.fillStyle = '#fff'; occCtx.fillRect(0, 0, W, H);
+    placed.forEach((p) => {
+      occCtx.setTransform(1, 0, 0, 1, 0, 0);
+      occCtx.translate(p.x, p.y); occCtx.rotate(p.rot); occCtx.scale(p.scale, p.scale);
+      occCtx.drawImage(p.s.canvas, -p.s.canvas.width / 2, -p.s.canvas.height / 2);
+    });
+    occCtx.setTransform(1, 0, 0, 1, 0, 0);
+    const d = occCtx.getImageData(0, 0, W, H).data;
+    for (let i = 0; i < N; i++) trans[i] = d[i * 4] / 255;
+  }
+  const density = (q) => 1 - Math.exp(-q / TAU);
+
+  // ---------- Drawing the sheet ----------
+  function render() {
+    const px = img.data;
+    const wet = BLUE_WET, dry = BLUE_DRY;
+    for (let i = 0; i < N; i++) {
+      const g = grain[i], c = coat[i];
+      let col;
+      if (stage === 'coat' || stage === 'arrange') col = mix(PAPER, COAT, c);
+      else {
+        const dn = density(dose[i]);
+        const before = mix(mix(PAPER, COAT, c), GREY, dn * c);
+        if (washT <= 0) col = before;
+        else {
+          const blue = mix(wet, dry, dryT);
+          const after = mix(PAPER, blue, Math.min(1, dn * c * (1 + 0.08 * dryT)));
+          col = mix(before, after, washT);
+        }
+      }
+      const k = i * 4;
+      px[k] = col[0] * g; px[k + 1] = col[1] * g; px[k + 2] = col[2] * g; px[k + 3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+    // specimens lie on top until they are lifted off for washing
+    if (stage === 'coat' || stage === 'arrange' || (stage === 'exposed' && washT === 0)) {
+      placed.forEach((p, idx) => {
+        ctx.save();
+        ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.scale(p.scale, p.scale);
+        ctx.globalAlpha = stage === 'exposed' ? 0.85 : 0.92;
+        ctx.filter = 'none';
+        drawSpecimenColor(p.s, idx === selected);
+        ctx.restore();
+      });
+    }
+  }
+  // specimens shown in their natural colours while they lie on the sheet
+  const tintCache = new Map();
+  function tinted(s) {
+    if (tintCache.has(s)) return tintCache.get(s);
+    const c = document.createElement('canvas'); c.width = s.canvas.width; c.height = s.canvas.height;
+    const g = c.getContext('2d');
+    g.drawImage(s.canvas, 0, 0);
+    g.globalCompositeOperation = 'source-in';
+    g.fillStyle = { 'Forked seaweed': '#8a6a2c', 'Feathery red seaweed': '#9b2d35', 'Kelp blade': '#6b5a22', 'Lady fern': '#3f7a35', 'Feather': '#7d746a' }[s.name];
+    g.fillRect(0, 0, c.width, c.height);
+    tintCache.set(s, c);
+    return c;
+  }
+  function drawSpecimenColor(s, sel) {
+    const t = tinted(s);
+    if (sel) { ctx.shadowColor = 'rgba(183, 125, 18, 0.95)'; ctx.shadowBlur = 8; }
+    ctx.drawImage(t, -t.width / 2, -t.height / 2);
+    ctx.shadowBlur = 0;
+  }
+
+  // ---------- Tray ----------
+  const tray = $('#tray');
+  SPECIMENS.forEach((s, i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'spec';
+    const c = document.createElement('canvas'); c.width = 150; c.height = 210;
+    c.getContext('2d').drawImage(tinted(s), 0, 0);
+    b.appendChild(c);
+    b.appendChild(document.createTextNode(s.name));
+    b.setAttribute('aria-label', 'Lay the ' + s.name.toLowerCase() + ' on the sheet');
+    b.addEventListener('click', () => {
+      if (stage !== 'coat' && stage !== 'arrange') return;
+      stage = 'arrange';
+      const r = Math.random;
+      placed.push({ s, x: 90 + r() * (W - 180), y: 110 + r() * (H - 220), rot: (r() - 0.5) * 0.8, scale: 0.95 + r() * 0.25 });
+      selected = placed.length - 1;
+      steps(); render();
+      say(`${s.name} laid on the sheet. Drag it where you want it.`);
+    });
+    tray.appendChild(b);
+  });
+
+  // ---------- Pointer on the sheet: brushing and arranging ----------
+  function toSheet(e) {
+    const r = sheet.getBoundingClientRect();
+    return [(e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height];
+  }
+  function hit(x, y) {
+    for (let i = placed.length - 1; i >= 0; i--) {
+      const p = placed[i], c = Math.cos(-p.rot), s = Math.sin(-p.rot);
+      const dx = (x - p.x) / p.scale, dy = (y - p.y) / p.scale;
+      const u = dx * c - dy * s + p.s.canvas.width / 2, v = dx * s + dy * c + p.s.canvas.height / 2;
+      if (u < 0 || v < 0 || u >= p.s.canvas.width || v >= p.s.canvas.height) continue;
+      // generous: anything within the specimen's outline box near some leaf counts
+      for (let oy = -6; oy <= 6; oy += 3) for (let ox = -6; ox <= 6; ox += 3) {
+        const uu = (u + ox) | 0, vv = (v + oy) | 0;
+        if (uu >= 0 && vv >= 0 && uu < p.s.canvas.width && vv < p.s.canvas.height && p.s.alpha[vv * p.s.canvas.width + uu] > 20) return i;
+      }
+    }
+    return -1;
+  }
+  let drag = null, brushing = false, lastBrush = null;
+  const brushR = rng(99);
+  function brush(x, y) {
+    const R = 26;
+    const pts = lastBrush ? Math.max(1, Math.ceil(Math.hypot(x - lastBrush[0], y - lastBrush[1]) / 4)) : 1;
+    for (let k = 0; k < pts; k++) {
+      const bx = lastBrush ? lastBrush[0] + (x - lastBrush[0]) * (k + 1) / pts : x;
+      const by = lastBrush ? lastBrush[1] + (y - lastBrush[1]) * (k + 1) / pts : y;
+      for (let yy = Math.max(0, by - R | 0); yy < Math.min(H, by + R); yy++) {
+        for (let xx = Math.max(0, bx - R | 0); xx < Math.min(W, bx + R); xx++) {
+          const d = Math.hypot(xx - bx, yy - by) / R;
+          if (d >= 1) continue;
+          // bristle streaks run along the stroke
+          const streak = 0.75 + 0.25 * Math.sin(yy * 1.7 + xx * 0.05);
+          const i = yy * W + xx;
+          coat[i] = Math.min(1, coat[i] + (1 - d * d) * 0.28 * streak);
+        }
+      }
+    }
+    lastBrush = [x, y];
+    brushR();
+  }
+  let rafPending = false;
+  const requestRender = () => { if (!rafPending) { rafPending = true; requestAnimationFrame(() => { rafPending = false; render(); }); } };
+  sheet.addEventListener('pointerdown', (e) => {
+    if (stage !== 'coat' && stage !== 'arrange') return;
+    sheet.setPointerCapture(e.pointerId);
+    const [x, y] = toSheet(e);
+    const i = hit(x, y);
+    if (i >= 0) {
+      selected = i; drag = { dx: x - placed[i].x, dy: y - placed[i].y };
+      placed.push(placed.splice(i, 1)[0]); selected = placed.length - 1;
+      sheet.classList.add('moving');
+    } else {
+      selected = -1;
+      brushing = true; lastBrush = null; brush(x, y);
+      if (stage === 'arrange' && !placed.length) stage = 'coat';
+    }
+    steps(); requestRender();
+  });
+  sheet.addEventListener('pointermove', (e) => {
+    const [x, y] = toSheet(e);
+    if (drag && selected >= 0) { placed[selected].x = x - drag.dx; placed[selected].y = y - drag.dy; requestRender(); }
+    else if (brushing) { brush(x, y); requestRender(); }
+  });
+  ['pointerup', 'pointercancel'].forEach((t) => sheet.addEventListener(t, () => {
+    if (drag && selected >= 0) {
+      const p = placed[selected];
+      if (p.x < -20 || p.y < -20 || p.x > W + 20 || p.y > H + 20) { placed.splice(selected, 1); selected = -1; say('Specimen lifted off the sheet.'); }
+    }
+    drag = null; brushing = false; lastBrush = null;
+    sheet.classList.remove('moving');
+    steps(); requestRender();
+  }));
+  sheet.addEventListener('keydown', (e) => {
+    if (selected < 0 || (stage !== 'arrange' && stage !== 'coat')) return;
+    const d = { ArrowLeft: [-6, 0], ArrowRight: [6, 0], ArrowUp: [0, -6], ArrowDown: [0, 6] }[e.key];
+    if (d) { e.preventDefault(); placed[selected].x += d[0]; placed[selected].y += d[1]; render(); }
+    if (e.key === 'r' || e.key === 'R') { placed[selected].rot += Math.PI / 8; render(); }
+  });
+  sheet.tabIndex = 0;
+
+  // ---------- Steps ----------
+  const say = (t, cls) => { const s = $('#say'); s.textContent = t; s.className = 'say' + (cls ? ' ' + cls : ''); };
+  function steps() {
+    const order = ['coat', 'arrange', 'exposed', 'washed', 'dried'];
+    const at = order.indexOf(stage);
+    const done = [0, 1, 3, 4, 5][at], now = { coat: [0, 1], arrange: [1, 2], exposed: [3], washed: [4], dried: [] }[stage];
+    ['#st1', '#st2', '#st3', '#st4', '#st5'].forEach((s, i) => {
+      const el = $(s);
+      el.classList.toggle('done', i < done && !now.includes(i));
+      el.classList.toggle('now', now.includes(i));
+    });
+    const before = at <= 1;
+    $('#coatAll').disabled = !before; $('#turn').disabled = !before || selected < 0; $('#clearSpecs').disabled = !before || !placed.length;
+    $$('.spec').forEach((b) => { b.disabled = !before; });
+    $('#expose').disabled = !before;
+    $('#wash').disabled = stage !== 'exposed' || washT > 0;
+    $('#dry').disabled = stage !== 'washed';
+    $$('.sky').forEach((b) => { b.disabled = !before; });
+    $('#mins').disabled = !before;
+    $('#boardNote').textContent = before ? 'Drag on bare paper to brush on sensitizer. Drag a specimen to move it.' : stage === 'dried' ? 'Your print is finished. Start a new sheet to make another.' : 'Exposed sheet: the specimens have been lifted off.';
+  }
+  function newSheet() {
+    animId++;
+    coat.fill(0); dose.fill(0); placed = []; selected = -1; washT = 0; dryT = 0; stage = 'coat';
+    steps(); render(); readouts(null);
+    say('A fresh sheet of watercolor paper. Brush the sensitizer on, leaving the edges ragged the way Atkins’s sheets were.');
+  }
+  function coatAll() {
+    const r = rng(3);
+    // broad horizontal strokes with ragged ends
+    for (let y = 8; y < H - 4; y += 18) {
+      const x0 = 10 + r() * 22, x1 = W - 10 - r() * 22;
+      lastBrush = null;
+      for (let x = x0; x <= x1; x += 6) brush(x, y + Math.sin(x * 0.02 + y) * 3);
+    }
+    lastBrush = null;
+    if (stage === 'coat' && placed.length) stage = 'arrange';
+    render();
+  }
+  $('#newSheet').addEventListener('click', newSheet);
+  $('#coatAll').addEventListener('click', () => { coatAll(); say('Coated. In 1843 this was done by candlelight or in a dim room, because daylight starts the reaction at once.'); });
+  $('#turn').addEventListener('click', () => { if (selected >= 0) { placed[selected].rot += Math.PI / 8; render(); } });
+  $('#clearSpecs').addEventListener('click', () => { placed = []; selected = -1; stage = 'coat'; steps(); render(); });
+  $$('.sky').forEach((b) => b.addEventListener('click', () => {
+    uv = +b.dataset.uv;
+    $$('.sky').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    updateStripSky();
+  }));
+  const minsIn = $('#mins');
+  minsIn.addEventListener('input', () => { minutes = +minsIn.value; $('#minsOut').textContent = minutes + (minutes === 1 ? ' minute' : ' minutes'); });
+
+  function coverage() { let c = 0; for (let i = 0; i < N; i++) c += coat[i] > 0.3; return c / N; }
+  function readouts(stats) {
+    $('#roBg').textContent = stats ? Math.round(stats.bg * 100) + '%' : '—';
+    $('#roDetail').textContent = stats ? (stats.detail === null ? 'no plants' : Math.round(stats.detail * 100) + '%') : '—';
+  }
+  function measure() {
+    // background: well-coated, uncovered paper. detail: how much lighter the thin parts of the plants stay
+    let bgSum = 0, bgN = 0, thinSum = 0, thinN = 0;
+    for (let i = 0; i < N; i += 3) {
+      if (coat[i] < 0.6) continue;
+      if (trans[i] > 0.98) { bgSum += density(dose[i]); bgN++; }
+      else if (trans[i] > 0.12 && trans[i] < 0.7) { thinSum += density(dose[i]); thinN++; }
+    }
+    const bg = bgN ? bgSum / bgN : 0;
+    const thin = thinN ? thinSum / thinN : null;
+    return { bg, detail: thin === null ? null : Math.max(0, (bg - thin) / Math.max(bg, 0.01)) };
+  }
+  let animId = 0;   // a new sheet cancels anything still developing on the old one
+  function animate(ms, onFrame, done) {
+    const mine = animId;
+    if (reduceMotion) { onFrame(1); done(); return; }
+    const t0 = performance.now();
+    (function f(now) {
+      if (mine !== animId) return;
+      const k = Math.min(1, (now - t0) / ms);
+      onFrame(k);
+      if (k < 1) requestAnimationFrame(f); else done();
+    })(t0);
+  }
+  $('#expose').addEventListener('click', () => {
+    if (coverage() < 0.05) { say('There is almost no sensitizer on the sheet yet. Brush some on, or press Coat the whole sheet.', 'bad'); return; }
+    computeTrans();
+    selected = -1; stage = 'exposed'; washT = 0;
+    const total = uv * minutes;
+    steps();
+    $('#wash').disabled = true;
+    say(`Exposing for ${minutes} minute${minutes > 1 ? 's' : ''} in ${uv === 1 ? 'summer sun' : uv < 0.3 ? 'overcast light' : 'hazy sun'}. Watch the uncovered paper turn from yellow-green to a dull grey-blue.`);
+    animate(2600, (k) => {
+      for (let i = 0; i < N; i++) dose[i] = total * k * trans[i];
+      render();
+    }, () => {
+      const st = measure();
+      readouts(st);
+      steps();
+      say('Done. The image is there but faint and greenish. Lift the specimens away and wash the sheet.');
+    });
+  });
+  $('#wash').addEventListener('click', () => {
+    $('#wash').disabled = true;
+    say('Rinsing in cold running water. The yellow salts under the plants dissolve away.');
+    animate(2200, (k) => { washT = k; render(); }, () => {
+      stage = 'washed'; steps();
+      const st = measure();
+      verdict(st);
+    });
+  });
+  $('#dry').addEventListener('click', () => {
+    $('#dry').disabled = true;
+    animate(1800, (k) => { dryT = k; render(); }, () => {
+      stage = 'dried'; steps();
+      const st = measure();
+      verdict(st, true);
+    });
+  });
+  function verdict(st, dried) {
+    readouts(st);
+    const tail = dried ? ' Dry, the blue has deepened.' : ' Hang it up to dry and the blue will deepen.';
+    if (st.bg < 0.62) say(`Underexposed: the background reached only ${Math.round(st.bg * 100)}% of full blue, so the print looks pale and washed out. Give the next sheet more time or stronger sun.` + tail, 'bad');
+    else if (st.detail !== null && st.detail < 0.2) say(`Overexposed: the blue is deep, but light soaked through the thin parts of the plants and filled in their detail. Try a shorter exposure.` + tail, 'bad');
+    else say((st.detail === null ? 'A good, even blue. Lay some specimens on the next sheet to print their shapes.' : 'A good print: a deep blue ground and white plants with their fine parts still showing.') + tail, 'good');
+  }
+
+  // ---------- Test strip ----------
+  const strip = $('#strip'), sctx = strip.getContext('2d');
+  function updateStripSky() { $('#stripSky').textContent = 'Uses the sky chosen above: ' + (uv === 1 ? 'summer sun' : uv < 0.3 ? 'overcast' : 'hazy') + '.'; }
+  updateStripSky();
+  function drawStrip(k) {
+    const SW = 500, SH = 140, n = SW * SH;
+    // a feathery seaweed and a feather laid along the strip
+    const o = document.createElement('canvas'); o.width = SW; o.height = SH;
+    const g = o.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, SW, SH);
+    g.translate(SW / 2, SH / 2); g.rotate(Math.PI / 2); g.scale(0.62, 2.2);
+    g.drawImage(SPECIMENS[1].canvas, -75, -105);
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.translate(SW / 2, SH / 2 + 4); g.rotate(-Math.PI / 2); g.scale(0.55, 2.1);
+    g.drawImage(SPECIMENS[4].canvas, -75, -105);
+    const t = g.getImageData(0, 0, SW, SH).data;
+    const im = sctx.createImageData(SW, SH), p = im.data;
+    const sr = rng(41);
+    for (let i = 0; i < n; i++) {
+      const x = i % SW, band = Math.min(4, Math.floor(x / (SW / 5)));
+      const mins = [1, 2, 4, 8, 16][band];
+      const q = uv * mins * (t[i * 4] / 255) * k;
+      const dn = density(q);
+      const col = mix(PAPER, BLUE_DRY, dn);
+      const gr = 0.965 + 0.035 * sr();
+      p[i * 4] = col[0] * gr; p[i * 4 + 1] = col[1] * gr; p[i * 4 + 2] = col[2] * gr; p[i * 4 + 3] = 255;
+    }
+    sctx.putImageData(im, 0, 0);
+    sctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+    for (let b = 1; b < 5; b++) sctx.fillRect(b * SW / 5 - 0.5, 0, 1, SH);
+  }
+  $('#stripBtn').addEventListener('click', () => {
+    const btn = $('#stripBtn'); btn.disabled = true;
+    animate(1600, (k) => drawStrip(k), () => { btn.disabled = false; });
+  });
+
+  // ---------- Opening print ----------
+  (function opening() {
+    coatAll();
+    placed = [
+      { s: SPECIMENS[1], x: 150, y: 175, rot: -0.25, scale: 1.25 },
+      { s: SPECIMENS[0], x: 330, y: 190, rot: 0.3, scale: 1.1 },
+      { s: SPECIMENS[4], x: 245, y: 210, rot: 0.05, scale: 0.85 }
+    ];
+    computeTrans();
+    for (let i = 0; i < N; i++) dose[i] = 5 * trans[i];
+    stage = 'dried'; washT = 1; dryT = 1;
+    render(); steps();
+    readouts(measure());
+    say('This print was exposed for five minutes in summer sun, washed and dried. Press New sheet to make your own.', 'good');
+    drawStrip(1);
+  })();
+})();
+</script>
+</body>
+</html>
