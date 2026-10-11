@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Celtic Knotwork</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=Sometype+Mono&family=Uncial+Antiqua&display=swap">
+<style>
+:root {
+  /* Layout: the knot panel on vellum fills the top, with the plait controls beside it; then Allen's method, the history from Lombard Italy to Kells, and the eight elementary knots. */
+  --ground: #e6e9e3;
+  --card: #f4f5f1;
+  --ink: #1d2320;
+  --muted: #56605a;
+  --line: rgba(29, 35, 32, 0.14);
+  --accent: #2c6e57;
+  --red: #a8321f;
+  --f-display: "Uncial Antiqua", "Palatino Linotype", Georgia, serif;
+  --f-body: "Literata", Georgia, "Times New Roman", serif;
+  --f-data: "Sometype Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #121614;
+    --card: #1a1f1c;
+    --ink: #e7ece8;
+    --muted: #a2aca6;
+    --line: rgba(231, 236, 232, 0.13);
+    --accent: #84d1b2;
+    --red: #f08b78;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #121614;
+  --card: #1a1f1c;
+  --ink: #e7ece8;
+  --muted: #a2aca6;
+  --line: rgba(231, 236, 232, 0.13);
+  --accent: #84d1b2;
+  --red: #f08b78;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--f-body); font-size: 18px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 400; line-height: 1.1; margin: 0; text-wrap: balance; }
+a { color: var(--accent); }
+
+.page { box-sizing: border-box; max-width: 1200px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 48px; }
+.masthead { display: grid; gap: 10px; }
+.eyebrow { margin: 0; font-family: var(--f-data); font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.masthead h1 { font-size: clamp(2.8rem, 8vw, 5.2rem); }
+.masthead h1 span { color: var(--accent); }
+.lede { margin: 0; max-width: 64ch; color: var(--muted); }
+h2 { font-size: clamp(1.7rem, 3.4vw, 2.4rem); }
+.text { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.text p { margin: 0; max-width: 64ch; }
+
+.work { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.panel { padding: 12px; border-radius: 4px; background: #efe3c8; box-shadow: 0 10px 26px rgba(0, 0, 0, 0.2), inset 0 0 50px rgba(140, 100, 50, 0.2); min-width: 0; }
+#knot { display: block; width: 100%; height: auto; cursor: pointer; touch-action: manipulation; }
+.count { margin: 8px 4px 0; font-family: var(--f-data); font-size: 0.86rem; color: #5a4632; }
+.side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.tray { padding: 12px 14px; background: var(--card); border: 1px solid var(--line); border-radius: 4px; display: grid; gap: 8px; }
+.tray > span { font-family: var(--f-data); font-size: 0.74rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.btn { padding: 5px 11px; border-radius: 3px; border: 1.5px solid var(--line); background: none; font-size: 0.95rem; }
+.btn:hover { border-color: var(--ink); }
+.btn[aria-pressed="true"] { border-color: var(--ink); background: color-mix(in srgb, var(--ink) 10%, transparent); }
+.btn.main { background: var(--ink); color: var(--ground); border-color: var(--ink); font-weight: 600; }
+select { padding: 4px 6px; border-radius: 3px; border: 1.5px solid var(--line); background: var(--card); }
+label.sz { display: inline-flex; gap: 6px; align-items: center; font-size: 0.95rem; }
+.hint { margin: 0; font-size: 0.96rem; }
+.note { margin: 0; padding: 10px 12px; border-left: 3px solid var(--accent); background: var(--card); font-size: 0.97rem; }
+.breaks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; text-align: center; font-size: 0.86rem; color: var(--muted); }
+.breaks canvas { width: 100%; max-width: 90px; height: auto; display: block; margin: 0 auto 2px; background: #efe3c8; border-radius: 3px; }
+
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 36px; align-items: start; }
+.quote { margin: 0; padding: 12px 16px; border-left: 3px solid var(--red); background: var(--card); font-style: italic; }
+.quote cite { display: block; margin-top: 6px; font-style: normal; font-size: 0.86rem; color: var(--muted); }
+.dates { display: grid; gap: 6px; }
+.dates div { display: grid; grid-template-columns: 6.5em 1fr; gap: 10px; padding: 8px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 3px; }
+.dates b { font-family: var(--f-data); font-weight: 400; color: var(--red); }
+.dates p { margin: 0; font-size: 0.95rem; }
+.sources { margin: 0; font-size: 0.86rem; color: var(--muted); max-width: 100ch; }
+
+@media (max-width: 920px) { .work, .two { grid-template-columns: minmax(0, 1fr); } }
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="knotwork" defer></script>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <p class="eyebrow">Art Studio · Insular art · Ireland, Britain and Lombard Italy</p>
+    <h1>Celtic <span>Knotwork</span></h1>
+    <p class="lede">Every knot in the Book of Kells begins as a simple plait. Cut two cords where they cross and join the loose ends the other way: that is a break. Click the crossings of the plait to make breaks, and watch a woven band turn into knots.</p>
+  </header>
+
+  <section class="work" aria-label="Make knotwork">
+    <div class="panel">
+      <canvas id="knot" width="960" height="600" aria-label="A panel of plaited cords. Click a crossing to make a break."></canvas>
+      <p class="count" id="count"></p>
+    </div>
+    <div class="side">
+      <div class="tray">
+        <span>The panel</span>
+        <div class="row">
+          <label class="sz">Width <select id="w"></select></label>
+          <label class="sz">Height <select id="h"></select></label>
+        </div>
+        <div class="row" role="group" aria-label="Patterns">
+          <button class="btn" type="button" data-p="plait">Plain plait</button>
+          <button class="btn" type="button" data-p="rows">Regular breaks</button>
+          <button class="btn" type="button" data-p="cross">Cruciform breaks</button>
+          <button class="btn main" type="button" data-p="random">A new knot</button>
+        </div>
+      </div>
+      <div class="tray">
+        <span>Making a break</span>
+        <div class="breaks">
+          <div><canvas id="b0" width="90" height="90"></canvas>a crossing</div>
+          <div><canvas id="b1" width="90" height="90"></canvas>joined above and below</div>
+          <div><canvas id="b2" width="90" height="90"></canvas>joined left and right</div>
+        </div>
+        <p class="hint">Click a crossing once to join its ends one way, again to join them the other way, and a third time to let the cords cross again.</p>
+        <div class="row">
+          <button class="btn" id="mirror" type="button" aria-pressed="true">Mirror my breaks</button>
+          <button class="btn" id="colour" type="button" aria-pressed="true">Colour each cord</button>
+          <button class="btn" id="grid" type="button" aria-pressed="false">Show Allen’s setting-out</button>
+        </div>
+      </div>
+      <p class="note" id="note" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="two" aria-label="Allen's method">
+    <div class="text">
+      <h2>Plaits and breaks</h2>
+      <p>The antiquary J. Romilly Allen explained the method in 1904. A panel’s sides are divided into equal parts and joined by diagonal lines, and the plait is drawn over that network, each cord passing over and under in turn.</p>
+      <p class="quote">“If now we desire to make a break in the plait any two of the cords are cut asunder at the point where they cross each other, leaving four loose ends … To make a break the loose ends are joined together in pairs. This can be done in two ways only.”<cite>J. Romilly Allen, Celtic Art in Pagan and Christian Times, 1904</cite></p>
+      <p>Two horizontal and two vertical breaks side by side leave a space shaped like a cross. Allen found “eight elementary knots which form the basis of nearly all the interlaced patterns in Celtic decorative art”, two from a three-cord plait and six from a four-cord plait. He noted that plaits with an odd number of cords were seldom used, because they make lopsided patterns.</p>
+      <p>Every crossing on this page follows the rule of the plait: a cord that passes over at one crossing passes under at the next, all the way round, whatever breaks you make.</p>
+    </div>
+    <div class="text">
+      <h2>From Rome to Kells</h2>
+      <div class="dates">
+        <div><b>3rd–4th c.</b><p>Plaits and interlace in Roman floor mosaics. Allen found no break in any Romano-British pavement.</p></div>
+        <div><b>514–523</b><p>The marble screen of San Clemente in Rome: still plaitwork without breaks.</p></div>
+        <div><b>712–795</b><p>True knotwork, with breaks, on dated church carvings in Lombard Italy: Valpolicella (712), Cividale (737), San Prassede in Rome (772–795).</p></div>
+        <div><b>7th c.</b><p>A Gospel fragment now at Durham Cathedral holds the earliest true knots in the Celtic manner.</p></div>
+        <div><b>c. 715–800</b><p>The Lindisfarne Gospels and the Book of Kells carry knotwork to its height, beside Welsh, Pictish and Irish stone crosses.</p></div>
+        <div><b>1951</b><p>George Bain’s Celtic Art: The Methods of Construction shows how to draw it again; his son Iain later simplified the method with grid lines.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <p class="sources">Sources: J. Romilly Allen, <a href="https://www.gutenberg.org/ebooks/76733" target="_blank" rel="noopener">Celtic Art in Pagan and Christian Times</a> (1904, on Project Gutenberg: setting out a plait, breaks, cruciform breaks, the eight elementary knots, odd numbers of cords, the dated Italian examples); Wikipedia, <a href="https://en.wikipedia.org/wiki/Celtic_knot" target="_blank" rel="noopener">Celtic knot</a> (Roman mosaics, the Durham fragment, Lindisfarne and Kells) and <a href="https://en.wikipedia.org/wiki/George_Bain_(artist)" target="_blank" rel="noopener">George Bain</a>. The weaving here is drawn by a rule: crossings sit at the middles of the edges of a square grid, and at each crossing the cord running one way always lies on top, so over and under alternate along every cord.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const cv = $('#knot'), g = cv.getContext('2d'), CW = cv.width, CH = cv.height;
+  // ports at a crossing: 0 up-right, 1 up-left, 2 down-left, 3 down-right
+  const DIR = [[1, 1], [-1, 1], [-1, -1], [1, -1]];
+  const CONNECT = [
+    (p) => (p + 2) % 4,                       // crossing: straight through
+    (p) => [1, 0, 3, 2][p],                   // joined above and below: the ends turn back left and right
+    (p) => [3, 2, 1, 0][p]                    // joined left and right: the ends turn back up and down
+  ];
+  const INK = '#2a1d12';
+  const CORDS = ['#b23a24', '#2b5aa0', '#d4a020', '#2e7d5b', '#7a3f8f', '#c76a1e', '#3d8a96', '#8c2f4a'];
+  let W = 8, H = 5, state = new Map(), mirror = true, colourCords = true, showGrid = false, hover = null;
+
+  // crossings sit at the middles of grid edges: (x, y) with x + y odd, inside [0, 2W] x [0, 2H]
+  const key = (x, y) => x * 1000 + y;
+  const isSite = (x, y) => x >= 0 && y >= 0 && x <= 2 * W && y <= 2 * H && (x + y) % 2 === 1;
+  function siteState(x, y) {
+    // the border of the panel is always a break: the cords turn back at the edge
+    if (y === 0 || y === 2 * H) return 1;
+    if (x === 0 || x === 2 * W) return 2;
+    return state.get(key(x, y)) || 0;
+  }
+
+  // ---------- Tracing the cords ----------
+  let loops = [];
+  function trace() {
+    const used = new Set();
+    loops = [];
+    for (let x = 0; x <= 2 * W; x++) for (let y = 0; y <= 2 * H; y++) {
+      if (!isSite(x, y)) continue;
+      for (let p = 0; p < 4; p++) {
+        if (!isSite(x + DIR[p][0], y + DIR[p][1]) || used.has(key(x, y) * 4 + p)) continue;
+        // walk from this port until the cord closes on itself
+        const loop = [];
+        let sx = x, sy = y, inP = p, guard = 0;
+        do {
+          const outP = CONNECT[siteState(sx, sy)](inP);
+          used.add(key(sx, sy) * 4 + inP); used.add(key(sx, sy) * 4 + outP);
+          loop.push({ x: sx, y: sy, inP, outP, cross: siteState(sx, sy) === 0 });
+          sx += DIR[outP][0]; sy += DIR[outP][1]; inP = (outP + 2) % 4;
+        } while (!(sx === x && sy === y && inP === p) && ++guard < 10000);
+        loops.push(loop);
+      }
+    }
+  }
+
+  // ---------- Drawing ----------
+  let u = 30, ox = 0, oy = 0;
+  function layout() {
+    u = Math.min((CW - 60) / (2 * W), (CH - 60) / (2 * H));
+    ox = (CW - 2 * W * u) / 2; oy = (CH - 2 * H * u) / 2;
+  }
+  const P = (x, y) => [ox + x * u, oy + (2 * H - y) * u];
+  const port = (s, p) => P(s.x + DIR[p][0] * 0.5, s.y + DIR[p][1] * 0.5);
+  function piecePath(path, s, first) {
+    const a = port(s, s.inP), b = port(s, s.outP), c = P(s.x, s.y);
+    if (first) path.moveTo(a[0], a[1]);
+    if (s.cross) path.lineTo(b[0], b[1]);
+    else {
+      // a turn: the cord swings round the break, a little short of the crossing point
+      const m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], k = 0.15;
+      path.quadraticCurveTo(c[0] + (c[0] - m[0]) * k, c[1] + (c[1] - m[1]) * k, b[0], b[1]);
+    }
+  }
+  function strokeBand(path, colour) {
+    const w = u * 0.56;
+    g.lineJoin = 'round'; g.lineCap = 'butt';
+    g.strokeStyle = INK; g.lineWidth = w + u * 0.2; g.stroke(path);
+    g.strokeStyle = colour; g.lineWidth = w; g.stroke(path);
+    // a fine line down the middle, as scribes often drew
+    g.strokeStyle = 'rgba(255,248,230,0.28)'; g.lineWidth = u * 0.06; g.stroke(path);
+  }
+  function draw() {
+    g.clearRect(0, 0, CW, CH);
+    drawCords();
+    if (showGrid) {
+      g.save(); g.setLineDash([5, 5]);
+      // Allen's setting-out: the sides divided equally and joined by diagonals
+      // the cords run along these diagonals, x - y and x + y odd
+      g.strokeStyle = 'rgba(40,20,10,0.55)'; g.lineWidth = 1.2;
+      for (let c = 1 - 2 * H; c < 2 * W; c += 2) {
+        const xa = Math.max(0, c), xb = Math.min(2 * W, 2 * H + c);
+        g.beginPath(); g.moveTo(...P(xa, xa - c)); g.lineTo(...P(xb, xb - c)); g.stroke();
+      }
+      for (let c = 1; c < 2 * W + 2 * H; c += 2) {
+        const xa = Math.max(0, c - 2 * H), xb = Math.min(2 * W, c);
+        g.beginPath(); g.moveTo(...P(xa, c - xa)); g.lineTo(...P(xb, c - xb)); g.stroke();
+      }
+      g.setLineDash([]);
+      g.fillStyle = 'rgba(40,20,10,0.6)';
+      for (let x = 0; x <= 2 * W; x += 2) for (let y = 0; y <= 2 * H; y += 2) { const [X, Y] = P(x, y); g.beginPath(); g.arc(X, Y, 2.6, 0, 7); g.fill(); }
+      g.restore();
+    }
+    drawFrame();
+  }
+  function drawCords() {
+    const colourOf = (i) => (colourCords ? CORDS[i % CORDS.length] : '#e9d9b4');
+    // every cord whole, then the cord that lies on top at each crossing drawn again over it
+    const paths = loops.map((loop) => { const path = new Path2D(); loop.forEach((s, j) => piecePath(path, s, j === 0)); path.closePath(); return path; });
+    paths.forEach((path, i) => strokeBand(path, colourOf(i)));
+    loops.forEach((loop, i) => loop.forEach((s) => {
+      if (!s.cross) return;
+      // at crossings on horizontal grid edges the up-right cord is on top, on vertical edges the up-left one
+      const ports = [s.inP, s.outP];
+      const onTop = s.y % 2 === 0 ? ports.includes(0) : ports.includes(1);
+      if (!onTop) return;
+      const path = new Path2D(); piecePath(path, s, true); strokeBand(path, colourOf(i));
+    }));
+  }
+  function drawFrame() {
+    // the frame
+    const [x0, y0] = P(0, 2 * H), [x1, y1] = P(2 * W, 0);
+    g.strokeStyle = INK; g.lineWidth = 2.5; g.strokeRect(x0 - u * 0.55, y0 - u * 0.55, x1 - x0 + u * 1.1, y1 - y0 + u * 1.1);
+    g.lineWidth = 1; g.strokeRect(x0 - u * 0.75, y0 - u * 0.75, x1 - x0 + u * 1.5, y1 - y0 + u * 1.5);
+    if (hover) { const [X, Y] = P(hover.x, hover.y); g.strokeStyle = '#a8321f'; g.lineWidth = 2; g.beginPath(); g.arc(X, Y, u * 0.42, 0, 7); g.stroke(); }
+  }
+  function countLine() {
+    const n = loops.length;
+    $('#count').textContent = n === 1 ? 'One single endless cord: the whole panel is one knot.' : `${n} separate cords in this panel.`;
+  }
+  function refresh() { trace(); layout(); draw(); countLine(); }
+
+  // ---------- Clicking crossings ----------
+  function siteAt(e) {
+    const r = cv.getBoundingClientRect(), mx = (e.clientX - r.left) * CW / r.width, my = (e.clientY - r.top) * CH / r.height;
+    const fx = (mx - ox) / u, fy = 2 * H - (my - oy) / u;
+    let best = null, bd = 0.5;
+    for (let x = Math.floor(fx) - 1; x <= Math.ceil(fx) + 1; x++) for (let y = Math.floor(fy) - 1; y <= Math.ceil(fy) + 1; y++) {
+      if (!isSite(x, y) || x === 0 || y === 0 || x === 2 * W || y === 2 * H) continue;
+      const d = Math.hypot(fx - x, fy - y);
+      if (d < bd) { bd = d; best = { x, y }; }
+    }
+    return best;
+  }
+  function setSite(x, y, v) { if (v) state.set(key(x, y), v); else state.delete(key(x, y)); }
+  cv.addEventListener('click', (e) => {
+    const s = siteAt(e); if (!s) return;
+    const v = ((state.get(key(s.x, s.y)) || 0) + 1) % 3;
+    const targets = mirror ? [[s.x, s.y], [2 * W - s.x, s.y], [s.x, 2 * H - s.y], [2 * W - s.x, 2 * H - s.y]] : [[s.x, s.y]];
+    targets.forEach(([x, y]) => setSite(x, y, v));
+    const before = loops.length; refresh();
+    say(v === 0 ? 'The cords cross again.' : `A break: the four loose ends are joined in pairs${loops.length !== before ? `, and the panel now has ${loops.length === 1 ? 'a single cord' : loops.length + ' cords'}` : ''}.`);
+  });
+  cv.addEventListener('pointermove', (e) => { const s = siteAt(e); if ((s && (!hover || s.x !== hover.x || s.y !== hover.y)) || (!s && hover)) { hover = s; draw(); } });
+  cv.addEventListener('pointerleave', () => { hover = null; draw(); });
+
+  // ---------- Patterns ----------
+  const say = (t) => { $('#note').textContent = t; };
+  const interiorSites = () => { const out = []; for (let x = 1; x < 2 * W; x++) for (let y = 1; y < 2 * H; y++) if (isSite(x, y)) out.push([x, y]); return out; };
+  // a break along a grid edge: a wall that the cords may not cross
+  const along = (x, y) => (y % 2 === 0 ? 1 : 2);
+  const PATTERNS = {
+    plait() { state = new Map(); say('A plain plait, as on the crosses at Nevern and Llantwit Major: every cord passes over, then under, from edge to edge.'); },
+    rows() {
+      state = new Map();
+      // breaks along the middle line of the panel at regular intervals
+      const ym = H % 2 === 0 ? H : H - 1;
+      for (let x = 1; x < 2 * W; x += 4) if (isSite(x, ym)) setSite(x, ym, along(x, ym));
+      if (H >= 4) for (let x = 3; x < 2 * W; x += 4) { [ym - 2, ym + 2].forEach((y) => { if (y > 0 && y < 2 * H && isSite(x, y)) setSite(x, y, along(x, y)); }); }
+      say('Breaks made at regular intervals. When they come close enough together, the plait stops being the main feature and the panel becomes a row of knots.');
+    },
+    cross() {
+      state = new Map();
+      // two horizontal and two vertical breaks around a grid point leave a cross-shaped space
+      for (let i = 2; i < 2 * W; i += 4) for (let j = 2; j < 2 * H; j += 4) {
+        [[i - 1, j], [i + 1, j], [i, j - 1], [i, j + 1]].forEach(([x, y]) => { if (isSite(x, y) && x > 0 && y > 0 && x < 2 * W && y < 2 * H) setSite(x, y, along(x, y)); });
+      }
+      say('Cruciform breaks, as on the crosses at Llanbadarn Fawr and Neuadd Siarman. Allen wondered whether the cross-shaped spaces had a meaning of their own.');
+    },
+    random(seed) {
+      state = new Map();
+      // a knot with mirror symmetry both ways, from breaks chosen in one quarter
+      let s = seed || 0;
+      const rnd = seed ? () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; } : Math.random;
+      interiorSites().forEach(([x, y]) => {
+        if (x > W || y > H) return;
+        const r = rnd(), v = r < 0.62 ? 0 : r < 0.84 ? along(x, y) : 3 - along(x, y);
+        [[x, y], [2 * W - x, y], [x, 2 * H - y], [2 * W - x, 2 * H - y]].forEach(([a, b]) => setSite(a, b, v));
+      });
+      say('A new knot with symmetry both ways. Click crossings to change it, or ask for another.');
+    }
+  };
+  $$('[data-p]').forEach((b) => b.addEventListener('click', () => { PATTERNS[b.dataset.p](); refresh(); }));
+  const wSel = $('#w'), hSel = $('#h');
+  for (let k = 3; k <= 14; k++) { const o = document.createElement('option'); o.value = k; o.textContent = k; if (k === W) o.selected = true; wSel.appendChild(o); }
+  for (let k = 2; k <= 9; k++) { const o = document.createElement('option'); o.value = k; o.textContent = k; if (k === H) o.selected = true; hSel.appendChild(o); }
+  const resize = () => { W = +wSel.value; H = +hSel.value; const old = state; state = new Map(); old.forEach((v, k) => { const x = Math.floor(k / 1000), y = k % 1000; if (x < 2 * W && y < 2 * H && isSite(x, y)) state.set(k, v); }); refresh(); };
+  wSel.addEventListener('change', resize); hSel.addEventListener('change', resize);
+  $('#mirror').addEventListener('click', (e) => { mirror = !mirror; e.currentTarget.setAttribute('aria-pressed', String(mirror)); });
+  $('#colour').addEventListener('click', (e) => { colourCords = !colourCords; e.currentTarget.setAttribute('aria-pressed', String(colourCords)); draw(); });
+  $('#grid').addEventListener('click', (e) => { showGrid = !showGrid; e.currentTarget.setAttribute('aria-pressed', String(showGrid)); draw(); });
+
+  // three little diagrams of a crossing and its two breaks
+  [0, 1, 2].forEach((v) => {
+    const c = $('#b' + v), x = c.getContext('2d'), m = 45, d = 28;
+    const ends = [[m + d, m - d], [m - d, m - d], [m - d, m + d], [m + d, m + d]];
+    x.lineCap = 'round';
+    const band = (draw) => { [[INK, 12], ['#b23a24', 8]].forEach(([s, w]) => { x.strokeStyle = s; x.lineWidth = w; x.beginPath(); draw(); x.stroke(); }); };
+    if (v === 0) { band(() => { x.moveTo(...ends[1]); x.lineTo(...ends[3]); }); band(() => { x.moveTo(...ends[0]); x.lineTo(...ends[2]); }); }
+    else {
+      const pairs = v === 1 ? [[1, 0], [2, 3]] : [[1, 2], [0, 3]];
+      pairs.forEach(([a, b]) => band(() => { const A = ends[a], B = ends[b], mid = [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2]; x.moveTo(...A); x.quadraticCurveTo(m + (m - mid[0]) * 0.15, m + (m - mid[1]) * 0.15, ...B); }));
+    }
+  });
+
+  // open on a knot of two interlaced cords, the same one every time
+  PATTERNS.random(10); refresh();
+  say('A knot with symmetry both ways, made of two cords. Click any crossing to make a break, or start from a plain plait.');
+})();
+</script>
+</body>
+</html>

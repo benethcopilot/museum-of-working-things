@@ -165,6 +165,11 @@
       "try": "Colour by part, then go back to step 1"
     },
     {
+      "slug": "knotwork", "hall": "studio", "title": "Celtic Knotwork", "ages": "6 and up",
+      "blurb": "Start from a plain plait and click its crossings to make breaks, the way J. Romilly Allen explained the knots of the Book of Kells. The weave always alternates over and under.",
+      "try": "Make the whole panel one endless cord"
+    },
+    {
       "slug": "mendeleev", "hall": "numbers", "title": "Mendeleev’s Table", "ages": "10 and up",
       "blurb": "Deal the elements onto Mendeleev’s 1871 table, leave gaps where nothing fits, and predict the elements nobody had found yet.",
       "try": "Decide where tellurium goes"
