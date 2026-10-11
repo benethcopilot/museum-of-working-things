@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Javanese Batik</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Space+Mono&display=swap">
+<style>
+:root {
+  /* Layout: a length of cotton stretched on the frame at the left, the batik maker's tools and the two dye jars at the right; then the three ways of waxing, the forbidden patterns, crackle and the dyes. */
+  --ground: #ebe6dc;
+  --card: #f6f2ea;
+  --ink: #23201b;
+  --muted: #5e574c;
+  --line: rgba(35, 32, 27, 0.14);
+  --soga: #8a4f22;
+  --indigo: #2b4778;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Newsreader", Georgia, "Times New Roman", serif;
+  --f-data: "Space Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #16130f;
+    --card: #1f1b16;
+    --ink: #eee8de;
+    --muted: #aea392;
+    --line: rgba(238, 232, 222, 0.13);
+    --soga: #e3a46e;
+    --indigo: #9db6e6;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #16130f;
+  --card: #1f1b16;
+  --ink: #eee8de;
+  --muted: #aea392;
+  --line: rgba(238, 232, 222, 0.13);
+  --soga: #e3a46e;
+  --indigo: #9db6e6;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--f-body); font-size: 19px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--soga); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 800; line-height: 1.02; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+a { color: var(--soga); }
+
+.page { box-sizing: border-box; max-width: 1220px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 48px; }
+.masthead { display: grid; gap: 10px; }
+.eyebrow { margin: 0; font-family: var(--f-data); font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.masthead h1 { font-size: clamp(3rem, 9vw, 6rem); }
+.masthead h1 span { color: var(--soga); }
+.lede { margin: 0; max-width: 64ch; color: var(--muted); }
+h2 { font-size: clamp(1.7rem, 3.4vw, 2.4rem); }
+.text { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.text p { margin: 0; max-width: 64ch; }
+
+/* ---------- Frame ---------- */
+.studio { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+.frame { padding: 14px; background: linear-gradient(#7a5a3c, #5d4129); border-radius: 4px; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25); min-width: 0; }
+#cloth { display: block; width: 100%; height: auto; touch-action: none; cursor: crosshair; }
+.framecap { margin: 8px 2px 0; font-size: 0.86rem; color: #f2e4cf; font-style: italic; }
+.tools { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.tray { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; background: var(--card); border: 1px solid var(--line); border-radius: 3px; }
+.tray > span { font-family: var(--f-data); font-size: 0.74rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.btn { padding: 5px 11px; border-radius: 3px; border: 1.5px solid var(--line); background: none; font-size: 0.95rem; }
+.btn:hover { border-color: var(--ink); }
+.btn[aria-pressed="true"] { border-color: var(--ink); background: color-mix(in srgb, var(--ink) 10%, transparent); }
+.btn.main { background: var(--ink); color: var(--ground); border-color: var(--ink); font-weight: 600; }
+.jar { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
+.jar i { width: 22px; height: 26px; border-radius: 3px 3px 9px 9px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3); }
+.caps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.capbtn { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 4px; }
+.capbtn canvas { width: 46px; height: 46px; border-radius: 2px; background: #f2ead8; }
+.log { margin: 0; font-family: var(--f-data); font-size: 0.82rem; color: var(--muted); }
+.hint { margin: 0; font-size: 0.97rem; }
+.note { margin: 0; padding: 10px 12px; border-left: 3px solid var(--soga); background: var(--card); font-size: 0.98rem; }
+label.snap { display: inline-flex; gap: 6px; align-items: center; font-size: 0.92rem; }
+label.snap input { accent-color: var(--soga); }
+
+/* ---------- Below ---------- */
+.three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.three div, .motifs div { padding: 12px 14px; background: var(--card); border: 1px solid var(--line); border-radius: 3px; }
+.three b, .motifs b { display: block; font-family: var(--f-display); font-size: 1.15rem; }
+.three p, .motifs p { margin: 4px 0 0; font-size: 0.95rem; color: var(--muted); }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 36px; align-items: start; }
+.motifs { display: grid; gap: 8px; }
+.quote { margin: 0; padding: 12px 16px; border-left: 3px solid var(--indigo); background: var(--card); font-style: italic; }
+.quote cite { display: block; margin-top: 6px; font-style: normal; font-size: 0.86rem; color: var(--muted); }
+.sources { margin: 0; font-size: 0.88rem; color: var(--muted); max-width: 100ch; }
+
+@media (max-width: 940px) {
+  .studio, .two { grid-template-columns: minmax(0, 1fr); }
+  .three { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="batik" defer></script>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <p class="eyebrow">Art Studio · Java, Indonesia · UNESCO intangible heritage since 2009</p>
+    <h1>Javanese <span>Batik</span></h1>
+    <p class="lede">Batik makers draw on cotton with hot wax. Where the wax goes the dye cannot, so the cloth keeps its colour there. Stamp the wax with a copper cap, write it with a canting, dip the cloth in indigo, scrape and wax again, dip it in soga brown, then boil the wax away.</p>
+  </header>
+
+  <section class="studio" aria-label="The batik frame">
+    <div class="frame">
+      <canvas id="cloth" width="840" height="560" aria-label="A length of cotton cloth on a frame. Drag to apply wax with the chosen tool."></canvas>
+      <p class="framecap">Mori cotton stretched on the frame.</p>
+    </div>
+    <div class="tools">
+      <div class="tray">
+        <span>Wax</span>
+        <div class="row" role="group" aria-label="Wax tool">
+          <button class="btn tool" type="button" data-t="cap" aria-pressed="true">Copper cap</button>
+          <button class="btn tool" type="button" data-t="canting" aria-pressed="false">Canting</button>
+          <button class="btn tool" type="button" data-t="brush" aria-pressed="false">Brush</button>
+          <button class="btn tool" type="button" data-t="scrape" aria-pressed="false">Scraper</button>
+        </div>
+        <div class="caps" id="caps" role="group" aria-label="Cap pattern"></div>
+        <label class="snap" id="snaprow"><input type="checkbox" id="snap" checked> line each stamp up with the last</label>
+        <p class="hint" id="hint"></p>
+      </div>
+      <div class="tray">
+        <span>Dye jars</span>
+        <div class="row">
+          <button class="btn jar" type="button" data-d="indigo"><i style="background:#2f4f86"></i>Indigo</button>
+          <button class="btn jar" type="button" data-d="soga"><i style="background:#9a5a2a"></i>Soga brown</button>
+          <button class="btn" id="crush" type="button">Crush the cloth</button>
+        </div>
+        <p class="log" id="log"></p>
+      </div>
+      <div class="row">
+        <button class="btn main" id="boil" type="button">Boil off the wax</button>
+        <button class="btn" id="fresh" type="button">Fresh cloth</button>
+        <button class="btn" id="example" type="button">Example: Yogya sogan</button>
+      </div>
+      <p class="note" id="note" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="text" aria-label="Three ways to wax">
+    <h2>Written, stamped, painted</h2>
+    <div class="three">
+      <div><b>Batik tulis, written</b><p>Wax is written with a canting: a small copper cup with a spout on a wooden handle. It makes the finest patterns, and the slowest.</p></div>
+      <div><b>Batik cap, stamped</b><p>A copper stamp prints wax over a whole area at once. Its pattern is built from copper strips bent and set on edge: the lightest for fine outlines, heavier for lines, the heaviest for the frame.</p></div>
+      <div><b>Batik lukis, painted</b><p>Wax is brushed on, which is useful for covering large areas, and dyes can be painted too.</p></div>
+    </div>
+    <p>Whichever tool is used, the cloth is dipped, dried, waxed again for the next colour and dipped again, as many times as there are colours. At the end the wax is removed by boiling or scraping. On 2 October 2009 UNESCO recognised Indonesian written and stamped batik as part of the intangible heritage of humanity, and Indonesia now keeps 2 October as Batik Day.</p>
+  </section>
+
+  <section class="two" aria-label="Patterns and dyes">
+    <div class="text">
+      <h2>Forbidden patterns</h2>
+      <p>Some patterns of the Javanese courts were batik larang, “forbidden batik”, worn only by the ruler and his family.</p>
+      <div class="motifs">
+        <div><b>Kawung</b><p>From Yogyakarta: ovals in a grid like the fruit of the kawung palm, or a lotus with four petals. A sign of authority and justice, once used only by the royal family.</p></div>
+        <div><b>Parang</b><p>“Slope”: bands of S shapes running down at 45 degrees. Also batik larang; the size of the parang showed the wearer’s rank in the royal family.</p></div>
+        <div><b>Truntum</b><p>Small stars, created by Kanjeng Ratu Kencana, queen of Paku Buwana III (1749–1799), as a sign of love that guides and grows.</p></div>
+      </div>
+    </div>
+    <div class="text">
+      <h2>Indigo, then soga</h2>
+      <p>Court batik from Yogyakarta and Solo was made in deep indigo blue and the browns of soga, a dye from the trunk of the soga tree. A museum record of the process: the design is waxed with a copper cap, the cloth is dyed in indigo, waxed again, and dyed in soga. Yogya sogan is mostly dark brown, black and white; Solo sogan is orange-brown and brown.</p>
+      <p class="quote">“Unintentional crackling is a sign of poor craftsmanship.” Yet “a crackle effect can be produced all over the design by crushing the fabric … just before the last dipping.”<cite>Pieter Mijer, Batiks and How to Make Them, 1919</cite></p>
+      <p>Mijer explains why: pure beeswax cracks very little, and the more paraffin in the wax, the more it crackles.</p>
+    </div>
+  </section>
+
+  <p class="sources">Sources: Wikipedia, <a href="https://en.wikipedia.org/wiki/Batik" target="_blank" rel="noopener">Batik</a> (canting, cap, painted batik, dyeing and removal by boiling or scraping, UNESCO 2009 and Batik Day) and <a href="https://en.wikipedia.org/wiki/Indonesian_batik_patterns" target="_blank" rel="noopener">Indonesian batik patterns</a> (kawung, parang and batik larang, truntum, sogan of Yogya and Solo); Horniman Museum, <a href="https://www.horniman.ac.uk/object/HC.1999.264.12" target="_blank" rel="noopener">batik process record</a> (cap, indigo, rewaxing, soga); Pieter Mijer, <a href="https://www.gutenberg.org/ebooks/73820" target="_blank" rel="noopener">Batiks and How to Make Them</a> (1919, on Project Gutenberg: royal colours of Djocdja and Solo, copper tjaps in three weights, crackle). The cap patterns on this page are simple versions drawn for it. The dyes are a model in which each bath darkens whatever cloth it reaches.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const W = 420, H = 280, N = W * H, K = 2;               // cloth cells, shown at twice the size
+  const MORI = [246, 240, 226];
+  const DYES = { indigo: [0.30, 0.42, 0.66], soga: [0.78, 0.50, 0.27] };
+
+  const wax = new Uint8Array(N), crack = new Uint8Array(N), col = new Float32Array(N * 3), uptake = new Float32Array(N);
+  let rs = 11; const srand = () => { rs = (rs * 16807) % 2147483647; return (rs - 1) / 2147483646; };
+  for (let i = 0; i < N; i++) uptake[i] = 0.93 + srand() * 0.12;
+  let tool = 'cap', capName = 'kawung', log = [], boiled = false;
+
+  const cv = $('#cloth'), g = cv.getContext('2d');
+  const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+  const small = mk(W, H), sx = small.getContext('2d'), sim = sx.createImageData(W, H);
+  // the weave of the cotton, drawn once
+  const weave = mk(W * K, H * K);
+  (function () {
+    const x = weave.getContext('2d'), im = x.createImageData(W * K, H * K), d = im.data;
+    for (let y = 0; y < H * K; y++) for (let xx = 0; xx < W * K; xx++) {
+      const k = (y * W * K + xx) * 4, v = ((xx % 3 === 0) ? 18 : 0) + ((y % 3 === 1) ? 14 : 0) + srand() * 16;
+      d[k] = d[k + 1] = d[k + 2] = 255 - v; d[k + 3] = 255;
+    }
+    x.putImageData(im, 0, 0);
+  })();
+
+  // ---------- Cap patterns: copper strips drawn as wax lines in one tile ----------
+  const CAPS = {
+    kawung: {
+      T: 40, label: 'kawung',
+      draw(x, T, fill) {
+        const h = T / 2;
+        [[1, 1], [-1, 1], [1, -1], [-1, -1]].forEach(([a, b]) => {
+          x.save(); x.translate(h + a * T / 4, h + b * T / 4); x.rotate(a * b > 0 ? Math.PI / 4 : -Math.PI / 4);
+          x.beginPath(); x.ellipse(0, 0, T * 0.31, T * 0.15, 0, 0, Math.PI * 2);
+          if (fill) x.fill(); else { x.stroke(); x.beginPath(); x.ellipse(0, 0, T * 0.1, T * 0.035, 0, 0, Math.PI * 2); x.fill(); }
+          x.restore();
+        });
+        if (!fill) [[h, h], [0, 0], [T, 0], [0, T], [T, T]].forEach(([a, b]) => { x.beginPath(); x.arc(a, b, T * 0.055, 0, Math.PI * 2); x.fill(); });
+      }
+    },
+    parang: {
+      T: 40, label: 'parang',
+      draw(x, T) {
+        // bands of S curls between two rails at 45 degrees, repeated so that stamps join corner to corner, and a diamond in each gap
+        [-T, 0, T].forEach((sh) => {
+          [-0.2, 0.2].forEach((o) => { x.beginPath(); x.moveTo(sh + o * T, T); x.lineTo(sh + o * T + T, 0); x.stroke(); });
+          x.beginPath();
+          for (let k = 0; k <= 100; k++) {
+            const s = k / 100, w = Math.sin(s * Math.PI * 4) * T * 0.11;
+            const qx = sh + s * T + w * 0.7071, qy = T - s * T + w * 0.7071;
+            k ? x.lineTo(qx, qy) : x.moveTo(qx, qy);
+          }
+          x.stroke();
+        });
+        [[T * 0.25, T * 0.25], [T * 0.75, T * 0.75]].forEach(([a, b]) => { x.beginPath(); x.moveTo(a, b - T * 0.09); x.lineTo(a + T * 0.09, b); x.lineTo(a, b + T * 0.09); x.lineTo(a - T * 0.09, b); x.closePath(); x.fill(); });
+      }
+    },
+    truntum: {
+      T: 32, label: 'truntum',
+      draw(x, T) {
+        const star = (cx, cy, r) => {
+          for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4; x.beginPath(); x.moveTo(cx + Math.cos(a) * r * 0.3, cy + Math.sin(a) * r * 0.3); x.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r); x.stroke(); }
+          x.beginPath(); x.arc(cx, cy, r * 0.18, 0, Math.PI * 2); x.fill();
+        };
+        star(T / 2, T / 2, T * 0.3);
+        [[0, 0], [T, 0], [0, T], [T, T]].forEach(([a, b]) => star(a, b, T * 0.2));
+        [[T / 2, 0], [0, T / 2], [T, T / 2], [T / 2, T]].forEach(([a, b]) => { x.beginPath(); x.arc(a, b, T * 0.045, 0, Math.PI * 2); x.fill(); });
+      }
+    }
+  };
+  // turn a cap's drawing into a tile of wax cells
+  function rasterCap(name, fill) {
+    const cp = CAPS[name], T = cp.T, c = mk(T, T), x = c.getContext('2d');
+    x.strokeStyle = '#000'; x.fillStyle = '#000'; x.lineWidth = 1.6; x.lineCap = 'round';
+    x.beginPath(); x.rect(0, 0, T, T); x.clip();
+    cp.draw(x, T, fill);
+    const d = x.getImageData(0, 0, T, T).data, m = new Uint8Array(T * T);
+    for (let i = 0; i < T * T; i++) m[i] = d[i * 4 + 3] > 90 ? 1 : 0;
+    return { T, m };
+  }
+  const MASKS = {}, FILLS = {};
+  Object.keys(CAPS).forEach((k) => { MASKS[k] = rasterCap(k, false); });
+  FILLS.kawung = rasterCap('kawung', true);
+
+  function stampAt(cx, cy, mask, snap) {
+    const T = mask.T;
+    let x0 = Math.round(cx - T / 2), y0 = Math.round(cy - T / 2);
+    if (snap) { x0 = Math.floor(cx / T) * T; y0 = Math.floor(cy / T) * T; }
+    for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) {
+      if (!mask.m[y * T + x]) continue;
+      const X = x0 + x, Y = y0 + y;
+      if (X < 0 || Y < 0 || X >= W || Y >= H) continue;
+      const i = Y * W + X; wax[i] = 1; crack[i] = 0;
+    }
+  }
+  function disc(cx, cy, r, val) {
+    for (let y = Math.max(0, Math.floor(cy - r)); y <= Math.min(H - 1, Math.ceil(cy + r)); y++)
+      for (let x = Math.max(0, Math.floor(cx - r)); x <= Math.min(W - 1, Math.ceil(cx + r)); x++)
+        if ((x + 0.5 - cx) ** 2 + (y + 0.5 - cy) ** 2 <= r * r) { const i = y * W + x; wax[i] = val; crack[i] = 0; }
+  }
+
+  // ---------- Dyeing, crushing, boiling ----------
+  function dip(name) {
+    const f = DYES[name];
+    let reached = 0;
+    for (let i = 0; i < N; i++) {
+      let s = wax[i] ? (crack[i] ? 0.85 : 0) : 1;
+      if (!s) continue;
+      reached++;
+      s *= uptake[i];
+      for (let k = 0; k < 3; k++) col[i * 3 + k] *= 1 - s + s * f[k];
+    }
+    log.push(name === 'indigo' ? 'indigo' : 'soga');
+    boiled = false;
+    return reached / N;
+  }
+  function crush(strength) {
+    // the wax breaks along a network of fine veins
+    const B = strength > 1 ? 14 : 22, gw = Math.ceil(W / B) + 1, gh = Math.ceil(H / B) + 1, pts = [];
+    for (let j = 0; j < gh; j++) for (let i = 0; i < gw; i++) pts.push([(i + srand()) * B, (j + srand()) * B]);
+    let n = 0;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const i = y * W + x;
+      if (!wax[i]) continue;
+      const bi = Math.floor(x / B), bj = Math.floor(y / B);
+      let d1 = Infinity, d2 = Infinity;
+      for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) {
+        const ii = bi + a, jj = bj + b; if (ii < 0 || jj < 0 || ii >= gw || jj >= gh) continue;
+        const p = pts[jj * gw + ii], d = Math.hypot(p[0] - x, p[1] - y);
+        if (d < d1) { d2 = d1; d1 = d; } else if (d < d2) d2 = d;
+      }
+      if (d2 - d1 < 0.9 + (srand() - 0.5) * 0.6) { crack[i] = 1; n++; }
+    }
+    return n;
+  }
+  function boil() { wax.fill(0); crack.fill(0); boiled = true; }
+  function fresh() { wax.fill(0); crack.fill(0); for (let i = 0; i < N; i++) { col[i * 3] = MORI[0]; col[i * 3 + 1] = MORI[1]; col[i * 3 + 2] = MORI[2]; } log = []; boiled = false; }
+
+  // ---------- Drawing the cloth ----------
+  function render() {
+    const d = sim.data;
+    for (let i = 0; i < N; i++) {
+      let r = col[i * 3], gg = col[i * 3 + 1], b = col[i * 3 + 2];
+      if (wax[i]) {
+        // translucent yellow wax; a cracked vein shows pale until dye gets into it
+        const a = 0.42;
+        r = r * (1 - a) + 252 * a; gg = gg * (1 - a) + 222 * a; b = b * (1 - a) + 140 * a;
+        if (crack[i] && !log.length) { r += 10; gg += 10; b += 14; }
+      }
+      d[i * 4] = r; d[i * 4 + 1] = gg; d[i * 4 + 2] = b; d[i * 4 + 3] = 255;
+    }
+    sx.putImageData(sim, 0, 0);
+    g.imageSmoothingEnabled = true; g.globalCompositeOperation = 'source-over';
+    g.drawImage(small, 0, 0, W * K, H * K);
+    g.globalCompositeOperation = 'multiply'; g.globalAlpha = 0.55; g.drawImage(weave, 0, 0); g.globalAlpha = 1;
+    g.globalCompositeOperation = 'source-over';
+    $('#log').textContent = `Baths so far: ${log.length ? log.join(' → ') : 'none'}${boiled ? ' → boiled' : ''}`;
+  }
+  let pending = false;
+  const redraw = () => { if (!pending) { pending = true; requestAnimationFrame(() => { pending = false; render(); }); } };
+
+  // ---------- Hands on the cloth ----------
+  function pt(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height]; }
+  let drag = null, lastStamp = null;
+  function apply(x, y) {
+    if (tool === 'canting') disc(x, y, 1.05, 1);
+    else if (tool === 'brush') disc(x, y, 7, 1);
+    else if (tool === 'scrape') disc(x, y, 6, 0);
+  }
+  cv.addEventListener('pointerdown', (e) => {
+    try { cv.setPointerCapture(e.pointerId); } catch (err) { /* capture is optional */ }
+    const p = pt(e);
+    if (boiled) { say('The wax has been boiled off. Start a fresh cloth, or wax this one again and dye it once more.'); boiled = false; }
+    if (tool === 'cap') {
+      const snap = $('#snap').checked;
+      stampAt(p[0], p[1], MASKS[capName], snap);
+      lastStamp = p; drag = { last: p, stamp: true };
+    } else { drag = { last: p }; apply(p[0], p[1]); }
+    redraw();
+  });
+  cv.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const p = pt(e);
+    if (drag.stamp) {
+      // dragging with the cap prints a row of stamps, one per tile
+      const T = MASKS[capName].T;
+      if (Math.hypot(p[0] - lastStamp[0], p[1] - lastStamp[1]) >= T * 0.9) { stampAt(p[0], p[1], MASKS[capName], $('#snap').checked); lastStamp = p; redraw(); }
+      return;
+    }
+    const [x0, y0] = drag.last, n = Math.max(1, Math.ceil(Math.hypot(p[0] - x0, p[1] - y0) / 0.7));
+    for (let k = 1; k <= n; k++) apply(x0 + (p[0] - x0) * k / n, y0 + (p[1] - y0) * k / n);
+    drag.last = p; redraw();
+  });
+  ['pointerup', 'pointercancel'].forEach((t) => cv.addEventListener(t, () => { drag = null; }));
+
+  // ---------- Controls ----------
+  const say = (t) => { $('#note').textContent = t; };
+  const HINTS = {
+    cap: 'Press the copper cap onto the cloth, or drag to print a row. With lining up on, each stamp meets the last exactly, as a skilled stamper does by eye.',
+    canting: 'Write fine lines and dots of hot wax with the canting’s spout.',
+    brush: 'Brush wax over large areas you want to keep the colour they have now.',
+    scrape: 'Scrape wax off wherever the next dye should reach.'
+  };
+  function setTool(t) {
+    tool = t; $$('.tool').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.t === t)));
+    $('#caps').hidden = t !== 'cap'; $('#snaprow').hidden = t !== 'cap'; $('#hint').textContent = HINTS[t];
+  }
+  $$('.tool').forEach((b) => b.addEventListener('click', () => setTool(b.dataset.t)));
+  Object.keys(CAPS).forEach((k) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'btn capbtn'; b.dataset.c = k; b.setAttribute('aria-pressed', String(k === capName));
+    const c = mk(92, 92), x = c.getContext('2d'), T = CAPS[k].T, s = 92 / (T * 2);
+    x.strokeStyle = '#b06a2c'; x.fillStyle = '#b06a2c'; x.lineWidth = 1.6; x.lineCap = 'round';
+    for (let a = 0; a < 2; a++) for (let bb = 0; bb < 2; bb++) { x.save(); x.scale(s, s); x.translate(a * T, bb * T); x.beginPath(); x.rect(0, 0, T, T); x.clip(); CAPS[k].draw(x, T, false); x.restore(); }
+    b.appendChild(c); b.appendChild(document.createTextNode(CAPS[k].label));
+    b.addEventListener('click', () => { capName = k; $$('.capbtn').forEach((q) => q.setAttribute('aria-pressed', String(q === b))); say(CAP_NOTES[k]); });
+    $('#caps').appendChild(b);
+  });
+  const CAP_NOTES = {
+    kawung: 'Kawung: ovals like palm fruit or a four-petalled lotus. Once worn only by the royal family of Yogyakarta.',
+    parang: 'Parang, “slope”: S shapes running down at 45 degrees. Its size once showed the wearer’s rank at court.',
+    truntum: 'Truntum: little stars, a pattern of love made by Queen Kencana of Surakarta in the 18th century.'
+  };
+  $$('.jar').forEach((b) => b.addEventListener('click', () => {
+    const name = b.dataset.d, reached = dip(name);
+    const cracked = crack.some((v, i) => v && wax[i]);
+    render();
+    if (reached > 0.97) say(`The whole cloth took the ${name === 'indigo' ? 'indigo' : 'soga'}: there was almost no wax on it. Wax first to keep some cloth its colour.`);
+    else if (name === 'indigo') say(`Dipped in indigo. Everything without wax turned blue${cracked ? ', and the dye crept into the cracks in the wax' : ''}. To keep some blue, wax over it now; to make brown later, scrape wax off the pale places that should turn brown.`);
+    else say(`Dipped in soga. Bare cotton turns brown, and blue under soga turns almost black${cracked ? '; the cracked wax let fine dark veins through' : ''}. Boil off the wax to see the cloth.`);
+  }));
+  $('#crush').addEventListener('click', () => {
+    if (!wax.some((v) => v)) { say('There is no wax on the cloth to crack.'); return; }
+    crush(1); render();
+    say('The cloth is crushed in the hands and the cold wax cracks. The next dye will seep into the cracks as fine veins: crackle. Mijer warned that crackle you did not intend is a sign of poor work.');
+  });
+  $('#boil').addEventListener('click', () => {
+    if (!wax.some((v) => v)) { say('There is no wax left to boil off.'); return; }
+    boil(); render();
+    say('Boiled: the wax floats off and the pattern appears, every colour where the wax kept the dye away.');
+  });
+  $('#fresh').addEventListener('click', () => { fresh(); render(); setTool('cap'); say('A fresh length of mori cotton. Stamp or write the wax for what should stay pale, then dip it in indigo.'); });
+
+  // ---------- The example, in the order of the museum record ----------
+  function example() {
+    fresh();
+    rs = 11;
+    // a field of kawung with a parang border top and bottom
+    for (let y = 40; y < H - 40; y += 40) for (let x = 0; x < W; x += 40) stampAt(x + 1, y + 1, MASKS.kawung, true);
+    for (let x = 0; x < W; x += 40) { stampAt(x + 1, 1, MASKS.parang, true); stampAt(x + 1, H - 39, MASKS.parang, true); }
+    for (let x = 0; x < W; x++) [39, 40, H - 41, H - 40].forEach((y) => { wax[y * W + x] = 1; });
+    dip('indigo');
+    // wax the kawung ovals so they stay blue
+    for (let y = 40; y < H - 40; y += 40) for (let x = 0; x < W; x += 40) stampAt(x + 1, y + 1, FILLS.kawung, true);
+    for (let y = 40; y < H - 40; y += 40) for (let x = 0; x < W; x += 40) stampAt(x + 1, y + 1, MASKS.kawung, true);
+    crush(1);
+    dip('soga');
+    boil();
+    render(); setTool('cap');
+    say('Yogya sogan: kawung outlines stamped in wax, dipped in indigo, the ovals waxed to keep them blue, the cloth crushed for a little crackle, dipped in soga, then boiled. Dark brown, blue and white, with fine veins.');
+  }
+  $('#example').addEventListener('click', example);
+
+  setTool('cap');
+  example();
+})();
+</script>
+</body>
+</html>

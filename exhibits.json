@@ -155,6 +155,11 @@
       "try": "Illuminate your own initial, then tilt the page"
     },
     {
+      "slug": "batik", "hall": "studio", "title": "Javanese Batik", "ages": "All ages",
+      "blurb": "Stamp hot wax with a copper cap or write it with a canting, dip the cotton in indigo, scrape and wax again, dip it in soga brown, crush it for crackle and boil the wax away.",
+      "try": "Scrape some wax off before the soga bath"
+    },
+    {
       "slug": "mendeleev", "hall": "numbers", "title": "Mendeleev’s Table", "ages": "10 and up",
       "blurb": "Deal the elements onto Mendeleev’s 1871 table, leave gaps where nothing fits, and predict the elements nobody had found yet.",
       "try": "Decide where tellurium goes"
