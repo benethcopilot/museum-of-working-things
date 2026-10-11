@@ -160,6 +160,11 @@
       "try": "Scrape some wax off before the soga bath"
     },
     {
+      "slug": "orizuru", "hall": "studio", "title": "Orizuru Paper Crane", "ages": "All ages",
+      "blurb": "Watch one square fold into the traditional crane, step by step, turn it in 3D, and see where every part of the square ends up.",
+      "try": "Colour by part, then go back to step 1"
+    },
+    {
       "slug": "mendeleev", "hall": "numbers", "title": "Mendeleev’s Table", "ages": "10 and up",
       "blurb": "Deal the elements onto Mendeleev’s 1871 table, leave gaps where nothing fits, and predict the elements nobody had found yet.",
       "try": "Decide where tellurium goes"

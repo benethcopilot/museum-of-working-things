@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<title>Orizuru Paper Crane</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@400;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Fira+Code:wght@400&display=swap">
+<style>
+:root {
+  /* Layout: the folding table on the left, the step card and controls on the right; then where every part of the square goes, the thousand cranes, and the oldest book. */
+  --ground: #eef0ec;
+  --card: #f9faf7;
+  --ink: #1e2321;
+  --muted: #59625e;
+  --line: rgba(30, 35, 33, 0.14);
+  --accent: #c8402e;
+  --pine: #2f6b55;
+  --f-display: "Kaisei Decol", "Yu Mincho", Georgia, serif;
+  --f-body: "Zen Kaku Gothic New", "Segoe UI", system-ui, sans-serif;
+  --f-data: "Fira Code", Consolas, "Courier New", monospace;
+  --table: #e4ddcf;
+  --table-2: #d3c9b6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #121514;
+    --card: #1a1e1c;
+    --ink: #e9eeeb;
+    --muted: #a3ada8;
+    --line: rgba(233, 238, 235, 0.13);
+    --accent: #f08a78;
+    --pine: #8fd0b4;
+    --table: #2a2723;
+    --table-2: #1f1d1a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #121514;
+  --card: #1a1e1c;
+  --ink: #e9eeeb;
+  --muted: #a3ada8;
+  --line: rgba(233, 238, 235, 0.13);
+  --accent: #f08a78;
+  --pine: #8fd0b4;
+  --table: #2a2723;
+  --table-2: #1f1d1a;
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:disabled { opacity: 0.4; cursor: default; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 700; line-height: 1.1; margin: 0; text-wrap: balance; }
+a { color: var(--accent); }
+
+.page { box-sizing: border-box; max-width: 1200px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; display: flex; flex-direction: column; gap: 48px; }
+.masthead { display: grid; gap: 10px; }
+.eyebrow { margin: 0; font-family: var(--f-data); font-size: 0.76rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.masthead h1 { font-size: clamp(2.8rem, 8vw, 5.2rem); }
+.masthead h1 span { color: var(--accent); }
+.lede { margin: 0; max-width: 64ch; color: var(--muted); }
+h2 { font-size: clamp(1.7rem, 3.4vw, 2.4rem); }
+.text { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.text p { margin: 0; max-width: 64ch; }
+
+/* ---------- Folding table ---------- */
+.fold { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 26px; align-items: start; }
+.tablebox { position: relative; border-radius: 6px; background: radial-gradient(ellipse at 50% 40%, var(--table), var(--table-2)); min-width: 0; }
+#stage { display: block; width: 100%; height: auto; touch-action: none; cursor: grab; }
+#stage.dragging { cursor: grabbing; }
+.stagehint { position: absolute; left: 12px; bottom: 8px; margin: 0; font-size: 0.8rem; color: var(--muted); }
+.side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.stepcard { padding: 14px 16px; background: var(--card); border: 1px solid var(--line); border-radius: 4px; display: grid; gap: 8px; }
+.stepnum { font-family: var(--f-data); font-size: 0.8rem; color: var(--muted); letter-spacing: 0.08em; }
+.stepcard h3 { font-size: 1.5rem; }
+.stepcard p { margin: 0; }
+.kind { display: inline-block; padding: 1px 8px; border-radius: 99px; border: 1px solid var(--line); font-size: 0.8rem; color: var(--pine); font-weight: 700; }
+.dots { display: flex; gap: 6px; flex-wrap: wrap; }
+.dot { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--line); background: none; font-family: var(--f-data); font-size: 0.8rem; }
+.dot[aria-current="step"] { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn { padding: 6px 13px; border-radius: 4px; border: 1.5px solid var(--line); background: none; font-size: 0.95rem; }
+.btn:hover:not(:disabled) { border-color: var(--ink); }
+.btn.main { background: var(--ink); color: var(--ground); border-color: var(--ink); font-weight: 700; }
+.btn[aria-pressed="true"] { border-color: var(--ink); background: color-mix(in srgb, var(--ink) 10%, transparent); }
+.swatch { width: 26px; height: 26px; border-radius: 3px; border: 2px solid transparent; padding: 0; }
+.swatch[aria-pressed="true"] { border-color: var(--ink); }
+.tray { padding: 12px 14px; background: var(--card); border: 1px solid var(--line); border-radius: 4px; display: grid; gap: 8px; }
+.tray > span { font-family: var(--f-data); font-size: 0.74rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+#cp { width: 100%; max-width: 260px; height: auto; display: block; }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.86rem; }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+
+/* ---------- Below ---------- */
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 36px; align-items: start; }
+.facts { display: grid; gap: 8px; }
+.facts div { padding: 10px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 4px; }
+.facts b { font-family: var(--f-display); font-size: 1.1rem; }
+.facts p { margin: 2px 0 0; font-size: 0.95rem; color: var(--muted); }
+.sources { margin: 0; font-size: 0.86rem; color: var(--muted); max-width: 100ch; }
+
+@media (max-width: 920px) {
+  .fold, .two { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+<link rel="stylesheet" href="../../shared/museum.css">
+<script src="../../shared/museum.js" data-exhibit="orizuru" defer></script>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <p class="eyebrow">Art Studio · Japan · the most classic of all origami</p>
+    <h1>Orizuru <span>折鶴</span></h1>
+    <p class="lede">One square of paper, no cuts, no glue: a crane. Step through the traditional folds and watch the paper move, turn the model in your hands, then see where every part of the square ends up.</p>
+  </header>
+
+  <section class="fold" aria-label="Fold the crane">
+    <div class="tablebox">
+      <canvas id="stage" width="760" height="640" aria-label="A sheet of paper being folded into a crane. Drag to turn it."></canvas>
+      <p class="stagehint">Drag to turn the paper</p>
+    </div>
+    <div class="side">
+      <div class="stepcard" aria-live="polite">
+        <span class="stepnum" id="stepnum"></span>
+        <h3 id="steptitle"></h3>
+        <span class="kind" id="stepkind"></span>
+        <p id="steptext"></p>
+      </div>
+      <div class="dots" id="dots" role="group" aria-label="Steps"></div>
+      <div class="row">
+        <button class="btn" id="back" type="button">Back</button>
+        <button class="btn main" id="next" type="button">Fold</button>
+        <button class="btn" id="play" type="button">Fold it all</button>
+        <button class="btn" id="view" type="button">Reset view</button>
+      </div>
+      <div class="tray">
+        <span>Paper</span>
+        <div class="row" id="papers"></div>
+        <button class="btn" id="parts" type="button" aria-pressed="false">Colour by part</button>
+      </div>
+      <div class="tray">
+        <span>The square, unfolded</span>
+        <canvas id="cp" width="260" height="260" aria-label="The crease pattern of the square"></canvas>
+        <div class="legend"><span><i style="background:#d9a521"></i>wings</span><span><i style="background:#c8402e"></i>neck and head</span><span><i style="background:#3a6fb0"></i>tail</span><span><i style="background:#9aa39e"></i>body</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="two" aria-label="Cranes in Japan">
+    <div class="text">
+      <h2>A thousand cranes</h2>
+      <p>Orizuru means “folded crane”: ori, folded, and tsuru, crane. Cranes were said to live a thousand years, and paper cranes were offered at shrines and temples by people asking for blessings. A string of a thousand is senbazuru, and folding one is said to grant a wish.</p>
+      <p>Sadako Sasaki was two when the atomic bomb fell on Hiroshima, 1.6 km from her home. At twelve, in hospital with leukaemia, she set out to fold a thousand cranes, using medicine wrappers and any paper she could find. She folded more than a thousand before she died in October 1955. Her classmates raised a statue of her in the Hiroshima Peace Park, and every year about ten million paper cranes are sent there.</p>
+    </div>
+    <div class="text">
+      <h2>The oldest folding book</h2>
+      <div class="facts">
+        <div><b>About 1600</b><p>A sword fitting made by Gotō Eijō is decorated with a folded paper crane, a sign that people were folding for play by then.</p></div>
+        <div><b>1797</b><p>Hiden Senbazuru Orikata, “The secret of folding a thousand cranes”, the oldest known technical book on origami for play: 49 designs by the monk Gidō of Ise Province, with comic poems by Akisato Ritō.</p></div>
+        <div><b>Renzuru</b><p>Many of Gidō’s designs are joined cranes, folded from one sheet with careful cuts so that the birds stay linked at a wingtip or beak. Kuwana City made his 49 methods Intangible Cultural Properties in 1976.</p></div>
+        <div><b>The 20th century</b><p>Akira Yoshizawa created the system of arrows and dashed lines for origami diagrams that Randlett and Harbin later improved. Diagrams still use it today.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <p class="sources">Sources: Wikipedia, <a href="https://en.wikipedia.org/wiki/Orizuru" target="_blank" rel="noopener">Orizuru</a>, <a href="https://en.wikipedia.org/wiki/One_thousand_origami_cranes" target="_blank" rel="noopener">One thousand origami cranes</a>, <a href="https://en.wikipedia.org/wiki/Sadako_Sasaki" target="_blank" rel="noopener">Sadako Sasaki</a> and <a href="https://en.wikipedia.org/wiki/History_of_origami" target="_blank" rel="noopener">History of origami</a> (Gotō Eijō, the Hiden Senbazuru Orikata of 1797, Gidō and Akisato Ritō, Kuwana City, Yoshizawa). Crease patterns for comparison: Amanda Ghassaei’s <a href="https://github.com/amandaghassaei/OrigamiSimulator" target="_blank" rel="noopener">Origami Simulator</a>. The folding on this page is computed: each flat stage is a set of fold angles on the creases, chained facet by facet from the centre of the paper, and the later folds turn or mirror the layers they move.</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const D2R = Math.PI / 180;
+
+  // ---------- Small 3D maths: a transform is a 3x3 matrix m (row-major) and a translation t ----------
+  const I3 = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+  const mul3 = (a, b) => [
+    a[0] * b[0] + a[1] * b[3] + a[2] * b[6], a[0] * b[1] + a[1] * b[4] + a[2] * b[7], a[0] * b[2] + a[1] * b[5] + a[2] * b[8],
+    a[3] * b[0] + a[4] * b[3] + a[5] * b[6], a[3] * b[1] + a[4] * b[4] + a[5] * b[7], a[3] * b[2] + a[4] * b[5] + a[5] * b[8],
+    a[6] * b[0] + a[7] * b[3] + a[8] * b[6], a[6] * b[1] + a[7] * b[4] + a[8] * b[7], a[6] * b[2] + a[7] * b[5] + a[8] * b[8]
+  ];
+  const mv = (m, v) => [m[0] * v[0] + m[1] * v[1] + m[2] * v[2], m[3] * v[0] + m[4] * v[1] + m[5] * v[2], m[6] * v[0] + m[7] * v[1] + m[8] * v[2]];
+  const add = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+  const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  function rotAxis(ax, deg) {
+    const [x, y, z] = ax, c = Math.cos(deg * D2R), s = Math.sin(deg * D2R), C = 1 - c;
+    return [c + x * x * C, x * y * C - z * s, x * z * C + y * s, y * x * C + z * s, c + y * y * C, y * z * C - x * s, z * x * C - y * s, z * y * C + x * s, c + z * z * C];
+  }
+  const apply = (T, p) => add(mv(T.m, p), T.t);
+  // world transform W applied after a facet's transform T: W∘T
+  const compose = (W, T) => ({ m: mul3(W.m, T.m), t: add(mv(W.m, T.t), W.t) });
+  // a rotation by deg about the world line through p with unit direction ax
+  const rotLine = (p, ax, deg) => { const m = rotAxis(ax, deg); return { m, t: sub(p, mv(m, p)) }; };
+  // an in-plane mirror across the vertical plane through the line (p, dir)
+  function mirrorLine(p, d) {
+    const [dx, dy] = d, m = [dx * dx - dy * dy, 2 * dx * dy, 0, 2 * dx * dy, dy * dy - dx * dx, 0, 0, 0, 1];
+    return { m, t: sub(p, mv(m, p)) };
+  }
+
+  // ---------- The crease pattern of the bird base, in a unit square ----------
+  const s = (Math.SQRT2 - 1) / 2, q = (0.5 + s) / 2;
+  const V = {
+    W1: [0, 0], L1: [1, 0], W2: [1, 1], L2: [0, 1], O: [0.5, 0.5],
+    Mb: [0.5, 0], Mr: [1, 0.5], Mt: [0.5, 1], Ml: [0, 0.5],
+    Kb: [0.5, s], Kr: [1 - s, 0.5], Kt: [0.5, 1 - s], Kl: [s, 0.5],
+    Q1: [q, q], Q2: [1 - q, 1 - q], Q3: [1 - q, q], Q4: [q, 1 - q]
+  };
+  // W1 and W2 become the wings, L1 the neck, L2 the tail
+  const QUADS = { W1: ['Mb', 'Kb', 'Ml', 'Kl', 'Q1'], L1: ['Mb', 'Kb', 'Mr', 'Kr', 'Q3'], W2: ['Mr', 'Kr', 'Mt', 'Kt', 'Q2'], L2: ['Mt', 'Kt', 'Ml', 'Kl', 'Q4'] };
+  const BASE = [];
+  Object.entries(QUADS).forEach(([C, [Ma, Ka, Mb2, Kb2, Qc]]) => {
+    [['a', [C, Ma, Ka]], ['b', [C, Ka, Qc]], ['c', [C, Qc, Kb2]], ['d', [C, Kb2, Mb2]], ['e', [Ka, 'O', Qc]], ['f', [Qc, 'O', Kb2]]].forEach(([k, names]) => {
+      BASE.push({ id: C + k, group: C, names, poly: names.map((n) => V[n]) });
+    });
+  });
+  function creaseType(a, b) {
+    const isK = (n) => n[0] === 'K', isM = (n) => n[0] === 'M', isQ = (n) => n[0] === 'Q', isC = (n) => /^[WL]\d$/.test(n);
+    const pair = (f, g) => (f(a) && g(b)) || (f(b) && g(a));
+    const wingQ = (n) => n === 'Q1' || n === 'Q2';
+    if (pair((n) => n === 'O', isK)) return 'midIn';
+    if (pair(isK, isM)) return 'midOut';
+    if (pair((n) => n === 'O', isQ) || pair(isQ, isC)) return [a, b].some(wingQ) ? 'wingDiag' : 'legDiag';
+    if (pair(isC, isK)) return [a, b].some((n) => n === 'W1' || n === 'W2') ? 'wingCorner' : 'legCorner';
+    if (pair(isK, isQ)) return [a, b].some(wingQ) ? 'wingDiamond' : 'legDiamond';
+    return 'none';
+  }
+  // fold angles in degrees for each flat stage: positive is a valley on the coloured side, negative a mountain
+  const EPS = 2.5, F = 180 - EPS;
+  const STATES = [
+    {},
+    { midIn: -F, midOut: -F, legDiag: F },
+    { midIn: -F, midOut: -F, legDiag: F, wingCorner: F, legCorner: -F },
+    { midIn: -F, midOut: 0, legDiag: F, wingDiamond: F, wingCorner: -F, legCorner: -F }
+  ];
+  // adjacency between base facets
+  const ADJ = BASE.map(() => []);
+  BASE.forEach((f, i) => BASE.forEach((g, j) => {
+    if (i >= j) return;
+    const shared = f.names.filter((n) => g.names.includes(n));
+    if (shared.length === 2) { ADJ[i].push([j, shared]); ADJ[j].push([i, shared]); }
+  }));
+  const ROOT = BASE.findIndex((f) => f.id === 'W1e');
+  const centroid = (poly) => { let x = 0, y = 0; poly.forEach((p) => { x += p[0]; y += p[1]; }); return [x / poly.length, y / poly.length]; };
+  // chain the facets out from the root, turning each about the crease it hangs from;
+  // mid-fold, facets hang by creases that are not moving whenever they can, so rigid parts travel together
+  function solve(angleOf, moving) {
+    const T = new Array(BASE.length).fill(null), seen = new Array(BASE.length).fill(false);
+    T[ROOT] = { m: I3, t: [0, 0, 0] };
+    const queue = [[ROOT, null]];
+    while (queue.length) {
+      const [i, from] = queue.shift();
+      if (seen[i]) continue;
+      seen[i] = true;
+      if (from) T[i] = from();
+      ADJ[i].forEach(([j, [a, b]]) => {
+        if (seen[j]) return;
+        // at rest, a plain breadth-first chain keeps the outer layers closest to the centre facet
+        const cost = !moving || moving(creaseType(a, b)) ? 1 : 0;
+        const make = () => {
+          const p = V[a], r = V[b], cj = centroid(BASE[j].poly);
+          let nx = -(r[1] - p[1]), ny = r[0] - p[0];
+          const len = Math.hypot(nx, ny); nx /= len; ny /= len;
+          if ((cj[0] - p[0]) * nx + (cj[1] - p[1]) * ny < 0) { nx = -nx; ny = -ny; }
+          return compose(T[i], rotLine([p[0], p[1], 0], [ny, -nx, 0], angleOf(creaseType(a, b))));
+        };
+        // a 0-1 breadth-first search: steady creases go to the front of the queue
+        if (cost) queue.push([j, make]); else queue.unshift([j, make]);
+      });
+    }
+    return BASE.map((f, i) => ({ id: f.id, group: f.group, poly: f.poly, T: T[i], role: f.group[0] === 'W' && /[abcd]$/.test(f.id) ? 'wing' : 'body' }));
+  }
+  const stateFacets = (k, k2, u = 0) => {
+    const at = (s, type) => STATES[s][type] || 0;
+    return solve((type) => {
+      const a = at(k, type), b = k2 == null ? a : at(k2, type);
+      return a + (b - a) * u;
+    }, k2 == null ? null : (type) => at(k, type) !== at(k2, type));
+  };
+
+  // ---------- Folds made on the folded paper ----------
+  const world = (f, p) => apply(f.T, [p[0], p[1], 0]);
+  const side = (p, d, x) => (x[0] - p[0]) * d[1] - (x[1] - p[1]) * d[0];   // > 0 on the right of the line
+  function centreW(f) { const w = f.poly.map((p) => world(f, p)); let x = 0, y = 0, z = 0; w.forEach((v) => { x += v[0]; y += v[1]; z += v[2]; }); return [x / w.length, y / w.length, z / w.length]; }
+  // split each chosen facet where the world line (p, d), seen from the front, crosses it
+  function split(facets, pick, p, d) {
+    const out = [];
+    facets.forEach((f) => {
+      if (!pick(f)) { out.push(f); return; }
+      const w = f.poly.map((v) => world(f, v)), sd = w.map((v) => side(p, d, v));
+      if (sd.every((v) => v >= -1e-9) || sd.every((v) => v <= 1e-9)) { out.push(f); return; }
+      const A = [], B = [];
+      for (let i = 0; i < f.poly.length; i++) {
+        const j = (i + 1) % f.poly.length, a = sd[i], b = sd[j];
+        if (a >= 0) A.push(f.poly[i]); if (a <= 0) B.push(f.poly[i]);
+        if ((a > 0 && b < 0) || (a < 0 && b > 0)) {
+          const u = a / (a - b), x = [f.poly[i][0] + (f.poly[j][0] - f.poly[i][0]) * u, f.poly[i][1] + (f.poly[j][1] - f.poly[i][1]) * u];
+          A.push(x); B.push(x);
+        }
+      }
+      if (A.length > 2) out.push({ ...f, id: f.id + '+', poly: A });
+      if (B.length > 2) out.push({ ...f, id: f.id + '-', poly: B });
+    });
+    return out;
+  }
+  // the moving layers, on the given side of the line, turned or mirrored by W
+  function moveSide(facets, pick, p, d, sgn, W, role) {
+    return facets.map((f) => (pick(f) && side(p, d, centreW(f)) * sgn > 0 ? { ...f, T: compose(W, f.T), role: role || f.role } : f));
+  }
+  // the world z of the moving layers near the hinge, so they turn about their own height
+  function hingeZ(facets, pick) { const zs = facets.filter(pick).map((f) => centreW(f)[2]); return zs.length ? zs.reduce((a, b) => a + b, 0) / zs.length : 0; }
+  function foldOp(facets, op, u) {
+    const { pick, p, dir } = op, d = [Math.cos(dir * D2R), Math.sin(dir * D2R)];
+    let fs = split(facets, pick, p, d);
+    const z = hingeZ(fs, (f) => pick(f) && side(p, d, centreW(f)) * op.side > 0);
+    const P = [p[0], p[1], z];
+    if (op.type === 'turn') {
+      // the axis points so that a positive angle lifts the moving side toward the viewer
+      const n = [d[1] * op.side, -d[0] * op.side], ax = [n[1], -n[0], 0];
+      fs = moveSide(fs, pick, p, d, op.side, rotLine(P, ax, op.angle * u), op.role);
+    } else {
+      // an inside reverse fold mirrors the flap across the line; mid-way the flap is seen edge-on
+      const M = mirrorLine(P, d), k = 1 - 2 * u, n = [-d[1], d[0]];
+      const W = u >= 1 ? M : (() => {
+        // squash the perpendicular direction from 1 through 0 to -1 about the line
+        const m = [1 + (k - 1) * n[0] * n[0], (k - 1) * n[0] * n[1], 0, (k - 1) * n[1] * n[0], 1 + (k - 1) * n[1] * n[1], 0, 0, 0, 1];
+        return { m, t: sub(P, mv(m, P)) };
+      })();
+      fs = moveSide(fs, pick, p, d, op.side, W, op.role);
+    }
+    return fs;
+  }
+
+  // ---------- The steps ----------
+  const inG = (...ids) => (f) => ids.some((id) => f.id.startsWith(id));
+  const Qw = V.Q1, O0 = [0, 0];
+  // the reverse fold lines through the top of each leg
+  const NECK = { p: Qw, dir: -63, side: 0, pick: inG('L1') }, TAIL = { p: Qw, dir: 153, side: 0, pick: inG('L2') };
+  const legSide = (op) => Math.sign(side(op.p, [Math.cos(op.dir * D2R), Math.sin(op.dir * D2R)], O0));
+  NECK.side = legSide(NECK); TAIL.side = legSide(TAIL);
+  function mirrorPoint(op, x) { const d = [Math.cos(op.dir * D2R), Math.sin(op.dir * D2R)]; return apply(mirrorLine([op.p[0], op.p[1], 0], d), [x[0], x[1], 0]); }
+  // the head: a reverse fold near the tip of the neck
+  const neckTip = mirrorPoint(NECK, O0), neckBase = mirrorPoint(NECK, [0.36, 0.32]);
+  const nd = Math.atan2(neckTip[1] - neckBase[1], neckTip[0] - neckBase[0]) / D2R;
+  const headAt = [neckTip[0] - Math.cos(nd * D2R) * 0.12, neckTip[1] - Math.sin(nd * D2R) * 0.12];
+  const HEAD = { p: headAt, dir: (nd + (nd - 100)) / 2, side: 0, pick: inG('L1') };
+  HEAD.side = Math.sign(side(HEAD.p, [Math.cos(HEAD.dir * D2R), Math.sin(HEAD.dir * D2R)], neckTip));
+  const KL = [V.Kb, V.Kl], kd = Math.atan2(V.Kl[1] - V.Kb[1], V.Kl[0] - V.Kb[0]) / D2R;
+  const wingSide = Math.sign(side(V.Kb, [Math.cos(kd * D2R), Math.sin(kd * D2R)], V.O));
+  const T = F;
+  const STEPS = [
+    { title: 'A square of paper', kind: 'start', text: 'Coloured side up. Crease both diagonals as valley folds, turn the paper over, and crease it in half both ways. The creases are already on this sheet.' },
+    { title: 'Preliminary base', kind: 'collapse', state: 1, text: 'Bring all four corners down together along the creases. The diagonals fold one way and the midlines the other, and the square collapses into a smaller square standing on its point.' },
+    { title: 'Kite folds', kind: 'valley folds', state: 2, text: 'Fold the lower edges of the top layer in to the centre line. Turn the model over and do the same behind.' },
+    { title: 'Petal fold: the bird base', kind: 'petal folds', state: 3, text: 'Lift the bottom corner of the top layer up as far as it goes, letting its sides swing in along the kite creases. Repeat behind. This is the bird base, the start of many origami animals.' },
+    { title: 'Narrow the legs', kind: 'valley folds', ops: [
+      { type: 'turn', pick: inG('L1a', 'L1b'), p: O0, dir: 33.75, side: 1, angle: T },
+      { type: 'turn', pick: inG('L2d', 'L2c'), p: O0, dir: 56.25, side: -1, angle: T },
+      { type: 'turn', pick: inG('L1c', 'L1d'), p: O0, dir: 33.75, side: 1, angle: -T },
+      { type: 'turn', pick: inG('L2a', 'L2b'), p: O0, dir: 56.25, side: -1, angle: -T }
+    ], text: 'The two thin flaps at the bottom are the legs of the bird base. Fold their outer edges to the centre line, in front and behind, to make them slender.' },
+    { title: 'Neck and tail', kind: 'inside reverse folds', ops: [{ type: 'mirror', ...NECK, role: 'neck' }, { type: 'mirror', ...TAIL, role: 'tail' }], text: 'Push each slender flap up between the layers of the body, reversing its centre crease. One becomes the neck, the other the tail.' },
+    { title: 'The head', kind: 'inside reverse fold', ops: [{ type: 'mirror', ...HEAD, role: 'neck' }], text: 'Reverse fold the tip of the neck down to make the head and beak.' },
+    { title: 'Spread the wings', kind: 'valley folds', ops: [
+      { type: 'turn', pick: inG('W1a', 'W1b', 'W1c', 'W1d'), p: V.Kb, dir: kd, side: wingSide, angle: 78 },
+      { type: 'turn', pick: inG('W2a', 'W2b', 'W2c', 'W2d'), p: V.Kb, dir: kd, side: wingSide, angle: -78 }
+    ], text: 'Fold the wings down and spread them out. Hold the body and pull the wings gently apart to round it. Your crane is finished.' }
+  ];
+  // the folded paper at step k, and part-way into step k+1
+  function stateAt(k, u) {
+    let fs;
+    const lastState = Math.min(k, 3);
+    if (k < 3 && u > 0 && STEPS[k + 1].state != null) return stateFacets(lastState, STEPS[k + 1].state, u);
+    fs = stateFacets(lastState);
+    for (let j = 4; j <= Math.min(k, STEPS.length - 1); j++) STEPS[j].ops.forEach((op) => { fs = foldOp(fs, op, 1); });
+    if (u > 0 && k + 1 < STEPS.length && STEPS[k + 1].ops) STEPS[k + 1].ops.forEach((op) => { fs = foldOp(fs, op, u); });
+    return fs;
+  }
+
+  // ---------- Drawing ----------
+  const cv = $('#stage'), g = cv.getContext('2d'), W = cv.width, H = cv.height;
+  const PAPERS = [['#c8402e', 'vermilion'], ['#2f5d9e', 'indigo'], ['#d9a521', 'gold'], ['#3f8c5f', 'pine']];
+  let paper = PAPERS[0][0], showParts = false;
+  const ROLE = { wing: '#d9a521', neck: '#c8402e', tail: '#3a6fb0', body: '#9aa39e' };
+  let yaw = 0, pitch = 0, dragYaw = 0, dragPitch = 0;
+  const VIEWS = [[0, 0], [-12, 10], [-12, 10], [-12, 10], [-12, 10], [-14, 12], [-14, 12], [38, 28]];
+  const hex = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+  function view(p) {
+    // turn the model so the bird base points up, then apply the camera
+    const a = 45 * D2R, x0 = p[0] * Math.cos(a) - p[1] * Math.sin(a), y0 = p[0] * Math.sin(a) + p[1] * Math.cos(a), z0 = p[2];
+    const yw = (yaw + dragYaw) * D2R, pt = (pitch + dragPitch) * D2R;
+    const x1 = x0 * Math.cos(yw) + z0 * Math.sin(yw), z1 = -x0 * Math.sin(yw) + z0 * Math.cos(yw);
+    const y2 = y0 * Math.cos(pt) - z1 * Math.sin(pt), z2 = y0 * Math.sin(pt) + z1 * Math.cos(pt);
+    return [x1, y2, z2];
+  }
+  let fit = null;
+  // ---------- Which layer is in front: compare two facets where they overlap on screen ----------
+  function inside(pt, poly) {
+    let c = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const [xi, yi] = poly[i], [xj, yj] = poly[j];
+      if ((yi > pt[1]) !== (yj > pt[1]) && pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi) c = !c;
+    }
+    return c;
+  }
+  function crossPoint(a, b) {
+    for (let i = 0; i < a.length; i++) {
+      const p = a[i], p2 = a[(i + 1) % a.length];
+      for (let j = 0; j < b.length; j++) {
+        const r = b[j], r2 = b[(j + 1) % b.length];
+        const d = (p2[0] - p[0]) * (r2[1] - r[1]) - (p2[1] - p[1]) * (r2[0] - r[0]);
+        if (Math.abs(d) < 1e-12) continue;
+        const t = ((r[0] - p[0]) * (r2[1] - r[1]) - (r[1] - p[1]) * (r2[0] - r[0])) / d, u = ((r[0] - p[0]) * (p2[1] - p[1]) - (r[1] - p[1]) * (p2[0] - p[0])) / d;
+        if (t > 0.02 && t < 0.98 && u > 0.02 && u < 0.98) return [p[0] + (p2[0] - p[0]) * t, p[1] + (p2[1] - p[1]) * t];
+      }
+    }
+    return null;
+  }
+  function depthAt(P, pt) {
+    const [a, b, c] = P.pts, u = sub(b, a), v = sub(c, a), n = [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]];
+    if (Math.abs(n[2]) < 1e-9) return P.z;
+    return a[2] - (n[0] * (pt[0] - a[0]) + n[1] * (pt[1] - a[1])) / n[2];
+  }
+  function order(polys) {
+    const n = polys.length, before = polys.map(() => []), indeg = new Array(n).fill(0);
+    polys.forEach((P) => { const xs = P.pts.map((p) => p[0]), ys = P.pts.map((p) => p[1]); P.box = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]; P.flat = P.pts.map((p) => [p[0], p[1]]); });
+    for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+      const A = polys[i], B = polys[j];
+      if (A.box[1] <= B.box[0] || B.box[1] <= A.box[0] || A.box[3] <= B.box[2] || B.box[3] <= A.box[2]) continue;
+      // a point that both cover: an interior point of one inside the other, or a crossing of their edges
+      const ca = [A.flat.reduce((s, p) => s + p[0], 0) / A.flat.length, A.flat.reduce((s, p) => s + p[1], 0) / A.flat.length];
+      const cb = [B.flat.reduce((s, p) => s + p[0], 0) / B.flat.length, B.flat.reduce((s, p) => s + p[1], 0) / B.flat.length];
+      const pt = inside(ca, B.flat) ? ca : inside(cb, A.flat) ? cb : crossPoint(A.flat, B.flat);
+      if (!pt) continue;
+      const da = depthAt(A, pt), db = depthAt(B, pt);
+      if (Math.abs(da - db) < 1e-7) continue;
+      if (da < db) { before[i].push(j); indeg[j]++; } else { before[j].push(i); indeg[i]++; }
+    }
+    // draw far to near; if the constraints loop, fall back on the farthest remaining facet
+    const out = [], done = new Array(n).fill(false);
+    for (let k = 0; k < n; k++) {
+      let pick = -1;
+      for (let i = 0; i < n; i++) if (!done[i] && indeg[i] === 0 && (pick < 0 || polys[i].z < polys[pick].z)) pick = i;
+      if (pick < 0) for (let i = 0; i < n; i++) if (!done[i] && (pick < 0 || polys[i].z < polys[pick].z)) pick = i;
+      done[pick] = true; out.push(polys[pick]);
+      before[pick].forEach((j) => { indeg[j]--; });
+    }
+    polys.length = 0; out.forEach((p) => polys.push(p));
+  }
+  function draw(fs) {
+    const polys = fs.map((f) => {
+      const pts = f.poly.map((v) => view(world(f, v)));
+      const top = (() => { const n = mv(f.T.m, [0, 0, 1]), o = view([0, 0, 0]), e = view(n); return [e[0] - o[0], e[1] - o[1], e[2] - o[2]]; })();
+      let z = 0; pts.forEach((p) => { z += p[2]; });
+      return { f, pts, z: z / pts.length, top };
+    });
+    // frame the model
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    polys.forEach((p) => p.pts.forEach(([x, y]) => { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }));
+    const target = { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, sc: Math.min(W * 0.78 / Math.max(0.2, x1 - x0), H * 0.78 / Math.max(0.2, y1 - y0), 520) };
+    fit = fit ? { cx: fit.cx + (target.cx - fit.cx) * 0.25, cy: fit.cy + (target.cy - fit.cy) * 0.25, sc: fit.sc + (target.sc - fit.sc) * 0.25 } : target;
+    if (settle) fit = target;
+    g.clearRect(0, 0, W, H);
+    // a soft shadow on the table
+    g.fillStyle = 'rgba(0,0,0,0.12)'; g.beginPath(); g.ellipse(W / 2, H * 0.86, fit.sc * Math.min(0.6, (x1 - x0) * 0.5), 14, 0, 0, Math.PI * 2); g.fill();
+    order(polys);
+    const L = [-0.35, 0.5, 0.8], ll = Math.hypot(...L);
+    const pc = hex(paper);
+    polys.forEach(({ f, pts, top }) => {
+      const tl = Math.hypot(...top) || 1, facing = top[2] / tl;
+      const coloured = facing > 0;
+      const n = coloured ? top : [-top[0], -top[1], -top[2]];
+      const lit = 0.62 + 0.42 * Math.max(0, (n[0] * L[0] + n[1] * L[1] + n[2] * L[2]) / (tl * ll));
+      const base = showParts ? hex(ROLE[f.role]) : coloured ? pc : [246, 243, 236];
+      const c = base.map((v) => Math.round(clamp(v * lit, 0, 255)));
+      g.beginPath();
+      pts.forEach(([x, y], i) => { const X = W / 2 + (x - fit.cx) * fit.sc, Y = H / 2 - (y - fit.cy) * fit.sc; i ? g.lineTo(X, Y) : g.moveTo(X, Y); });
+      g.closePath();
+      g.fillStyle = `rgb(${c.join(',')})`; g.fill();
+      g.lineJoin = 'round'; g.lineWidth = 0.9; g.strokeStyle = `rgba(${Math.round(c[0] * 0.55)},${Math.round(c[1] * 0.55)},${Math.round(c[2] * 0.55)},0.55)`; g.stroke();
+    });
+  }
+  // the crease pattern: every facet in paper coordinates, tinted by where it goes
+  function drawCP(fs) {
+    const c = $('#cp'), x = c.getContext('2d'), S = c.width, pad = 10, sc = S - 2 * pad;
+    x.clearRect(0, 0, S, S);
+    fs.forEach((f) => {
+      x.beginPath();
+      f.poly.forEach(([u, v], i) => { const X = pad + u * sc, Y = pad + (1 - v) * sc; i ? x.lineTo(X, Y) : x.moveTo(X, Y); });
+      x.closePath(); x.fillStyle = ROLE[f.role]; x.globalAlpha = 0.55; x.fill(); x.globalAlpha = 1;
+      x.strokeStyle = 'rgba(30,35,33,0.55)'; x.lineWidth = 0.8; x.stroke();
+    });
+    x.strokeStyle = '#1e2321'; x.lineWidth = 1.5; x.strokeRect(pad, pad, sc, sc);
+  }
+
+  // ---------- Steps and animation ----------
+  let step = 0, anim = null, settle = true;
+  function show(k, u) { const fs = stateAt(k, u || 0); draw(fs); return fs; }
+  function setCamera(k, u) {
+    const a = VIEWS[k], b = VIEWS[Math.min(k + 1, VIEWS.length - 1)], e = u || 0;
+    yaw = a[0] + (b[0] - a[0]) * e; pitch = a[1] + (b[1] - a[1]) * e;
+  }
+  function render(k, u) { setCamera(k, u); return show(k, u); }
+  function updateCard() {
+    const st = STEPS[step];
+    $('#stepnum').textContent = `Step ${step + 1} of ${STEPS.length}`;
+    $('#steptitle').textContent = st.title; $('#stepkind').textContent = st.kind; $('#steptext').textContent = st.text;
+    $('#back').disabled = step === 0; $('#next').disabled = step === STEPS.length - 1;
+    $('#next').textContent = step === STEPS.length - 1 ? 'Finished' : `Fold step ${step + 2}`;
+    $$('.dot').forEach((d, i) => d.setAttribute('aria-current', i === step ? 'step' : 'false'));
+  }
+  function go(k) {
+    anim = null; step = clamp(k, 0, STEPS.length - 1); settle = true;
+    const fs = render(step, 0); settle = false; updateCard();
+    drawCP(stateAt(STEPS.length - 1, 0));
+    return fs;
+  }
+  function foldNext(then) {
+    if (step >= STEPS.length - 1) return;
+    if (reduceMotion) { go(step + 1); if (then) then(); return; }
+    const from = step, t0 = performance.now(), dur = STEPS[from + 1].state ? 1700 : 1300, token = {};
+    anim = token;
+    (function f(now) {
+      if (anim !== token) return;
+      const u = Math.min(1, (now - t0) / dur), e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+      render(from, e);
+      if (u < 1) requestAnimationFrame(f); else { anim = null; go(from + 1); if (then) then(); }
+    })(t0);
+  }
+  $('#next').addEventListener('click', () => foldNext());
+  $('#back').addEventListener('click', () => go(step - 1));
+  $('#play').addEventListener('click', () => { go(0); const chain = () => { if (step < STEPS.length - 1) setTimeout(() => foldNext(chain), 350); }; setTimeout(chain, 300); });
+  $('#view').addEventListener('click', () => { dragYaw = 0; dragPitch = 0; render(step, 0); });
+  STEPS.forEach((st, i) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'dot'; b.textContent = i + 1; b.setAttribute('aria-label', `Step ${i + 1}: ${st.title}`); b.addEventListener('click', () => go(i)); $('#dots').appendChild(b); });
+  PAPERS.forEach(([c, name], i) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'swatch'; b.style.background = c; b.setAttribute('aria-label', `${name} paper`); b.setAttribute('aria-pressed', String(i === 0)); b.addEventListener('click', () => { paper = c; $$('.swatch').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); render(step, 0); }); $('#papers').appendChild(b); });
+  $('#parts').addEventListener('click', (e) => { showParts = !showParts; e.currentTarget.setAttribute('aria-pressed', String(showParts)); render(step, 0); });
+
+  // turn the model by dragging
+  let drag = null;
+  cv.addEventListener('pointerdown', (e) => { try { cv.setPointerCapture(e.pointerId); } catch (err) { /* optional */ } drag = [e.clientX, e.clientY, dragYaw, dragPitch]; cv.classList.add('dragging'); });
+  cv.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    dragYaw = drag[2] + (e.clientX - drag[0]) * 0.5; dragPitch = clamp(drag[3] + (e.clientY - drag[1]) * 0.4, -80, 80);
+    if (!anim) { settle = true; render(step, 0); settle = false; }
+  });
+  ['pointerup', 'pointercancel'].forEach((t) => cv.addEventListener(t, () => { drag = null; cv.classList.remove('dragging'); }));
+
+  // open on the finished crane, so the first thing a visitor sees is where the folding leads
+  go(STEPS.length - 1);
+})();
+</script>
+</body>
+</html>
